@@ -163,10 +163,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
 <tr class="separator:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c06def3c8b760a74550263bc6c67869" id="r_a4c06def3c8b760a74550263bc6c67869"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c06def3c8b760a74550263bc6c67869">ansiChar</a> (int ch)</td></tr>
-<tr class="memdesc:a4c06def3c8b760a74550263bc6c67869"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to ansi sequence.  <br /></td></tr>
+<tr class="memdesc:a4c06def3c8b760a74550263bc6c67869"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to ansi sequence. Lookup table for fast O(1) character to ANSI code conversion.  <br /></td></tr>
 <tr class="separator:a4c06def3c8b760a74550263bc6c67869"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe7087a291a76df22cdf0931e04d4e7f" id="r_abe7087a291a76df22cdf0931e04d4e7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe7087a291a76df22cdf0931e04d4e7f">ansiNum</a> (int ch)</td></tr>
-<tr class="memdesc:abe7087a291a76df22cdf0931e04d4e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to numeric values.  <br /></td></tr>
+<tr class="memdesc:abe7087a291a76df22cdf0931e04d4e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to numeric values. Lookup table for fast O(1) character to ANSI numeric code conversion.  <br /></td></tr>
 <tr class="separator:abe7087a291a76df22cdf0931e04d4e7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c81ef265757da76d491c19e4d34fe9e" id="r_a8c81ef265757da76d491c19e4d34fe9e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c81ef265757da76d491c19e4d34fe9e">ansiLetter</a> (int num)</td></tr>
 <tr class="memdesc:a8c81ef265757da76d491c19e4d34fe9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi numeric values to character code (x?).  <br /></td></tr>
@@ -487,7 +487,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Convert ansi character code (x?) to ansi sequence. </p>
+<p>Convert ansi character code (x?) to ansi sequence. Lookup table for fast O(1) character to ANSI code conversion. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ch</td><td>Character to convert </td></tr>
@@ -539,7 +539,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Convert ansi character code (x?) to numeric values. </p>
+<p>Convert ansi character code (x?) to numeric values. Lookup table for fast O(1) character to ANSI numeric code conversion. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ch</td><td>ANSI character </td></tr>
