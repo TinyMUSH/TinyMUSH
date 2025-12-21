@@ -57,114 +57,76 @@ int safe_gettimeofday(struct timeval *tv, void *tz __attribute__((unused)))
 
 /**
  * @brief Convert ansi character code (%x?) to ansi sequence.
+ * Lookup table for fast O(1) character to ANSI code conversion.
  *
  * @param ch Character to convert
  * @return char* Ansi sequence
  */
 char *ansiChar(int ch)
 {
-	switch (ch)
-	{
-	case 'B':
-		return ANSI_BBLUE;
-	case 'C':
-		return ANSI_BCYAN;
-	case 'G':
-		return ANSI_BGREEN;
-	case 'M':
-		return ANSI_BMAGENTA;
-	case 'R':
-		return ANSI_BRED;
-	case 'W':
-		return ANSI_BWHITE;
-	case 'X':
-		return ANSI_BBLACK;
-	case 'Y':
-		return ANSI_BYELLOW;
-	case 'b':
-		return ANSI_BLUE;
-	case 'c':
-		return ANSI_CYAN;
-	case 'f':
-		return ANSI_BLINK;
-	case 'g':
-		return ANSI_GREEN;
-	case 'h':
-		return ANSI_HILITE;
-	case 'i':
-		return ANSI_INVERSE;
-	case 'm':
-		return ANSI_MAGENTA;
-	case 'n':
-		return ANSI_NORMAL;
-	case 'r':
-		return ANSI_RED;
-	case 'u':
-		return ANSI_UNDER;
-	case 'w':
-		return ANSI_WHITE;
-	case 'x':
-		return ANSI_BLACK;
-	case 'y':
-		return ANSI_YELLOW;
-	}
-	return STRING_EMPTY;
+	static const char *ansi_table[256] = {
+		['B'] = ANSI_BBLUE,
+		['C'] = ANSI_BCYAN,
+		['G'] = ANSI_BGREEN,
+		['M'] = ANSI_BMAGENTA,
+		['R'] = ANSI_BRED,
+		['W'] = ANSI_BWHITE,
+		['X'] = ANSI_BBLACK,
+		['Y'] = ANSI_BYELLOW,
+		['b'] = ANSI_BLUE,
+		['c'] = ANSI_CYAN,
+		['f'] = ANSI_BLINK,
+		['g'] = ANSI_GREEN,
+		['h'] = ANSI_HILITE,
+		['i'] = ANSI_INVERSE,
+		['m'] = ANSI_MAGENTA,
+		['n'] = ANSI_NORMAL,
+		['r'] = ANSI_RED,
+		['u'] = ANSI_UNDER,
+		['w'] = ANSI_WHITE,
+		['x'] = ANSI_BLACK,
+		['y'] = ANSI_YELLOW,
+	};
+	
+	unsigned char uch = (unsigned char)ch;
+	return ansi_table[uch] ? ansi_table[uch] : STRING_EMPTY;
 }
 
 /**
  * @brief Convert ansi character code (%x?) to numeric values.
+ * Lookup table for fast O(1) character to ANSI numeric code conversion.
  *
  * @param ch ANSI character
  * @return int ANSI numeric values
  */
 int ansiNum(int ch)
 {
-	switch (ch)
-	{
-	case 'B':
-		return I_ANSI_BBLUE;
-	case 'C':
-		return I_ANSI_BCYAN;
-	case 'G':
-		return I_ANSI_BGREEN;
-	case 'M':
-		return I_ANSI_BMAGENTA;
-	case 'R':
-		return I_ANSI_BRED;
-	case 'W':
-		return I_ANSI_BWHITE;
-	case 'X':
-		return I_ANSI_BBLACK;
-	case 'Y':
-		return I_ANSI_BYELLOW;
-	case 'b':
-		return I_ANSI_BLUE;
-	case 'c':
-		return I_ANSI_CYAN;
-	case 'f':
-		return I_ANSI_BLINK;
-	case 'g':
-		return I_ANSI_GREEN;
-	case 'h':
-		return I_ANSI_HILITE;
-	case 'i':
-		return I_ANSI_INVERSE;
-	case 'm':
-		return I_ANSI_MAGENTA;
-	case 'n':
-		return I_ANSI_NORMAL;
-	case 'r':
-		return I_ANSI_RED;
-	case 'u':
-		return I_ANSI_UNDER;
-	case 'w':
-		return I_ANSI_WHITE;
-	case 'x':
-		return I_ANSI_BLACK;
-	case 'y':
-		return I_ANSI_YELLOW;
-	}
-	return 0;
+	static const int ansi_num_table[256] = {
+		['B'] = I_ANSI_BBLUE,
+		['C'] = I_ANSI_BCYAN,
+		['G'] = I_ANSI_BGREEN,
+		['M'] = I_ANSI_BMAGENTA,
+		['R'] = I_ANSI_BRED,
+		['W'] = I_ANSI_BWHITE,
+		['X'] = I_ANSI_BBLACK,
+		['Y'] = I_ANSI_BYELLOW,
+		['b'] = I_ANSI_BLUE,
+		['c'] = I_ANSI_CYAN,
+		['f'] = I_ANSI_BLINK,
+		['g'] = I_ANSI_GREEN,
+		['h'] = I_ANSI_HILITE,
+		['i'] = I_ANSI_INVERSE,
+		['m'] = I_ANSI_MAGENTA,
+		['n'] = I_ANSI_NORMAL,
+		['r'] = I_ANSI_RED,
+		['u'] = I_ANSI_UNDER,
+		['w'] = I_ANSI_WHITE,
+		['x'] = I_ANSI_BLACK,
+		['y'] = I_ANSI_YELLOW,
+	};
+	
+	unsigned char uch = (unsigned char)ch;
+	return ansi_num_table[uch];
 }
 
 /**
@@ -421,6 +383,20 @@ static inline void append_str(char **p_ptr, const char *end, const char *str)
 }
 
 /**
+ * @brief Append escape sequence with format to buffer
+ * @param p_ptr Pointer to current position pointer
+ * @param end End of buffer
+ * @param fmt Format string (simple: just digits and separators)
+ */
+static inline void append_escape_seq(char **p_ptr, const char *end, const char *fmt)
+{
+	append_ch(p_ptr, end, '\e');
+	append_ch(p_ptr, end, '[');
+	append_str(p_ptr, end, fmt);
+	append_ch(p_ptr, end, 'm');
+}
+
+/**
  * @brief Go to a string and convert ansi to the lowest supported level.
  *
  * @param s String to convert
@@ -435,126 +411,113 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 	p = buf = XMALLOC(LBUF_SIZE, "buf");
 	end = buf + LBUF_SIZE - 1;
 
-	if (s && *s)
+	if (!s || !*s)
+		return buf;
+
+	while (*s)
 	{
-		while (*s)
+		if (*s == '\e')
 		{
-			if (*s == '\e')
+			// Got an escape code
+			if (truecolors)
 			{
-				// Got an escape code
-				if (truecolors)
-				{
-					// Player support everything, just shove it and continue
-					append_ch(&p, end, *s++);
-				}
-				else
-				{
-					// Player doesn't support true colors, find what is the color.
-					VT100ATTR attr = decodeVT100(&s);
-					if (xterm)
-					{
-						char *t = NULL;
-						// Player support xterm colors, convert to xterm
-						append_ch(&p, end, '\e');
-						append_ch(&p, end, '[');
-
-						if (attr.foreground.type)
-						{
-							t = XASPRINTF("level_ansi.t", "38;5;%d", RGB2X11(attr.foreground.rgb));
-							append_str(&p, end, t);
-							XFREE(t);
-
-							if (attr.background.type)
-							{
-								append_ch(&p, end, ';');
-							}
-						}
-
-						if (attr.background.type)
-						{
-							t = XASPRINTF("level_ansi.t", "48;5;%d", RGB2X11(attr.background.rgb));
-							append_str(&p, end, t);
-							XFREE(t);
-
-							if (attr.reset)
-							{
-								append_ch(&p, end, ';');
-							}
-						}
-
-						if (attr.reset)
-						{
-							append_ch(&p, end, '0');
-						}
-						append_ch(&p, end, 'm');
-					}
-					else if (ansi)
-					{
-						// Player support ansi colors, convert to ansi
-						char *t = NULL;
-						// Player support xterm colors, convert to xterm
-						append_ch(&p, end, '\e');
-						append_ch(&p, end, '[');
-
-						if (attr.foreground.type)
-						{
-							uint8_t f = RGB2Ansi(attr.foreground.rgb);
-							if (f < 8)
-							{
-								f += 30;
-							}
-							else
-							{
-								f += 82;
-							}
-							t = XASPRINTF("level_ansi.t", "%d", f);
-							append_str(&p, end, t);
-							XFREE(t);
-
-							if (attr.background.type)
-							{
-								append_ch(&p, end, ';');
-							}
-						}
-
-						if (attr.background.type)
-						{
-							uint8_t b = RGB2Ansi(attr.background.rgb);
-							if (b < 8)
-							{
-								b += 40;
-							}
-							else
-							{
-								b += 92;
-							}
-							t = XASPRINTF("level_ansi.t", "%d", b);
-							append_str(&p, end, t);
-							XFREE(t);
-
-							if (attr.reset)
-							{
-								append_ch(&p, end, ';');
-							}
-						}
-
-						if (attr.reset)
-						{
-							append_ch(&p, end, '0');
-						}
-
-						append_ch(&p, end, 'm');
-					}
-				}
+				// Player support everything, just shove it and continue
+				append_ch(&p, end, *s++);
 			}
 			else
 			{
-				append_ch(&p, end, *s++);
+				// Player doesn't support true colors, find what is the color.
+				VT100ATTR attr = decodeVT100(&s);
+				
+				if (xterm)
+				{
+					// Player support xterm colors, convert to xterm
+					bool has_fg = attr.foreground.type;
+					bool has_bg = attr.background.type;
+					
+					if (has_fg || has_bg || attr.reset)
+					{
+						append_ch(&p, end, '\e');
+						append_ch(&p, end, '[');
+						
+						if (has_fg)
+						{
+							int xterm_fg = RGB2X11(attr.foreground.rgb);
+							SAFE_LTOS(buf, &p, 38, LBUF_SIZE);
+							append_ch(&p, end, ';');
+							append_ch(&p, end, '5');
+							append_ch(&p, end, ';');
+							SAFE_LTOS(buf, &p, xterm_fg, LBUF_SIZE);
+							
+							if (has_bg || attr.reset)
+								append_ch(&p, end, ';');
+						}
+						
+						if (has_bg)
+						{
+							int xterm_bg = RGB2X11(attr.background.rgb);
+							SAFE_LTOS(buf, &p, 48, LBUF_SIZE);
+							append_ch(&p, end, ';');
+							append_ch(&p, end, '5');
+							append_ch(&p, end, ';');
+							SAFE_LTOS(buf, &p, xterm_bg, LBUF_SIZE);
+							
+							if (attr.reset)
+								append_ch(&p, end, ';');
+						}
+						
+						if (attr.reset)
+							append_ch(&p, end, '0');
+							
+						append_ch(&p, end, 'm');
+					}
+				}
+				else if (ansi)
+				{
+					// Player support ansi colors, convert to ansi
+					bool has_fg = attr.foreground.type;
+					bool has_bg = attr.background.type;
+					
+					if (has_fg || has_bg || attr.reset)
+					{
+						append_ch(&p, end, '\e');
+						append_ch(&p, end, '[');
+						
+						if (has_fg)
+						{
+							uint8_t f = RGB2Ansi(attr.foreground.rgb);
+							f += (f < 8) ? 30 : 82;
+							SAFE_LTOS(buf, &p, f, LBUF_SIZE);
+							
+							if (has_bg || attr.reset)
+								append_ch(&p, end, ';');
+						}
+						
+						if (has_bg)
+						{
+							uint8_t b = RGB2Ansi(attr.background.rgb);
+							b += (b < 8) ? 40 : 92;
+							SAFE_LTOS(buf, &p, b, LBUF_SIZE);
+							
+							if (attr.reset)
+								append_ch(&p, end, ';');
+						}
+						
+						if (attr.reset)
+							append_ch(&p, end, '0');
+							
+						append_ch(&p, end, 'm');
+					}
+				}
 			}
 		}
-		*p = '\0';
+		else
+		{
+			append_ch(&p, end, *s++);
+		}
 	}
-
+	
+	*p = '\0';
 	return buf;
 }
 
