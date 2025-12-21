@@ -21,7 +21,7 @@ var searchData=
   ['ansibits_18',['ansiBits',['../stringutil_8c.html#aeea32225c2e762704649e5f6552e0196',1,'stringutil.c']]],
   ['ansibitsmask_19',['ansiBitsMask',['../stringutil_8c.html#ab0240b86a4a419021f3ed8f2b8044854',1,'stringutil.c']]],
   ['ansichar_20',['ansiChar',['../stringutil_8c.html#ad9fb46aebd6c81cf6a0534df0cce4b20',1,'stringutil.c']]],
-  ['ansiletter_21',['ansiLetter',['../stringutil_8c.html#a8c81ef265757da76d491c19e4d34fe9e',1,'stringutil.c']]],
+  ['ansiletter_21',['ansiLetter',['../stringutil_8c.html#a0470cba3f6816805c6318269dbc65086',1,'stringutil.c']]],
   ['ansinum_22',['ansiNum',['../stringutil_8c.html#abf63b066e2c927e4127377bc44fc7722',1,'stringutil.c']]],
   ['anum_5fextend_23',['anum_extend',['../db_8c.html#a591106532fac7d3b5674038604f0829e',1,'db.c']]],
   ['arec_5fcomp_24',['arec_comp',['../funlist_8c.html#afbfe4d9fdd460a6b0f8cda1237132842',1,'funlist.c']]],

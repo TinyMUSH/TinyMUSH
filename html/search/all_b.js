@@ -384,7 +384,7 @@ var searchData=
   ['ansibits_381',['ansiBits',['../stringutil_8c.html#aeea32225c2e762704649e5f6552e0196',1,'stringutil.c']]],
   ['ansibitsmask_382',['ansiBitsMask',['../stringutil_8c.html#ab0240b86a4a419021f3ed8f2b8044854',1,'stringutil.c']]],
   ['ansichar_383',['ansiChar',['../stringutil_8c.html#ad9fb46aebd6c81cf6a0534df0cce4b20',1,'stringutil.c']]],
-  ['ansiletter_384',['ansiLetter',['../stringutil_8c.html#a8c81ef265757da76d491c19e4d34fe9e',1,'stringutil.c']]],
+  ['ansiletter_384',['ansiLetter',['../stringutil_8c.html#a0470cba3f6816805c6318269dbc65086',1,'stringutil.c']]],
   ['ansinum_385',['ansiNum',['../stringutil_8c.html#abf63b066e2c927e4127377bc44fc7722',1,'stringutil.c']]],
   ['anum_5falc_5ftop_386',['anum_alc_top',['../db_8c.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c'],['../externs_8h.html#a1323df38074b528092a5ea1f2658ff2a',1,'anum_alc_top:&#160;db.c']]],
   ['anum_5fextend_387',['anum_extend',['../db_8c.html#a591106532fac7d3b5674038604f0829e',1,'db.c']]],
