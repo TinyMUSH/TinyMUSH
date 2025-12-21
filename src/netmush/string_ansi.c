@@ -249,7 +249,7 @@ static inline void append_str(char **p_ptr, const char *end, const char *str)
  */
 static inline void append_escape_seq(char **p_ptr, const char *end, const char *fmt)
 {
-	append_ch(p_ptr, end, '\e');
+	append_ch(p_ptr, end, ESC_CHAR);
 	append_ch(p_ptr, end, '[');
 	append_str(p_ptr, end, fmt);
 	append_ch(p_ptr, end, 'm');
@@ -372,7 +372,7 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 
 	while (*s)
 	{
-		if (*s == '\e')
+		if (*s == ESC_CHAR)
 		{
 			// Got an escape code
 			if (truecolors)
@@ -399,7 +399,7 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 					
 					if (has_fg || has_bg || attr.reset)
 					{
-						append_ch(&p, end, '\e');
+						append_ch(&p, end, ESC_CHAR);
 						append_ch(&p, end, '[');
 						
 						if (has_fg)
@@ -442,7 +442,7 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 					
 					if (has_fg || has_bg || attr.reset)
 					{
-						append_ch(&p, end, '\e');
+						append_ch(&p, end, ESC_CHAR);
 						append_ch(&p, end, '[');
 						
 						if (has_fg)
