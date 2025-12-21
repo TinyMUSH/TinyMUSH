@@ -832,6 +832,7 @@ extern int backup_copy(char *src, char *dst, int flag);
 extern char *mktimestamp(void);
 extern void do_backup_mush(dbref player, dbref cause, int key);
 extern int backup_mush(dbref player, dbref cause, int key);
+extern void fork_and_backup(void);
 extern int copy_file(char *src, char *dst, int flag);
 extern pid_t write_pidfile(char *fn);
 extern FILE *fmkstemp(char *template);

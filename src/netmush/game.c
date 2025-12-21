@@ -1583,6 +1583,32 @@ void do_backup_mush(dbref player, dbref cause, int key)
 	backup_mush(player, cause, key);
 }
 
+void fork_and_backup(void)
+{
+	pid_t child;
+	
+	raw_broadcast(0, "GAME: Backup in progress. Game may freeze for a few minutes.");
+	
+	child = fork();
+	
+	if (child < 0)
+	{
+		log_perror("BCK", "FORK", NULL, "fork()");
+		return;
+	}
+	else if (child > 0)
+	{
+		/* Parent: backup_mush will be called in child process, don't wait */
+		return;
+	}
+	else
+	{
+		/* Child: do the backup and exit */
+		backup_mush(NOTHING, NOTHING, 0);
+		_exit(EXIT_SUCCESS);
+	}
+}
+
 int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
 {
 	int i, txt_n = 0, cnf_n = 0, dbf_n = 0;

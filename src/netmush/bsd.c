@@ -325,7 +325,7 @@ void shovechars(int port)
 		if (mushstate.backup_flag && !mushstate.dumping)
 		{
 			mushstate.backup_flag = 0;
-			backup_mush(NOTHING, NOTHING, 0);
+			fork_and_backup();
 		}
 		/**
 		 * test for events
