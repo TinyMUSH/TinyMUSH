@@ -53,7 +53,7 @@ var searchData=
   ['nomatch_5fmessage_50',['NOMATCH_MESSAGE',['../constants_8h.html#a928acac9a278053a1d596fbd00f94117',1,'constants.h']]],
   ['non_20project_20topics_51',['Non-Project Topics',['../md_CODE__OF__CONDUCT.html#autotoc_md13',1,'']]],
   ['noperm_52',['NOPERM',['../constants_8h.html#a9dd732461e256bece9a4f74941e6ad96',1,'constants.h']]],
-  ['normal_5fto_5fwhite_53',['normal_to_white',['../string__util_8c.html#ac311df3ec3fa40aed5400d732b4dd184',1,'string_util.c']]],
+  ['normal_5fto_5fwhite_53',['normal_to_white',['../string__ansi_8c.html#ac311df3ec3fa40aed5400d732b4dd184',1,'string_ansi.c']]],
   ['nospoof_54',['NOSPOOF',['../constants_8h.html#aa9d2f88704a09196c50b77aee171de3f',1,'constants.h']]],
   ['not_5ftoken_55',['NOT_TOKEN',['../constants_8h.html#a2465341f59a28d9a99e043f7ded26482',1,'constants.h']]],
   ['notes_56',['Test Coverage Notes',['../md_KNOWN__BUGS.html#autotoc_md420',1,'']]],

@@ -311,7 +311,7 @@ var searchData=
   ['converting_20from_20tinymush_202_202_308',['Converting from TinyMUSH 2.2',['../md_docs_2Historical_2CONVERTING.html#autotoc_md337',1,'']]],
   ['converting_20from_20tinymux_201_200_309',['Converting from TinyMUX 1.0',['../md_docs_2Historical_2CONVERTING.html#autotoc_md333',1,'']]],
   ['copy_5fdelim_310',['COPY_DELIM',['../funlist_8c.html#a241181c6ee2c6518c9edf900419696ce',1,'funlist.c']]],
-  ['copy_5fesccode_311',['copy_esccode',['../string__util_8c.html#ae7386d146453d3709627334d65ffe158',1,'string_util.c']]],
+  ['copy_5fesccode_311',['copy_esccode',['../string__ansi_8c.html#ae7386d146453d3709627334d65ffe158',1,'string_ansi.c']]],
   ['copying_312',['COPYING',['../md_COPYING.html',1,'']]],
   ['copyright_3a_20the_20artistic_20license_313',['TinyMUSH Copyright: The &quot;Artistic License&quot;',['../md_COPYING.html#autotoc_md53',1,'']]],
   ['core_20capabilities_314',['Core Capabilities',['../md_README.html#autotoc_md427',1,'']]],

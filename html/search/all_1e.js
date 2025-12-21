@@ -210,7 +210,7 @@ var searchData=
   ['trace_5flimit_207',['trace_limit',['../structconfdata.html#a891c54dc2d62f114ca78c346b8d948e8',1,'confdata']]],
   ['trace_5ftopdown_208',['trace_topdown',['../structconfdata.html#a635370d57700845ce5cf4fe290297d40',1,'confdata']]],
   ['tracemem_5fheader_209',['tracemem_header',['../structtracemem__header.html',1,'']]],
-  ['track_5fansi_5fletters_210',['track_ansi_letters',['../string__util_8c.html#a291922bbc383badf03b65e647c407215',1,'string_util.c']]],
+  ['track_5fansi_5fletters_210',['track_ansi_letters',['../string__ansi_8c.html#a291922bbc383badf03b65e647c407215',1,'string_ansi.c']]],
   ['tracking_20structure_20memtrack_211',['Memory Tracking Structure (MEMTRACK)',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md67',1,'']]],
   ['transform_5fsay_212',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
   ['translate_5fstring_213',['translate_string',['../string__util_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_util.c']]],

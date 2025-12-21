@@ -18,7 +18,7 @@ var searchData=
   ['tobasex_15',['toBaseX',['../funmath_8c.html#a42e8f0cc3ed47a987ab43a39bc8b2efb',1,'funmath.c']]],
   ['token_5fchar_16',['token_char',['../eval_8c.html#af91fbf8efad581eb78e23c3a11e6458a',1,'eval.c']]],
   ['total_5frawmemory_17',['total_rawmemory',['../alloc_8c.html#a61a069393801244ea12e6842c8661650',1,'alloc.c']]],
-  ['track_5fansi_5fletters_18',['track_ansi_letters',['../string__util_8c.html#a291922bbc383badf03b65e647c407215',1,'string_util.c']]],
+  ['track_5fansi_5fletters_18',['track_ansi_letters',['../string__ansi_8c.html#a291922bbc383badf03b65e647c407215',1,'string_ansi.c']]],
   ['transform_5fsay_19',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
   ['translate_5fstring_20',['translate_string',['../string__util_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_util.c']]],
   ['trim_5fspace_5fsep_21',['trim_space_sep',['../fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f',1,'fnhelper.c']]],

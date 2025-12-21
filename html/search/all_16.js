@@ -17,7 +17,7 @@ var searchData=
   ['len_14',['len',['../structhelp__indx.html#ac9a5681d50c04ccb1182f20e096c0047',1,'help_indx::len'],['../structhelp__entry.html#a973c657719091247035b16de78fd7db6',1,'help_entry::len']]],
   ['let_20us_20know_15',['### If you have suggestions for more FAQs, please email us and let us know.',['../md_docs_2Historical_2FAQ.html#autotoc_md358',1,'']]],
   ['letter_5fto_5fflag_16',['letter_to_flag',['../flags_8c.html#a21f89f3a36e485d217314e08e69343d2',1,'flags.c']]],
-  ['level_5fansi_17',['level_ansi',['../string__util_8c.html#a717386e8da894eee3a7cd535b5926eb4',1,'string_util.c']]],
+  ['level_5fansi_17',['level_ansi',['../string__ansi_8c.html#a717386e8da894eee3a7cd535b5926eb4',1,'string_ansi.c']]],
   ['license_18',['License',['../md_CONTRIBUTING.html#autotoc_md51',1,'License'],['../md_README.html#autotoc_md448',1,'License'],['../md_COPYING.html#autotoc_md53',1,'TinyMUSH Copyright: The &quot;Artistic License&quot;']]],
   ['lifecycle_20mod_5fmymodule_5f_19',['Module Lifecycle (mod_mymodule_)',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md475',1,'']]],
   ['light_20',['LIGHT',['../constants_8h.html#abc98e3adbe205cd3ab83d97150d0a845',1,'constants.h']]],
