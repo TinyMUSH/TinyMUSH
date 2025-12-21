@@ -1581,6 +1581,19 @@
 #define ANSI_WHITE "\033[37m"
 
 /**
+ * Bright foreground colors (90-97)
+ *
+ */
+#define ANSI_BRIGHT_BLACK "\033[90m"
+#define ANSI_BRIGHT_RED "\033[91m"
+#define ANSI_BRIGHT_GREEN "\033[92m"
+#define ANSI_BRIGHT_YELLOW "\033[93m"
+#define ANSI_BRIGHT_BLUE "\033[94m"
+#define ANSI_BRIGHT_MAGENTA "\033[95m"
+#define ANSI_BRIGHT_CYAN "\033[96m"
+#define ANSI_BRIGHT_WHITE "\033[97m"
+
+/**
  * Background colors
  *
  */

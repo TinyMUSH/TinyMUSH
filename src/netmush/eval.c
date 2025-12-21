@@ -848,6 +848,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 	int at_space = 1, nfargs = 0, gender = -1, i = 0, j = 0, alldone = 0, aflags = 0, alen = 0, feval = 0;
 	int is_trace = Trace(player) && !(eval & EV_NOTRACE), is_top = 0, save_count = 0;
 	int ansi = 0, nchar = 0, navail = 0;
+	int hilite_mode = 0;  /*!< Track hilite/bright mode for color codes */
 	FUN *fp = NULL;
 	UFUN *ufp = NULL;
 	VARENT *xvar = NULL;
@@ -1282,19 +1283,39 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				}
 				else
 				{
-					XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
-					ansi = (**dstr == 'n') ? 0 : 1;
+				// Track hilite/bright mode
+				if (**dstr == 'h')
+				{
+					hilite_mode = 1;
 				}
+				else if (**dstr == 'n')
+				{
+					hilite_mode = 0;
+				}
+				
+				// Use bright variant of color codes when hilite_mode is active
+				if (hilite_mode && (**dstr != 'h' && **dstr != 'n' && **dstr != 'f' && **dstr != 'u' && **dstr != 'i'))
+				{
+					const char *bright_code = ansiChar_Bright((unsigned char)**dstr);
+					if (*bright_code)
+					{
+						XSAFELBSTR(bright_code, buff, bufc);
+					}
+					else
+					{
+						XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
+					}
+				}
+				else
+				{
+					XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
+				}
+				ansi = (**dstr == 'n') ? 0 : 1;
+			}
 
-				break;
+			break;
 
-			case '=':
-				/**
-				 * Equivalent of generic v() attr get
-				 *
-				 */
-				(*dstr)++;
-
+		case '=':
 				if (**dstr != '<')
 				{
 					(*dstr)--;

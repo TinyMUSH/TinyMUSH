@@ -1247,6 +1247,7 @@ extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *
 
 /* string_ansi.c */
 extern const char *ansiChar(int ch);
+extern const char *ansiChar_Bright(int ch);
 extern const int ansiNum(int ch);
 extern const char ansiLetter(int num);
 extern const char ansiMushCode(int num, bool bg);

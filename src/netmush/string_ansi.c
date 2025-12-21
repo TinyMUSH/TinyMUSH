@@ -60,6 +60,30 @@ const char *ansiChar(int ch)
 }
 
 /**
+ * @brief Convert ansi character code (%x? uppercase) to bright ansi sequence.
+ * Returns the bright/high intensity variant (90-97) for foreground colors.
+ *
+ * @param ch Character to convert (should match lowercase versions)
+ * @return char* Bright ansi sequence
+ */
+const char *ansiChar_Bright(int ch)
+{
+	static const char *bright_table[256] = {
+		['b'] = ANSI_BRIGHT_BLUE,
+		['c'] = ANSI_BRIGHT_CYAN,
+		['g'] = ANSI_BRIGHT_GREEN,
+		['m'] = ANSI_BRIGHT_MAGENTA,
+		['r'] = ANSI_BRIGHT_RED,
+		['w'] = ANSI_BRIGHT_WHITE,
+		['x'] = ANSI_BRIGHT_BLACK,
+		['y'] = ANSI_BRIGHT_YELLOW,
+	};
+	
+	unsigned char uch = (unsigned char)ch;
+	return bright_table[uch] ? bright_table[uch] : STRING_EMPTY;
+}
+
+/**
  * @brief Convert ansi character code (%x?) to numeric values.
  * Lookup table for fast O(1) character to ANSI numeric code conversion.
  *
