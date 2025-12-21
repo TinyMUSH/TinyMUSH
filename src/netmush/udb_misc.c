@@ -105,7 +105,10 @@ void fatal(const char *p, ...)
 		if (p == (const char *)-1)
 		{
 			static char errbuf[256];
-			strerror_r(errno, errbuf, sizeof(errbuf));
+			if (strerror_r(errno, errbuf, sizeof(errbuf)) != 0)
+			{
+				snprintf(errbuf, sizeof(errbuf), "Unknown error %d", errno);
+			}
 			p = errbuf;
 		}
 

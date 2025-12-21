@@ -1905,7 +1905,10 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 	{
 		int saved_errno = errno;
 		char errbuf[256];
-		strerror_r(saved_errno, errbuf, sizeof(errbuf));
+		if (strerror_r(saved_errno, errbuf, sizeof(errbuf)) != 0)
+		{
+			snprintf(errbuf, sizeof(errbuf), "Unknown error %d", saved_errno);
+		}
 		log_write(LOG_ALWAYS, "WIZ", "RSTRT", "execl report an error %s", errbuf);
 	}
 }

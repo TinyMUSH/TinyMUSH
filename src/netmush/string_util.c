@@ -31,7 +31,10 @@
 const char *safe_strerror(int errnum)
 {
 	static __thread char errbuf[256];
-	strerror_r(errnum, errbuf, sizeof(errbuf));
+	if (strerror_r(errnum, errbuf, sizeof(errbuf)) != 0)
+	{
+		snprintf(errbuf, sizeof(errbuf), "Unknown error %d", errnum);
+	}
 	return errbuf;
 }
 

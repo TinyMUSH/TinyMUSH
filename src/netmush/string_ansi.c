@@ -256,6 +256,103 @@ static inline void append_escape_seq(char **p_ptr, const char *end, const char *
 }
 
 /**
+ * @brief Write mushcode transition between ANSI states into a caller buffer.
+ */
+static size_t ansi_transition_mushcode_into(int ansi_before, int ansi_after, char *buffer, size_t cap)
+{
+	char *p = buffer;
+	char *end = (cap > 0) ? (buffer + cap - 1) : buffer;
+
+	if (!cap)
+		return 0;
+
+	*p = '\0';
+
+	if (ansi_before != ansi_after)
+	{
+		int ansi_bits_set = (~ansi_before) & ansi_after;
+		int ansi_bits_clr = ansi_before & (~ansi_after);
+
+		if ((ansi_bits_clr & 0xf00) || (ansi_bits_set & 0x088) || (ansi_bits_clr == 0x1000))
+		{
+			append_str(&p, end, "%xn");
+			ansi_bits_set = (~ansiBits(0)) & ansi_after;
+			ansi_bits_clr = ansiBits(0) & (~ansi_after);
+		}
+
+		if (ansi_bits_set & 0x100)
+			append_str(&p, end, "%xh");
+
+		if (ansi_bits_set & 0x200)
+			append_str(&p, end, "%xu");
+
+		if (ansi_bits_set & 0x400)
+			append_str(&p, end, "%xf");
+
+		if (ansi_bits_set & 0x800)
+			append_str(&p, end, "%xi");
+
+		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
+			append_ch(&p, end, ansiMushCode(ansi_after & 0x00f, false));
+
+		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
+			append_ch(&p, end, ansiMushCode((ansi_after & 0x0f0) >> 4, true));
+	}
+
+	*p = '\0';
+	return (size_t)(p - buffer);
+}
+
+/**
+ * @brief Remove escape sequences matching given prefixes (stopping at 'm')
+ */
+static char *strip_prefixed_codes(const char *s, const char *fg_prefix, const char *bg_prefix)
+{
+	char *buf, *p;
+	const char *s1 = s;
+	const size_t fg_len = strlen(fg_prefix);
+	const size_t bg_len = strlen(bg_prefix);
+	p = buf = XMALLOC(LBUF_SIZE, "buf");
+
+	while (s1 && *s1)
+	{
+		int matched = 0;
+
+		if (fg_len && strncmp(s1, fg_prefix, fg_len) == 0)
+		{
+			s1 += fg_len;
+			matched = 1;
+		}
+		else if (bg_len && strncmp(s1, bg_prefix, bg_len) == 0)
+		{
+			s1 += bg_len;
+			matched = 1;
+		}
+
+		if (matched)
+		{
+			while (*s1 && *s1 != ANSI_END)
+			{
+				s1++;
+			}
+
+			if (*s1 == ANSI_END)
+			{
+				s1++;
+			}
+
+			continue;
+		}
+
+		XSAFELBCHR(*s1, buf, &p);
+		++s1;
+	}
+
+	*p = '\0';
+	return buf;
+}
+
+/**
  * @brief Go to a string and convert ansi to the lowest supported level.
  *
  * @param s String to convert
@@ -381,17 +478,13 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 }
 
 /**
- * \fn char *strip_ansi ( const char *s )
- * \brief Return a new string with ansi escape codes removed
+ * @brief Remove ANSI escape codes from a string
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param s Pointer to the original string
- *
- * \return 0 Pointer to the new string with ansi code removed.
+ * @param s The input string (may be NULL)
+ * @return char* New string without ANSI codes (newly allocated)
  */
-
 char *strip_ansi(const char *s)
 {
 	char *buf, *p, *s1;
@@ -424,174 +517,37 @@ char *strip_ansi(const char *s)
 }
 
 /**
- * \fn char *strip_xterm ( char *s )
- * \brief Return a new string with xterm color code removed
+ * @brief Remove xterm color escape codes from a string
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param s Pointer to the original string
- *
- * \return Pointer to the new string with ansi code removed.
+ * @param s The input string
+ * @return char* New string without xterm color codes (newly allocated)
  */
-
 char *strip_xterm(char *s)
 {
-	char *buf, *p;
-	char *s1 = s;
-	int skip = 0;
-	p = buf = XMALLOC(LBUF_SIZE, "buf");
-
-	while (*s1)
-	{
-		if (strncmp(s1, ANSI_XTERM_FG, strlen(ANSI_XTERM_FG)) == 0)
-		{
-			skip = 1;
-
-			while (skip)
-			{
-				if ((*s1 == '\0') || (*s1 == ANSI_END))
-				{
-					skip = 0;
-
-					if (*s1 == ANSI_END)
-					{
-						s1++;
-					}
-				}
-				else
-				{
-					s1++;
-				}
-			}
-		}
-
-		if (strncmp(s1, ANSI_XTERM_BG, strlen(ANSI_XTERM_BG)) == 0)
-		{
-			skip = 1;
-
-			while (skip)
-			{
-				if ((*s1 == '\0') || (*s1 == ANSI_END))
-				{
-					skip = 0;
-
-					if (*s1 == ANSI_END)
-					{
-						s1++;
-					}
-				}
-				else
-				{
-					s1++;
-				}
-			}
-		}
-
-		if (*s1)
-		{
-			XSAFELBCHR(*s1, buf, &p);
-			++s1;
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	*p = '\0';
-	return (buf);
+	return strip_prefixed_codes(s, ANSI_XTERM_FG, ANSI_XTERM_BG);
 }
 
 /**
- * \fn char *strip_xterm ( char *s )
- * \brief Return a new string with xterm color code removed
+ * @brief Remove 24-bit color escape codes from a string
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param s Pointer to the original string
- *
- * \return Pointer to the new string with ansi code removed.
+ * @param s The input string
+ * @return char* New string without 24-bit color codes (newly allocated)
  */
-
 char *strip_24bit(char *s)
 {
-	char *buf, *p;
-	char *s1 = s;
-	int skip = 0;
-	p = buf = XMALLOC(LBUF_SIZE, "buf");
-
-	while (*s1)
-	{
-		if (strncmp(s1, ANSI_24BIT_FG, strlen(ANSI_24BIT_FG)) == 0)
-		{
-			skip = 1;
-
-			while (skip)
-			{
-				if ((*s1 == '\0') || (*s1 == ANSI_END))
-				{
-					skip = 0;
-
-					if (*s1 == ANSI_END)
-					{
-						s1++;
-					}
-				}
-				else
-				{
-					s1++;
-				}
-			}
-		}
-
-		if (strncmp(s1, ANSI_24BIT_BG, strlen(ANSI_24BIT_BG)) == 0)
-		{
-			skip = 1;
-
-			while (skip)
-			{
-				if ((*s1 == '\0') || (*s1 == ANSI_END))
-				{
-					skip = 0;
-
-					if (*s1 == ANSI_END)
-					{
-						s1++;
-					}
-				}
-				else
-				{
-					s1++;
-				}
-			}
-		}
-
-		if (*s1)
-		{
-			XSAFELBCHR(*s1, buf, &p);
-			++s1;
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	*p = '\0';
-	return (buf);
+	return strip_prefixed_codes(s, ANSI_24BIT_FG, ANSI_24BIT_BG);
 }
 
 /**
- * \fn int strip_ansi_len ( const char *s )
- * \brief Count non-escape-code characters.
+ * @brief Count visible characters (ignoring ANSI escape codes)
  *
- * \param s Pointer to the string.
- *
- * \return An integer representing the number of character in the string.
+ * @param s The input string
+ * @return int Number of non-escape characters
  */
-
 int strip_ansi_len(const char *s)
 {
 	int n = 0;
@@ -621,17 +577,13 @@ int strip_ansi_len(const char *s)
 }
 
 /**
- * \fn char *normal_to_white ( const char *raw )
- * \brief This function implements the NOBLEED flag.
+ * @brief Implement the NOBLEED flag by translating ANSI normal to white
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param raw Pointer to the string who need to be ansi terminated.
- *
- * \return A pointer to the string terminated.
+ * @param raw Input string to process
+ * @return char* String with ANSI normal mapped to white (newly allocated)
  */
-
 char *normal_to_white(const char *raw)
 {
 	char *buf, *q;
@@ -750,18 +702,14 @@ char *normal_to_white(const char *raw)
 }
 
 /**
- * \fn char *ansi_transition_esccode ( int ansi_before, int ansi_after )
- * \brief Handle the transition between two ansi sequence
+ * @brief Build ANSI escape sequence to transition between states
  *
- * It is the responsibility of the caller to free the returning buffer
- * with XFREE();
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param ansi_before Ansi state before transition.
- * \param ansi_after ansi state after transition.
- *
- * \return A pointer to an ansi sequence that will do the transition.
+ * @param ansi_before Current ANSI state (packed bits)
+ * @param ansi_after Target ANSI state (packed bits)
+ * @return char* Escape sequence performing the transition (newly allocated)
  */
-
 char *ansi_transition_esccode(int ansi_before, int ansi_after)
 {
 	int ansi_bits_set, ansi_bits_clr;
@@ -860,116 +808,31 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 }
 
 /**
- * \fn char *ansi_transition_mushcode ( int ansi_before, int ansi_after )
- * \brief Handle the transition between two ansi sequence of mushcode.
+ * @brief Build mushcode sequence to transition between ANSI states
  *
- * It is the responsibility of the caller to free the returning buffer
- * with XFREE();
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param ansi_before Ansi state before transition.
- * \param ansi_after ansi state after transition.
- *
- * \return A pointer to a mushcode sequence that will do the transition.
+ * @param ansi_before Current ANSI state (packed bits)
+ * @param ansi_after Target ANSI state (packed bits)
+ * @return char* Mushcode sequence performing the transition (newly allocated)
  */
-
 char *ansi_transition_mushcode(int ansi_before, int ansi_after)
 {
-	int ansi_bits_set, ansi_bits_clr;
-	char *p;
-	char *buffer;
-	buffer = XMALLOC(SBUF_SIZE, "buffer");
-	*buffer = '\0';
-
-	if (ansi_before != ansi_after)
-	{
-		p = buffer;
-		/*
-		 * If they turn off any highlight bits, or they change from some color
-		 * * to default color, we need to use ansi normal first.
-		 */
-		ansi_bits_set = (~ansi_before) & ansi_after;
-		ansi_bits_clr = ansi_before & (~ansi_after);
-
-		if ((ansi_bits_clr & 0xf00) || /* highlights off */
-			(ansi_bits_set & 0x088) || /* normal to color */
-			(ansi_bits_clr == 0x1000))
-		{ /* explicit normal */
-			XSTRCPY(p, "%xn");
-			p += 3;
-			ansi_bits_set = (~ansiBits(0)) & ansi_after;
-			ansi_bits_clr = ansiBits(0) & (~ansi_after);
-		}
-
-		/*
-		 * Next reproduce the highlight state
-		 */
-
-		if (ansi_bits_set & 0x100)
-		{
-			XSTRCPY(p, "%xh");
-			p += 3;
-		}
-
-		if (ansi_bits_set & 0x200)
-		{
-			XSTRCPY(p, "%xu");
-			p += 3;
-		}
-
-		if (ansi_bits_set & 0x400)
-		{
-			XSTRCPY(p, "%xf");
-			p += 3;
-		}
-
-		if (ansi_bits_set & 0x800)
-		{
-			XSTRCPY(p, "%xi");
-			p += 3;
-		}
-
-		/*
-		 * Foreground color
-		 */
-		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-		{
-			XSTRCPY(p, "%xx");
-			p += 3;
-			p[-1] = ansiMushCode(ansi_after & 0x00f, false);
-		}
-
-		/*
-		 * Background color
-		 */
-		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-		{
-			XSTRCPY(p, "%xX");
-			p += 3;
-			p[-1] = ansiMushCode((ansi_after & 0x0f0) >> 4, true);
-		}
-
-		/*
-		 * Terminate
-		 */
-		*p = '\0';
-	}
-
+	char *buffer = XMALLOC(SBUF_SIZE, "buffer");
+	size_t len = ansi_transition_mushcode_into(ansi_before, ansi_after, buffer, SBUF_SIZE);
+	buffer[len] = '\0';
 	return buffer;
 }
 
 /**
- * \fn char *ansi_transition_letters ( int ansi_before, int ansi_after )
- * \brief Handle the transition between two ansi sequence of mushcode.
+ * @brief Build mushcode letter sequence to transition between ANSI states
  *
- * It is the responsibility of the caller to free the returning buffer
- * with XFREE();
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param ansi_before Ansi state before transition.
- * \param ansi_after ansi state after transition.
- *
- * \return A pointer to the letters of mushcode that will do the transition.
+ * @param ansi_before Current ANSI state (packed bits)
+ * @param ansi_after Target ANSI state (packed bits)
+ * @return char* Mushcode letters performing the transition (newly allocated)
  */
-
 char *ansi_transition_letters(int ansi_before, int ansi_after)
 {
 	int ansi_bits_set, ansi_bits_clr;
@@ -1047,33 +910,26 @@ char *ansi_transition_letters(int ansi_before, int ansi_after)
 }
 
 /**
- * \fn int ansi_map_states ( const char *s, int **m, char **p )
- * \brief Identify ansi state of every character in a string
+ * @brief Map ANSI state for every character in a string
  *
- * It is the responsibility of the caller to free m with
- * XFREE(m, "ansi_map_states_ansi_map") and p with
- * XFREE(p, "ansi_map_states_stripped");
+ * Caller must free `*m` with XFREE(m, "ansi_map_states_ansi_map") and
+ * `*p` with XFREE(p, "ansi_map_states_stripped").
  *
- * \param s Pointer to the string to be mapped.
- * \param m Pointer to the ansi map to be build.
- * \param p Pointer to the mapped string.
- *
- * \return The number of items mapped.
+ * @param s Input string
+ * @param m Out: allocated array of ANSI states per character
+ * @param p Out: stripped string without ANSI codes
+ * @return int Number of characters mapped
  */
-
 int ansi_map_states(const char *s, int **m, char **p)
 {
 	int *ansi_map;
 	char *stripped;
-	char *s1, *s2;
+	const char *s1;
 	int n = 0, ansi_state = ANST_NORMAL;
-	const int map_cap = HBUF_SIZE - 1;
-	const int strip_cap = LBUF_SIZE - 1;
-	ansi_map = (int *)XCALLOC(HBUF_SIZE, sizeof(int), "ansi_map");
-	stripped = XMALLOC(LBUF_SIZE, "stripped");
-
 	if (!s)
 	{
+		ansi_map = (int *)XCALLOC(1, sizeof(int), "ansi_map");
+		stripped = XMALLOC(1, "stripped");
 		ansi_map[0] = ANST_NORMAL;
 		stripped[0] = '\0';
 		*m = ansi_map;
@@ -1081,9 +937,12 @@ int ansi_map_states(const char *s, int **m, char **p)
 		return 0;
 	}
 
-	s2 = s1 = XSTRDUP(s, "s1");
+	size_t len = strlen(s);
+	ansi_map = (int *)XCALLOC(len + 1, sizeof(int), "ansi_map");
+	stripped = XMALLOC(len + 1, "stripped");
 
-	while (*s1 && n < map_cap && n < strip_cap)
+	s1 = s;
+	while (*s1 && (size_t)n < len)
 	{
 		if (*s1 == ESC_CHAR)
 		{
@@ -1140,14 +999,13 @@ int ansi_map_states(const char *s, int **m, char **p)
 		}
 	}
 
-	/* If we stopped due to buffer limits, continue consuming escape codes only
-	 * to keep the input pointer consistent; ansi_state beyond this point is not
-	 * recorded to avoid overruns. */
 	while (*s1)
 	{
 		if (*s1 == ESC_CHAR)
 		{
-			skip_esccode(&s1);
+			char *mutable = (char *)s1;
+			skip_esccode(&mutable);
+			s1 = mutable;
 		}
 		else
 		{
@@ -1159,17 +1017,14 @@ int ansi_map_states(const char *s, int **m, char **p)
 	stripped[n] = '\0';
 	*m = ansi_map;
 	*p = stripped;
-	XFREE(s2);
 	return n;
 }
 
 /**
- * \fn void skip_esccode ( char **s )
- * \brief Skip to the end of a ansi sequence
+ * @brief Advance pointer past a single ANSI escape sequence
  *
- * \param s Pointer containing the ansi sequence.
+ * @param s Pointer to the string pointer to advance
  */
-
 void skip_esccode(char **s)
 {
 	++(*s);
@@ -1194,13 +1049,11 @@ void skip_esccode(char **s)
 }
 
 /**
- * \fn void copy_esccode ( char **s, char **t )
- * \brief Copy the ansi sequence into another pointer
+ * @brief Copy a single ANSI escape sequence to another buffer
  *
- * \param s Pointer containing the ansi sequence.
- * \param t Pointer who will receive the ansi sequence.
+ * @param s Pointer to source string pointer (advanced past sequence)
+ * @param t Pointer to destination pointer (advanced after copy)
  */
-
 void copy_esccode(char **s, char **t)
 {
 	**t = **s;
@@ -1233,14 +1086,12 @@ void copy_esccode(char **s, char **t)
 }
 
 /**
- * \fn void safe_copy_esccode ( char **s, char *buff, char **bufc )
- * \brief Copy the ansi sequence into another pointer, moving bufc to the end of the receiving buffer and watching for overflow.
+ * @brief Safely copy a single ANSI escape sequence into a bounded buffer
  *
- * \param s Pointer containing the ansi sequence.
- * \param buff Pointer to the receiving buffer.
- * \param bufc Pointer to where the data will be copied into the receiving buffer.
+ * @param s Pointer to source string pointer (advanced past sequence)
+ * @param buff Destination buffer
+ * @param bufc Pointer to current write position within destination buffer
  */
-
 void safe_copy_esccode(char **s, char *buff, char **bufc)
 {
 	XSAFELBCHR(**s, buff, bufc);
@@ -1269,13 +1120,11 @@ void safe_copy_esccode(char **s, char *buff, char **bufc)
 }
 
 /**
- * \fn void track_ansi_letters ( char *t, int *ansi_state )
- * \brief Convert mushcode to ansi state.
+ * @brief Update ANSI state from mushcode letters
  *
- * \param t Pointer containing the ansi sequence.
- * \param ansi_state The ansi state that need to be updated.
+ * @param t Mushcode letter sequence to parse
+ * @param ansi_state In/out ANSI state to update
  */
-
 void track_ansi_letters(char *t, int *ansi_state)
 {
 	char *s;
@@ -1315,18 +1164,14 @@ void track_ansi_letters(char *t, int *ansi_state)
 }
 
 /**
- * \fn char *remap_colors ( const char *s, int *cmap )
- * \brief Allow a change of the color sequences
+ * @brief Remap ANSI color indices according to a color map
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param s Pointer to the string to be remap.
- * \param m Pointer to the ansi color map to use.
- *
- * \return Pointer to the remapped string.
+ * @param s Input string to remap
+ * @param cmap Array of color remappings indexed from I_ANSI_BLACK
+ * @return char* Remapped string (newly allocated)
  */
-
 char *remap_colors(const char *s, int *cmap)
 {
 	char *buf;
@@ -1415,18 +1260,14 @@ char *remap_colors(const char *s, int *cmap)
 	return (buf);
 }
 /**
- * \fn char *translate_string ( char *str, int type )
- * \brief Convert raw ansi to mushcode or strip it.
+ * @brief Convert raw ANSI to mushcode or strip ANSI codes
  *
- * It is the responsibility of the caller to free the returned
- * buffer with XFREE().
+ * Caller is responsible for freeing the returned buffer with XFREE().
  *
- * \param str Pointer to the string to be translated
- * \param type 1 = Convert to mushcode, 0 strip ansi.
- *
- * \return Pointer to the translatted string.
+ * @param str String to translate (modified as it is consumed)
+ * @param type When 1 converts to mushcode, when 0 strips ANSI
+ * @return char* Translated string (newly allocated)
  */
-
 char *translate_string(char *str, int type)
 {
 	char *buff, *bp;
@@ -1491,9 +1332,10 @@ char *translate_string(char *str, int type)
 					} while (0);
 				}
 
-				char *transition = ansi_transition_mushcode(ansi_state_prev, ansi_state);
+				char transition[SBUF_SIZE];
+				size_t tlen = ansi_transition_mushcode_into(ansi_state_prev, ansi_state, transition, sizeof transition);
+				transition[tlen] = '\0';
 				XSAFELBSTR(transition, buff, &bp);
-				XFREE(transition);
 				ansi_state_prev = ansi_state;
 				continue;
 
@@ -1575,330 +1417,112 @@ char *translate_string(char *str, int type)
  */
 
 /**
- * \fn int rgb2xterm ( long rgb )
- * \brief Convert an RGB value to xterm value
+ * @brief Convert an RGB value to an xterm color index
  *
- * \param rgb Color to convert to xterm value
- *
- * \return The xterm value of the color.
+ * @param rgb RGB value (0xRRGGBB)
+ * @return int xterm color index, or nearest match
  */
-
 int rgb2xterm(long rgb)
 {
-	int xterm, r, g, b;
+	int r = (rgb >> 16) & 0xff;
+	int g = (rgb >> 8) & 0xff;
+	int b = rgb & 0xff;
 
-	/* First, handle standard colors */
-	if (rgb == 0x000000)
+	static const struct
 	{
-		return (0);
+		long rgb;
+		int idx;
+	} base16[] = {
+		{0x000000, 0}, {0x800000, 1}, {0x008000, 2}, {0x808000, 3},
+		{0x000080, 4}, {0x800080, 5}, {0x008080, 6}, {0xc0c0c0, 7},
+		{0x808080, 8}, {0xff0000, 9}, {0x00ff00, 10}, {0xffff00, 11},
+		{0x0000ff, 12}, {0xff00ff, 13}, {0x00ffff, 14}, {0xffffff, 15},
+	};
+
+	for (size_t i = 0; i < sizeof(base16) / sizeof(base16[0]); ++i)
+	{
+		if (rgb == base16[i].rgb)
+		{
+			return base16[i].idx;
+		}
 	}
 
-	if (rgb == 0x800000)
-	{
-		return (1);
-	}
-
-	if (rgb == 0x008000)
-	{
-		return (2);
-	}
-
-	if (rgb == 0x808000)
-	{
-		return (3);
-	}
-
-	if (rgb == 0x000080)
-	{
-		return (4);
-	}
-
-	if (rgb == 0x800080)
-	{
-		return (5);
-	}
-
-	if (rgb == 0x008080)
-	{
-		return (6);
-	}
-
-	if (rgb == 0xc0c0c0)
-	{
-		return (7);
-	}
-
-	if (rgb == 0x808080)
-	{
-		return (8);
-	}
-
-	if (rgb == 0xff0000)
-	{
-		return (9);
-	}
-
-	if (rgb == 0x00ff00)
-	{
-		return (10);
-	}
-
-	if (rgb == 0xffff00)
-	{
-		return (11);
-	}
-
-	if (rgb == 0x0000ff)
-	{
-		return (12);
-	}
-
-	if (rgb == 0xff00ff)
-	{
-		return (13);
-	}
-
-	if (rgb == 0x00ffff)
-	{
-		return (14);
-	}
-
-	if (rgb == 0xffffff)
-	{
-		return (15);
-	}
-
-	r = (rgb & 0xFF0000) >> 16;
-	g = (rgb & 0x00FF00) >> 8;
-	b = rgb & 0x0000FF;
-
-	/* Next, handle grayscales */
-
-	if ((r == g) && (r == b))
+	if (r == g && r == b)
 	{
 		if (rgb <= 0x080808)
 		{
-			return (232);
+			return 232;
 		}
 
-		if (rgb <= 0x121212)
-		{
-			return (233);
-		}
-
-		if (rgb <= 0x1c1c1c)
-		{
-			return (234);
-		}
-
-		if (rgb <= 0x262626)
-		{
-			return (235);
-		}
-
-		if (rgb <= 0x303030)
-		{
-			return (236);
-		}
-
-		if (rgb <= 0x3a3a3a)
-		{
-			return (237);
-		}
-
-		if (rgb <= 0x444444)
-		{
-			return (238);
-		}
-
-		if (rgb <= 0x4e4e4e)
-		{
-			return (239);
-		}
-
-		if (rgb <= 0x585858)
-		{
-			return (240);
-		}
-
-		if (rgb <= 0x606060)
-		{
-			return (241);
-		}
-
-		if (rgb <= 0x666666)
-		{
-			return (242);
-		}
-
-		if (rgb <= 0x767676)
-		{
-			return (243);
-		}
-
-		if (rgb <= 0x808080)
-		{
-			return (244);
-		}
-
-		if (rgb <= 0x8a8a8a)
-		{
-			return (245);
-		}
-
-		if (rgb <= 0x949494)
-		{
-			return (246);
-		}
-
-		if (rgb <= 0x9e9e9e)
-		{
-			return (247);
-		}
-
-		if (rgb <= 0xa8a8a8)
-		{
-			return (248);
-		}
-
-		if (rgb <= 0xb2b2b2)
-		{
-			return (249);
-		}
-
-		if (rgb <= 0xbcbcbc)
-		{
-			return (250);
-		}
-
-		if (rgb <= 0xc6c6c6)
-		{
-			return (251);
-		}
-
-		if (rgb <= 0xd0d0d0)
-		{
-			return (252);
-		}
-
-		if (rgb <= 0xdadada)
-		{
-			return (253);
-		}
-
-		if (rgb <= 0xe4e4e4)
-		{
-			return (254);
-		}
-
-		if (rgb <= 0xeeeeee)
-		{
-			return (255);
-		}
+		int gray = r;
+		int idx = 232 + (gray - 8 + 5) / 10; /* nearest match */
+		if (idx < 232)
+			idx = 232;
+		if (idx > 255)
+			idx = 255;
+		return idx;
 	}
 
-	/* It's an RGB, convert it */
-	xterm = (((r / 51) * 36) + ((g / 51) * 6) + (b / 51)) + 16;
+	int r_lvl = (r + 25) / 51;
+	int g_lvl = (g + 25) / 51;
+	int b_lvl = (b + 25) / 51;
 
-	/* Just in case... */
-
+	int xterm = 16 + (36 * r_lvl) + (6 * g_lvl) + b_lvl;
 	if (xterm < 16)
-	{
 		xterm = 16;
-	}
-
 	if (xterm > 231)
-	{
 		xterm = 231;
-	}
-
-	return (xterm);
+	return xterm;
 }
 
 /**
- * \fn int str2xterm ( char *str )
- * \brief Convert a value to xterm color
+ * @brief Parse a color string into an xterm color index
  *
- * \param str A string representing the color to be convert into xterm value.
- *            The value can be express as hex (#rrggbb), decimal (r g b). a 24
- *            bit integer value, or the actual xterm value.
+ * Accepts hex (#rrggbb), decimal triplets (r g b), 24-bit integer, or
+ * direct xterm index.
  *
- * \return The xterm value of the color.
+ * @param str Color string to parse
+ * @return int xterm color index, or -1 on error
  */
-
 int str2xterm(char *str)
 {
-	long rgb;
-	int r, g, b;
-	char *p, *t;
-	p = str;
+	char *p = str;
+	char *end = NULL;
 
 	if (*p == '#')
-	{ /* Ok, it's a RGB in hex */
+	{
 		p++;
-		rgb = strtol(p, &t, 16);
-
-		if (p == t)
-		{
-			return (-1);
-		}
-		else
-		{
-
-			return (rgb2xterm(rgb));
-		}
-	}
-	else
-	{ /* Then it must be decimal */
-		r = strtol(p, &t, 10);
-
-		if (p == t)
-		{
-			return (-1);
-		}
-		else if (*t == 0)
-		{
-			if (r < 256)
-			{
-				return (r); /* It's the color index */
-			}
-
-			return (rgb2xterm(r)); /* It's a RGB, fetch the index */
-		}
-		else
-		{
-			p = t;
-
-			while (!isdigit((unsigned char)*p) && (*p != 0))
-			{
-				p++;
-			}
-
-			g = strtol(p, &t, 10);
-
-			if ((p == t) || (*p == 0))
-			{
-				return (-1);
-			}
-
-			p = t;
-
-			while (!isdigit((unsigned char)*p) && (*p != 0))
-			{
-				p++;
-			}
-
-			b = strtol(p, &t, 10);
-
-			if ((p == t) || (*p == 0))
-			{
-				return (-1);
-			}
-
-			rgb = (r << 16) + (g << 8) + b;
-			return (rgb2xterm(rgb));
-		}
+		long rgb = strtol(p, &end, 16);
+		return (p == end) ? -1 : rgb2xterm(rgb);
 	}
 
-	return (-1); /* Something is terribly wrong... */
+	long first = strtol(p, &end, 10);
+	if (p == end)
+	{
+		return -1;
+	}
+
+	while (*end && !isdigit((unsigned char)*end))
+		end++;
+
+	if (*end == '\0')
+	{
+		if (first < 256)
+			return (int)first;
+		return rgb2xterm(first);
+	}
+
+	long second = strtol(end, &p, 10);
+	if (end == p)
+		return -1;
+	while (*p && !isdigit((unsigned char)*p))
+		p++;
+	if (*p == '\0')
+		return -1;
+	long third = strtol(p, &end, 10);
+	if (p == end)
+		return -1;
+
+	long rgb = ((first & 0xff) << 16) | ((second & 0xff) << 8) | (third & 0xff);
+	return rgb2xterm(rgb);
 }
