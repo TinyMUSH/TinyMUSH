@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __EXTERNS_H
-#define __EXTERNS_H
+#pragma once
 
 extern char *log_pos;
 
@@ -129,4 +128,3 @@ extern UDB_CHAIN *sys_c; /*!<  sys_c points to all cache lists */
 /**
  */
 
-#endif /* __EXTERNS_H */

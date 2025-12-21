@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __MACROS_H
-#define __MACROS_H
+#pragma once
 
 /**
  * @brief XMALLOC related macros
@@ -814,5 +813,3 @@
 #define DOM_COUNT (LAST_DOM - FIRST_DOM + 1)
 #define MONTH_COUNT (LAST_MONTH - FIRST_MONTH + 1)
 #define DOW_COUNT (LAST_DOW - FIRST_DOW + 1)
-
-#endif /* __MACROS_H */

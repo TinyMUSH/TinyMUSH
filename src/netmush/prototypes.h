@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __PROTOTYPES_H
-#define __PROTOTYPES_H
+#pragma once
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -1429,4 +1428,3 @@ extern void do_cut(dbref player, dbref cause, int key, char *thing);
 extern void do_motd(dbref player, dbref cause, int key, char *message);
 extern void do_global(dbref player, dbref cause, int key, char *flag);
 
-#endif /* __PROTOTYPES_H */

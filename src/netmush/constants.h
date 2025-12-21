@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __CONSTANTS_H
-#define __CONSTANTS_H
+#pragma once
 
 #include <float.h>
 
@@ -1760,5 +1759,3 @@
  */
 
 #define FPTS_DIG LDBL_DIG - 1
-
-#endif /* __CONSTANTS_H */

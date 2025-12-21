@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __TYPEDEFS_H
-#define __TYPEDEFS_H
+#pragma once
 
 #include <stdint.h>
 #include <stdio.h>
@@ -1431,4 +1430,3 @@ typedef struct
     bool reset;
 } VT100ATTR;
 
-#endif /* __TYPEDEFS_H */

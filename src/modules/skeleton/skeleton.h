@@ -4,8 +4,7 @@
  * @version 1.0
  */
 
-#ifndef __MOD_SKELETON_H
-#define __MOD_SKELETON_H
+#pragma once
 
 /* ============================================================================
  * MODULE CONFIGURATION STRUCTURE
@@ -54,4 +53,3 @@ bool mod_skeleton_delete_data(char *);
 void mod_skeleton_list_data(dbref);
 void mod_skeleton_reset_defaults(void);
 
-#endif /* __MOD_SKELETON_H */

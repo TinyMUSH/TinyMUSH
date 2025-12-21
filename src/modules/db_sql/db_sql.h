@@ -12,7 +12,7 @@
  * 
  */
 
-#ifndef __DB_SQL_H
+#pragma once
 #define __DB_SQL_H
 
 #ifdef HAVE_MSQL
@@ -103,5 +103,3 @@ typedef struct {
 } mod_db_sql_confstorage;
 
 extern mod_db_sql_confstorage mod_db_sql_config;
-
-#endif /* __DB_SQL_H */
