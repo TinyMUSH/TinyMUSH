@@ -377,8 +377,14 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 			// Got an escape code
 			if (truecolors)
 			{
-				// Player support everything, just shove it and continue
-				append_ch(&p, end, *s++);
+				// Player support everything, copy entire escape sequence
+				const char *s_start = s;
+				VT100ATTR attr = decodeVT100(&s);
+				// Copy the entire escape sequence from source to destination
+				while (s_start < s && *s_start)
+				{
+					append_ch(&p, end, *s_start++);
+				}
 			}
 			else
 			{
