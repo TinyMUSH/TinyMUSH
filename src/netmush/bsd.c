@@ -1064,69 +1064,44 @@ int process_input(DESC *d)
 	}
 
 	/**
-	 * Filter out CTRL+C (0x03) immediately to prevent client telnet issues
-	 * Some telnet clients send CTRL+C which can cause connection problems
+	 * Filter out CTRL+C (0x03) and other problematic control characters
+	 * at the network level before any processing
 	 */
 	{
-		char *src, *dst;
-		int filtered_got = 0;
-		int has_content = 0;
+		int i, j = 0;
 		
-		for (src = buf; src < buf + got; src++)
+		for (i = 0; i < got; i++)
 		{
-			if (*src != 0x03)  /* Skip CTRL+C */
-			{
-				buf[filtered_got++] = *src;
-				/* Check if this byte is actual content (not whitespace/control) */
-				if (*src != '\n' && *src != '\r' && !isspace(*src))
-				{
-					has_content = 1;
-				}
-			}
-		}
-		
-		/**
-		 * If filtering removed all content but left only whitespace/newlines,
-		 * and we haven't seen any real content, ignore this input entirely
-		 */
-		if (filtered_got > 0 && has_content)
-		{
-			got = in = filtered_got;
-		}
-		else if (filtered_got > 0)
-		{
+			unsigned char ch = (unsigned char)buf[i];
+			
 			/**
-			 * Only whitespace/newlines left - if there's a newline, process it
-			 * to clear any pending partial command
+			 * Allow only safe characters:
+			 * - Printable ASCII (0x20-0x7E)
+			 * - Essential whitespace: \n (0x0A), \r (0x0D), \t (0x09)
+			 * - ANSI ESC (0x1B) for color codes
+			 * - DEL (0x7F) for backspace
+			 * Reject: CTRL+C (0x03), CTRL+D, CTRL+Z, and all other control chars
 			 */
-			int has_newline = 0;
-			for (src = buf; src < buf + filtered_got; src++)
+			if ((ch >= 0x20 && ch <= 0x7E) ||  /* Printable ASCII */
+			    ch == 0x09 ||  /* TAB */
+			    ch == 0x0A ||  /* LF (newline) */
+			    ch == 0x0D ||  /* CR */
+			    ch == 0x1B ||  /* ESC for ANSI */
+			    ch == 0x07 ||  /* BEEP */
+			    ch == 0x7F)    /* DEL */
 			{
-				if (*src == '\n')
-				{
-					has_newline = 1;
-					break;
-				}
+				buf[j++] = buf[i];
 			}
-			if (has_newline)
-			{
-				got = in = filtered_got;
-			}
-			else
-			{
-				/* No content, no newline - skip this input */
-				mushstate.debug_cmd = cmdsave;
-				XFREE(buf);
-				return 1;
-			}
+			/* All other bytes (including CTRL+C 0x03) are silently dropped */
 		}
-		else
-		{
-			/* Everything was filtered out */
-			mushstate.debug_cmd = cmdsave;
-			XFREE(buf);
-			return 1;
-		}
+		got = in = j;
+	}
+
+	if (got <= 0)
+	{
+		mushstate.debug_cmd = cmdsave;
+		XFREE(buf);
+		return 1;  /* Not EOF, just filtered out all chars, continue */
 	}
 
 	if (!d->raw_input)
