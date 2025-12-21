@@ -67,12 +67,29 @@ fi
 # Lancer le serveur en arrière-plan
 if [ -f "netmush" ]; then
     ./netmush 2>&1 &
-    SERVER_PID=$!
-    echo -e "${GREEN}Serveur lancé (PID: $SERVER_PID)${NC}"
+    PARENT_PID=$!
     
-    # Attendre que le serveur se stabilise
-    sleep 3
+    # Le serveur fork et le parent quitte. Attendre que le fichier PID soit créé
+    # par le processus enfant qui devient le vrai serveur
+    echo -e "${YELLOW}Attente du démarrage du serveur...${NC}"
+    PID_FILE="db/mush.pid"
     
+    for i in {1..10}; do
+        if [ -f "$PID_FILE" ]; then
+            SERVER_PID=$(cat "$PID_FILE")
+            echo -e "${GREEN}Serveur lancé (PID: $SERVER_PID)${NC}"
+            break
+        fi
+        sleep 1
+    done
+    
+    if [ -z "$SERVER_PID" ]; then
+        echo -e "${RED}Erreur : Le PID du serveur n'a pas pu être déterminé${NC}"
+        exit 1
+    fi
+    
+    # Vérifier que le serveur est bien en cours d'exécution
+    sleep 2
     if kill -0 $SERVER_PID 2>/dev/null; then
         echo -e "${GREEN}=== Upgrade complété avec succès ===${NC}"
     else
