@@ -516,9 +516,12 @@ void queue_string(DESC *d, const char *format, ...)
 			}
 
 			queue_write(d, msg, strlen(msg));
+		
+		/* Always append ANSI_NORMAL to prevent color bleeding if player has color support */
+		if (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player))
+		{
+			queue_write(d, ANSI_NORMAL, 4);
 		}
-	}
-
 	XFREE(msg);
 }
 

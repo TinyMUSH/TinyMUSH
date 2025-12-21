@@ -1,0 +1,21 @@
+251221.122057 netmush INI/RNG  : RNG seeded from time: initstate=1766337657
+251221.122057 netmush INI/START: TinyMUSH version 4.0 alpha Revision 424 (552a1e81-dirty 2025-12-21 12:05:05 -0500)
+251221.122057 netmush INI/START: Build date: 2025-12-21 12:07:24
+251221.122057 netmush INI/LOAD : Full path and name of netmush : /home/eddy/source/TinyMUSH/game/netmush
+251221.122057 netmush INI/LOAD : Full path of work directory : /home/eddy/source/TinyMUSH
+251221.122057 netmush INI/LOAD : Configuration file : /home/eddy/source/TinyMUSH/game/configs/netmush.conf
+251221.122057 netmush INI/LOAD : Configuration home : /home/eddy/source/TinyMUSH/game/configs
+251221.122057 netmush CNF/INFO : Reading configuration file : /home/eddy/source/TinyMUSH/game/configs/netmush.conf
+251221.122057 netmush CNF/MOD  : Loaded module: mail
+251221.122057 netmush CNF/MOD  : Loaded module: comsys
+251221.122057 netmush HLP/LOAD : raw_helpfile: Loading helpfile news
+251221.122057 netmush HLP/INDX : raw_helpfile: Indexing news.txt
+251221.122057 netmush HLP/INDX : raw_helpfile: 2 topics indexed
+251221.122057 netmush HLP/LOAD : raw_helpfile: Successfully loaded helpfile news
+251221.122057 netmush HLP/LOAD : raw_helpfile: Loading helpfile mushman
+251221.122057 netmush HLP/INDX : raw_helpfile: Indexing mushman.txt
+251221.122057 netmush HLP/INDX : raw_helpfile: 395 topics indexed
+251221.122057 netmush HLP/LOAD : raw_helpfile: Successfully loaded helpfile mushman
+251221.122057 netmush HLP/LOAD : helpfile: Loading helpfile plushelp
+251221.122057 netmush HLP/INDX : helpfile: Indexing plushelp.txt
+251221.122057 
