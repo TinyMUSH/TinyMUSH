@@ -623,6 +623,8 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
 <p>Filter out CTRL+C (0x03) immediately to prevent client telnet issues Some telnet clients send CTRL+C which can cause connection problems</p>
+<p>If filtering removed all content but left only whitespace/newlines, and we haven't seen any real content, ignore this input entirely</p>
+<p>Only whitespace/newlines left - if there's a newline, process it to clear any pending partial command</p>
 
 </div>
 </div>
