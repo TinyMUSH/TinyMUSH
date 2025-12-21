@@ -1266,11 +1266,11 @@ extern void safe_copy_esccode(char **s, char *buff, char **bufc);
 extern void track_ansi_letters(char *t, int *ansi_state);
 extern char *remap_colors(const char *s, int *cmap);
 extern char *translate_string(char *str, int type);
+extern int rgb2xterm(long rgb);
 
 /* string_util.c */
 extern const char *safe_strerror(int errnum);
 extern int safe_gettimeofday(struct timeval *tv, void *tz);
-extern int rgb2xterm(long rgb);
 extern int str2xterm(char *str);
 extern char *upcasestr(char *s);
 extern char *munge_space(char *string);
