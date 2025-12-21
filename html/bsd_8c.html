@@ -622,8 +622,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
-<p>Filter out problematic control characters at the network level. If we receive CTRL+C (0x03), close the connection gracefully.</p>
-<p>If CTRL+C detected, close connection gracefully. Some telnet clients send CTRL+C which can cause desynchronization.</p>
+<p>Filter out problematic control characters at the network level, including CTRL+C (0x03). Previous approach of closing connection on CTRL+C caused telnet client to hang because some implementations expect proper protocol negotiation before disconnection. Instead, CTRL+C is now treated like other invalid control characters and silently filtered. This is more compatible with standard telnet.</p>
 <p>Filter out other dangerous control characters</p>
 <p>Allow safe characters:</p><ul>
 <li>Printable ASCII (0x20-0x7E)</li>
