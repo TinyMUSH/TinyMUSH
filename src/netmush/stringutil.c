@@ -208,7 +208,7 @@ int ansi_mask_bits[I_ANSI_LIM] = {
  * @param num ANSI number
  * @return int bitmask
  */
-int ansiBitsMask(int num)
+const int ansiBitsMask(int num)
 {
 	static const int mask_table[48] = {
 		[0] = 0x1fff,
@@ -237,49 +237,20 @@ int ansiBitsMask(int num)
  * @param num ANSI number
  * @return int ANSI bitvalue.
  */
-int ansiBits(int num)
+const int ansiBits(int num)
 {
-	switch (num)
-	{
-	case 0:
-		return 0x0099;
-	case 1:
-		return 0x0100;
-	case 4:
-		return 0x0200;
-	case 5:
-		return 0x0400;
-	case 7:
-		return 0x0800;
-	case 31:
-		return 0x0001;
-	case 32:
-		return 0x0002;
-	case 33:
-		return 0x0003;
-	case 34:
-		return 0x0004;
-	case 35:
-		return 0x0005;
-	case 36:
-		return 0x0006;
-	case 37:
-		return 0x0007;
-	case 41:
-		return 0x0010;
-	case 42:
-		return 0x0020;
-	case 43:
-		return 0x0030;
-	case 44:
-		return 0x0040;
-	case 45:
-		return 0x0050;
-	case 46:
-		return 0x0060;
-	case 47:
-		return 0x0070;
-	}
+	static const int bits_table[48] = {
+		[0] = 0x0099,
+		[1] = 0x0100,
+		[4] = 0x0200, [5] = 0x0400, [7] = 0x0800,
+		[31] = 0x0001, [32] = 0x0002, [33] = 0x0003, [34] = 0x0004,
+		[35] = 0x0005, [36] = 0x0006, [37] = 0x0007,
+		[41] = 0x0010, [42] = 0x0020, [43] = 0x0030, [44] = 0x0040,
+		[45] = 0x0050, [46] = 0x0060, [47] = 0x0070,
+	};
+	
+	if (num >= 0 && num < 48)
+		return bits_table[num];
 	return 0;
 }
 
