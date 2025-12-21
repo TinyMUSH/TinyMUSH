@@ -40,10 +40,9 @@ const char *safe_strerror(int errnum)
  * Returns struct timeval for compatibility with existing code
  *
  * @param tv Pointer to timeval structure to fill
- * @param tz Unused (for gettimeofday compatibility)
  * @return int 0 on success, -1 on error
  */
-int safe_gettimeofday(struct timeval *tv, void *tz __attribute__((unused)))
+int safe_gettimeofday(struct timeval *tv)
 {
 	struct timespec ts;
 	if (clock_gettime(CLOCK_MONOTONIC, &ts) == -1)
@@ -53,94 +52,6 @@ int safe_gettimeofday(struct timeval *tv, void *tz __attribute__((unused)))
 	tv->tv_sec = ts.tv_sec;
 	tv->tv_usec = ts.tv_nsec / 1000;
 	return 0;
-}
-
-/**
- * \fn int str2xterm ( char *str )
- * \brief Convert a value to xterm color
- *
- * \param str A string representing the color to be convert into xterm value.
- *            The value can be express as hex (#rrggbb), decimal (r g b). a 24
- *            bit integer value, or the actual xterm value.
- *
- * \return The xterm value of the color.
- */
-
-int str2xterm(char *str)
-{
-	long rgb;
-	int r, g, b;
-	char *p, *t;
-	p = str;
-
-	if (*p == '#')
-	{ /* Ok, it's a RGB in hex */
-		p++;
-		rgb = strtol(p, &t, 16);
-
-		if (p == t)
-		{
-			return (-1);
-		}
-		else
-		{
-
-			return (rgb2xterm(rgb));
-		}
-	}
-	else
-	{ /* Then it must be decimal */
-		r = strtol(p, &t, 10);
-
-		if (p == t)
-		{
-			return (-1);
-		}
-		else if (*t == 0)
-		{
-			if (r < 256)
-			{
-				return (r); /* It's the color index */
-			}
-
-			return (rgb2xterm(r)); /* It's a RGB, fetch the index */
-		}
-		else
-		{
-			p = t;
-
-			while (!isdigit((unsigned char)*p) && (*p != 0))
-			{
-				p++;
-			}
-
-			g = strtol(p, &t, 10);
-
-			if ((p == t) || (*p == 0))
-			{
-				return (-1);
-			}
-
-			p = t;
-
-			while (!isdigit((unsigned char)*p) && (*p != 0))
-			{
-				p++;
-			}
-
-			b = strtol(p, &t, 10);
-
-			if ((p == t) || (*p == 0))
-			{
-				return (-1);
-			}
-
-			rgb = (r << 16) + (g << 8) + b;
-			return (rgb2xterm(rgb));
-		}
-	}
-
-	return (-1); /* Something is terribly wrong... */
 }
 
 /**
