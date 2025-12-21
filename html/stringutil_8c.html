@@ -162,14 +162,14 @@ Functions</h2></td></tr>
 <tr class="memitem:ab69bc01ebdd6f669d4c33b032e9a7c5e" id="r_ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab69bc01ebdd6f669d4c33b032e9a7c5e">safe_gettimeofday</a> (struct timeval *tv, void *tz <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
 <tr class="memdesc:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
 <tr class="separator:ab69bc01ebdd6f669d4c33b032e9a7c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c06def3c8b760a74550263bc6c67869" id="r_a4c06def3c8b760a74550263bc6c67869"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c06def3c8b760a74550263bc6c67869">ansiChar</a> (int ch)</td></tr>
-<tr class="memdesc:a4c06def3c8b760a74550263bc6c67869"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to ansi sequence. Lookup table for fast O(1) character to ANSI code conversion.  <br /></td></tr>
-<tr class="separator:a4c06def3c8b760a74550263bc6c67869"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe7087a291a76df22cdf0931e04d4e7f" id="r_abe7087a291a76df22cdf0931e04d4e7f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe7087a291a76df22cdf0931e04d4e7f">ansiNum</a> (int ch)</td></tr>
-<tr class="memdesc:abe7087a291a76df22cdf0931e04d4e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to numeric values. Lookup table for fast O(1) character to ANSI numeric code conversion.  <br /></td></tr>
-<tr class="separator:abe7087a291a76df22cdf0931e04d4e7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9fb46aebd6c81cf6a0534df0cce4b20" id="r_ad9fb46aebd6c81cf6a0534df0cce4b20"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9fb46aebd6c81cf6a0534df0cce4b20">ansiChar</a> (int ch)</td></tr>
+<tr class="memdesc:ad9fb46aebd6c81cf6a0534df0cce4b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to ansi sequence. Lookup table for fast O(1) character to ANSI code conversion.  <br /></td></tr>
+<tr class="separator:ad9fb46aebd6c81cf6a0534df0cce4b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf63b066e2c927e4127377bc44fc7722" id="r_abf63b066e2c927e4127377bc44fc7722"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf63b066e2c927e4127377bc44fc7722">ansiNum</a> (int ch)</td></tr>
+<tr class="memdesc:abf63b066e2c927e4127377bc44fc7722"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to numeric values. Lookup table for fast O(1) character to ANSI numeric code conversion.  <br /></td></tr>
+<tr class="separator:abf63b066e2c927e4127377bc44fc7722"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c81ef265757da76d491c19e4d34fe9e" id="r_a8c81ef265757da76d491c19e4d34fe9e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c81ef265757da76d491c19e4d34fe9e">ansiLetter</a> (int num)</td></tr>
-<tr class="memdesc:a8c81ef265757da76d491c19e4d34fe9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi numeric values to character code (x?).  <br /></td></tr>
+<tr class="memdesc:a8c81ef265757da76d491c19e4d34fe9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi numeric values to character code (x?). Lookup table for fast O(1) numeric to character conversion.  <br /></td></tr>
 <tr class="separator:a8c81ef265757da76d491c19e4d34fe9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad47ac4fea9347eda47616c12c29c8f7c" id="r_ad47ac4fea9347eda47616c12c29c8f7c"><td class="memItemLeft" align="right" valign="top"><a id="ad47ac4fea9347eda47616c12c29c8f7c" name="ad47ac4fea9347eda47616c12c29c8f7c"></a>
 char&#160;</td><td class="memItemRight" valign="bottom"><b>ansiMushCode</b> (int num, bool bg)</td></tr>
@@ -472,14 +472,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 
 </div>
 </div>
-<a id="a4c06def3c8b760a74550263bc6c67869" name="a4c06def3c8b760a74550263bc6c67869"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c06def3c8b760a74550263bc6c67869">&#9670;&#160;</a></span>ansiChar()</h2>
+<a id="ad9fb46aebd6c81cf6a0534df0cce4b20" name="ad9fb46aebd6c81cf6a0534df0cce4b20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9fb46aebd6c81cf6a0534df0cce4b20">&#9670;&#160;</a></span>ansiChar()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char * ansiChar </td>
+          <td class="memname">const char * ansiChar </td>
           <td>(</td>
           <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
           <td></td>
@@ -513,7 +513,7 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Convert ansi numeric values to character code (x?). </p>
+<p>Convert ansi numeric values to character code (x?). Lookup table for fast O(1) numeric to character conversion. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">num</td><td>ANSI number </td></tr>
@@ -524,14 +524,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 
 </div>
 </div>
-<a id="abe7087a291a76df22cdf0931e04d4e7f" name="abe7087a291a76df22cdf0931e04d4e7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe7087a291a76df22cdf0931e04d4e7f">&#9670;&#160;</a></span>ansiNum()</h2>
+<a id="abf63b066e2c927e4127377bc44fc7722" name="abf63b066e2c927e4127377bc44fc7722"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf63b066e2c927e4127377bc44fc7722">&#9670;&#160;</a></span>ansiNum()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int ansiNum </td>
+          <td class="memname">const int ansiNum </td>
           <td>(</td>
           <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
           <td></td>
