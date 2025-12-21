@@ -1243,7 +1243,7 @@ extern void whisper_pose(dbref player, dbref target, char *message);
 extern void do_pemit_list(dbref player, char *list, const char *message, int do_contents);
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
-/* stringutil.c */
+/* string_util.c */
 extern const char *safe_strerror(int errnum);
 extern int safe_gettimeofday(struct timeval *tv, void *tz);
 extern const char *ansiChar(int ch);
