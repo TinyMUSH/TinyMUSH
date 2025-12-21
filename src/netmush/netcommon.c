@@ -518,7 +518,6 @@ void queue_string(DESC *d, const char *format, ...)
 			queue_write(d, msg, strlen(msg));
 		}
 	}
-}
 
 	XFREE(msg);
 }
