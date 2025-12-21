@@ -1105,7 +1105,7 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFC;  /* WONT */
 						response[2] = option;
-						write(d->descriptor, response, 3);
+						(void)write(d->descriptor, response, 3);
 					}
 					else if (cmd == 0xFB)  /* WILL - client will enable option */
 					{
@@ -1113,7 +1113,7 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFE;  /* DONT */
 						response[2] = option;
-						write(d->descriptor, response, 3);
+						(void)write(d->descriptor, response, 3);
 					}
 					/* DONT and WONT don't need responses */
 					
@@ -1153,14 +1153,12 @@ int process_input(DESC *d)
 			 * - ANSI ESC (0x1B)
 			 * - DEL (0x7F) for backspace
 			 * - BEEP (0x07)
-			 * - CTRL+L (0x0C) for screen refresh
 			 * Reject all other control characters
 			 */
 			if ((ch >= 0x20 && ch <= 0x7E) ||  /* Printable ASCII */
 			    ch == 0x09 ||  /* TAB */
 			    ch == 0x0A ||  /* LF */
 			    ch == 0x0D ||  /* CR */
-			    ch == 0x0C ||  /* CTRL+L (form feed/refresh) */
 			    ch == 0x1B ||  /* ESC */
 			    ch == 0x07 ||  /* BEEP */
 			    ch == 0x7F)    /* DEL */
