@@ -195,16 +195,31 @@ int check_pass(dbref player, const char *password)
     char *target;
     target = atr_get(player, A_PASS, &aowner, &aflags, &alen);
 
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-    struct crypt_data cdata;
-    cdata.initialized = 0;
-    if (*target && strcmp(target, password) && strcmp(crypt_r(password, "XX", &cdata), target))
-#else
-    if (*target && strcmp(target, password) && strcmp(crypt(password, "XX"), target))
-#endif
+    size_t pwlen = strlen(password);
+    size_t stored_len = strlen(target);
+    bool legacy_des = (stored_len == 13 && target[0] != '$');
+
+    /* Reject extra characters when legacy DES hashes are in use (only first 8 chars matter). */
+    if (legacy_des && pwlen > 8)
     {
         XFREE(target);
         return 0;
+    }
+
+    if (*target)
+    {
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+        struct crypt_data cdata;
+        cdata.initialized = 0;
+        const char *hashed = crypt_r(password, target, &cdata);
+#else
+        const char *hashed = crypt(password, target);
+#endif
+        if (strcmp(target, password) != 0 && (!hashed || strcmp(hashed, target) != 0))
+        {
+            XFREE(target);
+            return 0;
+        }
     }
 
     XFREE(target);
