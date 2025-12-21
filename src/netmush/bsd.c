@@ -1105,7 +1105,12 @@ int process_input(DESC *d)
 				(d->raw_input_at)--;
 			}
 		}
-		else if (p < pend && isascii(*q) && isprint(*q))
+		else if (*q == ESC_CHAR && p < pend)
+		{
+			/* Allow ESC for ANSI sequences, but only if it's part of a valid sequence */
+			*p++ = *q;
+		}
+		else if (p < pend && isascii(*q) && isprint(*q) && !iscntrl(*q))
 		{
 			*p++ = *q;
 		}
