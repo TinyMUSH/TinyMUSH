@@ -25,6 +25,9 @@
 #include <crypt.h>
 #endif
 
+/* Forward declaration from player.c for modern password hashing */
+extern char *hash_password(const char *password);
+
 void do_teleport(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
 	dbref victim, destination, loc, exitloc;
@@ -484,18 +487,28 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	/*
 	 * it's ok, do it
 	 */
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-	cdata.initialized = 0;
-	crypt_result = crypt_r((const char *)password, "XX", &cdata);
-#else
-	crypt_result = crypt((const char *)password, "XX");
-#endif
-	if (!crypt_result)
+	char *new_hash = hash_password(password);
+	if (new_hash)
 	{
-		notify_quiet(player, "Password encryption failed.");
-		return;
+		s_Pass(victim, new_hash);
+		XFREE(new_hash);
 	}
-	s_Pass(victim, crypt_result);
+	else
+	{
+		/* Fallback to legacy DES if modern hashing fails */
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+		cdata.initialized = 0;
+		crypt_result = crypt_r((const char *)password, "XX", &cdata);
+#else
+		crypt_result = crypt((const char *)password, "XX");
+#endif
+		if (!crypt_result)
+		{
+			notify_quiet(player, "Password encryption failed.");
+			return;
+		}
+		s_Pass(victim, crypt_result);
+	}
 	notify_quiet(player, "Password changed.");
 	notify_check(victim, victim, MSG_PUP_ALWAYS | MSG_ME, "Your password has been changed by %s.", Name(player));
 }

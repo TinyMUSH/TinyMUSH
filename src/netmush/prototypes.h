@@ -1083,6 +1083,7 @@ extern void do_dbck(dbref player, dbref cause, int key);
 extern void decrypt_logindata(char *atrbuf, LDATA *info);
 extern void encrypt_logindata(char *atrbuf, LDATA *info);
 extern void record_login(dbref player, int isgood, char *ldate, char *lhost, char *lusername);
+extern char *hash_password(const char *password);
 extern int check_pass(dbref player, const char *password);
 extern dbref connect_player(char *name, char *password, char *host, char *username, char *ip_addr);
 extern dbref create_player(char *name, char *password, dbref creator, int isrobot, int isguest);

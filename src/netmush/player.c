@@ -185,7 +185,51 @@ void record_login(dbref player, int isgood, char *ldate, char *lhost, char *luse
 }
 
 /* ---------------------------------------------------------------------------
+ * hash_password: Generate a secure password hash using the best available method.
+ * Prefers bcrypt ($2b$) if available, falls back to SHA-512 ($6$).
+ */
+
+char *hash_password(const char *password)
+{
+    char *result = NULL;
+    
+#if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+    struct crypt_data cdata;
+    cdata.initialized = 0;
+    
+    /* Try bcrypt first (rounds=12, good balance of security and speed) */
+    const char *hashed = crypt_r(password, "$2b$12$" "abcdefghijklmnopqrst", &cdata);
+    
+    /* If bcrypt not available, fall back to SHA-512 */
+    if (!hashed || hashed[0] != '$' || hashed[1] != '2')
+    {
+        hashed = crypt_r(password, "$6$rounds=5000$" "saltsaltsaltsalt", &cdata);
+    }
+    
+    if (hashed)
+    {
+        result = XSTRDUP(hashed, "hash_password");
+    }
+#else
+    const char *hashed = crypt(password, "$2b$12$" "abcdefghijklmnopqrst");
+    
+    if (!hashed || hashed[0] != '$' || hashed[1] != '2')
+    {
+        hashed = crypt(password, "$6$rounds=5000$" "saltsaltsaltsalt");
+    }
+    
+    if (hashed)
+    {
+        result = XSTRDUP(hashed, "hash_password");
+    }
+#endif
+    
+    return result;
+}
+
+/* ---------------------------------------------------------------------------
  * check_pass: Test a password to see if it is correct.
+ * Returns: 0 = failed, 1 = success, 2 = success with legacy hash (needs upgrade)
  */
 
 int check_pass(dbref player, const char *password)
@@ -198,6 +242,7 @@ int check_pass(dbref player, const char *password)
     size_t pwlen = strlen(password);
     size_t stored_len = strlen(target);
     bool legacy_des = (stored_len == 13 && target[0] != '$');
+    bool needs_upgrade = legacy_des;
 
     /* Reject extra characters when legacy DES hashes are in use (only first 8 chars matter). */
     if (legacy_des && pwlen > 8)
@@ -234,7 +279,8 @@ int check_pass(dbref player, const char *password)
         return 0;
     }
 
-    return 1;
+    /* Return 2 if password is correct but uses legacy hash (needs upgrade) */
+    return needs_upgrade ? 2 : 1;
 }
 
 /* ---------------------------------------------------------------------------
@@ -257,10 +303,23 @@ dbref connect_player(char *name, char *password, char *host, char *username, cha
         return NOTHING;
     }
 
-    if (!check_pass(player, password))
+    int pass_result = check_pass(player, password);
+    if (pass_result == 0)
     {
         record_login(player, 0, time_str, host, username);
         return NOTHING;
+    }
+    
+    /* Automatically upgrade legacy password hashes to modern format */
+    if (pass_result == 2)
+    {
+        char *new_hash = hash_password(password);
+        if (new_hash)
+        {
+            atr_add_raw(player, A_PASS, new_hash);
+            XFREE(new_hash);
+            log_write(LOG_SECURITY, "PWD", "UPGRD", "Password hash upgraded for player #%d (%s)", player, Name(player));
+        }
     }
 
     time(&tt);
@@ -348,13 +407,23 @@ dbref create_player(char *name, char *password, dbref creator, int isrobot, int 
         }
     }
 
+    char *new_hash = hash_password(pbuf);
+    if (new_hash)
+    {
+        s_Pass(player, new_hash);
+        XFREE(new_hash);
+    }
+    else
+    {
+        /* Fallback to legacy DES if modern hashing fails */
 #if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-    struct crypt_data cdata;
-    cdata.initialized = 0;
-    s_Pass(player, crypt_r(pbuf, "XX", &cdata));
+        struct crypt_data cdata;
+        cdata.initialized = 0;
+        s_Pass(player, crypt_r(pbuf, "XX", &cdata));
 #else
-    s_Pass(player, crypt(pbuf, "XX"));
+        s_Pass(player, crypt(pbuf, "XX"));
 #endif
+    }
     s_Home(player, (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
     XFREE(pbuf);
     return player;
@@ -383,14 +452,25 @@ void do_password(dbref player, dbref cause __attribute__((unused)), int key __at
     }
     else
     {
+        char *new_hash = hash_password(newpass);
+        if (new_hash)
+        {
+            atr_add_raw(player, A_PASS, new_hash);
+            XFREE(new_hash);
+            notify(player, "Password changed.");
+        }
+        else
+        {
+            /* Fallback to legacy DES if modern hashing fails */
 #if defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-        struct crypt_data cdata;
-        cdata.initialized = 0;
-        atr_add_raw(player, A_PASS, crypt_r(newpass, "XX", &cdata));
+            struct crypt_data cdata;
+            cdata.initialized = 0;
+            atr_add_raw(player, A_PASS, crypt_r(newpass, "XX", &cdata));
 #else
-        atr_add_raw(player, A_PASS, crypt(newpass, "XX"));
+            atr_add_raw(player, A_PASS, crypt(newpass, "XX"));
 #endif
-        notify(player, "Password changed.");
+            notify(player, "Password changed.");
+        }
     }
 
     XFREE(target);
