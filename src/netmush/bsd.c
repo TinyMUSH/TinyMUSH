@@ -1064,35 +1064,67 @@ int process_input(DESC *d)
 	}
 
 	/**
-	 * Filter out CTRL+C (0x03) and other problematic control characters
-	 * at the network level before any processing
+	 * Filter out problematic control characters at the network level.
+	 * If we receive CTRL+C (0x03), close the connection gracefully.
 	 */
 	{
-		int i, j = 0;
+		int i;
+		unsigned char ch;
+		int has_ctrl_c = 0;
 		
 		for (i = 0; i < got; i++)
 		{
-			unsigned char ch = (unsigned char)buf[i];
+			ch = (unsigned char)buf[i];
+			if (ch == 0x03)  /* CTRL+C */
+			{
+				has_ctrl_c = 1;
+				break;
+			}
+		}
+		
+		/**
+		 * If CTRL+C detected, close connection gracefully.
+		 * Some telnet clients send CTRL+C which can cause desynchronization.
+		 */
+		if (has_ctrl_c)
+		{
+			log_write(LOG_PROBLEMS, "NET", "CTRLC", "CTRL+C received from descriptor %d, closing connection", d->descriptor);
+			mushstate.debug_cmd = cmdsave;
+			XFREE(buf);
+			return 0;  /* Signal that connection should be closed */
+		}
+	}
+
+	/**
+	 * Filter out other dangerous control characters
+	 */
+	{
+		int i, j = 0;
+		unsigned char ch;
+		
+		for (i = 0; i < got; i++)
+		{
+			ch = (unsigned char)buf[i];
 			
 			/**
-			 * Allow only safe characters:
+			 * Allow safe characters:
 			 * - Printable ASCII (0x20-0x7E)
-			 * - Essential whitespace: \n (0x0A), \r (0x0D), \t (0x09)
-			 * - ANSI ESC (0x1B) for color codes
+			 * - Essential whitespace: \n, \r, \t
+			 * - ANSI ESC (0x1B)
 			 * - DEL (0x7F) for backspace
-			 * Reject: CTRL+C (0x03), CTRL+D, CTRL+Z, and all other control chars
+			 * - BEEP (0x07)
+			 * Reject all other control characters
 			 */
 			if ((ch >= 0x20 && ch <= 0x7E) ||  /* Printable ASCII */
 			    ch == 0x09 ||  /* TAB */
-			    ch == 0x0A ||  /* LF (newline) */
+			    ch == 0x0A ||  /* LF */
 			    ch == 0x0D ||  /* CR */
-			    ch == 0x1B ||  /* ESC for ANSI */
+			    ch == 0x1B ||  /* ESC */
 			    ch == 0x07 ||  /* BEEP */
 			    ch == 0x7F)    /* DEL */
 			{
 				buf[j++] = buf[i];
 			}
-			/* All other bytes (including CTRL+C 0x03) are silently dropped */
 		}
 		got = in = j;
 	}
