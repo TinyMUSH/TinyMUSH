@@ -1264,11 +1264,11 @@ extern void skip_esccode(char **s);
 extern void copy_esccode(char **s, char **t);
 extern void safe_copy_esccode(char **s, char *buff, char **bufc);
 extern void track_ansi_letters(char *t, int *ansi_state);
+extern char *remap_colors(const char *s, int *cmap);
 
 /* string_util.c */
 extern const char *safe_strerror(int errnum);
 extern int safe_gettimeofday(struct timeval *tv, void *tz);
-extern char *remap_colors(const char *s, int *cmap);
 extern char *translate_string(char *str, int type);
 extern int rgb2xterm(long rgb);
 extern int str2xterm(char *str);
