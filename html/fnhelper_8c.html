@@ -157,7 +157,7 @@ Include dependency graph for fnhelper.c:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a80be5e01c783115f4292901e4b97024c" id="r_a80be5e01c783115f4292901e4b97024c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a80be5e01c783115f4292901e4b97024c">PARSE_ANSI_SEQUENCE</a>(strp,  ansi_state)</td></tr>
-<tr class="memdesc:a80be5e01c783115f4292901e4b97024c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse ANSI escape sequence and update state.  <br /></td></tr>
+<tr class="memdesc:a80be5e01c783115f4292901e4b97024c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse ANSI escape sequence and update state (with bounds checking).  <br /></td></tr>
 <tr class="separator:a80be5e01c783115f4292901e4b97024c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -248,7 +248,7 @@ PCG Random Number Generation for C, Copyright 2014 Melissa O'Neill <a href="#" o
       </table>
 </div><div class="memdoc">
 
-<p>Parse ANSI escape sequence and update state. </p>
+<p>Parse ANSI escape sequence and update state (with bounds checking). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">strp</td><td>Pointer to string position (updated in place) </td></tr>
