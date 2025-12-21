@@ -1462,252 +1462,6 @@ char *translate_string(char *str, int type)
 	return buff;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * rgb2xterm -- Convert an RGB value to xterm color
- */
-
-/**
- * \fn int rgb2xterm ( long rgb )
- * \brief Convert an RGB value to xterm value
- *
- * \param rgb Color to convert to xterm value
- *
- * \return The xterm value of the color.
- */
-
-int rgb2xterm(long rgb)
-{
-	int xterm, r, g, b;
-
-	/* First, handle standard colors */
-	if (rgb == 0x000000)
-	{
-		return (0);
-	}
-
-	if (rgb == 0x800000)
-	{
-		return (1);
-	}
-
-	if (rgb == 0x008000)
-	{
-		return (2);
-	}
-
-	if (rgb == 0x808000)
-	{
-		return (3);
-	}
-
-	if (rgb == 0x000080)
-	{
-		return (4);
-	}
-
-	if (rgb == 0x800080)
-	{
-		return (5);
-	}
-
-	if (rgb == 0x008080)
-	{
-		return (6);
-	}
-
-	if (rgb == 0xc0c0c0)
-	{
-		return (7);
-	}
-
-	if (rgb == 0x808080)
-	{
-		return (8);
-	}
-
-	if (rgb == 0xff0000)
-	{
-		return (9);
-	}
-
-	if (rgb == 0x00ff00)
-	{
-		return (10);
-	}
-
-	if (rgb == 0xffff00)
-	{
-		return (11);
-	}
-
-	if (rgb == 0x0000ff)
-	{
-		return (12);
-	}
-
-	if (rgb == 0xff00ff)
-	{
-		return (13);
-	}
-
-	if (rgb == 0x00ffff)
-	{
-		return (14);
-	}
-
-	if (rgb == 0xffffff)
-	{
-		return (15);
-	}
-
-	r = (rgb & 0xFF0000) >> 16;
-	g = (rgb & 0x00FF00) >> 8;
-	b = rgb & 0x0000FF;
-
-	/* Next, handle grayscales */
-
-	if ((r == g) && (r == b))
-	{
-		if (rgb <= 0x080808)
-		{
-			return (232);
-		}
-
-		if (rgb <= 0x121212)
-		{
-			return (233);
-		}
-
-		if (rgb <= 0x1c1c1c)
-		{
-			return (234);
-		}
-
-		if (rgb <= 0x262626)
-		{
-			return (235);
-		}
-
-		if (rgb <= 0x303030)
-		{
-			return (236);
-		}
-
-		if (rgb <= 0x3a3a3a)
-		{
-			return (237);
-		}
-
-		if (rgb <= 0x444444)
-		{
-			return (238);
-		}
-
-		if (rgb <= 0x4e4e4e)
-		{
-			return (239);
-		}
-
-		if (rgb <= 0x585858)
-		{
-			return (240);
-		}
-
-		if (rgb <= 0x606060)
-		{
-			return (241);
-		}
-
-		if (rgb <= 0x666666)
-		{
-			return (242);
-		}
-
-		if (rgb <= 0x767676)
-		{
-			return (243);
-		}
-
-		if (rgb <= 0x808080)
-		{
-			return (244);
-		}
-
-		if (rgb <= 0x8a8a8a)
-		{
-			return (245);
-		}
-
-		if (rgb <= 0x949494)
-		{
-			return (246);
-		}
-
-		if (rgb <= 0x9e9e9e)
-		{
-			return (247);
-		}
-
-		if (rgb <= 0xa8a8a8)
-		{
-			return (248);
-		}
-
-		if (rgb <= 0xb2b2b2)
-		{
-			return (249);
-		}
-
-		if (rgb <= 0xbcbcbc)
-		{
-			return (250);
-		}
-
-		if (rgb <= 0xc6c6c6)
-		{
-			return (251);
-		}
-
-		if (rgb <= 0xd0d0d0)
-		{
-			return (252);
-		}
-
-		if (rgb <= 0xdadada)
-		{
-			return (253);
-		}
-
-		if (rgb <= 0xe4e4e4)
-		{
-			return (254);
-		}
-
-		if (rgb <= 0xeeeeee)
-		{
-			return (255);
-		}
-	}
-
-	/* It's an RGB, convert it */
-	xterm = (((r / 51) * 36) + ((g / 51) * 6) + (b / 51)) + 16;
-
-	/* Just in case... */
-
-	if (xterm < 16)
-	{
-		xterm = 16;
-	}
-
-	if (xterm > 231)
-	{
-		xterm = 231;
-	}
-
-	return (xterm);
-}
-
 /**
  * \fn int str2xterm ( char *str )
  * \brief Convert a value to xterm color
@@ -1724,6 +1478,7 @@ int str2xterm(char *str)
 	long rgb;
 	int r, g, b;
 	char *p, *t;
+	rgbColor color;
 	p = str;
 
 	if (*p == '#')
@@ -1737,8 +1492,10 @@ int str2xterm(char *str)
 		}
 		else
 		{
-
-			return (rgb2xterm(rgb));
+			color.r = (rgb >> 16) & 0xFF;
+			color.g = (rgb >> 8) & 0xFF;
+			color.b = rgb & 0xFF;
+			return RGB2X11(color);
 		}
 	}
 	else
@@ -1756,7 +1513,11 @@ int str2xterm(char *str)
 				return (r); /* It's the color index */
 			}
 
-			return (rgb2xterm(r)); /* It's a RGB, fetch the index */
+			/* It's a RGB packed as int, fetch the index */
+			color.r = (r >> 16) & 0xFF;
+			color.g = (r >> 8) & 0xFF;
+			color.b = r & 0xFF;
+			return RGB2X11(color);
 		}
 		else
 		{
@@ -1788,8 +1549,10 @@ int str2xterm(char *str)
 				return (-1);
 			}
 
-			rgb = (r << 16) + (g << 8) + b;
-			return (rgb2xterm(rgb));
+			color.r = (uint8_t)r;
+			color.g = (uint8_t)g;
+			color.b = (uint8_t)b;
+			return RGB2X11(color);
 		}
 	}
 
