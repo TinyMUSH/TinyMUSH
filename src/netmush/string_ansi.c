@@ -447,22 +447,40 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 						
 						if (has_fg)
 						{
-							uint8_t f = RGB2Ansi(attr.foreground.rgb);
-							f += (f < 8) ? 30 : 82;
-							
+							int f;
+							if (attr.foreground.type == ANSICOLORTYPE_STANDARD)
+							{
+								uint8_t idx = RGB2X11(attr.foreground.rgb) & 0xF;
+								f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
+							}
+							else
+							{
+								uint8_t a = RGB2Ansi(attr.foreground.rgb);
+								f = (a < 8) ? (30 + a) : (90 + (a - 8));
+							}
+                            
 							SAFE_LTOS(buf, &p, f, LBUF_SIZE);
-							
+                            
 							if (has_bg || attr.reset)
 								append_ch(&p, end, ';');
 						}
 						
 						if (has_bg)
 						{
-							uint8_t b = RGB2Ansi(attr.background.rgb);
-							b += (b < 8) ? 40 : 92;
-							
+							int b;
+							if (attr.background.type == ANSICOLORTYPE_STANDARD)
+							{
+								uint8_t idx = RGB2X11(attr.background.rgb) & 0xF;
+								b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
+							}
+							else
+							{
+								uint8_t a = RGB2Ansi(attr.background.rgb);
+								b = (a < 8) ? (40 + a) : (100 + (a - 8));
+							}
+                            
 							SAFE_LTOS(buf, &p, b, LBUF_SIZE);
-							
+                            
 							if (attr.reset)
 								append_ch(&p, end, ';');
 						}
