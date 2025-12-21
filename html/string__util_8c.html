@@ -163,7 +163,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a024552f4a78374dc5be679d168cc98a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-resolution timer using clock_gettime Returns struct timeval for compatibility with existing code.  <br /></td></tr>
 <tr class="separator:a024552f4a78374dc5be679d168cc98a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af968a3f1c8e90d1b5d9f0fd6d6cb395a" id="r_af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af968a3f1c8e90d1b5d9f0fd6d6cb395a">upcasestr</a> (char *s)</td></tr>
-<tr class="memdesc:af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalizes an entire string.  <br /></td></tr>
+<tr class="memdesc:af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalize an entire string.  <br /></td></tr>
 <tr class="separator:af968a3f1c8e90d1b5d9f0fd6d6cb395a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17d9aec24a10b4e4273c92ac9eefd1b5" id="r_a17d9aec24a10b4e4273c92ac9eefd1b5"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a17d9aec24a10b4e4273c92ac9eefd1b5">munge_space</a> (char *string)</td></tr>
 <tr class="memdesc:a17d9aec24a10b4e4273c92ac9eefd1b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compress multiple spaces into one and remove leading/trailing spaces.  <br /></td></tr>
@@ -175,31 +175,31 @@ Functions</h2></td></tr>
 <tr class="memdesc:a9ae9f257089fccd6c0b93d2fe5eb1090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return portion of a string up to the indicated character.  <br /></td></tr>
 <tr class="separator:a9ae9f257089fccd6c0b93d2fe5eb1090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb6d7c8c2f40e28942fd60c35054915b" id="r_afb6d7c8c2f40e28942fd60c35054915b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb6d7c8c2f40e28942fd60c35054915b">string_compare</a> (const char *s1, const char *s2)</td></tr>
-<tr class="memdesc:afb6d7c8c2f40e28942fd60c35054915b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two string. Treat multiple spaces as one.  <br /></td></tr>
+<tr class="memdesc:afb6d7c8c2f40e28942fd60c35054915b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare two strings case-insensitively, treating multiple spaces as one.  <br /></td></tr>
 <tr class="separator:afb6d7c8c2f40e28942fd60c35054915b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af96d5924e7f236d5628f9ce77f8edb67" id="r_af96d5924e7f236d5628f9ce77f8edb67"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af96d5924e7f236d5628f9ce77f8edb67">string_prefix</a> (const char *string, const char *prefix)</td></tr>
-<tr class="memdesc:af96d5924e7f236d5628f9ce77f8edb67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare a string with a prefix.  <br /></td></tr>
+<tr class="memdesc:af96d5924e7f236d5628f9ce77f8edb67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare a string with a prefix case-insensitively.  <br /></td></tr>
 <tr class="separator:af96d5924e7f236d5628f9ce77f8edb67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3189f6fc705ab76f9e18d2f9a1a46e1f" id="r_a3189f6fc705ab76f9e18d2f9a1a46e1f"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3189f6fc705ab76f9e18d2f9a1a46e1f">string_match</a> (const char *src, const char *sub)</td></tr>
-<tr class="memdesc:a3189f6fc705ab76f9e18d2f9a1a46e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare a string with a substring, accepts only nonempty matches starting at the beginning of a word.  <br /></td></tr>
+<tr class="memdesc:a3189f6fc705ab76f9e18d2f9a1a46e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a substring within a string, matching only at word boundaries.  <br /></td></tr>
 <tr class="separator:a3189f6fc705ab76f9e18d2f9a1a46e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70c4fc8bc55fd0849a4ae9d573a000e3" id="r_a70c4fc8bc55fd0849a4ae9d573a000e3"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a70c4fc8bc55fd0849a4ae9d573a000e3">replace_string</a> (const char *old, const char *new, const char *string)</td></tr>
-<tr class="memdesc:a70c4fc8bc55fd0849a4ae9d573a000e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace all occurences of a substring with a new substring.  <br /></td></tr>
+<tr class="memdesc:a70c4fc8bc55fd0849a4ae9d573a000e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace all occurrences of a substring with a new substring.  <br /></td></tr>
 <tr class="separator:a70c4fc8bc55fd0849a4ae9d573a000e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c8d57248ab7b4a0dafc1f43a3a1ceb4" id="r_a6c8d57248ab7b4a0dafc1f43a3a1ceb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c8d57248ab7b4a0dafc1f43a3a1ceb4">edit_string</a> (char *src, char **dst, char *from, char *to)</td></tr>
-<tr class="memdesc:a6c8d57248ab7b4a0dafc1f43a3a1ceb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace all occurences of a substring with a new substring. Sensitive about ANSI codes, and handles special ^ and $ cases.  <br /></td></tr>
+<tr class="memdesc:a6c8d57248ab7b4a0dafc1f43a3a1ceb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace all occurrences of a substring, handling ANSI codes and special ^ and $ cases.  <br /></td></tr>
 <tr class="separator:a6c8d57248ab7b4a0dafc1f43a3a1ceb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefdde0a45362b2f36a48636efd3c4c65" id="r_aefdde0a45362b2f36a48636efd3c4c65"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefdde0a45362b2f36a48636efd3c4c65">minmatch</a> (char *str, char *target, int min)</td></tr>
-<tr class="memdesc:aefdde0a45362b2f36a48636efd3c4c65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find if a substring at the start of a string exist.  <br /></td></tr>
+<tr class="memdesc:aefdde0a45362b2f36a48636efd3c4c65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find if a substring matches at the start of a string with minimum length.  <br /></td></tr>
 <tr class="separator:aefdde0a45362b2f36a48636efd3c4c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a325056c0b50914cae7a5bfe2f32abb6d" id="r_a325056c0b50914cae7a5bfe2f32abb6d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a325056c0b50914cae7a5bfe2f32abb6d">matches_exit_from_list</a> (char *exit_list, char *pattern)</td></tr>
-<tr class="memdesc:a325056c0b50914cae7a5bfe2f32abb6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find if pattern is found in the exit list.  <br /></td></tr>
+<tr class="memdesc:a325056c0b50914cae7a5bfe2f32abb6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if a pattern is found in the exit list.  <br /></td></tr>
 <tr class="separator:a325056c0b50914cae7a5bfe2f32abb6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdeb4d27d73ff8b89cbf09ed57d2944e" id="r_acdeb4d27d73ff8b89cbf09ed57d2944e"><td class="memItemLeft" align="right" valign="top"><a id="acdeb4d27d73ff8b89cbf09ed57d2944e" name="acdeb4d27d73ff8b89cbf09ed57d2944e"></a>
-char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)</td></tr>
+<tr class="memitem:acdeb4d27d73ff8b89cbf09ed57d2944e" id="r_acdeb4d27d73ff8b89cbf09ed57d2944e"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acdeb4d27d73ff8b89cbf09ed57d2944e">ltos</a> (long num)</td></tr>
+<tr class="memdesc:acdeb4d27d73ff8b89cbf09ed57d2944e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a long signed number to string.  <br /></td></tr>
 <tr class="separator:acdeb4d27d73ff8b89cbf09ed57d2944e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cb207aba5b27261862d0bccc3225bff" id="r_a8cb207aba5b27261862d0bccc3225bff"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8cb207aba5b27261862d0bccc3225bff">repeatchar</a> (int count, char ch)</td></tr>
-<tr class="memdesc:a8cb207aba5b27261862d0bccc3225bff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a string with 'count' number of 'ch' characters.  <br /></td></tr>
+<tr class="memdesc:a8cb207aba5b27261862d0bccc3225bff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a string filled with a repeated character.  <br /></td></tr>
 <tr class="separator:a8cb207aba5b27261862d0bccc3225bff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -237,17 +237,22 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Replace all occurences of a substring with a new substring. Sensitive about ANSI codes, and handles special ^ and $ cases. </p>
+<p>Replace all occurrences of a substring, handling ANSI codes and special ^ and $ cases. </p>
+<p>Special cases:</p><ul>
+<li>from="^" prepends 'to' to the string</li>
+<li>from="$" appends 'to' to the string</li>
+<li>from="\^" or from="\$" matches literal ^ or $ characters</li>
+</ul>
+<p>Caller is responsible for freeing *dst with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">src</td><td>Pointer to the original string. </td></tr>
-    <tr><td class="paramname">dst</td><td>Pointer to the new string. </td></tr>
-    <tr><td class="paramname">from</td><td>Pointer to the string to be replaced </td></tr>
-    <tr><td class="paramname">to</td><td>Pointer to the string to be replaced with.</td></tr>
+    <tr><td class="paramname">src</td><td>The original string </td></tr>
+    <tr><td class="paramname">dst</td><td>Pointer to receive the new string (newly allocated) </td></tr>
+    <tr><td class="paramname">from</td><td>The substring to replace </td></tr>
+    <tr><td class="paramname">to</td><td>The replacement substring </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
 
 </div>
 </div>
@@ -271,15 +276,42 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 </div><div class="memdoc">
 
 <p>Return portion of a string up to the indicated character. </p>
-<p>Note that str will be move to the position following the searched character. If you need the original string, save it before calling this function.</p>
+<p>Note that str will be moved to the position following the searched character. If you need the original string, save it before calling this function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>The string you want to search </td></tr>
-    <tr><td class="paramname">targ</td><td>The caracter you want to search for,</td></tr>
+    <tr><td class="paramname">str</td><td>Pointer to the string pointer to search </td></tr>
+    <tr><td class="paramname">targ</td><td>The character to search for </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The string up to the character you've search for. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* The string up to the character, or NULL if str is invalid </dd></dl>
+
+</div>
+</div>
+<a id="acdeb4d27d73ff8b89cbf09ed57d2944e" name="acdeb4d27d73ff8b89cbf09ed57d2944e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdeb4d27d73ff8b89cbf09ed57d2944e">&#9670;&#160;</a></span>ltos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * ltos </td>
+          <td>(</td>
+          <td class="paramtype">long</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a long signed number to string. </p>
+<p>Caller is responsible for freeing the returned buffer with XFREE(). Uses Mark Vasoll's long int to string converter algorithm.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Number to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>char* String representation of the number (newly allocated) </dd></dl>
 
 </div>
 </div>
@@ -302,15 +334,15 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Find if pattern is found in the exit list. </p>
+<p>Check if a pattern is found in the exit list. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">exit_list</td><td>Pointer to the list of names of an exit </td></tr>
-    <tr><td class="paramname">pattern</td><td>Pointer to the pattern we are searching</td></tr>
+    <tr><td class="paramname">exit_list</td><td>Semicolon-separated list of exit names </td></tr>
+    <tr><td class="paramname">pattern</td><td>The pattern to search for </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>1 if the pattern is in the list, 0 if not. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>int 1 if the pattern is found, 0 otherwise </dd></dl>
 
 </div>
 </div>
@@ -338,17 +370,17 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Find if a substring at the start of a string exist. </p>
-<p>At least MIN characters must match. This is how flags are match by the command queue.</p>
+<p>Find if a substring matches at the start of a string with minimum length. </p>
+<p>At least min characters must match. This is how flags are matched by the command queue.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>Pointer to the string that will be search. </td></tr>
-    <tr><td class="paramname">target</td><td>Pointer to the string being search. </td></tr>
-    <tr><td class="paramname">min</td><td>Minimum length of match.</td></tr>
+    <tr><td class="paramname">str</td><td>The string to search </td></tr>
+    <tr><td class="paramname">target</td><td>The target substring </td></tr>
+    <tr><td class="paramname">min</td><td>Minimum number of characters that must match </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>1 if found, 0 if not. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>int 1 if found, 0 if not </dd></dl>
 
 </div>
 </div>
@@ -368,14 +400,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 </div><div class="memdoc">
 
 <p>Compress multiple spaces into one and remove leading/trailing spaces. </p>
-<p>It is the responsibility of the caller to free the returned buffer with XFREE().</p>
+<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s</td><td>The string that need to be munge</td></tr>
+    <tr><td class="paramname">string</td><td>The string to munge </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The string munged </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* The munged string (newly allocated) </dd></dl>
 
 </div>
 </div>
@@ -398,16 +430,16 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Return a string with 'count' number of 'ch' characters. </p>
-<p>It is the responsibility of the caller to free the resulting buffer.</p>
+<p>Create a string filled with a repeated character. </p>
+<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">count</td><td>Length of the string to build </td></tr>
-    <tr><td class="paramname">ch</td><td>Character used to fill the string.</td></tr>
+    <tr><td class="paramname">count</td><td>Number of characters (clamped to 0..LBUF_SIZE-1) </td></tr>
+    <tr><td class="paramname">ch</td><td>Character to repeat </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A Pointer to the new string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* String of repeated characters (newly allocated) </dd></dl>
 
 </div>
 </div>
@@ -435,16 +467,17 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Replace all occurences of a substring with a new substring. </p>
+<p>Replace all occurrences of a substring with a new substring. </p>
+<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">old</td><td>The string you want to replace. </td></tr>
-    <tr><td class="paramname">new</td><td>The string you want to replace with. </td></tr>
-    <tr><td class="paramname">string</td><td>The string that is modified.</td></tr>
+    <tr><td class="paramname">old</td><td>The string to replace </td></tr>
+    <tr><td class="paramname">new</td><td>The replacement string </td></tr>
+    <tr><td class="paramname">string</td><td>The string to modify </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A pointer to the modified string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* The modified string (newly allocated) </dd></dl>
 
 </div>
 </div>
@@ -519,15 +552,15 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Compare two string. Treat multiple spaces as one. </p>
+<p>Compare two strings case-insensitively, treating multiple spaces as one. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">s1</td><td>The first string to compare </td></tr>
-    <tr><td class="paramname">s2</td><td>The second string to compare</td></tr>
+    <tr><td class="paramname">s2</td><td>The second string to compare </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if the string are different. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>int 0 if strings match, non-zero otherwise </dd></dl>
 
 </div>
 </div>
@@ -550,15 +583,16 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Compare a string with a substring, accepts only nonempty matches starting at the beginning of a word. </p>
+<p>Find a substring within a string, matching only at word boundaries. </p>
+<p>Accepts only nonempty matches starting at the beginning of a word.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">src</td><td>The string you want to search </td></tr>
-    <tr><td class="paramname">sub</td><td>The search term.</td></tr>
+    <tr><td class="paramname">src</td><td>The string to search </td></tr>
+    <tr><td class="paramname">sub</td><td>The substring to find </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The position of the search term. 0 if not found. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>const char* Pointer to the match position, or NULL if not found </dd></dl>
 
 </div>
 </div>
@@ -581,15 +615,15 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Compare a string with a prefix. </p>
+<p>Compare a string with a prefix case-insensitively. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">string</td><td>The string you want to search </td></tr>
-    <tr><td class="paramname">prefix</td><td>The prefix you are searching for.</td></tr>
+    <tr><td class="paramname">string</td><td>The string to search </td></tr>
+    <tr><td class="paramname">prefix</td><td>The prefix to search for </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if the prefix isn't found. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>int Number of matching characters if prefix found, 0 otherwise </dd></dl>
 
 </div>
 </div>
@@ -609,13 +643,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
 </div><div class="memdoc">
 
 <p>Remove leading and trailing spaces. </p>
+<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s</td><td>The string that need to be trimmed.</td></tr>
+    <tr><td class="paramname">string</td><td>The string to trim </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The trimmed string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* The trimmed string (newly allocated) </dd></dl>
 
 </div>
 </div>
@@ -634,14 +669,14 @@ char *&#160;</td><td class="memItemRight" valign="bottom"><b>ltos</b> (long num)
       </table>
 </div><div class="memdoc">
 
-<p>Capitalizes an entire string. </p>
+<p>Capitalize an entire string. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s</td><td>The string that need to be capitalized.</td></tr>
+    <tr><td class="paramname">s</td><td>The string to capitalize </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The string capitalized. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>char* The capitalized string (same pointer as input) </dd></dl>
 
 </div>
 </div>
