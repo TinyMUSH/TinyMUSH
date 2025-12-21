@@ -1153,12 +1153,14 @@ int process_input(DESC *d)
 			 * - ANSI ESC (0x1B)
 			 * - DEL (0x7F) for backspace
 			 * - BEEP (0x07)
+			 * - CTRL+L (0x0C) for screen refresh
 			 * Reject all other control characters
 			 */
 			if ((ch >= 0x20 && ch <= 0x7E) ||  /* Printable ASCII */
 			    ch == 0x09 ||  /* TAB */
 			    ch == 0x0A ||  /* LF */
 			    ch == 0x0D ||  /* CR */
+			    ch == 0x0C ||  /* CTRL+L (form feed/refresh) */
 			    ch == 0x1B ||  /* ESC */
 			    ch == 0x07 ||  /* BEEP */
 			    ch == 0x7F)    /* DEL */
