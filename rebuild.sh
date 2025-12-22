@@ -8,6 +8,9 @@ NC='\033[0m' # No Color
 
 echo -e "${YELLOW}=== TinyMUSH Upgrade Script ===${NC}"
 
+# Répertoire racine du dépôt (emplacement de ce script)
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # 1. Arrêt propre du serveur s'il est en cours d'exécution
 if pgrep -x "netmush" > /dev/null; then
     echo -e "${YELLOW}Fermeture propre du serveur...${NC}"
@@ -53,6 +56,36 @@ if [ $? -ne 0 ]; then
 fi
 
 cd ..
+
+# 3.5. Option de restauration DB à partir d'un backup local
+BACKUP_FILE="${ROOT_DIR}/netmush.db.backup"
+GAME_DB_DIR="${ROOT_DIR}/game/db"
+GAME_DB_FILE="${GAME_DB_DIR}/netmush.db"
+BACKUPS_DIR="${ROOT_DIR}/game/backups"
+
+if [ -f "$BACKUP_FILE" ]; then
+    echo -e "${YELLOW}Un backup local a été détecté: ${BACKUP_FILE}${NC}"
+    echo -e "${YELLOW}Souhaitez-vous remplacer la base du jeu (${GAME_DB_FILE}) par ce backup ?${NC}"
+    read -r -p "Confirmer le remplacement ? [y/N] " REPLY
+    case "$REPLY" in
+        [yY]|[yY][eE][sS]|[oO]|[oO][uU][iI])
+            mkdir -p "$GAME_DB_DIR" "$BACKUPS_DIR"
+            TS="$(date +%Y%m%d-%H%M%S)"
+            if [ -f "$GAME_DB_FILE" ]; then
+                SAFE_BAK="$BACKUPS_DIR/netmush.db.pre-rebuild-${TS}"
+                echo -e "${YELLOW}Sauvegarde de l'ancienne DB: ${SAFE_BAK}${NC}"
+                cp -p "$GAME_DB_FILE" "$SAFE_BAK"
+            fi
+            echo -e "${YELLOW}Restauration du backup vers ${GAME_DB_FILE}...${NC}"
+            cp -f "$BACKUP_FILE" "$GAME_DB_FILE"
+            chmod 600 "$GAME_DB_FILE" 2>/dev/null || true
+            echo -e "${GREEN}Base de données restaurée depuis le backup.${NC}"
+            ;;
+        *)
+            echo -e "${YELLOW}Restauration ignorée (réponse: ${REPLY:-N}).${NC}"
+            ;;
+    esac
+fi
 
 # 4. Redémarrage du serveur
 echo -e "${YELLOW}Redémarrage du serveur...${NC}"
