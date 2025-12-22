@@ -2346,21 +2346,31 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 			if (is_chevron && *s == '>')
 				s++;
 			*xtp = '\0';
-			r = g = b = -1;
-			if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
-				sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-			} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
-				// Format "R G B"
+			// Vérifie que xtbuf n'est pas vide ou uniquement des espaces
+			int only_spaces = 1;
+			for (char *p = xtbuf; *p; ++p) {
+				if (!isspace((unsigned char)*p)) {
+					only_spaces = 0;
+					break;
+				}
 			}
-			if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
-				XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
-			} else if (xtbuf[0]) {
-				int i = str2xterm(xtbuf);
-				XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-			}
-			if (xtbuf[0]) {
-				XSAFELBSTR(xtbuf, buff, bufc);
-				xterm = 1;
+			if (xtbuf[0] && !only_spaces) {
+				r = g = b = -1;
+				if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
+					sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
+				} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
+					// Format "R G B"
+				}
+				if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+					XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
+				} else {
+					int i = str2xterm(xtbuf);
+					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
+				}
+				if (xtbuf[0]) {
+					XSAFELBSTR(xtbuf, buff, bufc);
+					xterm = 1;
+				}
 			}
 		}
 	}
