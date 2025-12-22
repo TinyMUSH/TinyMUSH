@@ -2452,6 +2452,7 @@ void dump_database(void)
 	mushstate.epoch++;
 	mushstate.dumping = 1;
 	log_write(LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mushconf.db_file, mushstate.epoch);
+	al_store(); /* Persist any in-memory attribute list before sync */
 	pcache_sync();
 	cache_sync();
 	dump_database_internal(DUMP_DB_NORMAL);

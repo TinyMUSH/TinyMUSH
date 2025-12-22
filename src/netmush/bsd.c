@@ -1372,6 +1372,7 @@ void sighandler(int sig)
 		check_panicking(sig);
 		log_signal(signames[sig]);
 		raw_broadcast(0, "GAME: Caught signal %s, exiting.", signames[sig]);
+		al_store(); /* Persist any in-memory attribute list before forced exit */
 		dump_database_internal(DUMP_DB_KILLED);
 		s = XASPRINTF("s", "Caught signal %s", signames[sig]);
 		write_status_file(NOTHING, s);
@@ -1406,6 +1407,7 @@ void sighandler(int sig)
 			 * Not good, Don't sync, restart using older db.
 			 *
 			 */
+			al_store(); /* Persist any in-memory attribute list before crash dump */
 			dump_database_internal(DUMP_DB_CRASH);
 			cache_sync();
 			dddb_close();
