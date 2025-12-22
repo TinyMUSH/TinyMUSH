@@ -2298,37 +2298,47 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	 */
 	s = fargs[0];
 
-	// Parsing foreground color
-	XMEMSET(xtbuf, 0, SBUF_SIZE);
-	int is_chevron = 0;
-	if (*s == '<') {
-		is_chevron = 1;
-		s++;
-	}
-	xtp = xtbuf;
-	while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0'))) {
-		XSAFESBCHR(*s, xtbuf, &xtp);
-		s++;
-	}
-	// Si on s'arrête sur '/', on ne l'avance pas ici, il sera traité pour le background
-	if (is_chevron && *s == '>')
-		s++;
-	*xtp = '\0';
-	int r = -1, g = -1, b = -1;
-	if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
-		sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-	} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
-		// Format "R G B"
-	}
-	if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
-		XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
-	} else if (xtbuf[0]) {
-		int i = str2xterm(xtbuf);
-		XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-	}
-	XSAFELBSTR(xtbuf, buff, bufc);
-	if (xtbuf[0])
-		xterm = 1;
+	       // Parsing foreground color
+	       XMEMSET(xtbuf, 0, SBUF_SIZE);
+	       int is_chevron = 0;
+	       if (*s == '<') {
+		       is_chevron = 1;
+		       s++;
+	       }
+	       xtp = xtbuf;
+	       while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0'))) {
+		       XSAFESBCHR(*s, xtbuf, &xtp);
+		       s++;
+	       }
+	       if (is_chevron && *s == '>')
+		       s++;
+	       *xtp = '\0';
+	       int r = -1, g = -1, b = -1;
+	       if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
+		       sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
+	       } else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
+		       // Format "R G B"
+	       }
+	       if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+		       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
+		       XSAFELBSTR(xtbuf, buff, bufc);
+		       xterm = 1;
+	       } else if (xtbuf[0]) {
+		       // Si une seule lettre, utiliser la table classique
+		       if (strlen(xtbuf) == 1) {
+			       const char *seq = ansiChar(xtbuf[0]);
+			       if (seq && *seq) {
+				       XSAFELBSTR(seq, buff, bufc);
+			       }
+		       } else {
+			       int i = str2xterm(xtbuf);
+			       if (i >= 0 && i <= 255) {
+				       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+				       XSAFELBSTR(xtbuf, buff, bufc);
+				       xterm = 1;
+			       }
+		       }
+	       }
 	// Parsing background color only if '/' is present
 	if (*s == '/') {
 		s++;
