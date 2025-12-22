@@ -1885,6 +1885,7 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 
 void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char *object, char *argv[], int nargs)
 {
+	log_write(LOG_ALWAYS, "TRIGGER", "ENTRY", "do_trigger: player=%d, key=%d, object=%s, nargs=%d", player, key, object ? object : "(null)", nargs);
 	dbref thing;
 	int attrib;
 	char *s;
@@ -1904,6 +1905,8 @@ void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char
 		notify_quiet(player, NOPERM_MESSAGE);
 		return;
 	}
+
+	log_write(LOG_ALWAYS, "TRIGGER", "BEFORE_DIDIT", "do_trigger: thing=%d, attrib=%d, object=%s", thing, attrib, object ? object : "(null)");
 
 	did_it(player, thing, A_NULL, NULL, A_NULL, NULL, attrib, key & TRIG_NOW, argv, nargs, 0);
 

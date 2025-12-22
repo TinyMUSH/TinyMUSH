@@ -959,7 +959,6 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
  */
 char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
-
 	dbref exit = NOTHING, aowner = NOTHING, parent = NOTHING;
 	CMDENT *cmdp = NULL;
 	MODULE *csm__mp = NULL;
@@ -1738,141 +1737,128 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 	save_pout = mushstate.pout;
 	mushstate.break_called = 0;
 
-	while (cmdline && (!qent || qent == mushstate.qfirst) && !mushstate.break_called)
-	{
-		cp = parse_to(&cmdline, ';', 0);
+	       while (cmdline && (!qent || qent == mushstate.qfirst) && !mushstate.break_called)
+	       {
+			   cp = parse_to(&cmdline, ';', 0);
 
-		if (cp && *cp)
-		{
-			numpipes = 0;
-			while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
-			{
-				cmdline++;
-				numpipes++;
-				mushstate.inpipe = 1;
-				mushstate.poutnew = XMALLOC(LBUF_SIZE, "mushstate.poutnew");
-				mushstate.poutbufc = mushstate.poutnew;
-				mushstate.poutobj = player;
-				mushstate.debug_cmd = cp;
-				/**
-				 * No lag check on piped commands
-				 *
-				 */
-				process_command(player, cause, 0, cp, args, nargs);
+		       if (cp && *cp)
+		       {
 
-				if (mushstate.pout && mushstate.pout != save_pout)
-				{
-					XFREE(mushstate.pout);
-				}
+					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
+										 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
+										 cp ? cp : "<NULL>", cp ? (int)strlen(cp) : 0);
+					   log_write(LOG_ALWAYS, "TRIG", "CMDLINE", "[DEBUG process_cmdline] RAW cp='%s' (len=%d) (player=#%d, cause=#%d)",
+								 cp ? cp : "<NULL>", cp ? (int)strlen(cp) : 0, player, cause);
+					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
+									 "[DEBUG process_cmdline] about to call process_command: '%s'",
+									 cp ? cp : "<NULL>");
+				       numpipes = 0;
+				       while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
+				       {
+					       cmdline++;
+					       numpipes++;
+					       mushstate.inpipe = 1;
+					       mushstate.poutnew = XMALLOC(LBUF_SIZE, "mushstate.poutnew");
+					       mushstate.poutbufc = mushstate.poutnew;
+					       mushstate.poutobj = player;
+					       mushstate.debug_cmd = cp;
+					       process_command(player, cause, 0, cp, args, nargs);
 
-				*mushstate.poutbufc = '\0';
-				mushstate.pout = mushstate.poutnew;
-				cp = parse_to(&cmdline, ';', 0);
-			}
+					       if (mushstate.pout && mushstate.pout != save_pout)
+					       {
+						       XFREE(mushstate.pout);
+					       }
 
-			mushstate.inpipe = save_inpipe;
-			mushstate.poutnew = save_poutnew;
-			mushstate.poutbufc = save_poutbufc;
-			mushstate.poutobj = save_poutobj;
-			mushstate.debug_cmd = cp;
-			/**
-			 * Is the queue still linked like we think it is?
-			 *
-			 */
-			if (qent && qent != mushstate.qfirst)
-			{
-				if (mushstate.pout && mushstate.pout != save_pout)
-				{
-					XFREE(mushstate.pout);
-				}
+					       *mushstate.poutbufc = '\0';
+					       mushstate.pout = mushstate.poutnew;
+					       cp = parse_to(&cmdline, ';', 0);
+				       }
 
-				break;
-			}
+			       mushstate.inpipe = save_inpipe;
+			       mushstate.poutnew = save_poutnew;
+			       mushstate.poutbufc = save_poutbufc;
+			       mushstate.poutobj = save_poutobj;
+			       mushstate.debug_cmd = cp;
+			       if (qent && qent != mushstate.qfirst)
+			       {
+				       if (mushstate.pout && mushstate.pout != save_pout)
+				       {
+					       XFREE(mushstate.pout);
+				       }
+				       break;
+			       }
 
-			if (mushconf.lag_check)
-			{
-				gettimeofday(&begin_time, NULL);
+			       if (mushconf.lag_check)
+			       {
+				       gettimeofday(&begin_time, NULL);
+				       if (mushconf.lag_check_cpu)
+				       {
+					       getrusage(RUSAGE_SELF, &b_usage);
+				       }
+			       }
 
-				if (mushconf.lag_check_cpu)
-				{
-					getrusage(RUSAGE_SELF, &b_usage);
-				}
-			}
+			       log_cmdbuf = process_command(player, cause, 0, cp, args, nargs);
 
-			log_cmdbuf = process_command(player, cause, 0, cp, args, nargs);
+			       if (mushstate.pout && mushstate.pout != save_pout)
+			       {
+				       XFREE(mushstate.pout);
+				       mushstate.pout = save_pout;
+			       }
 
-			if (mushstate.pout && mushstate.pout != save_pout)
-			{
-				XFREE(mushstate.pout);
-				mushstate.pout = save_pout;
-			}
+			       save_poutbufc = mushstate.poutbufc;
 
-			save_poutbufc = mushstate.poutbufc;
-
-			if (mushconf.lag_check)
-			{
-				gettimeofday(&end_time, NULL);
-
-				if (mushconf.lag_check_cpu)
-				{
-					getrusage(RUSAGE_SELF, &e_usage);
-				}
-
-				used_time = msec_diff(end_time, begin_time);
-
-				if ((used_time / 1000) >= mushconf.max_cmdsecs)
-				{
-					pname = log_getname(player);
-
-					if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
-					{
-						lname = log_getname(Location(player));
-						log_write(LOG_PROBLEMS, "CMD", "CPU", "%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
-						XFREE(lname);
-					}
-					else
-					{
-						log_write(LOG_PROBLEMS, "CMD", "CPU", "%s queued command taking %.2f secs (enactor #%d): %s", pname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
-					}
-
-					XFREE(pname);
-				}
-				/**
-				 * Don't use msec_add(), this is more accurate
-				 *
-				 */
-				if (mushconf.lag_check_clk)
-				{
-					obj_time = Time_Used(player);
-
-					if (mushconf.lag_check_cpu)
-					{
-						obj_time.tv_usec += e_usage.ru_utime.tv_usec;
-						obj_time.tv_sec += e_usage.ru_utime.tv_sec - b_usage.ru_utime.tv_sec;
-					}
-					else
-					{
-						obj_time.tv_usec += end_time.tv_usec - begin_time.tv_usec;
-						obj_time.tv_sec += end_time.tv_sec - begin_time.tv_sec;
-					}
-
-					if (obj_time.tv_usec < 0)
-					{
-						obj_time.tv_usec += 1000000;
-						obj_time.tv_sec--;
-					}
-					else if (obj_time.tv_usec >= 1000000)
-					{
-						obj_time.tv_sec += obj_time.tv_usec / 1000000;
-						obj_time.tv_usec = obj_time.tv_usec % 1000000;
-					}
-
-					db[player].cpu_time_used.tv_sec = obj_time.tv_sec;
-					db[player].cpu_time_used.tv_usec = obj_time.tv_usec;
-				}
-			}
-		}
-	}
+			       if (mushconf.lag_check)
+			       {
+				       gettimeofday(&end_time, NULL);
+				       if (mushconf.lag_check_cpu)
+				       {
+					       getrusage(RUSAGE_SELF, &e_usage);
+				       }
+				       used_time = msec_diff(end_time, begin_time);
+				       if ((used_time / 1000) >= mushconf.max_cmdsecs)
+				       {
+					       pname = log_getname(player);
+					       if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
+					       {
+						       lname = log_getname(Location(player));
+						       log_write(LOG_PROBLEMS, "CMD", "CPU", "%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
+						       XFREE(lname);
+					       }
+					       else
+					       {
+						       log_write(LOG_PROBLEMS, "CMD", "CPU", "%s queued command taking %.2f secs (enactor #%d): %s", pname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
+					       }
+					       XFREE(pname);
+				       }
+				       if (mushconf.lag_check_clk)
+				       {
+					       obj_time = Time_Used(player);
+					       if (mushconf.lag_check_cpu)
+					       {
+						       obj_time.tv_usec += e_usage.ru_utime.tv_usec;
+						       obj_time.tv_sec += e_usage.ru_utime.tv_sec - b_usage.ru_utime.tv_sec;
+					       }
+					       else
+					       {
+						       obj_time.tv_usec += end_time.tv_usec - begin_time.tv_usec;
+						       obj_time.tv_sec += end_time.tv_sec - begin_time.tv_sec;
+					       }
+					       if (obj_time.tv_usec < 0)
+					       {
+						       obj_time.tv_usec += 1000000;
+						       obj_time.tv_sec--;
+					       }
+					       else if (obj_time.tv_usec >= 1000000)
+					       {
+						       obj_time.tv_sec += obj_time.tv_usec / 1000000;
+						       obj_time.tv_usec = obj_time.tv_usec % 1000000;
+					       }
+					       db[player].cpu_time_used.tv_sec = obj_time.tv_sec;
+					       db[player].cpu_time_used.tv_usec = obj_time.tv_usec;
+				       }
+			       }
+		       }
+	       }
 
 	mushstate.debug_cmd = cmdsave;
 	mushstate.curr_enactor = save_enactor;

@@ -2667,6 +2667,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 	char *tbuf = NULL, *tp = NULL, *sp = NULL;
 	int t = 0, num = 0, aflags = 0, alen = 0, need_pres = 0, retval = 0;
 
+
 	/*
 	 * If we need to call eval_expression_string() from within this function, we first save
 	 * * the state of the global registers, in order to avoid munging them
@@ -2972,6 +2973,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 
 		if (!act)
 		{
+			log_write(LOG_ALWAYS, "TRIG", "TRACE", "did_it: !act, return");
 			return;
 		}
 
@@ -3003,19 +3005,10 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 				act = runout;
 				runout = NULL;
 			}
-			else
-			{
-				XFREE(act);
-				if (runout)
-				{
-					XFREE(runout);
-				}
-				if (charges)
-				{
-					XFREE(charges);
-				}
-				return;
-			}
+			       else
+			       {
+				       /* On ne retourne plus ici : on laisse act tel quel pour exécution */
+			       }
 
 			if (runout)
 			{

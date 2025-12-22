@@ -125,6 +125,7 @@ def send_cmd(tn: telnetlib.Telnet, cmd: str, timeout: float) -> str:
 
 def main() -> None:
     args = parse_args()
+
     commands_with_expectations = load_commands(args.config)
 
     ensure_creds()
@@ -152,17 +153,33 @@ def main() -> None:
         print(f"Skipping {len(skipped_disconnect)} disconnecting commands (enable with --allow-disconnect): {', '.join(skipped_disconnect)}")
 
     results = []
+    obj_id = None
     for cmd, expected in commands:
-        resp = send_cmd(tn, cmd, TIMEOUT)
-
-        if expected:
-            status = "OK" if expected in resp else "ERR"
+        # Si la commande est @create testobj, extraire l'ID de l'objet créé
+        if cmd.strip().startswith("@create testobj"):
+            resp = send_cmd(tn, cmd, TIMEOUT)
+            import re
+            m = re.search(r'created as object #(\d+)', resp)
+            if m:
+                obj_id = m.group(1)
+            status = "OK" if "created as object" in resp else "ERR"
+            print(f"[{status}] {cmd}\n{resp.strip()}\n")
+            results.append((cmd, expected, status, resp))
+            continue
+        # Remplacer testobj par #ID si trouvé
+        if obj_id:
+            cmd_sub = cmd.replace("testobj", f"#{obj_id}")
+            expected_sub = expected.replace("testobj", f"#{obj_id}") if expected else expected
         else:
-            # No expectation means we accept any output (including empty)
+            cmd_sub = cmd
+            expected_sub = expected
+        resp = send_cmd(tn, cmd_sub, TIMEOUT)
+        if expected_sub:
+            status = "OK" if expected_sub in resp else "ERR"
+        else:
             status = "OK"
-
-        print(f"[{status}] {cmd}\n{resp.strip()}\n")
-        results.append((cmd, expected, status, resp))
+        print(f"[{status}] {cmd_sub}\n{resp.strip()}\n")
+        results.append((cmd_sub, expected_sub, status, resp))
 
     # Graceful logout if possible
     try:
