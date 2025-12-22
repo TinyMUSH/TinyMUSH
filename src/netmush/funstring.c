@@ -2287,6 +2287,17 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 
 	track_ansi_letters(fargs[0], &ansi_state);
 	s = ansi_transition_esccode(ANST_NONE, ansi_state);
+	// Si l'utilisateur n'a pas demandé de background, on retire \033[40m
+	if (s && !strchr(fargs[0], '/')) {
+		char *p = strstr(s, "\033[40m");
+		if (p) {
+			// On retire la séquence \033[40m
+			size_t len = strlen(s);
+			size_t off = p - s;
+			memmove(p, p + 5, len - off - 4); // 5 = longueur de "\033[40m"
+			s[len - 5] = '\0';
+		}
+	}
 	XSAFELBSTR(s, buff, bufc);
 	XFREE(s);
 
