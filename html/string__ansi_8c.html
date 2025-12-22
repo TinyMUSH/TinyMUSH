@@ -206,9 +206,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ac311df3ec3fa40aed5400d732b4dd184" id="r_ac311df3ec3fa40aed5400d732b4dd184"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac311df3ec3fa40aed5400d732b4dd184">normal_to_white</a> (const char *raw)</td></tr>
 <tr class="memdesc:ac311df3ec3fa40aed5400d732b4dd184"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement the NOBLEED flag by translating ANSI normal to white.  <br /></td></tr>
 <tr class="separator:ac311df3ec3fa40aed5400d732b4dd184"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e2445e56c3738359679b63758389abd" id="r_a9e2445e56c3738359679b63758389abd"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e2445e56c3738359679b63758389abd">ansi_transition_esccode</a> (int ansi_before, int ansi_after)</td></tr>
-<tr class="memdesc:a9e2445e56c3738359679b63758389abd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build ANSI escape sequence to transition between states.  <br /></td></tr>
-<tr class="separator:a9e2445e56c3738359679b63758389abd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f9d8fc7cd3421b6c9db45c7ced52ba2" id="r_a1f9d8fc7cd3421b6c9db45c7ced52ba2"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f9d8fc7cd3421b6c9db45c7ced52ba2">ansi_transition_esccode</a> (int ansi_before, int ansi_after, bool no_default_bg)</td></tr>
+<tr class="memdesc:a1f9d8fc7cd3421b6c9db45c7ced52ba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build ANSI escape sequence to transition between states.  <br /></td></tr>
+<tr class="separator:a1f9d8fc7cd3421b6c9db45c7ced52ba2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa395d590e1044b04a875c3959a73169" id="r_afa395d590e1044b04a875c3959a73169"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa395d590e1044b04a875c3959a73169">ansi_transition_mushcode</a> (int ansi_before, int ansi_after)</td></tr>
 <tr class="memdesc:afa395d590e1044b04a875c3959a73169"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build mushcode sequence to transition between ANSI states.  <br /></td></tr>
 <tr class="separator:afa395d590e1044b04a875c3959a73169"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -339,8 +339,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9e2445e56c3738359679b63758389abd" name="a9e2445e56c3738359679b63758389abd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e2445e56c3738359679b63758389abd">&#9670;&#160;</a></span>ansi_transition_esccode()</h2>
+<a id="a1f9d8fc7cd3421b6c9db45c7ced52ba2" name="a1f9d8fc7cd3421b6c9db45c7ced52ba2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f9d8fc7cd3421b6c9db45c7ced52ba2">&#9670;&#160;</a></span>ansi_transition_esccode()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -353,7 +353,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ansi_after</em></span>&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ansi_after</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>no_default_bg</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

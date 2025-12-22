@@ -378,7 +378,7 @@ var searchData=
   ['ansi_5fbright_5fblack_375',['ANSI_BRIGHT_BLACK',['../constants_8h.html#aca932afda9df1d2d6a70e7270a3fac2c',1,'constants.h']]],
   ['ansi_5fcolors_376',['ansi_colors',['../structconfdata.html#afbc26dae4bc983c8c952cccbaa2c9082',1,'confdata']]],
   ['ansi_5fmap_5fstates_377',['ansi_map_states',['../string__ansi_8c.html#ad176dafa463adcaebeb9bef8bc72d852',1,'string_ansi.c']]],
-  ['ansi_5ftransition_5fesccode_378',['ansi_transition_esccode',['../string__ansi_8c.html#a9e2445e56c3738359679b63758389abd',1,'string_ansi.c']]],
+  ['ansi_5ftransition_5fesccode_378',['ansi_transition_esccode',['../string__ansi_8c.html#a1f9d8fc7cd3421b6c9db45c7ced52ba2',1,'string_ansi.c']]],
   ['ansi_5ftransition_5fletters_379',['ansi_transition_letters',['../string__ansi_8c.html#a899c23a638dad1cdc903ae93feee24ae',1,'string_ansi.c']]],
   ['ansi_5ftransition_5fmushcode_380',['ansi_transition_mushcode',['../string__ansi_8c.html#afa395d590e1044b04a875c3959a73169',1,'string_ansi.c']]],
   ['ansi_5fxterm_5ffg_381',['ANSI_XTERM_FG',['../constants_8h.html#afff8fed7529d6fa16ccac38c653f88cf',1,'constants.h']]],
