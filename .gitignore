@@ -69,3 +69,7 @@ Thumbs.db
 # Core dumps
 core
 core.*
+
+# Local database snapshots at repo root
+/netmush.db
+/netmush.db.*
