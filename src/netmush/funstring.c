@@ -2296,106 +2296,60 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	 */
 	s = fargs[0];
 
-	while (*s)
-	{
+	// Nouveau parsing : foreground, puis background si présent
+	// Foreground
+	XMEMSET(xtbuf, 0, SBUF_SIZE);
+	int is_chevron = 0;
+	if (*s == '<') { is_chevron = 1; s++; } else { is_chevron = 0; }
+	xtp = xtbuf;
+	while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0'))) {
+		XSAFESBCHR(*s, xtbuf, &xtp);
+		s++;
+	}
+	if (is_chevron && *s == '>') s++;
+	*xtp = '\0';
+	int r = -1, g = -1, b = -1;
+	if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
+		sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
+	} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
+		// Format "R G B"
+	}
+	if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+		XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
+	} else if (xtbuf[0]) {
+		int i = str2xterm(xtbuf);
+		XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+	}
+	XSAFELBSTR(xtbuf, buff, bufc);
+	if (xtbuf[0]) xterm = 1;
+	// Background
+	if (*s == '/') {
+		s++;
 		XMEMSET(xtbuf, 0, SBUF_SIZE);
-		if (*s == '<' || *s == '/')
-		{
-			/**
-			 * Xterm colors
-			 *
-			 */
-			int xterm_isbg = 0, i = 0;
-
-			if (*s == '/')
-			{
-				/**
-				 * We are dealing with background
-				 *
-				 */
-				s++;
-
-				if (!*s)
-				{
-					break;
-				}
-				else
-				{
-					xterm_isbg = 1;
-				}
-			}
-			else
-			{
-				/**
-				 * We are dealing with foreground
-				 *
-				 */
-				xterm_isbg = 0;
-			}
-
-			if (*s == '<')
-			{
-				/**
-				 * Ok we got a color to process
-				 *
-				 */
-				s++;
-
-				if (!*s)
-				{
-					break;
-				}
-
-				xtp = xtbuf;
-
-				while (*s && (*s != '>'))
-				{
-				XSAFESBCHR(*s, xtbuf, &xtp);
-					s++;
-				}
-
-				if (*s != '>')
-				{
-					break;
-				}
-
-				*xtp = '\0';
-
-				/**
-				 * Now we have the color string... Time to handle it
-				 *
-				 */
-				i = str2xterm(xtbuf);
-
-				if (xterm_isbg)
-				{
-					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-				}
-				else
-				{
-					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-				}
-
-				XSAFELBSTR(xtbuf, buff, bufc);
-				xterm = 1;
-			}
-			else
-			{
-				break;
-			}
-
-			/* Shall we continue? */
-			s++;
-
-			if (*s != '<' && *s != '/')
-			{
-				break;
-			}
-		}
-		else
-		{
+		is_chevron = 0;
+		if (*s == '<') { is_chevron = 1; s++; } else { is_chevron = 0; }
+		xtp = xtbuf;
+		while (*s && ((is_chevron && *s != '>' && *s != '\0') || (!is_chevron && *s != '\0'))) {
+			if (!is_chevron && *s == '/') break;
+			XSAFESBCHR(*s, xtbuf, &xtp);
 			s++;
 		}
+		if (is_chevron && *s == '>') s++;
+		*xtp = '\0';
+		r = g = b = -1;
+		if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
+			sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
+		} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
+			// Format "R G B"
+		}
+		if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+			XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
+		} else if (xtbuf[0]) {
+			int i = str2xterm(xtbuf);
+			XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
+		}
+		XSAFELBSTR(xtbuf, buff, bufc);
+		if (xtbuf[0]) xterm = 1;
 	}
 
 	s = fargs[1];
