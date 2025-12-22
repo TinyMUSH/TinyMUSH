@@ -90,6 +90,7 @@ $(function(){ initResizable(false); });
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">string_ansi.c File Reference</div></div>
 </div><!--header-->
@@ -154,6 +155,13 @@ Include dependency graph for string_ansi.c:</div>
 </map>
 </div>
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a6b85d53b1d76e442c97b0a017e381d35" id="r_a6b85d53b1d76e442c97b0a017e381d35"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b85d53b1d76e442c97b0a017e381d35">CHECK_BUFFER_SPACE</a>(needed)</td></tr>
+<tr class="separator:a6b85d53b1d76e442c97b0a017e381d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7daef26dd4daea21e49315e8dbcf1684" id="r_a7daef26dd4daea21e49315e8dbcf1684"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7daef26dd4daea21e49315e8dbcf1684">FLUSH_IF_NEEDED</a>()</td></tr>
+<tr class="separator:a7daef26dd4daea21e49315e8dbcf1684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ad9fb46aebd6c81cf6a0534df0cce4b20" id="r_ad9fb46aebd6c81cf6a0534df0cce4b20"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9fb46aebd6c81cf6a0534df0cce4b20">ansiChar</a> (int ch)</td></tr>
@@ -180,6 +188,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a717386e8da894eee3a7cd535b5926eb4" id="r_a717386e8da894eee3a7cd535b5926eb4"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a717386e8da894eee3a7cd535b5926eb4">level_ansi</a> (const char *s, bool ansi, bool xterm, bool truecolors)</td></tr>
 <tr class="memdesc:a717386e8da894eee3a7cd535b5926eb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go to a string and convert ansi to the lowest supported level.  <br /></td></tr>
 <tr class="separator:a717386e8da894eee3a7cd535b5926eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a104f0abc0b0a9e501afa5d4db999800e" id="r_a104f0abc0b0a9e501afa5d4db999800e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a104f0abc0b0a9e501afa5d4db999800e">level_ansi_stream</a> (const char *s, bool ansi, bool xterm, bool truecolors, void(*flush_fn)(const char *data, size_t len, void *ctx), void *ctx)</td></tr>
+<tr class="memdesc:a104f0abc0b0a9e501afa5d4db999800e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ANSI codes based on player capabilities with streaming output.  <br /></td></tr>
+<tr class="separator:a104f0abc0b0a9e501afa5d4db999800e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7464d90ae1acb37dd803284f3586b795" id="r_a7464d90ae1acb37dd803284f3586b795"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7464d90ae1acb37dd803284f3586b795">strip_ansi</a> (const char *s)</td></tr>
 <tr class="memdesc:a7464d90ae1acb37dd803284f3586b795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove ANSI escape codes from a string.  <br /></td></tr>
 <tr class="separator:a7464d90ae1acb37dd803284f3586b795"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,7 +248,59 @@ Functions</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>TinyMUSH development team (<a href="https://github.com/TinyMUSH">https://github.com/TinyMUSH</a>) </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file. </dd></dl>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a6b85d53b1d76e442c97b0a017e381d35" name="a6b85d53b1d76e442c97b0a017e381d35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b85d53b1d76e442c97b0a017e381d35">&#9670;&#160;</a></span>CHECK_BUFFER_SPACE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CHECK_BUFFER_SPACE</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>needed</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">        <span class="keywordflow">do</span> { \</div>
+<div class="line">            used = p - buf; \</div>
+<div class="line">            if (used + (needed) &gt;= buf_size - 1) { \</div>
+<div class="line">                buf_size *= 2; \</div>
+<div class="line">                buf = XREALLOC(buf, buf_size, <span class="stringliteral">&quot;buf&quot;</span>); \</div>
+<div class="line">                p = buf + used; \</div>
+<div class="line">                end = buf + buf_size - 1; \</div>
+<div class="line">            } \</div>
+<div class="line">        } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a7daef26dd4daea21e49315e8dbcf1684" name="a7daef26dd4daea21e49315e8dbcf1684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7daef26dd4daea21e49315e8dbcf1684">&#9670;&#160;</a></span>FLUSH_IF_NEEDED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FLUSH_IF_NEEDED</td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">        <span class="keywordflow">do</span> { \</div>
+<div class="line">            <span class="keywordtype">size_t</span> used = p - buf; \</div>
+<div class="line">            if (used &gt;= flush_threshold) { \</div>
+<div class="line">                *p = <span class="charliteral">&#39;\0&#39;</span>; \</div>
+<div class="line">                flush_fn(buf, used, ctx); \</div>
+<div class="line">                p = buf; \</div>
+<div class="line">            } \</div>
+<div class="line">        } <span class="keywordflow">while</span>(0)</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
 <a id="ad176dafa463adcaebeb9bef8bc72d852" name="ad176dafa463adcaebeb9bef8bc72d852"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad176dafa463adcaebeb9bef8bc72d852">&#9670;&#160;</a></span>ansi_map_states()</h2>
 
@@ -632,6 +695,61 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>char* Converted string </dd></dl>
+
+</div>
+</div>
+<a id="a104f0abc0b0a9e501afa5d4db999800e" name="a104f0abc0b0a9e501afa5d4db999800e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a104f0abc0b0a9e501afa5d4db999800e">&#9670;&#160;</a></span>level_ansi_stream()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void level_ansi_stream </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>ansi</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>xterm</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>truecolors</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void(*</td>          <td class="paramname"><span class="paramname"><em>flush_fn&#160;</em></span>)(const char *data, size_t len, void *ctx), </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>ctx</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert ANSI codes based on player capabilities with streaming output. </p>
+<p>This function processes ANSI escape sequences and flushes output when buffer reaches 80% capacity. This allows handling arbitrarily large messages without allocating huge buffers.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>The input string containing ANSI codes </td></tr>
+    <tr><td class="paramname">ansi</td><td>Player supports basic ANSI colors (16 colors) </td></tr>
+    <tr><td class="paramname">xterm</td><td>Player supports xterm colors (256 colors) </td></tr>
+    <tr><td class="paramname">truecolors</td><td>Player supports 24-bit true colors </td></tr>
+    <tr><td class="paramname">flush_fn</td><td>Callback function to flush buffer chunks </td></tr>
+    <tr><td class="paramname">ctx</td><td>Context pointer passed to flush_fn </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
