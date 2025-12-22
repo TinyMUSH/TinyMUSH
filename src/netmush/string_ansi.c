@@ -1034,7 +1034,7 @@ char *normal_to_white(const char *raw)
  * @param ansi_after Target ANSI state (packed bits)
  * @return char* Escape sequence performing the transition (newly allocated)
  */
-char *ansi_transition_esccode(int ansi_before, int ansi_after)
+char *ansi_transition_esccode(int ansi_before, int ansi_after, bool no_default_bg)
 {
 	int ansi_bits_set, ansi_bits_clr;
 	char *p;
@@ -1102,15 +1102,18 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after)
 			p[-2] |= (ansi_after & 0x00f);
 		}
 
-		/*
-		 * Background color
-		 */
-		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-		{
-			XSTRCPY(p, "40;");
-			p += 3;
-			p[-2] |= ((ansi_after & 0x0f0) >> 4);
-		}
+		   /*
+			* Background color
+			* Si no_default_bg est vrai, on ne génère pas de background si la couleur est 0 (noir par défaut)
+			*/
+		   if ((ansi_bits_set | ansi_bits_clr) & 0x0f0) {
+			   int bg = (ansi_after & 0x0f0) >> 4;
+			   if (!(no_default_bg && bg == 0)) {
+				   XSTRCPY(p, "40;");
+				   p += 3;
+				   p[-2] |= bg;
+			   }
+		   }
 
 		/*
 		 * Terminate

@@ -1260,7 +1260,7 @@ extern char *strip_xterm(char *s);
 extern char *strip_24bit(char *s);
 extern int strip_ansi_len(const char *s);
 extern char *normal_to_white(const char *raw);
-extern char *ansi_transition_esccode(int ansi_before, int ansi_after);
+extern char *ansi_transition_esccode(int ansi_before, int ansi_after, bool no_default_bg);
 extern char *ansi_transition_mushcode(int ansi_before, int ansi_after);
 extern char *ansi_transition_letters(int ansi_before, int ansi_after);
 extern int ansi_map_states(const char *s, int **m, char **p);

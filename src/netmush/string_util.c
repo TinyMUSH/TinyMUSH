@@ -817,7 +817,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 		}
 	}
 
-	p = ansi_transition_esccode(ansi_state, ANST_NONE);
+	p = ansi_transition_esccode(ansi_state, ANST_NONE, false);
 	XSAFELBSTR(p, *dst, &cp);
 	XFREE(p);
 }

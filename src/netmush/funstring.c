@@ -731,7 +731,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 				 * Yup, return what follows
 				 *
 				 */
-				buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2);
+				   buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 				XSAFELBSTR(cp, buff, bufc);
@@ -1006,7 +1006,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 			 */
 			*bp = '\0';
 			XSAFELBSTR(haystack, buff, bufc);
-			buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL);
+			   buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			return;
@@ -1683,7 +1683,7 @@ void fun_left(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	}
 
 	XSAFESTRNCAT(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
-	s = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+	s = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
 	XSAFELBSTR(s, buff, bufc);
 	XFREE(s);
 }
@@ -1832,7 +1832,7 @@ void fun_right(char *buff, char **bufc, dbref player __attribute__((unused)), db
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}
@@ -2285,21 +2285,12 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		return;
 	}
 
-	track_ansi_letters(fargs[0], &ansi_state);
-	s = ansi_transition_esccode(ANST_NONE, ansi_state);
-	// Si l'utilisateur n'a pas demandé de background, on retire \033[40m
-	if (s && !strchr(fargs[0], '/')) {
-		char *p = strstr(s, "\033[40m");
-		if (p) {
-			// On retire la séquence \033[40m
-			size_t len = strlen(s);
-			size_t off = p - s;
-			memmove(p, p + 5, len - off - 4); // 5 = longueur de "\033[40m"
-			s[len - 5] = '\0';
-		}
-	}
-	XSAFELBSTR(s, buff, bufc);
-	XFREE(s);
+	   track_ansi_letters(fargs[0], &ansi_state);
+	   // On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
+	   bool no_default_bg = !strchr(fargs[0], '/');
+	   s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
+	   XSAFELBSTR(s, buff, bufc);
+	   XFREE(s);
 
 	/**
 	 * Now that normal ansi has been done, time for xterm
@@ -2445,7 +2436,7 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	}
 
 	XSAFELBSTR(fargs[1], buff, bufc);
-	s = ansi_transition_esccode(ansi_state, ANST_NONE);
+	s = ansi_transition_esccode(ansi_state, ANST_NONE, false);
 	XSAFELBSTR(s, buff, bufc);
 	XFREE(s);
 
@@ -2583,7 +2574,7 @@ void fun_scramble(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 		if (ansi_state != ansi_map[j])
 		{
-			buf = ansi_transition_esccode(ansi_state, ansi_map[j]);
+			   buf = ansi_transition_esccode(ansi_state, ansi_map[j], false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			ansi_state = ansi_map[j];
@@ -2594,7 +2585,7 @@ void fun_scramble(char *buff, char **bufc, dbref player __attribute__((unused)),
 		stripped[j] = stripped[i];
 	}
 
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
 	XSAFELBSTR(buf, buff, bufc);
 	XFREE(buf);
 	XFREE(ansi_map);
@@ -2623,7 +2614,7 @@ void fun_reverse(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	{
 		if (ansi_state != ansi_map[n])
 		{
-			buf = ansi_transition_esccode(ansi_state, ansi_map[n]);
+			   buf = ansi_transition_esccode(ansi_state, ansi_map[n], false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			ansi_state = ansi_map[n];
@@ -2632,7 +2623,7 @@ void fun_reverse(char *buff, char **bufc, dbref player __attribute__((unused)), 
 		XSAFELBCHR(stripped[n], buff, bufc);
 	}
 
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
 	XSAFELBSTR(buf, buff, bufc);
 	XFREE(buf);
 	XFREE(ansi_map);
@@ -2775,7 +2766,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state);
+		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}
@@ -2840,7 +2831,7 @@ void fun_mid(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 	}
 
 	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
 	XSAFELBSTR(buf, buff, bufc);
 	XFREE(buf);
 }
@@ -3168,7 +3159,7 @@ void fun_ansipos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 	if (nfargs > 2 && (fargs[2][0] == 'e' || fargs[2][0] == '0'))
 	{
-		s = ansi_transition_esccode(ANST_NONE, ansi_state);
+		s = ansi_transition_esccode(ANST_NONE, ansi_state, false);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 	}
@@ -3570,7 +3561,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		/*
 		 * Restore previous ansi state
 		 */
-		buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
+		buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		/*
@@ -3580,7 +3571,7 @@ void perform_border(char *buff, char **bufc, dbref player __attribute__((unused)
 		/*
 		 * Back to ansi normal
 		 */
-		buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
+		buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 
@@ -4226,7 +4217,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Restore previous ansi state
 			 */
-			buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state);
+			   buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			/*
@@ -4236,7 +4227,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Back to ansi normal
 			 */
-			buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL);
+			   buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 
@@ -4744,14 +4735,14 @@ void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), d
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ansi_state_l, ansi_state_r);
+		buf = ansi_transition_esccode(ansi_state_l, ansi_state_r, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		XSAFELBSTR(s, buff, bufc);
 	}
 	else
 	{
-		buf = ansi_transition_esccode(ansi_state_l, ANST_NORMAL);
+		buf = ansi_transition_esccode(ansi_state_l, ANST_NORMAL, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}

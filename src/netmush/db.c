@@ -16,7 +16,9 @@
 #include "typedefs.h"
 #include "macros.h"
 #include "externs.h"
+
 #include "prototypes.h"
+#include <stdbool.h>
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -1133,7 +1135,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     }
 
     *bufc = s;
-    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL);
+    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
     XSAFELBSTR(buf, buff, bufc);
     XFREE(buf);
 }
