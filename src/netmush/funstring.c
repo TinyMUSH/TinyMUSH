@@ -2296,17 +2296,20 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	 */
 	s = fargs[0];
 
-	// Nouveau parsing : foreground, puis background si présent
-	// Foreground
+	// Parsing foreground color
 	XMEMSET(xtbuf, 0, SBUF_SIZE);
 	int is_chevron = 0;
-	if (*s == '<') { is_chevron = 1; s++; } else { is_chevron = 0; }
+	if (*s == '<') {
+		is_chevron = 1;
+		s++;
+	}
 	xtp = xtbuf;
 	while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0'))) {
 		XSAFESBCHR(*s, xtbuf, &xtp);
 		s++;
 	}
-	if (is_chevron && *s == '>') s++;
+	if (is_chevron && *s == '>')
+		s++;
 	*xtp = '\0';
 	int r = -1, g = -1, b = -1;
 	if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
@@ -2321,20 +2324,24 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
 	}
 	XSAFELBSTR(xtbuf, buff, bufc);
-	if (xtbuf[0]) xterm = 1;
-	// Background
+	if (xtbuf[0])
+		xterm = 1;
+	// Parsing background color only if '/' is present
 	if (*s == '/') {
 		s++;
 		XMEMSET(xtbuf, 0, SBUF_SIZE);
 		is_chevron = 0;
-		if (*s == '<') { is_chevron = 1; s++; } else { is_chevron = 0; }
+		if (*s == '<') {
+			is_chevron = 1;
+			s++;
+		}
 		xtp = xtbuf;
 		while (*s && ((is_chevron && *s != '>' && *s != '\0') || (!is_chevron && *s != '\0'))) {
-			if (!is_chevron && *s == '/') break;
 			XSAFESBCHR(*s, xtbuf, &xtp);
 			s++;
 		}
-		if (is_chevron && *s == '>') s++;
+		if (is_chevron && *s == '>')
+			s++;
 		*xtp = '\0';
 		r = g = b = -1;
 		if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
@@ -2348,8 +2355,10 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 			int i = str2xterm(xtbuf);
 			XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
 		}
-		XSAFELBSTR(xtbuf, buff, bufc);
-		if (xtbuf[0]) xterm = 1;
+		if (xtbuf[0]) {
+			XSAFELBSTR(xtbuf, buff, bufc);
+			xterm = 1;
+		}
 	}
 
 	s = fargs[1];
