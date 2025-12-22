@@ -1316,6 +1316,9 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			break;
 
 		case '=':
+		        // Equivalent of generic v() attr get
+		        (*dstr)++;
+
 				if (**dstr != '<')
 				{
 					(*dstr)--;
