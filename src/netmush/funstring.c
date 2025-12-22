@@ -2398,8 +2398,6 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		}
 	}
 
-	XFREE(xtbuf);
-
 	s = fargs[1];
 
 	while (*s)
@@ -2917,7 +2915,7 @@ void fun_pos(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 		if (t)
 		{
-			SAFE_LTOS(buff, bufc, (int)(t - s + 1), LBUF_SIZE);
+			XSAFELTOS(buff, bufc, (int)(t - s + 1), LBUF_SIZE);
 		}
 		else
 		{
@@ -2941,7 +2939,7 @@ void fun_pos(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 		if (*t == '\0')
 		{
-			SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, i, LBUF_SIZE);
 			XFREE(s1);
 			XFREE(b1);
 			return;
@@ -3011,7 +3009,7 @@ void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 				print_separator(&osep, buff, bufc);
 			}
 
-			SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, i, LBUF_SIZE);
 		}
 	}
 
@@ -3044,12 +3042,12 @@ void fun_diffpos(char *buff, char **bufc, dbref player __attribute__((unused)), 
 
 		if (*s1 != *s2)
 		{
-			SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, i, LBUF_SIZE);
 			return;
 		}
 	}
 
-	SAFE_LTOS(buff, bufc, -1, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, -1, LBUF_SIZE);
 }
 
 /*
@@ -3093,7 +3091,7 @@ void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 			xp = split_token(&cp, &isep);
 		}
 
-		SAFE_LTOS(buff, bufc, i, LBUF_SIZE);
+		XSAFELTOS(buff, bufc, i, LBUF_SIZE);
 		XFREE(buf);
 		return;
 	}
@@ -4572,7 +4570,7 @@ void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_strlen(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, strip_ansi_len(fargs[0]), LBUF_SIZE);
+	XSAFELTOS(buff, bufc, strip_ansi_len(fargs[0]), LBUF_SIZE);
 }
 
 void fun_delete(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

@@ -2567,7 +2567,7 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 					}
 
 					XSAFELBCHR('#', list, &lp);
-					SAFE_LTOS(list, &lp, obj, LBUF_SIZE);
+					XSAFELTOS(list, &lp, obj, LBUF_SIZE);
 				}
 			}
 		}
@@ -2591,7 +2591,7 @@ char *master_attr(dbref player, dbref thing, int what, char **sargs, int nsargs,
 				}
 
 				XSAFELBCHR('#', list, &lp);
-				SAFE_LTOS(list, &lp, obj, LBUF_SIZE);
+				XSAFELTOS(list, &lp, obj, LBUF_SIZE);
 			}
 		}
 		*lp = '\0';
@@ -3539,7 +3539,7 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 			}
 
 			tp = tbuf;
-			SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+			XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
 			XSAFELBCHR('.', tbuf, &tp);
 			*tp = '\0';
 			len = strlen(tbuf);
@@ -3629,7 +3629,7 @@ void do_reference(dbref player, __attribute__((unused)) dbref cause, int key, ch
 	}
 	else
 	{
-		SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+		XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
 		XSAFELBCHR('.', tbuf, &tp);
 	}
 

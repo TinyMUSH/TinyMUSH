@@ -1394,7 +1394,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					}
 
 					xtp = xtbuf;
-					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
+					XSAFELTOS(xtbuf, &xtp, player, LBUF_SIZE);
 					XSAFECOPYCHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
 					XSAFECOPYCHR(ch, xtbuf, &xtp, SBUF_SIZE - 1);
 				}
@@ -1410,7 +1410,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					}
 
 					xtp = xtbuf;
-					SAFE_LTOS(xtbuf, &xtp, player, LBUF_SIZE);
+					XSAFELTOS(xtbuf, &xtp, player, LBUF_SIZE);
 					XSAFECOPYCHR('.', xtbuf, &xtp, SBUF_SIZE - 1);
 
 					while (**dstr && (**dstr != '>'))
@@ -1663,7 +1663,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 *
 				 */
 				XSAFELBCHR('#', buff, bufc);
-				SAFE_LTOS(buff, bufc, cause, LBUF_SIZE);
+				XSAFELTOS(buff, bufc, cause, LBUF_SIZE);
 				break;
 
 			case '!':
@@ -1672,7 +1672,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 *
 				 */
 				XSAFELBCHR('#', buff, bufc);
-				SAFE_LTOS(buff, bufc, player, LBUF_SIZE);
+				XSAFELTOS(buff, bufc, player, LBUF_SIZE);
 				break;
 
 			case 'N':
@@ -1693,7 +1693,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				if (!(eval & EV_NO_LOCATION))
 				{
 					XSAFELBCHR('#', buff, bufc);
-					SAFE_LTOS(buff, bufc, where_is(cause), LBUF_SIZE);
+					XSAFELTOS(buff, bufc, where_is(cause), LBUF_SIZE);
 				}
 
 				break;
@@ -1704,7 +1704,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 *
 				 */
 				XSAFELBCHR('#', buff, bufc);
-				SAFE_LTOS(buff, bufc, caller, LBUF_SIZE);
+				XSAFELTOS(buff, bufc, caller, LBUF_SIZE);
 				break;
 
 			case ':':
@@ -1713,7 +1713,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 *
 				 */
 				XSAFELBCHR(':', buff, bufc);
-				SAFE_LTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
+				XSAFELTOS(buff, bufc, CreateTime(cause), LBUF_SIZE);
 				break;
 
 			case 'M':
@@ -1801,7 +1801,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				 * Arguments to function
 				 *
 				 */
-				SAFE_LTOS(buff, bufc, ncargs, LBUF_SIZE);
+				XSAFELTOS(buff, bufc, ncargs, LBUF_SIZE);
 				break;
 
 			case '|':
@@ -2196,7 +2196,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 				}
 				else if ((**dstr == '@') && mushstate.in_loop)
 				{
-					SAFE_LTOS(buff, bufc, mushstate.loop_number[mushstate.in_loop - 1], LBUF_SIZE);
+					XSAFELTOS(buff, bufc, mushstate.loop_number[mushstate.in_loop - 1], LBUF_SIZE);
 				}
 				else if ((**dstr == '+') && mushstate.in_loop)
 				{
@@ -2213,7 +2213,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					 * nesting level.
 					 *
 					 */
-					SAFE_LTOS(buff, bufc, ((mushstate.in_loop) ? (mushstate.in_loop - 1) : mushstate.in_switch), LBUF_SIZE);
+					XSAFELTOS(buff, bufc, ((mushstate.in_loop) ? (mushstate.in_loop - 1) : mushstate.in_switch), LBUF_SIZE);
 				}
 				else
 				{

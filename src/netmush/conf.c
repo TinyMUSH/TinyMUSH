@@ -2528,7 +2528,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 
     if ((tp->interpreter == cf_bool) || (tp->interpreter == cf_int) || (tp->interpreter == cf_int_factor) || (tp->interpreter == cf_const))
     {
-        SAFE_LTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
+        XSAFELTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
         return;
     }
 
@@ -2541,7 +2541,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
     if (tp->interpreter == cf_dbref)
     {
         XSAFELBCHR('#', buff, bufc);
-        SAFE_LTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
+        XSAFELTOS(buff, bufc, *(tp->loc), LBUF_SIZE);
         return;
     }
 

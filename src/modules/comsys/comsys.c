@@ -417,7 +417,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                         safe_name(cause, msg_ns, &mp);
                         XSAFELBCHR('(', msg_ns, &mp);
                         XSAFELBCHR('#', msg_ns, &mp);
-                        SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
+                        XSAFELTOS(msg_ns, &mp, cause, LBUF_SIZE);
                         XSAFELBCHR(')', msg_ns, &mp);
 
                         if (Good_obj(cause) && cause != Owner(cause))
@@ -430,7 +430,7 @@ static void com_message(CHANNEL *chp, char *msg, dbref cause)
                         if (cause != mushstate.curr_enactor)
                         {
                             XSAFESTRCAT(msg_ns, &mp, "<-(#", LBUF_SIZE);
-                            SAFE_LTOS(msg_ns, &mp, cause, LBUF_SIZE);
+                            XSAFELTOS(msg_ns, &mp, cause, LBUF_SIZE);
                             XSAFELBCHR(')', msg_ns, &mp);
                         }
 
@@ -2761,7 +2761,7 @@ void fun_cwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
                 XSAFELBCHR(' ', buff, bufc);
 
             XSAFELBCHR('#', buff, bufc);
-            SAFE_LTOS(buff, bufc, chp->connect_who[i]->player, LBUF_SIZE);
+            XSAFELTOS(buff, bufc, chp->connect_who[i]->player, LBUF_SIZE);
         }
     }
 }
@@ -2780,7 +2780,7 @@ void fun_cwhoall(char *buff, char **bufc, dbref player, dbref caller __attribute
             XSAFELBCHR(' ', buff, bufc);
 
         XSAFELBCHR('#', buff, bufc);
-        SAFE_LTOS(buff, bufc, wp->player, LBUF_SIZE);
+        XSAFELTOS(buff, bufc, wp->player, LBUF_SIZE);
     }
 }
 
@@ -2789,7 +2789,7 @@ void fun_comowner(char *buff, char **bufc, dbref player, dbref caller __attribut
     CHANNEL *chp;
     Grab_Channel(player);
     XSAFELBCHR('#', buff, bufc);
-    SAFE_LTOS(buff, bufc, chp->owner, LBUF_SIZE);
+    XSAFELTOS(buff, bufc, chp->owner, LBUF_SIZE);
 }
 
 void fun_comdesc(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

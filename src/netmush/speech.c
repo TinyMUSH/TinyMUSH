@@ -812,7 +812,7 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 				XSAFELBCHR(' ', dbref_list, &ddp);
 			}
 
-			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
+			XSAFELTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
 		}
 	}
 
@@ -855,14 +855,14 @@ void do_page(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	 * * eliminated when the pagegroup is used.
 	 */
 	dbref_list = ddp = XMALLOC(LBUF_SIZE, "dbref_list");
-	SAFE_LTOS(dbref_list, &ddp, player, LBUF_SIZE);
+	XSAFELTOS(dbref_list, &ddp, player, LBUF_SIZE);
 
 	for (i = 0; i < n_dbrefs; i++)
 	{
 		if (dbrefs_array[i] != NOTHING)
 		{
 			XSAFELBCHR(' ', dbref_list, &ddp);
-			SAFE_LTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
+			XSAFELTOS(dbref_list, &ddp, dbrefs_array[i], LBUF_SIZE);
 		}
 	}
 

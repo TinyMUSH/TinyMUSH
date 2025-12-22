@@ -442,6 +442,15 @@ void queue_write(DESC *d, const char *b, int n)
 	} while (n > 0);
 }
 
+/**
+ * Callback helper for level_ansi_stream - writes chunks directly to queue
+ */
+static void queue_write_callback(const char *data, size_t len, void *context)
+{
+	DESC *d = (DESC *)context;
+	queue_write(d, data, len);
+}
+
 void queue_string(DESC *d, const char *format, ...)
 {
 	va_list ap;
@@ -476,46 +485,36 @@ void queue_string(DESC *d, const char *format, ...)
 		}
 		else
 		{
-
-			buf = level_ansi(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player));
-			XSTRNCPY(msg, buf, LBUF_SIZE);
-			XFREE(buf);
-			/*
-			if (!Ansi(d->player) && strchr(s, ESC_CHAR))
+			// Check if we need post-processing (NoBleed or colormap)
+			bool needs_postprocessing = (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player))) || d->colormap;
+			
+			if (needs_postprocessing)
 			{
-				buf = strip_ansi(msg);
-				XSTRNCPY(msg, buf, LBUF_SIZE);
+				// Use buffered version for post-processing
+				buf = level_ansi(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player));
+				
+				if (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)))
+				{
+					char *buf2 = normal_to_white(buf);
+					XFREE(buf);
+					buf = buf2;
+				}
+				
+				if (d->colormap)
+				{
+					char *buf2 = remap_colors(buf, d->colormap);
+					XFREE(buf);
+					buf = buf2;
+				}
+				
+				queue_write(d, buf, strlen(buf));
 				XFREE(buf);
 			}
-			else if (!Color256(d->player)  && strchr(s, ESC_CHAR))
+			else
 			{
-				buf = strip_xterm(msg);
-				XSTRNCPY(msg, buf, LBUF_SIZE);
-				XFREE(buf);
+				// Use streaming version for direct output (fast path)
+				level_ansi_stream(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player), queue_write_callback, d);
 			}
-			else if (!Color24Bit(d->player)  && strchr(s, ESC_CHAR))
-			{
-				buf = strip_24bit(msg);
-				XSTRNCPY(msg, buf, LBUF_SIZE);
-				XFREE(buf);
-			}
-
-			else if (NoBleed(d->player))
-			*/
-			if (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)))
-			{
-				buf = normal_to_white(msg);
-				XSTRNCPY(msg, buf, LBUF_SIZE);
-				XFREE(buf);
-			}
-			else if (d->colormap)
-			{
-				buf = remap_colors(msg, d->colormap);
-				XSTRNCPY(msg, buf, LBUF_SIZE);
-				XFREE(buf);
-			}
-
-			queue_write(d, msg, strlen(msg));
 		}
 	}
 
@@ -2807,7 +2806,7 @@ void make_ulist(dbref player, char *buff, char **bufc)
 			}
 
 			XSAFELBCHR('#', buff, bufc);
-			SAFE_LTOS(buff, bufc, d->player, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, d->player, LBUF_SIZE);
 		}
 }
 

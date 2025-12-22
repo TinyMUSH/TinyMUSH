@@ -252,6 +252,21 @@ int tailfind(char *file, char *key)
 
 void do_dump(dbref player, dbref cause, int key)
 {
+	/* Journaliser et garder l'optimisation lorsqu'elle est demandée explicitement */
+	if (key & DUMP_OPTIMIZE)
+	{
+		if (mushstate.dumping)
+		{
+			/* Dump déjà en cours: refuser l'optimisation et consigner */
+			log_write(LOG_DBSAVES, "DMP", "OPT", "Refusing optimize: dump already in progress");
+			notify(player, "Dumping. Please try again later.");
+			return;
+		}
+
+		/* Pas de dump en cours: consigner la demande d'optimisation */
+		log_write(LOG_DBSAVES, "DMP", "OPT", "Optimize requested by player #%d", player);
+	}
+
 	if (mushstate.dumping)
 	{
 		notify(player, "Dumping. Please try again later.");
@@ -2477,7 +2492,10 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 		if ((key & DUMP_OPTIMIZE) || (mushconf.dbopt_interval && (mushstate.epoch % mushconf.dbopt_interval == 0)))
 		{
+            /* Journaliser le début/fin de l'optimisation côté commande */
+            log_write(LOG_DBSAVES, "DMP", "OPT", "Optimize start: %s.#%d#", mushconf.db_file, mushstate.epoch);
 			dddb_optimize();
+            log_write(LOG_DBSAVES, "DMP", "OPT", "Optimize done: %s.#%d#", mushconf.db_file, mushstate.epoch);
 		}
 	}
 

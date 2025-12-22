@@ -1254,6 +1254,7 @@ extern const char ansiMushCode(int num, bool bg);
 extern const int ansiBitsMask(int num);
 extern const int ansiBits(int num);
 extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
+extern void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors, void (*flush_fn)(const char *, size_t, void *), void *ctx);
 extern char *strip_ansi(const char *s);
 extern char *strip_xterm(char *s);
 extern char *strip_24bit(char *s);

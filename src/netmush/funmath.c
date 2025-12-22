@@ -464,7 +464,7 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
         total += (int)random_range(1, die);
     }
 
-    SAFE_LTOS(buff, bufc, total, LBUF_SIZE);
+    XSAFELTOS(buff, bufc, total, LBUF_SIZE);
 }
 
 /**

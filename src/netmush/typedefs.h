@@ -1422,6 +1422,7 @@ typedef struct
 {
     ANSICOLORTYPES type;
     rgbColor rgb;
+    uint8_t xterm_index;  /* Original xterm index (0-255) when type is ANSICOLORTYPE_XTERM */
 } VT100COLOR;
 
 typedef struct

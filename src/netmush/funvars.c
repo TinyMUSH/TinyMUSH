@@ -1476,7 +1476,7 @@ void print_htab_matches(dbref obj, HASHTAB *htab, char *buff, char **bufc)
     HASHENT *hptr;
     int i, len;
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, obj, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
@@ -1536,7 +1536,7 @@ void set_xvar(dbref obj, char *name, char *data)
      * truncating long names.
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, obj, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, obj, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = name; *p; p++)
@@ -1633,7 +1633,7 @@ void clear_xvars(dbref obj, char **xvar_names, int n_xvars)
      * Build our dbref bit first.
      */
     tp = pre;
-    SAFE_LTOS(pre, &tp, obj, LBUF_SIZE);
+    XSAFELTOS(pre, &tp, obj, LBUF_SIZE);
     XSAFESBCHR('.', pre, &tp);
     *tp = '\0';
 
@@ -1680,7 +1680,7 @@ void xvars_clr(dbref player)
     int i, len;
     VARENT *xvar;
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
@@ -1738,7 +1738,7 @@ void fun_x(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
      * Variable string is '<dbref number minus #>.<variable name>'
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
@@ -1892,7 +1892,7 @@ void fun_let(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
      * way is cleaner.
      */
     tp = pre;
-    SAFE_LTOS(pre, &tp, player, LBUF_SIZE);
+    XSAFELTOS(pre, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', pre, &tp);
     *tp = '\0';
 
@@ -2154,7 +2154,7 @@ void fun_structure(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * The hashtable is indexed by <dbref number>.<structure name>
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
@@ -2465,7 +2465,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Make sure this instance doesn't exist.
      */
     ip = ibuf;
-    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    XSAFELTOS(ibuf, &ip, player, LBUF_SIZE);
     XSAFESBCHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
@@ -2490,7 +2490,7 @@ void fun_construct(char *buff, char **bufc, dbref player, dbref caller, dbref ca
      * Look up the structure.
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[1]; *p; p++)
@@ -2738,7 +2738,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      * Make sure this instance doesn't exist.
      */
     ip = ibuf;
-    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    XSAFELTOS(ibuf, &ip, player, LBUF_SIZE);
     XSAFESBCHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
@@ -2763,7 +2763,7 @@ void load_structure(dbref player, char *buff, char **bufc, char *inst_name, char
      * Look up the structure.
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = str_name; *p; p++)
@@ -2975,7 +2975,7 @@ void fun_z(char *buff, char **bufc, dbref player, dbref caller __attribute__((un
     char *p, *tp;
     STRUCTDATA *s_ptr;
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
@@ -3031,7 +3031,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
      * Find the instance first, since this is how we get our typechecker.
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
@@ -3068,7 +3068,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
         if (inst_ptr->datatype->need_typecheck)
         {
             cp = cbuf;
-            SAFE_LTOS(cbuf, &cp, player, LBUF_SIZE);
+            XSAFELTOS(cbuf, &cp, player, LBUF_SIZE);
             XSAFESBCHR('.', cbuf, &cp);
             XSAFESBSTR(inst_ptr->datatype->s_name, cbuf, &cp);
             XSAFESBCHR('.', cbuf, &cp);
@@ -3134,7 +3134,7 @@ void fun_modify(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
     XFREE(words);
     XFREE(vals);
-    SAFE_LTOS(buff, bufc, n_mod, LBUF_SIZE);
+    XSAFELTOS(buff, bufc, n_mod, LBUF_SIZE);
     XFREE(tbuf);
     XFREE(cbuf);
 }
@@ -3152,7 +3152,7 @@ void unload_structure(dbref player, char *buff, char **bufc, char *inst_name, ch
      * Get the instance.
      */
     ip = ibuf;
-    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    XSAFELTOS(ibuf, &ip, player, LBUF_SIZE);
     XSAFESBCHR('.', ibuf, &ip);
 
     for (p = inst_name; *p; p++)
@@ -3281,7 +3281,7 @@ void fun_destruct(char *buff, char **bufc, dbref player, dbref caller __attribut
      * Get the instance.
      */
     ip = ibuf;
-    SAFE_LTOS(ibuf, &ip, player, LBUF_SIZE);
+    XSAFELTOS(ibuf, &ip, player, LBUF_SIZE);
     XSAFESBCHR('.', ibuf, &ip);
 
     for (p = fargs[0]; *p; p++)
@@ -3350,7 +3350,7 @@ void fun_unstructure(char *buff, char **bufc, dbref player, dbref caller __attri
      * Find the structure
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, player, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, player, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
 
     for (p = fargs[0]; *p; p++)
@@ -3465,7 +3465,7 @@ void structure_clr(dbref thing)
      * The instance table is indexed as <dbref number>.<instance name>
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, thing, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
@@ -3539,7 +3539,7 @@ void structure_clr(dbref thing)
      * The structure table is indexed as <dbref number>.<struct name>
      */
     tp = tbuf;
-    SAFE_LTOS(tbuf, &tp, thing, LBUF_SIZE);
+    XSAFELTOS(tbuf, &tp, thing, LBUF_SIZE);
     XSAFESBCHR('.', tbuf, &tp);
     *tp = '\0';
     len = strlen(tbuf);
@@ -3740,7 +3740,7 @@ void fun_items(char *buff, char **bufc, dbref player, dbref caller __attribute__
         }
     }
 
-    SAFE_LTOS(buff, bufc, StackCount(it), LBUF_SIZE);
+    XSAFELTOS(buff, bufc, StackCount(it), LBUF_SIZE);
 }
 
 void fun_push(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))

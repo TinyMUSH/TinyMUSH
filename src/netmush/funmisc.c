@@ -550,7 +550,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			print_separator(&osep, buff, bufc);
 		}
 
-		SAFE_LTOS(buff, bufc, bot, LBUF_SIZE);
+		XSAFELTOS(buff, bufc, bot, LBUF_SIZE);
 		XFREE(lnum_buff);
 		return;
 	}
@@ -622,7 +622,7 @@ void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  */
 void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.now, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.now, LBUF_SIZE);
 }
 
 /**
@@ -918,7 +918,7 @@ void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 	if (do_convtime(fargs[0], &ttm))
 	{
-		SAFE_LTOS(buff, bufc, mktime(&ttm), LBUF_SIZE);
+		XSAFELTOS(buff, bufc, mktime(&ttm), LBUF_SIZE);
 	}
 	else
 	{
@@ -1271,7 +1271,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
 					}
 					else
 					{
-						SAFE_LTOS(buff, bufc, n, LBUF_SIZE);
+						XSAFELTOS(buff, bufc, n, LBUF_SIZE);
 
 						if (showsuffix)
 						{
@@ -1375,7 +1375,7 @@ void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused))
  */
 void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.reboot_nums, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.reboot_nums, LBUF_SIZE);
 }
 
 /**
@@ -1524,7 +1524,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
  */
 void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.record_players, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.record_players, LBUF_SIZE);
 }
 
 /**
@@ -1542,7 +1542,7 @@ void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)
  */
 void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.func_invk_ctr, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.func_invk_ctr, LBUF_SIZE);
 }
 
 /**
@@ -1560,7 +1560,7 @@ void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), d
  */
 void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.func_nest_lev, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.func_nest_lev, LBUF_SIZE);
 }
 
 /**
@@ -1578,7 +1578,7 @@ void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), d
  */
 void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.cmd_invk_ctr, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.cmd_invk_ctr, LBUF_SIZE);
 }
 
 /**
@@ -1596,7 +1596,7 @@ void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), d
  */
 void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	SAFE_LTOS(buff, bufc, mushstate.cmd_nest_lev, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, mushstate.cmd_nest_lev, LBUF_SIZE);
 }
 
 /**
@@ -2191,7 +2191,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	XSAFELBCHR('#', buff, bufc);
-	SAFE_LTOS(buff, bufc, thing, LBUF_SIZE);
+	XSAFELTOS(buff, bufc, thing, LBUF_SIZE);
 }
 
 /*---------------------------------------------------------------------------
@@ -2425,7 +2425,7 @@ void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char
 				print_separator(&SPACE_DELIM, buff, bufc);
 			}
 
-			SAFE_LTOS(buff, bufc, tmp->pid, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, tmp->pid, LBUF_SIZE);
 		}
 	}
 }

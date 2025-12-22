@@ -4317,7 +4317,7 @@ void fun_mail(char *buff, char **bufc, dbref player, dbref caller __attribute__(
     if ((nfargs == 0) || !fargs[0] || !fargs[0][0])
     {
         count_mail(player, 0, &rc, &uc, &cc);
-        SAFE_LTOS(buff, bufc, rc + uc, LBUF_SIZE);
+        XSAFELTOS(buff, bufc, rc + uc, LBUF_SIZE);
         return;
     }
 
@@ -4432,7 +4432,7 @@ void fun_mailfrom(char *buff, char **bufc, dbref player, dbref caller __attribut
     if (mp != NULL)
     {
         XSAFELBCHR('#', buff, bufc);
-        SAFE_LTOS(buff, bufc, mp->from, LBUF_SIZE);
+        XSAFELTOS(buff, bufc, mp->from, LBUF_SIZE);
         return;
     }
 

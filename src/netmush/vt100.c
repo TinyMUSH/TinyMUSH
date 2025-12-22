@@ -487,7 +487,7 @@ VT100ATTR decodeVT100(const char **ansi)
     int codes[SGR_CODES_MAX];
     int index = 0;
     bool has_m = false;
-    VT100ATTR attr = {{ANSICOLORTYPE_NONE, {0, 0, 0}}, {ANSICOLORTYPE_NONE, {0, 0, 0}}, false};
+    VT100ATTR attr = {{ANSICOLORTYPE_NONE, {0, 0, 0}, 0}, {ANSICOLORTYPE_NONE, {0, 0, 0}, 0}, false};
 
     if (ansi == NULL || *ansi == NULL || **ansi != ESC_CHAR)
     {
@@ -564,6 +564,7 @@ VT100ATTR decodeVT100(const char **ansi)
                     if (codes[i] >= 0 && codes[i] <= 255)
                     {
                         attr.foreground.type = ANSICOLORTYPE_XTERM;
+                        attr.foreground.xterm_index = (uint8_t)codes[i];
                         attr.foreground.rgb = X112RGB((uint8_t)codes[i]);
                     }
                     break;
@@ -592,6 +593,7 @@ VT100ATTR decodeVT100(const char **ansi)
                     if (codes[i] >= 0 && codes[i] <= 255)
                     {
                         attr.background.type = ANSICOLORTYPE_XTERM;
+                        attr.background.xterm_index = (uint8_t)codes[i];
                         attr.background.rgb = X112RGB((uint8_t)codes[i]);
                     }
                     break;

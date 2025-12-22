@@ -51,9 +51,25 @@ void dbm_error(const char *msg)
 
 int dddb_optimize(void)
 {
+    int rc;
     log_write(LOG_ALWAYS, "DB", "INFO", "Optimizing %s", dbfile);
 
-    return gdbm_reorganize(dbp);
+    /*
+     * L'optimisation (gdbm_reorganize) réécrit la structure interne du fichier.
+     * Sans verrou exclusif, un accès concurrent en écriture/lecture peut
+     * corrompre la base. On utilise notre verrou fcntl global.
+     */
+    db_lock();
+
+    rc = gdbm_reorganize(dbp);
+
+    /* Assurer la persistance sur disque avant de libérer le verrou */
+    if (rc == 0) {
+        (void)gdbm_sync(dbp);
+    }
+
+    db_unlock();
+    return rc;
 }
 
 int dddb_init(void)

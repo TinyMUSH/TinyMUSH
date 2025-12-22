@@ -264,7 +264,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 				print_separator(&osep, buff, bufc);
 			}
 
-			SAFE_LTOS(buff, bufc, r_bot, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, r_bot, LBUF_SIZE);
 		}
 
 		return;
@@ -282,7 +282,7 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		tmp = (unsigned int)random_range(0, (n_range)-1);
 
-		SAFE_LTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
+		XSAFELTOS(buff, bufc, r_bot + tmp, LBUF_SIZE);
 	}
 }
 
@@ -436,7 +436,7 @@ void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	SAFE_LTOS(buff, bufc, countwords(fargs[0], &isep), LBUF_SIZE);
+	XSAFELTOS(buff, bufc, countwords(fargs[0], &isep), LBUF_SIZE);
 }
 
 /**
@@ -679,7 +679,7 @@ void fun_match(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 		if (quick_wild(fargs[1], r))
 		{
-			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, wcount, LBUF_SIZE);
 			return;
 		}
 
@@ -765,7 +765,7 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 				print_separator(&osep, buff, bufc);
 			}
 
-			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, wcount, LBUF_SIZE);
 		}
 
 		wcount++;
@@ -1436,7 +1436,7 @@ void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 		if (!strcmp(fargs[1], r))
 		{
-			SAFE_LTOS(buff, bufc, wcount, LBUF_SIZE);
+			XSAFELTOS(buff, bufc, wcount, LBUF_SIZE);
 			return;
 		}
 
@@ -1919,7 +1919,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_separator(&osep, buff, bufc);
 			}
 
-			SAFE_LTOS(buff, bufc, poslist[i], LBUF_SIZE);
+			XSAFELTOS(buff, bufc, poslist[i], LBUF_SIZE);
 		}
 	}
 	else

@@ -68,7 +68,8 @@
 #define XSAFENOMATCH(b, p) __xsafestrncat(b, p, "#-1 NO MATCH", 12, LBUF_SIZE - 1)
 #define XSAFEBOOL(b, p, n) __xsafestrcatchr((b), (p), ((n) ? '1' : '0'), LBUF_SIZE - 1)
 
-#define SAFE_LTOS(d, p, n, s) __xsafeltos(d, p, n, s)
+#define XSAFELTOS(d, p, n, s) __xsafeltos(d, p, n, s)
+
 
 // Misc Macros
 #define XGETSIZE(p) (((char *)__xfind(p)->magic - p) - sizeof(char))

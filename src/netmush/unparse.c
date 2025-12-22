@@ -172,7 +172,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 
 				default:
 					XSAFELBCHR('#', boolexp_buf, buftop);
-					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
+					XSAFELTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
 
@@ -193,7 +193,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 
 				default:
 					XSAFELBCHR('#', boolexp_buf, buftop);
-					SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
+					XSAFELTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 					break;
 				}
 			}
@@ -226,7 +226,7 @@ void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, cha
 		}
 		else
 		{
-			SAFE_LTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
+			XSAFELTOS(boolexp_buf, buftop, b->thing, LBUF_SIZE);
 		}
 
 		XSAFELBCHR(sep_ch, boolexp_buf, buftop);

@@ -222,7 +222,10 @@ unsigned int register_dbtype(char *modname)
 		 */
 		data.dptr = &mushstate.moduletype_top;
 		data.dsize = sizeof(unsigned int);
+		/* Verrouiller lors de l'écriture pour éviter les courses */
+		db_lock();
 		db_put(key, data, DBTYPE_MODULETYPE);
+		db_unlock();
 		type = mushstate.moduletype_top;
 		mushstate.moduletype_top++;
 		return type;

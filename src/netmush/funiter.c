@@ -502,7 +502,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  */
 void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    SAFE_LTOS(buff, bufc, mushstate.in_loop - 1, LBUF_SIZE);
+    XSAFELTOS(buff, bufc, mushstate.in_loop - 1, LBUF_SIZE);
 }
 
 /**
@@ -529,7 +529,7 @@ void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
         return;
     }
 
-    SAFE_LTOS(buff, bufc, mushstate.loop_number[lev], LBUF_SIZE);
+    XSAFELTOS(buff, bufc, mushstate.loop_number[lev], LBUF_SIZE);
 }
 
 /**
@@ -682,7 +682,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     i = 1;
     clist[2] = XMALLOC(SBUF_SIZE, "clist[2]");
     op = clist[2];
-    SAFE_LTOS(clist[2], &op, i, LBUF_SIZE);
+    XSAFELTOS(clist[2], &op, i, LBUF_SIZE);
 
     if ((nfargs >= 3) && (fargs[2]))
     {
@@ -711,7 +711,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
         clist[0] = rstore;
         clist[1] = split_token(&cp, &isep);
         op = clist[2];
-        SAFE_LTOS(clist[2], &op, i, LBUF_SIZE);
+        XSAFELTOS(clist[2], &op, i, LBUF_SIZE);
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
@@ -808,7 +808,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     {
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
+        XSAFELTOS(objs[1], &op, i, LBUF_SIZE);
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         result = bp = XMALLOC(LBUF_SIZE, "bp");
@@ -928,7 +928,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
+        XSAFELTOS(objs[1], &op, i, LBUF_SIZE);
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
@@ -1253,7 +1253,7 @@ void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref caus
         cbuf[0][0] = *cp++;
         cbuf[0][1] = '\0';
         op = cbuf[1];
-        SAFE_LTOS(cbuf[1], &op, i, LBUF_SIZE);
+        XSAFELTOS(cbuf[1], &op, i, LBUF_SIZE);
         XMEMCPY(atextbuf, atext, alen);
         atextbuf[alen] = '\0';
         str = atextbuf;
@@ -1537,7 +1537,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
         objs[0] = split_token(&cp, &isep);
         op = objs[1];
-        SAFE_LTOS(objs[1], &op, i, LBUF_SIZE);
+        XSAFELTOS(objs[1], &op, i, LBUF_SIZE);
         XMEMCPY(atextbuf, atext1, alen1);
         atextbuf[alen1] = '\0';
         str = atextbuf;

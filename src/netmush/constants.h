@@ -15,7 +15,7 @@
 #include <float.h>
 
 #define HBUF_SIZE 32768 /*!< Huge buffer size */
-#define LBUF_SIZE 8192  /*!< Large buffer size */
+#define LBUF_SIZE 16384  /*!< Large buffer size (increased for complex ANSI/xterm output) */
 #define GBUF_SIZE 1024  /*!< Generic buffer size */
 #define MBUF_SIZE 512   /*!< Standard buffer size */
 #define SBUF_SIZE 64    /*!< Small buffer size */

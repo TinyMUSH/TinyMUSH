@@ -184,7 +184,7 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
 		return;
 	}
 
-	SAFE_LTOS(buff, bufc, Is_Func(CONNINFO_IDLE) ? fetch_idle(target, port) : fetch_connect(target, port), LBUF_SIZE);
+	XSAFELTOS(buff, bufc, Is_Func(CONNINFO_IDLE) ? fetch_idle(target, port) : fetch_connect(target, port), LBUF_SIZE);
 }
 
 /**
@@ -240,7 +240,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
 	}
 
 	XSAFELBCHR('#', buff, bufc);
-	SAFE_LTOS(buff, bufc, get_programmer(target), LBUF_SIZE);
+	XSAFELTOS(buff, bufc, get_programmer(target), LBUF_SIZE);
 }
 
 /**
