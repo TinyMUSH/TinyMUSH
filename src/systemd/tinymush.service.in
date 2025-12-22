@@ -3,6 +3,7 @@ Description=TinyMUSH service
 
 [Service]
 ExecStart=${TINYMUSH_ROOT_DIRECTORY}/netmush
+WorkingDirectory=${TINYMUSH_ROOT_DIRECTORY}
 KillMode=process
 KillSignal=QUIT
 RestartKillSignal=USR1
