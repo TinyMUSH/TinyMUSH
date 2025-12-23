@@ -2290,12 +2290,27 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		return;
 	}
 
-	   track_ansi_letters(fargs[0], &ansi_state);
-	   // On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
-	   bool no_default_bg = !strchr(fargs[0], '/');
-	   s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
-	   XSAFELBSTR(s, buff, bufc);
-	   XFREE(s);
+	       // On ne génère la séquence classique que si aucune couleur explicite n'est demandée
+	       bool has_explicit_color = false;
+	       char *tmp = fargs[0];
+	       // Détection d'un code couleur explicite (RGB, XTERM, etc.)
+	       if (tmp && *tmp) {
+		       // RGB hexadécimal (#RRGGBB)
+		       if (*tmp == '#' && strlen(tmp) == 7) has_explicit_color = true;
+		       // RGB espace (R G B)
+		       int r = -1, g = -1, b = -1;
+		       if (sscanf(tmp, "%d %d %d", &r, &g, &b) == 3 && r >= 0 && g >= 0 && b >= 0) has_explicit_color = true;
+		       // XTERM index
+		       if (str2xterm(tmp) >= 0 && str2xterm(tmp) <= 255) has_explicit_color = true;
+	       }
+	       if (!has_explicit_color) {
+		       track_ansi_letters(fargs[0], &ansi_state);
+		       // On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
+		       bool no_default_bg = !strchr(fargs[0], '/');
+		       s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
+		       XSAFELBSTR(s, buff, bufc);
+		       XFREE(s);
+	       }
 
 	/**
 	 * Now that normal ansi has been done, time for xterm
