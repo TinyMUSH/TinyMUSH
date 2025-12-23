@@ -2268,8 +2268,13 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
  */
 void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	int ansi_state = 0;
-	int xterm = 0;
+	       int ansi_state = 0;
+	       int xterm = 0;
+	       bool color24bit = false;
+	       // Détection du flag COLOR24BIT
+	       if (player != NOTHING && Color24Bit(player)) {
+		       color24bit = true;
+	       }
 	char *s = NULL, *xtp = NULL;
 	char xtbuf[SBUF_SIZE];
 
@@ -2319,26 +2324,33 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	       } else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
 		       // Format "R G B"
 	       }
-	       if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
-		       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
-		       XSAFELBSTR(xtbuf, buff, bufc);
-		       xterm = 1;
-	       } else if (xtbuf[0]) {
-		       // Si une seule lettre, utiliser la table classique
-		       if (strlen(xtbuf) == 1) {
-			       const char *seq = ansiChar(xtbuf[0]);
-			       if (seq && *seq) {
-				       XSAFELBSTR(seq, buff, bufc);
-			       }
-		       } else {
-			       int i = str2xterm(xtbuf);
-			       if (i >= 0 && i <= 255) {
-				       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-				       XSAFELBSTR(xtbuf, buff, bufc);
-				       xterm = 1;
+		       if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+				       if (color24bit) {
+					       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
+					       XSAFELBSTR(xtbuf, buff, bufc);
+				       } else {
+					       rgbColor rgb; rgb.r = r; rgb.g = g; rgb.b = b;
+					       int i = RGB2X11(rgb);
+					       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+					       XSAFELBSTR(xtbuf, buff, bufc);
+					       xterm = 1;
+				       }
+		       } else if (xtbuf[0]) {
+			       // Si une seule lettre, utiliser la table classique
+			       if (strlen(xtbuf) == 1) {
+				       const char *seq = ansiChar(xtbuf[0]);
+				       if (seq && *seq) {
+					       XSAFELBSTR(seq, buff, bufc);
+				       }
+			       } else {
+				       int i = str2xterm(xtbuf);
+				       if (i >= 0 && i <= 255) {
+					       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+					       XSAFELBSTR(xtbuf, buff, bufc);
+					       xterm = 1;
+				       }
 			       }
 		       }
-	       }
 	// Parsing background color only if '/' is present
 	if (*s == '/') {
 		s++;
@@ -2379,10 +2391,18 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 					int i = str2xterm(xtbuf);
 					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
 				}
-				if (xtbuf[0]) {
-					XSAFELBSTR(xtbuf, buff, bufc);
-					xterm = 1;
-				}
+				       if (xtbuf[0]) {
+						       if (color24bit && r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+							       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
+							       XSAFELBSTR(xtbuf, buff, bufc);
+						       } else {
+							       rgbColor rgb; rgb.r = r; rgb.g = g; rgb.b = b;
+							       int i = RGB2X11(rgb);
+							       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
+							       XSAFELBSTR(xtbuf, buff, bufc);
+							       xterm = 1;
+						       }
+				       }
 			}
 		}
 	}
