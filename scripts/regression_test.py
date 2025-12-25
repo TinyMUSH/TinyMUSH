@@ -81,7 +81,11 @@ def load_commands(path: str) -> List[Tuple[str, str]]:
             if not line or line.startswith("#"):
                 continue
 
-            if "|" in line:
+            if line.startswith(">"): # send line literally without splitting at |
+                cmd = line[1:].strip()
+                commands.append((cmd, ""))
+
+            elif "|" in line:
                 cmd, expected = line.split("|", 1)
                 commands.append((cmd.strip(), expected.strip()))
             else:
