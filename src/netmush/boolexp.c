@@ -601,7 +601,6 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
  */
 BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	log_write_raw(1, "Parsing L: %s ", *pBuf);
 	BOOLEXP *b = NULL;
 	char *p = NULL, *buf = NULL;
 	MSTATE mstate;
@@ -612,7 +611,6 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 	switch ((**pBuf))
 	{
 	case '(':
-	    log_write_raw(1, "(parenthesis)\n");
 		(*pBuf)++;
 		b = parse_boolexp_E(pBuf, parse_player, parsing_internal);
 		skip_whitespace(pBuf);
@@ -671,7 +669,6 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		{
 			if (parsing_internal)
 			{
-	            log_write_raw(1, "(internal mode)\n");
 				if (buf[0] != '#')
 				{
 					XFREE(buf);
@@ -690,7 +687,6 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 			}
 			else
 			{
-	            log_write_raw(1, "(external mode)\n");
 				save_match_state(&mstate);
 				init_match(parse_player, buf, TYPE_THING);
 				match_everything(MAT_EXIT_PARENTS);
@@ -736,12 +732,11 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		XFREE(buf);
 	}
 
-	log_write_raw(1, "Returning L: %s\n", *pBuf);
 	return b;
 }
 
 /**
- * @brief F -> !F; F -> @L; F -> =L; F -> +L; F -> $L; F -> L
+ * @brief F -> !F; F -> @L; F -> =L; F -> +L; F -> $L
  *
  * The argument L must be type BOOLEXP_CONST
  *
@@ -752,7 +747,6 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	log_write_raw(1, "Parsing F: %s\n", *pBuf);
 	BOOLEXP *b2 = NULL;
 
 	/**
@@ -783,7 +777,6 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		else
 		{
 			parse_depth--;
-	        log_write_raw(1, "Returning F(not): %s\n", *pBuf);
 			return (b2);
 		}
 
@@ -809,7 +802,6 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		else
 		{
 			parse_depth--;
-	        log_write_raw(1, "Returning F(indir): %s\n", *pBuf);
 			return (b2);
 		}
 
@@ -835,7 +827,6 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		else
 		{
 			parse_depth--;
-			(1, "Returning F(is): %s\n", *pBuf);
 			return (b2);
 		}
 
@@ -861,7 +852,6 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		else
 		{
 			parse_depth--;
-			(1, "Returning F(carry): %s\n", *pBuf);
 			return (b2);
 		}
 
@@ -887,14 +877,12 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
 		else
 		{
 			parse_depth--;
-			(1, "Returning F(owner): %s\n", *pBuf);
 			return (b2);
 		}
 
 	default:
 		b2 = parse_boolexp_L(pBuf, parse_player, parsing_internal);
 		parse_depth--;
-	    log_write_raw(1, "Returning F(literal): %s\n", *pBuf);
 		return b2;
 	}
 }
@@ -909,7 +897,6 @@ BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	log_write_raw(1, "Parsing T: %s\n", *pBuf);
 	BOOLEXP *b = NULL, *b2 = NULL;
 
 	/**
@@ -946,7 +933,6 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
 	}
 
 	parse_depth--;
-	log_write_raw(1, "Returning T: %s\n", *pBuf);
 	return b;
 }
 
@@ -960,7 +946,6 @@ BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 {
-	log_write_raw(1, "Parsing E: %s\n", *pBuf);
 	BOOLEXP *b = NULL, *b2 = NULL;
 
 	/**
@@ -997,7 +982,6 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
 	}
 
 	parse_depth--;
-	log_write_raw(1, "Returning E: %s\n", *pBuf);
 	return b;
 }
 
@@ -1011,7 +995,6 @@ BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal)
  */
 BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal)
 {
-	log_write_raw(1, "Parsing boolexp %s, (internal: %d)\n", buf, internal);
 	char *p = NULL, *pBuf = NULL, *pStore = NULL;
 	int num_opens = 0;
 	BOOLEXP *ret = NULL;
