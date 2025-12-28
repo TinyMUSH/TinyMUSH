@@ -6,7 +6,7 @@ TinyMUSH 4.0 uses CMake as its build system. This guide covers installation, con
 
 ```bash
 # Install dependencies (Ubuntu/Debian)
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
 
 # Build and install
 mkdir -p build && cd build
@@ -26,13 +26,13 @@ Default God password: **potrzebie**
 ### Ubuntu/Debian
 
 ```bash
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
 ```
 
 ### macOS (Homebrew)
 
 ```bash
-brew install cmake gdbm pcre
+brew install cmake gdbm pcre2
 ```
 
 ### Optional Tools

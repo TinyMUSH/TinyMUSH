@@ -21,7 +21,8 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#include <pcre.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <dlfcn.h>
@@ -764,7 +765,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 					*s++ = '\0';
 
-					if (((!(aflags & AF_REGEXP) && wild(buff + 1, new, aargs, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(buff + 1, new, ((aflags & AF_CASE) ? 0 : PCRE_CASELESS), aargs, NUM_ENV_VARS))) && (!mushconf.addcmd_obey_uselocks || could_doit(player, add->thing, A_LUSE)))
+					if (((!(aflags & AF_REGEXP) && wild(buff + 1, new, aargs, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(buff + 1, new, ((aflags & AF_CASE) ? 0 : PCRE2_CASELESS), aargs, NUM_ENV_VARS))) && (!mushconf.addcmd_obey_uselocks || could_doit(player, add->thing, A_LUSE)))
 					{
 						process_cmdline(((!(cmdp->callseq & CS_ACTOR) || God(player)) ? add->thing : player), player, s, aargs, NUM_ENV_VARS, NULL);
 

@@ -44,7 +44,7 @@ git clone https://github.com/TinyMUSH/TinyMUSH.git
 cd TinyMUSH
 
 # Install dependencies (Ubuntu/Debian)
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
 
 # Build and install
 mkdir -p build && cd build

@@ -25,7 +25,8 @@
 #include <string.h>
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <pcre.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -349,13 +350,14 @@ void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __
 int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs)
 {
 	int i;
-	pcre *re;
-	const char *errptr;
-	int erroffset;
-	int offsets[PCRE_MAX_OFFSETS];
+	pcre2_code *re;
+	pcre2_match_data *match_data;
+	int errorcode;
+	PCRE2_SIZE erroroffset;
 	int subpatterns;
 
-	if ((re = pcre_compile(pattern, case_opt, &errptr, &erroffset, mushstate.retabs)) == NULL)
+	re = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, case_opt, &errorcode, &erroroffset, NULL);
+	if (re == NULL)
 	{
 		/*
 		 * This is a matching error. We have an error message in
@@ -365,13 +367,16 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 		return 0;
 	}
 
+	match_data = pcre2_match_data_create_from_pattern(re, NULL);
+
 	/*
 	 * Now we try to match the pattern. The relevant fields will
 	 * automatically be filled in by this.
 	 */
-	if ((subpatterns = pcre_exec(re, NULL, str, strlen(str), 0, 0, offsets, PCRE_MAX_OFFSETS)) < 0)
+	if ((subpatterns = pcre2_match(re, (PCRE2_SPTR)str, strlen(str), 0, 0, match_data, NULL)) < 0)
 	{
-		pcre_free(re);
+		pcre2_match_data_free(match_data);
+		pcre2_code_free(re);
 		return 0;
 	}
 
@@ -399,8 +404,9 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 	for (i = 0; i < nargs; i++)
 	{
 		args[i] = XMALLOC(LBUF_SIZE, "args[i]");
+		PCRE2_SIZE arglen = LBUF_SIZE;
 
-		if (pcre_copy_substring(str, offsets, subpatterns, i, args[i], LBUF_SIZE) < 0)
+		if (pcre2_substring_copy_bynumber(match_data, i, (PCRE2_UCHAR *)args[i], &arglen) < 0)
 		{
 			/*
 			 * Match behavior of wild(): clear out null values.
@@ -410,7 +416,8 @@ int regexp_match(char *pattern, char *str, int case_opt, char *args[], int nargs
 		}
 	}
 
-	pcre_free(re);
+	pcre2_match_data_free(match_data);
+	pcre2_code_free(re);
 	return 1;
 }
 
@@ -507,7 +514,7 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 
 		*s++ = 0;
 
-		if ((!(aflags & (AF_REGEXP | AF_RMATCH)) && wild(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), ((aflags & AF_CASE) ? 0 : PCRE_CASELESS), args, NUM_ENV_VARS)) || ((aflags & AF_RMATCH) && register_match(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), args, NUM_ENV_VARS)))
+		if ((!(aflags & (AF_REGEXP | AF_RMATCH)) && wild(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), ((aflags & AF_CASE) ? 0 : PCRE2_CASELESS), args, NUM_ENV_VARS)) || ((aflags & AF_RMATCH) && register_match(buff + 1, ((aflags & AF_NOPARSE) ? raw_str : str), args, NUM_ENV_VARS)))
 		{
 			match = 1;
 
@@ -598,10 +605,9 @@ int check_filter(dbref object, dbref player, int filter, const char *msg)
 	int aflags, alen;
 	dbref aowner;
 	char *buf, *nbuf, *cp, *dp, *str;
-	pcre *re;
-	const char *errptr;
-	int len, case_opt, erroffset, subpatterns;
-	int offsets[PCRE_MAX_OFFSETS];
+	int len, case_opt, errorcode;
+	PCRE2_SIZE erroroffset;
+	int subpatterns;
 	GDATA *preserve;
 	buf = atr_pget(object, filter, &aowner, &aflags, &alen);
 
@@ -643,25 +649,30 @@ int check_filter(dbref object, dbref player, int filter, const char *msg)
 	else
 	{
 		len = strlen(msg);
-		case_opt = (aflags & AF_CASE) ? 0 : PCRE_CASELESS;
+		case_opt = (aflags & AF_CASE) ? 0 : PCRE2_CASELESS;
 
 		do
 		{
 			cp = parse_to(&dp, ',', EV_STRIP);
-			re = pcre_compile(cp, case_opt, &errptr, &erroffset, mushstate.retabs);
+			pcre2_code *re;
+			pcre2_match_data *match_data;
+			re = pcre2_compile((PCRE2_SPTR)cp, PCRE2_ZERO_TERMINATED, case_opt, &errorcode, &erroroffset, NULL);
 
 			if (re != NULL)
 			{
-				subpatterns = pcre_exec(re, NULL, (char *)msg, len, 0, 0, offsets, PCRE_MAX_OFFSETS);
+				match_data = pcre2_match_data_create_from_pattern(re, NULL);
+				subpatterns = pcre2_match(re, (PCRE2_SPTR)msg, len, 0, 0, match_data, NULL);
 
 				if (subpatterns >= 0)
 				{
-					pcre_free(re);
+					pcre2_match_data_free(match_data);
+					pcre2_code_free(re);
 					XFREE(nbuf);
 					return (0);
 				}
 
-				pcre_free(re);
+				pcre2_match_data_free(match_data);
+				pcre2_code_free(re);
 			}
 		} while (dp != NULL);
 	}
@@ -998,7 +1009,7 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		{
 			tp = atr_get(target, A_LISTEN, &aowner, &aflags, &alen);
 
-			if (*tp && ((!(aflags & AF_REGEXP) && wild(tp, msg, args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(tp, msg, ((aflags & AF_CASE) ? 0 : PCRE_CASELESS), args, NUM_ENV_VARS))))
+			if (*tp && ((!(aflags & AF_REGEXP) && wild(tp, msg, args, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(tp, msg, ((aflags & AF_CASE) ? 0 : PCRE2_CASELESS), args, NUM_ENV_VARS))))
 			{
 				for (nargs = NUM_ENV_VARS; nargs && (!args[nargs - 1] || !(*args[nargs - 1])); nargs--)
 					;
@@ -3934,7 +3945,7 @@ int main(int argc, char *argv[])
 	/*
 	 * Initialize PCRE tables for locale.
 	 */
-	mushstate.retabs = pcre_maketables();
+	mushstate.retabs = NULL;
 	/*
 	 * Go do restart things.
 	 */

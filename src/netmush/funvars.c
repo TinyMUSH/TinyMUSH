@@ -20,7 +20,8 @@
 
 #include <ctype.h>
 #include <string.h>
-#include <pcre.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
 /*
  * ---------------------------------------------------------------------------
@@ -4172,19 +4173,21 @@ void fun_lstack(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-    pcre *re;
-    pcre_extra *study = NULL;
-    const char *errptr;
+    pcre2_code *re;
+    pcre2_match_data *match_data;
     int case_option, all_option;
-    int erroffset, subpatterns, len;
-    int offsets[PCRE_MAX_OFFSETS];
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+    int subpatterns, len;
+    PCRE2_SIZE *ovector;
     char *r, *start, *tbuf;
     char tmp;
     int match_offset = 0;
     case_option = Func_Mask(REG_CASELESS);
     all_option = Func_Mask(REG_MATCH_ALL);
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
+    re = pcre2_compile((PCRE2_SPTR)fargs[1], PCRE2_ZERO_TERMINATED, case_option, &errorcode, &erroroffset, NULL);
+    if (re == NULL)
     {
         /*
          * Matching error. Note that this returns a null string
@@ -4192,29 +4195,22 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
          * in order to remain consistent with our other regexp
          * functions.
          */
-        notify_quiet(player, errptr);
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+        notify_quiet(player, (char *)buffer);
         return;
     }
 
     /*
-     * Study the pattern for optimization, if we're going to try multiple
-     * matches.
+     * JIT compile for optimization
      */
-    if (all_option)
-    {
-        study = pcre_study(re, 0, &errptr);
+    pcre2_jit_compile(re, PCRE2_JIT_COMPLETE);
 
-        if (errptr != NULL)
-        {
-            XFREE(re);
-            notify_quiet(player, errptr);
-            return;
-        }
-    }
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
 
     len = strlen(fargs[0]);
     start = fargs[0];
-    subpatterns = pcre_exec(re, study, fargs[0], len, 0, 0, offsets, PCRE_MAX_OFFSETS);
+    subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], len, 0, 0, match_data, NULL);
 
     /*
      * If there's no match, just return the original.
@@ -4222,16 +4218,14 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
 
     if (subpatterns < 0)
     {
-        XFREE(re);
-
-        if (study)
-        {
-            XFREE(study);
-        }
+        pcre2_match_data_free(match_data);
+        pcre2_code_free(re);
 
         XSAFELBSTR(fargs[0], buff, bufc);
         return;
     }
+
+    ovector = pcre2_get_ovector_pointer(match_data);
 
     do
     {
@@ -4247,10 +4241,10 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
         /*
          * Copy up to the start of the matched area.
          */
-        tmp = fargs[0][offsets[0]];
-        fargs[0][offsets[0]] = '\0';
+        tmp = fargs[0][ovector[0]];
+        fargs[0][ovector[0]] = '\0';
         XSAFELBSTR(start, buff, bufc);
-        fargs[0][offsets[0]] = tmp;
+        fargs[0][ovector[0]] = tmp;
 
         /*
          * Copy in the replacement, putting in captured
@@ -4302,35 +4296,32 @@ void perform_regedit(char *buff, char **bufc, dbref player, dbref caller __attri
             }
 
             tbuf = XMALLOC(LBUF_SIZE, "tbuf");
-            if (pcre_copy_substring(fargs[0], offsets, subpatterns, offset, tbuf, LBUF_SIZE) >= 0)
+            PCRE2_SIZE tbuflen = LBUF_SIZE;
+            if (pcre2_substring_copy_bynumber(match_data, offset, (PCRE2_UCHAR *)tbuf, &tbuflen) >= 0)
             {
                 XSAFELBSTR(tbuf, buff, bufc);
             }
             XFREE(tbuf);
         }
 
-        start = fargs[0] + offsets[1];
-        match_offset = offsets[1];
-    } while (all_option && (((offsets[0] == offsets[1]) &&
+        start = fargs[0] + ovector[1];
+        match_offset = ovector[1];
+    } while (all_option && (((ovector[0] == ovector[1]) &&
                              /*
                               * PCRE docs note: Perl special-cases the empty-string match in split
                               * and /g. To emulate, first try the match again at the same position
                               * with PCRE_NOTEMPTY, then advance the starting offset if that
                               * fails.
                               */
-                             (((subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, PCRE_NOTEMPTY, offsets, PCRE_MAX_OFFSETS)) >= 0) || ((match_offset++ < len) && (subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, 0, offsets, PCRE_MAX_OFFSETS)) >= 0))) ||
-                            ((match_offset <= len) && (subpatterns = pcre_exec(re, study, fargs[0], len, match_offset, 0, offsets, PCRE_MAX_OFFSETS)) >= 0)));
+                             (((subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], len, match_offset, PCRE2_NOTEMPTY, match_data, NULL)) >= 0) || ((match_offset++ < len) && (subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], len, match_offset, 0, match_data, NULL)) >= 0))) ||
+                            ((match_offset <= len) && (subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], len, match_offset, 0, match_data, NULL)) >= 0)));
 
     /*
      * Copy everything after the matched bit.
      */
     XSAFELBSTR(start, buff, bufc);
-    XFREE(re);
-
-    if (study)
-    {
-        XFREE(study);
-    }
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
 }
 
 /*
@@ -4387,24 +4378,29 @@ void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribut
     int case_option;
     char **qregs;
     char *matchbuf = XMALLOC(LBUF_SIZE, "matchbuf");
-    pcre *re;
-    const char *errptr;
-    int erroffset;
-    int offsets[PCRE_MAX_OFFSETS];
+    pcre2_code *re;
+    pcre2_match_data *match_data;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
+    PCRE2_SIZE *ovector;
     int subpatterns;
     case_option = Func_Mask(REG_CASELESS);
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
+    re = pcre2_compile((PCRE2_SPTR)fargs[1], PCRE2_ZERO_TERMINATED, case_option, &errorcode, &erroroffset, NULL);
+    if (re == NULL)
     {
         /*
          * Matching error.
          */
-        notify_quiet(player, errptr);
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+        notify_quiet(player, (char *)buffer);
         XFREE(matchbuf);
         return;
     }
 
-    subpatterns = pcre_exec(re, NULL, fargs[0], strlen(fargs[0]), 0, 0, offsets, PCRE_MAX_OFFSETS);
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
+    subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], strlen(fargs[0]), 0, 0, match_data, NULL);
 
     /*
      * If we had too many subpatterns for the offsets vector, set the
@@ -4416,12 +4412,14 @@ void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribut
     }
 
     nqregs = list2arr(&qregs, NUM_ENV_VARS, fargs[2], &SPACE_DELIM);
+    ovector = pcre2_get_ovector_pointer(match_data);
 
     for (i = 0; i < nqregs; i++)
     {
         if (qregs[i] && *qregs[i])
         {
-            if (pcre_copy_substring(fargs[0], offsets, subpatterns, i, matchbuf, LBUF_SIZE) < 0)
+            PCRE2_SIZE matchbuflen = LBUF_SIZE;
+            if (pcre2_substring_copy_bynumber(match_data, i, (PCRE2_UCHAR *)matchbuf, &matchbuflen) < 0)
             {
                 set_xvar(player, qregs[i], NULL);
             }
@@ -4432,7 +4430,8 @@ void perform_regparse(char *buff __attribute__((unused)), char **bufc __attribut
         }
     }
 
-    XFREE(re);
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
     XFREE(qregs);
     XFREE(matchbuf);
 }
@@ -4448,11 +4447,10 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     Delim isep, osep;
     int case_option, all_option;
     char *r, *s, *bb_p;
-    pcre *re;
-    pcre_extra *study;
-    const char *errptr;
-    int erroffset;
-    int offsets[PCRE_MAX_OFFSETS];
+    pcre2_code *re;
+    pcre2_match_data *match_data;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
     case_option = Func_Mask(REG_CASELESS);
     all_option = Func_Mask(REG_MATCH_ALL);
 
@@ -4496,31 +4494,28 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
     s = trim_space_sep(fargs[0], &isep);
     bb_p = *bufc;
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
+    re = pcre2_compile((PCRE2_SPTR)fargs[1], PCRE2_ZERO_TERMINATED, case_option, &errorcode, &erroroffset, NULL);
+    if (re == NULL)
     {
         /*
          * Matching error. Note difference from PennMUSH behavior:
          * Regular expression errors return 0, not #-1 with an error
          * message.
          */
-        notify_quiet(player, errptr);
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+        notify_quiet(player, (char *)buffer);
         return;
     }
 
-    study = pcre_study(re, 0, &errptr);
-
-    if (errptr != NULL)
-    {
-        notify_quiet(player, errptr);
-        XFREE(re);
-        return;
-    }
+    pcre2_jit_compile(re, PCRE2_JIT_COMPLETE);
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
 
     do
     {
         r = split_token(&s, &isep);
 
-        if (pcre_exec(re, study, r, strlen(r), 0, 0, offsets, PCRE_MAX_OFFSETS) >= 0)
+        if (pcre2_match(re, (PCRE2_SPTR)r, strlen(r), 0, 0, match_data, NULL) >= 0)
         {
             if (*bufc != bb_p)
             {
@@ -4540,12 +4535,8 @@ void perform_regrab(char *buff, char **bufc, dbref player, dbref caller, dbref c
         }
     } while (s);
 
-    XFREE(re);
-
-    if (study)
-    {
-        XFREE(study);
-    }
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
 }
 
 /*
@@ -4570,10 +4561,10 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
     int case_option;
     int i, nqregs;
     char **qregs;
-    pcre *re;
-    const char *errptr;
-    int erroffset;
-    int offsets[PCRE_MAX_OFFSETS];
+    pcre2_code *re;
+    pcre2_match_data *match_data;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
     int subpatterns;
     char tbuf[LBUF_SIZE];
     case_option = Func_Mask(REG_CASELESS);
@@ -4583,19 +4574,23 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
         return;
     }
 
-    if ((re = pcre_compile(fargs[1], case_option, &errptr, &erroffset, mushstate.retabs)) == NULL)
+    re = pcre2_compile((PCRE2_SPTR)fargs[1], PCRE2_ZERO_TERMINATED, case_option, &errorcode, &erroroffset, NULL);
+    if (re == NULL)
     {
         /*
          * Matching error. Note difference from PennMUSH behavior:
          * Regular expression errors return 0, not #-1 with an error
          * message.
          */
-        notify_quiet(player, errptr);
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+        notify_quiet(player, (char *)buffer);
         XSAFELBCHR('0', buff, bufc);
         return;
     }
 
-    subpatterns = pcre_exec(re, NULL, fargs[0], strlen(fargs[0]), 0, 0, offsets, PCRE_MAX_OFFSETS);
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
+    subpatterns = pcre2_match(re, (PCRE2_SPTR)fargs[0], strlen(fargs[0]), 0, 0, match_data, NULL);
     XSAFEBOOL(buff, bufc, (subpatterns >= 0));
 
     /*
@@ -4612,7 +4607,8 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
      */
     if (nfargs != 3)
     {
-        XFREE(re);
+        pcre2_match_data_free(match_data);
+        pcre2_code_free(re);
         return;
     }
 
@@ -4626,7 +4622,8 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
 
     for (i = 0; i < nqregs; i++)
     {
-        if (pcre_copy_substring(fargs[0], offsets, subpatterns, i, tbuf, LBUF_SIZE) < 0)
+        PCRE2_SIZE tbuflen = LBUF_SIZE;
+        if (pcre2_substring_copy_bynumber(match_data, i, (PCRE2_UCHAR *)tbuf, &tbuflen) < 0)
         {
             set_register("perform_regmatch", qregs[i], NULL);
         }
@@ -4636,7 +4633,8 @@ void perform_regmatch(char *buff, char **bufc, dbref player, dbref caller __attr
         }
     }
 
-    XFREE(re);
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
     XFREE(qregs);
 }
 
@@ -4660,10 +4658,10 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     int count[LBUF_SIZE / 2];
     int i = 0, is_exact_same = 0, is_same = 0, nwords = 0, lastn = 0, wc = 0;
     char *str = NULL, *dp = NULL, *savep = NULL, *bb_p = NULL;
-    pcre *re = NULL;
-    const char *errptr = NULL;
-    int erroffset = 0;
-    int offsets[PCRE_MAX_OFFSETS];
+    pcre2_code *re = NULL;
+    pcre2_match_data *match_data = NULL;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
     int subpatterns = 0;
     /*
      * We need at least 6 arguments. The last 2 args must be delimiters.
@@ -4689,14 +4687,20 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
      * Make sure we have a valid regular expression.
      */
 
-    if ((re = pcre_compile(fargs[lastn + 1], 0, &errptr, &erroffset, mushstate.retabs)) == NULL)
+    re = pcre2_compile((PCRE2_SPTR)fargs[lastn + 1], PCRE2_ZERO_TERMINATED, 0, &errorcode, &erroroffset, NULL);
+    if (re == NULL)
     {
         /*
          * Return nothing on a bad match.
          */
-        notify_quiet(player, errptr);
+        PCRE2_UCHAR buffer[256];
+        pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+        notify_quiet(player, (char *)buffer);
         return;
     }
+
+    pcre2_jit_compile(re, PCRE2_JIT_COMPLETE);
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
 
     /*
      * Our first and second args can be <obj>/<attr> or just <attr>. Use
@@ -4850,7 +4854,7 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
             eval_expression_string(condbuf, &dp, player, caller, cause, EV_STRIP | EV_FCHECK | EV_EVAL, &str, &(os[0]), lastn - 1);
         }
 
-        subpatterns = pcre_exec(re, NULL, savep, strlen(savep), 0, 0, offsets, PCRE_MAX_OFFSETS);
+        subpatterns = pcre2_match(re, (PCRE2_SPTR)savep, strlen(savep), 0, 0, match_data, NULL);
 
         if (subpatterns >= 0)
         {
@@ -4858,7 +4862,8 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
         }
     }
 
-    XFREE(re);
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
     XFREE(atext1);
 
     if (!is_exact_same)
@@ -4884,11 +4889,10 @@ void fun_until(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int grep_type, caseless;
-    pcre *re = NULL;
-    pcre_extra *study = NULL;
-    const char *errptr;
-    int erroffset;
-    int offsets[PCRE_MAX_OFFSETS];
+    pcre2_code *re = NULL;
+    pcre2_match_data *match_data = NULL;
+    int errorcode;
+    PCRE2_SIZE erroroffset;
     char *patbuf, *patc, *attrib, *p, *bb_p;
     int ca, aflags, alen;
     dbref thing, aowner, it;
@@ -4949,20 +4953,17 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
         break;
 
     case GREP_REGEXP:
-        if ((re = pcre_compile(fargs[2], caseless, &errptr, &erroffset, mushstate.retabs)) == NULL)
+        re = pcre2_compile((PCRE2_SPTR)fargs[2], PCRE2_ZERO_TERMINATED, caseless, &errorcode, &erroroffset, NULL);
+        if (re == NULL)
         {
-            notify_quiet(player, errptr);
+            PCRE2_UCHAR buffer[256];
+            pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
+            notify_quiet(player, (char *)buffer);
             return;
         }
 
-        study = pcre_study(re, 0, &errptr);
-
-        if (errptr != NULL)
-        {
-            XFREE(re);
-            notify_quiet(player, errptr);
-            return;
-        }
+        pcre2_jit_compile(re, PCRE2_JIT_COMPLETE);
+        match_data = pcre2_match_data_create_from_pattern(re, NULL);
 
         break;
 
@@ -4992,7 +4993,7 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
                 }
             }
 
-            if (((grep_type == GREP_EXACT) && strstr(attrib, fargs[2])) || ((grep_type == GREP_WILD) && quick_wild(fargs[2], attrib)) || ((grep_type == GREP_REGEXP) && (pcre_exec(re, study, attrib, alen, 0, 0, offsets, PCRE_MAX_OFFSETS) >= 0)))
+            if (((grep_type == GREP_EXACT) && strstr(attrib, fargs[2])) || ((grep_type == GREP_WILD) && quick_wild(fargs[2], attrib)) || ((grep_type == GREP_REGEXP) && (pcre2_match(re, (PCRE2_SPTR)attrib, alen, 0, 0, match_data, NULL) >= 0)))
             {
                 if (*bufc != bb_p)
                 {
@@ -5011,12 +5012,8 @@ void perform_grep(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
     if (re)
     {
-        XFREE(re);
-    }
-
-    if (study)
-    {
-        XFREE(study);
+        pcre2_match_data_free(match_data);
+        pcre2_code_free(re);
     }
 }
 

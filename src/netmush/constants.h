@@ -1151,7 +1151,7 @@
  * from perform_grep (grep, grepi, wildgrep, regrep, regrepi):
  *
  */
-#define REG_CASELESS 0x01  /*!< XXX must equal PCRE_CASELESS */
+#define REG_CASELESS 0x01  /*!< XXX must equal PCRE2_CASELESS */
 #define REG_MATCH_ALL 0x02 /*!< operate on all matches in a list */
 #define REG_TYPE 0x0c      /*!< mask to select grep type bits */
 #define GREP_EXACT 0

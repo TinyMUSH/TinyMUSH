@@ -57,7 +57,7 @@ COLORDEF ansi_truecolor_from_string(const char *color_str, bool is_bg)
 
 	// Trim début
 	char *p = buf;
-	while (is_space(*p))
+	while (isspace(*p))
 		++p;
 	
 
@@ -96,7 +96,7 @@ COLORDEF ansi_truecolor_from_string(const char *color_str, bool is_bg)
 			}
 		}
 	}
-	return false;
+	return (COLORDEF){ .type = COLOR_TYPE_NONE, .is_bg = is_bg };
 }
 
 /**

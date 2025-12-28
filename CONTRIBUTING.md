@@ -94,12 +94,12 @@ Install required dependencies:
 
 **Ubuntu/Debian:**
 ```bash
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre3-dev git
+apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev git
 ```
 
 **macOS:**
 ```bash
-brew install cmake gdbm pcre git
+brew install cmake gdbm pcre2 git
 ```
 
 **Optional but recommended:**

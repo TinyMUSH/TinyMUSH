@@ -2,7 +2,7 @@ add_executable(netmush alloc.c api.c boolexp.c bsd.c command.c conf.c constants.
 find_library(C_LIBRARY c REQUIRED)
 find_library(GDBM_LIBRARY gdbm REQUIRED)
 find_library(MATH_LIBRARY m REQUIRED)
-find_library(PCRE_LIBRARY pcre REQUIRED)
+find_library(PCRE_LIBRARY pcre2-8 REQUIRED)
 find_library(DL_LIBRARY dl REQUIRED)
 if(NOT APPLE)
     find_library(CRYPT_LIBRARY crypt REQUIRED)

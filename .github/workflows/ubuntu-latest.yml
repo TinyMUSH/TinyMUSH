@@ -14,7 +14,7 @@ jobs:
     - name: dependencies
       run: | 
         sudo apt update -q
-        sudo apt install -qy libcrypt-dev libgdbm-dev libpcre3-dev
+        sudo apt install -qy libcrypt-dev libgdbm-dev libpcre2-dev
     - name: build
       run: | 
         cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -S$PWD -B$PWD/build -G "Unix Makefiles"
