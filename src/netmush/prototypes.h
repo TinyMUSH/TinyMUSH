@@ -75,7 +75,7 @@ extern void free_boolexp(BOOLEXP *b);
 extern _Bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b);
 extern _Bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key);
 extern void skip_whitespace(char **pBuf);
-extern BOOLEXP *test_atr(char *s, dbref parse_player);
+extern BOOLEXP *test_atr(char *s, dbref parse_player, _Bool parsing_internal);
 extern BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, _Bool parsing_internal);
 extern BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, _Bool parsing_internal);
 extern BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, _Bool parsing_internal);

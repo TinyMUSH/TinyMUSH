@@ -500,7 +500,7 @@ void skip_whitespace(char **pBuf)
  * @param parse_player	DBref of player triggering the test
  * @return BOOLEXP*		Boolean expression with the result of the test
  */
-BOOLEXP *test_atr(char *s, dbref parse_player)
+BOOLEXP *test_atr(char *s, dbref parse_player, bool parsing_internal)
 {
 	ATTR *attrib = NULL;
 	BOOLEXP *b = NULL;
@@ -542,7 +542,7 @@ BOOLEXP *test_atr(char *s, dbref parse_player)
 		 * Only #1 can lock on numbers
 		 *
 		 */
-		if (!God(parse_player))
+		if (!parsing_internal && !God(parse_player))
 		{
 			XFREE(buff);
 			return ((BOOLEXP *)NULL);
@@ -650,7 +650,7 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		 * check for an attribute
 		 *
 		 */
-		if ((b = test_atr(buf, parse_player)) != NULL)
+		if ((b = test_atr(buf, parse_player, parsing_internal)) != NULL)
 		{
 			XFREE(buf);
 			return (b);
