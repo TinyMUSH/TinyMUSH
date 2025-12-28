@@ -154,6 +154,9 @@ Include dependency graph for funstring.c:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a75e55c213ab0002512fe19ca977ba501" id="r_a75e55c213ab0002512fe19ca977ba501"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCOLORDEF.html">COLORDEF</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75e55c213ab0002512fe19ca977ba501">ansi_truecolor_from_string</a> (const char *color_str, bool is_bg)</td></tr>
+<tr class="memdesc:a75e55c213ab0002512fe19ca977ba501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Génère une séquence ANSI 24bit (truecolor) pour le foreground ou background à partir d'une string couleur.  <br /></td></tr>
+<tr class="separator:a75e55c213ab0002512fe19ca977ba501"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcdd839ce8a5c200e3bff7f37419ca99" id="r_adcdd839ce8a5c200e3bff7f37419ca99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcdd839ce8a5c200e3bff7f37419ca99">fun_isword</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
 <tr class="memdesc:adcdd839ce8a5c200e3bff7f37419ca99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is every character in the argument a letter?  <br /></td></tr>
 <tr class="separator:adcdd839ce8a5c200e3bff7f37419ca99"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -341,6 +344,39 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 <dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a75e55c213ab0002512fe19ca977ba501" name="a75e55c213ab0002512fe19ca977ba501"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75e55c213ab0002512fe19ca977ba501">&#9670;&#160;</a></span>ansi_truecolor_from_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structCOLORDEF.html">COLORDEF</a> ansi_truecolor_from_string </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>color_str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_bg</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Génère une séquence ANSI 24bit (truecolor) pour le foreground ou background à partir d'une string couleur. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">color_str</td><td>String couleur (#RRGGBB, RRGGBB, &lt;#RRGGBB&gt;, &lt;RRGGBB&gt;, &lt;R G B&gt;, R G B) </td></tr>
+    <tr><td class="paramname">out</td><td>Buffer de sortie (doit être assez grand) </td></tr>
+    <tr><td class="paramname">out_size</td><td>Taille du buffer </td></tr>
+    <tr><td class="paramname">is_bg</td><td>true pour background, false pour foreground </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true si conversion réussie, false sinon </dd></dl>
+
+</div>
+</div>
 <a id="a4e3019ca33345b3de6c9d7a331c81a20" name="a4e3019ca33345b3de6c9d7a331c81a20"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4e3019ca33345b3de6c9d7a331c81a20">&#9670;&#160;</a></span>fun_after()</h2>
 

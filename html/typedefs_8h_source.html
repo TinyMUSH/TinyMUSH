@@ -1466,51 +1466,73 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l01395" name="l01395"></a><span class="lineno"><a class="line" href="typedefs_8h.html#a809ddd1566b368298078f47ebf2127ce"> 1395</a></span><span class="preprocessor">#define COLOR_SCHEME_ANSI 0x01  </span></div>
 <div class="line"><a id="l01396" name="l01396"></a><span class="lineno"><a class="line" href="typedefs_8h.html#ac396243fa3f8a1e1359f8cde4ea50cf8"> 1396</a></span><span class="preprocessor">#define COLOR_SCHEME_XTERM 0x02 </span></div>
 <div class="line"><a id="l01397" name="l01397"></a><span class="lineno"><a class="line" href="typedefs_8h.html#a936e0012e15d605661cbd05bda2be58a"> 1397</a></span><span class="preprocessor">#define COLOR_SCHEME_CSS 0x04   </span></div>
-<div class="foldopen" id="foldopen01399" data-start="{" data-end="};">
-<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"><a class="line" href="structCOLORINFO.html"> 1399</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span><span class="keyword">typedef</span> <span class="keyword">enum</span> COLOR_TYPE</div>
 <div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>{</div>
-<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>    <span class="keywordtype">char</span> *name;</div>
-<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>    <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> rgb;</div>
-<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"><a class="line" href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f"> 1403</a></span>    <a class="code hl_struct" href="structCIELABColor.html">CIELABColor</a> <a class="code hl_variable" href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f">lab</a>; </div>
-<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"><a class="line" href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b"> 1404</a></span>    uint8_t <a class="code hl_variable" href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b">schemes</a>; </div>
-<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>} <a class="code hl_struct" href="structCOLORINFO.html">COLORINFO</a>;</div>
-</div>
+<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>    COLOR_TYPE_NONE,</div>
+<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>    COLOR_TYPE_ANSI,</div>
+<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>    COLOR_TYPE_XTERM,</div>
+<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span>    COLOR_TYPE_TRUECOLOR</div>
+<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>} COLOR_TYPE;</div>
 <div class="line"><a id="l01406" name="l01406"></a><span class="lineno"> 1406</span> </div>
 <div class="foldopen" id="foldopen01407" data-start="{" data-end="};">
-<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"><a class="line" href="structCOLORMATCH.html"> 1407</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"><a class="line" href="structCOLORDEF.html"> 1407</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="structCOLORDEF.html">COLORDEF</a></div>
 <div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>{</div>
-<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>    <span class="keywordtype">float</span> deltaE;</div>
-<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>    <a class="code hl_struct" href="structCOLORINFO.html">COLORINFO</a> color;</div>
-<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span>} <a class="code hl_struct" href="structCOLORMATCH.html">COLORMATCH</a>;</div>
+<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>    COLOR_TYPE type;    <span class="comment">/* Type of color */</span></div>
+<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>    <span class="keywordtype">bool</span> is_bg;         <span class="comment">/* Is this a background color? */</span></div>
+<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span>    <span class="keyword">union</span></div>
+<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>    {</div>
+<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>        uint8_t ansi_index;  <span class="comment">/* 0-15 */</span></div>
+<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>        uint8_t xterm_index; <span class="comment">/* 0-255 */</span></div>
+<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>        <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> truecolor;  <span class="comment">/* 24-bit RGB */</span></div>
+<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>    } value;</div>
+<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>} <a class="code hl_struct" href="structCOLORDEF.html">COLORDEF</a>;</div>
 </div>
-<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span> </div>
-<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span><span class="keyword">typedef</span> <span class="keyword">enum</span></div>
-<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>{</div>
-<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>    ANSICOLORTYPE_NONE,</div>
-<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>    ANSICOLORTYPE_STANDARD,</div>
-<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>    ANSICOLORTYPE_XTERM,</div>
-<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>    ANSICOLORTYPE_TRUECOLORS</div>
-<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>} ANSICOLORTYPES;</div>
-<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span> </div>
-<div class="foldopen" id="foldopen01421" data-start="{" data-end="};">
-<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"><a class="line" href="structVT100COLOR.html"> 1421</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
-<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>{</div>
-<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>    ANSICOLORTYPES type;</div>
-<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>    <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> rgb;</div>
-<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>    uint8_t xterm_index;  <span class="comment">/* Original xterm index (0-255) when type is ANSICOLORTYPE_XTERM */</span></div>
-<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>} <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a>;</div>
+<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span> </div>
+<div class="foldopen" id="foldopen01419" data-start="{" data-end="};">
+<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"><a class="line" href="structCOLORINFO.html"> 1419</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>{</div>
+<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>    <span class="keywordtype">char</span> *name;</div>
+<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>    <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> rgb;</div>
+<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"><a class="line" href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f"> 1423</a></span>    <a class="code hl_struct" href="structCIELABColor.html">CIELABColor</a> <a class="code hl_variable" href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f">lab</a>; </div>
+<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"><a class="line" href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b"> 1424</a></span>    uint8_t <a class="code hl_variable" href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b">schemes</a>; </div>
+<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>} <a class="code hl_struct" href="structCOLORINFO.html">COLORINFO</a>;</div>
 </div>
-<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span> </div>
-<div class="foldopen" id="foldopen01428" data-start="{" data-end="};">
-<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"><a class="line" href="structVT100ATTR.html"> 1428</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
-<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>{</div>
-<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> foreground;</div>
-<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> background;</div>
-<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>    <span class="keywordtype">bool</span> reset;</div>
-<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span>} <a class="code hl_struct" href="structVT100ATTR.html">VT100ATTR</a>;</div>
+<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span> </div>
+<div class="foldopen" id="foldopen01427" data-start="{" data-end="};">
+<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"><a class="line" href="structCOLORMATCH.html"> 1427</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>{</div>
+<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>    <span class="keywordtype">float</span> deltaE;</div>
+<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>    <a class="code hl_struct" href="structCOLORINFO.html">COLORINFO</a> color;</div>
+<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>} <a class="code hl_struct" href="structCOLORMATCH.html">COLORMATCH</a>;</div>
 </div>
-<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span> </div>
-<div class="ttc" id="acommand_8c_html_a3fb9f2ed35ae78e9877a8236e15b852b"><div class="ttname"><a href="command_8c.html#a3fb9f2ed35ae78e9877a8236e15b852b">process_command</a></div><div class="ttdeci">char * process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)</div><div class="ttdoc">Execute a command.</div><div class="ttdef"><b>Definition</b> command.c:960</div></div>
+<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span> </div>
+<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span><span class="keyword">typedef</span> <span class="keyword">enum</span></div>
+<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>{</div>
+<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span>    ANSICOLORTYPE_NONE,</div>
+<div class="line"><a id="l01436" name="l01436"></a><span class="lineno"> 1436</span>    ANSICOLORTYPE_STANDARD,</div>
+<div class="line"><a id="l01437" name="l01437"></a><span class="lineno"> 1437</span>    ANSICOLORTYPE_XTERM,</div>
+<div class="line"><a id="l01438" name="l01438"></a><span class="lineno"> 1438</span>    ANSICOLORTYPE_TRUECOLORS</div>
+<div class="line"><a id="l01439" name="l01439"></a><span class="lineno"> 1439</span>} ANSICOLORTYPES;</div>
+<div class="line"><a id="l01440" name="l01440"></a><span class="lineno"> 1440</span> </div>
+<div class="foldopen" id="foldopen01441" data-start="{" data-end="};">
+<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"><a class="line" href="structVT100COLOR.html"> 1441</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"> 1442</span>{</div>
+<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>    ANSICOLORTYPES type;</div>
+<div class="line"><a id="l01444" name="l01444"></a><span class="lineno"> 1444</span>    <a class="code hl_struct" href="structrgbColor.html">rgbColor</a> rgb;</div>
+<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span>    uint8_t xterm_index;  <span class="comment">/* Original xterm index (0-255) when type is ANSICOLORTYPE_XTERM */</span></div>
+<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>} <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a>;</div>
+</div>
+<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span> </div>
+<div class="foldopen" id="foldopen01448" data-start="{" data-end="};">
+<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"><a class="line" href="structVT100ATTR.html"> 1448</a></span><span class="keyword">typedef</span> <span class="keyword">struct</span></div>
+<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>{</div>
+<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> foreground;</div>
+<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>    <a class="code hl_struct" href="structVT100COLOR.html">VT100COLOR</a> background;</div>
+<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>    <span class="keywordtype">bool</span> reset;</div>
+<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span>} <a class="code hl_struct" href="structVT100ATTR.html">VT100ATTR</a>;</div>
+</div>
+<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span> </div>
+<div class="ttc" id="acommand_8c_html_a3fb9f2ed35ae78e9877a8236e15b852b"><div class="ttname"><a href="command_8c.html#a3fb9f2ed35ae78e9877a8236e15b852b">process_command</a></div><div class="ttdeci">char * process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)</div><div class="ttdoc">Execute a command.</div><div class="ttdef"><b>Definition</b> command.c:961</div></div>
 <div class="ttc" id="aconstants_8h_html_a16a7a8efa1d35edcca6b8cffb9db470b"><div class="ttname"><a href="constants_8h.html#a16a7a8efa1d35edcca6b8cffb9db470b">NUM_GOOD</a></div><div class="ttdeci">#define NUM_GOOD</div><div class="ttdoc">Players constants.</div><div class="ttdef"><b>Definition</b> constants.h:1481</div></div>
 <div class="ttc" id="aconstants_8h_html_a2b80165f3b5e89e8aa0130ee2b08d59c"><div class="ttname"><a href="constants_8h.html#a2b80165f3b5e89e8aa0130ee2b08d59c">NUM_OBJPIPES</a></div><div class="ttdeci">#define NUM_OBJPIPES</div><div class="ttdoc">UDB Constants.</div><div class="ttdef"><b>Definition</b> constants.h:1693</div></div>
 <div class="ttc" id="aconstants_8h_html_a502c8aab5888819f96d107c249a83103"><div class="ttname"><a href="constants_8h.html#a502c8aab5888819f96d107c249a83103">MBUF_SIZE</a></div><div class="ttdeci">#define MBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:20</div></div>
@@ -1521,12 +1543,13 @@ $(function(){ initResizable(false); });
 <div class="ttc" id="adb__rw_8c_html_a6d1bddbab6656f3506368a11feee62a4"><div class="ttname"><a href="db__rw_8c.html#a6d1bddbab6656f3506368a11feee62a4">db_write_flatfile</a></div><div class="ttdeci">dbref db_write_flatfile(FILE *f, int format, int version)</div><div class="ttdoc">Write a db to Flat File.</div><div class="ttdef"><b>Definition</b> db_rw.c:1783</div></div>
 <div class="ttc" id="adb__rw_8c_html_ae3b2fe2b1852143ff0ee2a0140f9c05a"><div class="ttname"><a href="db__rw_8c.html#ae3b2fe2b1852143ff0ee2a0140f9c05a">db_write</a></div><div class="ttdeci">dbref db_write(void)</div><div class="ttdoc">Write DB to file.</div><div class="ttdef"><b>Definition</b> db_rw.c:2010</div></div>
 <div class="ttc" id="astructCIELABColor_html"><div class="ttname"><a href="structCIELABColor.html">CIELABColor</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1381</div></div>
-<div class="ttc" id="astructCOLORINFO_html"><div class="ttname"><a href="structCOLORINFO.html">COLORINFO</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1400</div></div>
-<div class="ttc" id="astructCOLORINFO_html_a09290e3ab1e968cf161c4d5a11679e2b"><div class="ttname"><a href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b">COLORINFO::schemes</a></div><div class="ttdeci">uint8_t schemes</div><div class="ttdef"><b>Definition</b> typedefs.h:1404</div></div>
-<div class="ttc" id="astructCOLORINFO_html_aeadcaa9122297ac3433f929b5d52c70f"><div class="ttname"><a href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f">COLORINFO::lab</a></div><div class="ttdeci">CIELABColor lab</div><div class="ttdef"><b>Definition</b> typedefs.h:1403</div></div>
-<div class="ttc" id="astructCOLORMATCH_html"><div class="ttname"><a href="structCOLORMATCH.html">COLORMATCH</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1408</div></div>
-<div class="ttc" id="astructVT100ATTR_html"><div class="ttname"><a href="structVT100ATTR.html">VT100ATTR</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1429</div></div>
-<div class="ttc" id="astructVT100COLOR_html"><div class="ttname"><a href="structVT100COLOR.html">VT100COLOR</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1422</div></div>
+<div class="ttc" id="astructCOLORDEF_html"><div class="ttname"><a href="structCOLORDEF.html">COLORDEF</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1408</div></div>
+<div class="ttc" id="astructCOLORINFO_html"><div class="ttname"><a href="structCOLORINFO.html">COLORINFO</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1420</div></div>
+<div class="ttc" id="astructCOLORINFO_html_a09290e3ab1e968cf161c4d5a11679e2b"><div class="ttname"><a href="structCOLORINFO.html#a09290e3ab1e968cf161c4d5a11679e2b">COLORINFO::schemes</a></div><div class="ttdeci">uint8_t schemes</div><div class="ttdef"><b>Definition</b> typedefs.h:1424</div></div>
+<div class="ttc" id="astructCOLORINFO_html_aeadcaa9122297ac3433f929b5d52c70f"><div class="ttname"><a href="structCOLORINFO.html#aeadcaa9122297ac3433f929b5d52c70f">COLORINFO::lab</a></div><div class="ttdeci">CIELABColor lab</div><div class="ttdef"><b>Definition</b> typedefs.h:1423</div></div>
+<div class="ttc" id="astructCOLORMATCH_html"><div class="ttname"><a href="structCOLORMATCH.html">COLORMATCH</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1428</div></div>
+<div class="ttc" id="astructVT100ATTR_html"><div class="ttname"><a href="structVT100ATTR.html">VT100ATTR</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1449</div></div>
+<div class="ttc" id="astructVT100COLOR_html"><div class="ttname"><a href="structVT100COLOR.html">VT100COLOR</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1442</div></div>
 <div class="ttc" id="astruct__help__indx__list_html"><div class="ttname"><a href="struct__help__indx__list.html">_help_indx_list</a></div><div class="ttdef"><b>Definition</b> typedefs.h:464</div></div>
 <div class="ttc" id="astructa__record_html"><div class="ttname"><a href="structa__record.html">a_record</a></div><div class="ttdef"><b>Definition</b> typedefs.h:1353</div></div>
 <div class="ttc" id="astructaddedentry_html"><div class="ttname"><a href="structaddedentry.html">addedentry</a></div><div class="ttdef"><b>Definition</b> typedefs.h:531</div></div>
