@@ -25,6 +25,7 @@
 #define COLOR_PALETTE_CACHE_MAX 256
 #define SGR_CODES_MAX 32
 
+
 // Forward declaration of unified color palette
 extern COLORINFO colorPalette[];
 

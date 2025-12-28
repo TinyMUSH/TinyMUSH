@@ -1,3 +1,4 @@
+
 /**
  * @file funstring.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
@@ -20,6 +21,83 @@
 
 #include <ctype.h>
 #include <string.h>
+
+/**
+ * @brief Génère une séquence ANSI 24bit (truecolor) pour le foreground ou background à partir d'une string couleur
+ *
+ * @param color_str String couleur (#RRGGBB, RRGGBB, <#RRGGBB>, <RRGGBB>, <R G B>, R G B)
+ * @param out Buffer de sortie (doit être assez grand)
+ * @param out_size Taille du buffer
+ * @param is_bg true pour background, false pour foreground
+ * @return true si conversion réussie, false sinon
+ */
+COLORDEF ansi_truecolor_from_string(const char *color_str, bool is_bg)
+{
+	COLORDEF color = {
+		.type = COLOR_TYPE_NONE,
+		.is_bg = is_bg,
+		.value = {.truecolor = {0, 0, 0}}};
+	char buf[32];
+	size_t j = 0;
+
+	if (!color_str || !*color_str)
+		return color;
+
+	// Copie et nettoyage de la chaîne : retire <, >, espaces en trop
+
+	for (size_t i = 0; color_str[i] && j < sizeof(buf) - 1; ++i)
+	{
+		if (color_str[i] != '<' && color_str[i] != '>')
+		{
+			buf[j++] = color_str[i];
+			buf[j] = '\0';
+		}
+	}
+	
+
+	// Trim début
+	char *p = buf;
+	while (is_space(*p))
+		++p;
+	
+
+	// Si la chaîne contient un espace, on suppose le format décimal "R G B"
+	if (strchr(p, ' '))
+	{
+		int r = -1, g = -1, b = -1;
+		if (sscanf(p, "%d %d %d", &r, &g, &b) == 3)
+		{
+			if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
+			{
+				color.type = COLOR_TYPE_TRUECOLOR;
+				color.value.truecolor.r = r;
+				color.value.truecolor.g = g;
+				color.value.truecolor.b = b;
+				return color;
+			}
+		}
+	}
+	else
+	{
+		// Sinon, on suppose le format hexadécimal RRGGBB
+		if (strlen(p) == 6 && strspn(p, "0123456789ABCDEFabcdef") == 6)
+		{
+			int r = -1, g = -1, b = -1;
+			if (sscanf(p, "%2x%2x%2x", &r, &g, &b) == 3)
+			{
+				if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
+				{
+					color.type = COLOR_TYPE_TRUECOLOR;
+					color.value.truecolor.r = r;
+					color.value.truecolor.g = g;
+					color.value.truecolor.b = b;
+					return color;
+				}
+			}
+		}
+	}
+	return false;
+}
 
 /**
  * @brief Is every character in the argument a letter?
@@ -731,7 +809,7 @@ void fun_after(char *buff, char **bufc, dbref player __attribute__((unused)), db
 				 * Yup, return what follows
 				 *
 				 */
-				   buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2, false);
+				buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 				XSAFELBSTR(cp, buff, bufc);
@@ -1006,7 +1084,7 @@ void fun_before(char *buff, char **bufc, dbref player __attribute__((unused)), d
 			 */
 			*bp = '\0';
 			XSAFELBSTR(haystack, buff, bufc);
-			   buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL, false);
+			buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			return;
@@ -2268,13 +2346,14 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
  */
 void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	       int ansi_state = 0;
-	       int xterm = 0;
-	       bool color24bit = false;
-	       // Détection du flag COLOR24BIT
-	       if (player != NOTHING && Color24Bit(player)) {
-		       color24bit = true;
-	       }
+	int ansi_state = 0;
+	int xterm = 0;
+	bool color24bit = false;
+	// Détection du flag COLOR24BIT
+	if (player != NOTHING && Color24Bit(player))
+	{
+		color24bit = true;
+	}
 	char *s = NULL, *xtp = NULL;
 	char xtbuf[SBUF_SIZE];
 
@@ -2290,26 +2369,31 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 		return;
 	}
 
-		       // On ne génère la séquence classique que si aucune couleur explicite n'est demandée
-			       bool has_explicit_rgb = false;
-			       char *tmp = fargs[0];
-			       int rgb_detect_r = -1, rgb_detect_g = -1, rgb_detect_b = -1;
-			       if (tmp && *tmp) {
-				       if (*tmp == '#' && strlen(tmp) == 7) {
-					       sscanf(tmp + 1, "%2x%2x%2x", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b);
-					       has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
-				       } else if (sscanf(tmp, "%d %d %d", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b) == 3) {
-					       has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
-				       }
-			       }
-		       if (!has_explicit_rgb) {
-			       track_ansi_letters(fargs[0], &ansi_state);
-			       // On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
-			       bool no_default_bg = !strchr(fargs[0], '/');
-			       s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
-			       XSAFELBSTR(s, buff, bufc);
-			       XFREE(s);
-		       }
+	// On ne génère la séquence classique que si aucune couleur explicite n'est demandée
+	bool has_explicit_rgb = false;
+	char *tmp = fargs[0];
+	int rgb_detect_r = -1, rgb_detect_g = -1, rgb_detect_b = -1;
+	if (tmp && *tmp)
+	{
+		if (*tmp == '#' && strlen(tmp) == 7)
+		{
+			sscanf(tmp + 1, "%2x%2x%2x", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b);
+			has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
+		}
+		else if (sscanf(tmp, "%d %d %d", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b) == 3)
+		{
+			has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
+		}
+	}
+	if (!has_explicit_rgb)
+	{
+		track_ansi_letters(fargs[0], &ansi_state);
+		// On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
+		bool no_default_bg = !strchr(fargs[0], '/');
+		s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
+		XSAFELBSTR(s, buff, bufc);
+		XFREE(s);
+	}
 
 	/**
 	 * Now that normal ansi has been done, time for xterm
@@ -2317,67 +2401,90 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 	 */
 	s = fargs[0];
 
-	       // Parsing foreground color
-	       XMEMSET(xtbuf, 0, SBUF_SIZE);
-	       int is_chevron = 0;
-	       if (*s == '<') {
-		       is_chevron = 1;
-		       s++;
-	       }
-	       xtp = xtbuf;
-	       while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0'))) {
-		       XSAFESBCHR(*s, xtbuf, &xtp);
-		       s++;
-	       }
-	       if (is_chevron && *s == '>')
-		       s++;
-	       *xtp = '\0';
-	       int r = -1, g = -1, b = -1;
-	       if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
-		       sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-	       } else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
-		       // Format "R G B"
-	       }
-		       if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
-				       if (color24bit) {
-					       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
-					       XSAFELBSTR(xtbuf, buff, bufc);
-				       } else {
-					       rgbColor rgb; rgb.r = r; rgb.g = g; rgb.b = b;
-					       int i = RGB2X11(rgb);
-					       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-					       XSAFELBSTR(xtbuf, buff, bufc);
-					       xterm = 1;
-				       }
-		       } else if (xtbuf[0]) {
-			       // Si une seule lettre, utiliser la table classique
-			       if (strlen(xtbuf) == 1) {
-				       const char *seq = ansiChar(xtbuf[0]);
-				       if (seq && *seq) {
-					       XSAFELBSTR(seq, buff, bufc);
-				       }
-			       } else {
-				       int i = str2xterm(xtbuf);
-				       if (i >= 0 && i <= 255) {
-					       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-					       XSAFELBSTR(xtbuf, buff, bufc);
-					       xterm = 1;
-				       }
-			       }
-		       }
+	// Parsing foreground color
+	XMEMSET(xtbuf, 0, SBUF_SIZE);
+	int is_chevron = 0;
+	if (*s == '<')
+	{
+		is_chevron = 1;
+		s++;
+	}
+	xtp = xtbuf;
+	while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0')))
+	{
+		XSAFESBCHR(*s, xtbuf, &xtp);
+		s++;
+	}
+	if (is_chevron && *s == '>')
+		s++;
+	*xtp = '\0';
+	int r = -1, g = -1, b = -1;
+	if (xtbuf[0] == '#' && strlen(xtbuf) == 7)
+	{
+		sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
+	}
+	else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3)
+	{
+		// Format "R G B"
+	}
+	if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
+	{
+		if (color24bit)
+		{
+			XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
+			XSAFELBSTR(xtbuf, buff, bufc);
+		}
+		else
+		{
+			rgbColor rgb;
+			rgb.r = r;
+			rgb.g = g;
+			rgb.b = b;
+			int i = RGB2X11(rgb);
+			XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+			XSAFELBSTR(xtbuf, buff, bufc);
+			xterm = 1;
+		}
+	}
+	else if (xtbuf[0])
+	{
+		// Si une seule lettre, utiliser la table classique
+		if (strlen(xtbuf) == 1)
+		{
+			const char *seq = ansiChar(xtbuf[0]);
+			if (seq && *seq)
+			{
+				XSAFELBSTR(seq, buff, bufc);
+			}
+		}
+		else
+		{
+			int i = str2xterm(xtbuf);
+			if (i >= 0 && i <= 255)
+			{
+				XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
+				XSAFELBSTR(xtbuf, buff, bufc);
+				xterm = 1;
+			}
+		}
+	}
 	// Parsing background color only if '/' is present
-	if (*s == '/') {
+	if (*s == '/')
+	{
 		s++;
 		// Vérifie qu'il y a bien une couleur après le '/'
-		if (*s) {
+		if (*s)
+		{
 			XMEMSET(xtbuf, 0, SBUF_SIZE);
 			is_chevron = 0;
-			if (*s == '<') {
+			if (*s == '<')
+			{
 				is_chevron = 1;
 				s++;
 			}
 			xtp = xtbuf;
-			while (*s && ((is_chevron && *s != '>' && *s != '\0') || (!is_chevron && *s != '\0'))) {
+			while (*s && ((is_chevron && *s != '>' && *s != '\0') || (!is_chevron && *s != '\0')))
+			{
 				XSAFESBCHR(*s, xtbuf, &xtp);
 				s++;
 			}
@@ -2386,37 +2493,53 @@ void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 			*xtp = '\0';
 			// Vérifie que xtbuf n'est pas vide ou uniquement des espaces
 			int only_spaces = 1;
-			for (char *p = xtbuf; *p; ++p) {
-				if (!isspace((unsigned char)*p)) {
+			for (char *p = xtbuf; *p; ++p)
+			{
+				if (!isspace((unsigned char)*p))
+				{
 					only_spaces = 0;
 					break;
 				}
 			}
-			if (xtbuf[0] && !only_spaces) {
+			if (xtbuf[0] && !only_spaces)
+			{
 				r = g = b = -1;
-				if (xtbuf[0] == '#' && strlen(xtbuf) == 7) {
+				if (xtbuf[0] == '#' && strlen(xtbuf) == 7)
+				{
 					sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-				} else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3) {
+				}
+				else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3)
+				{
 					// Format "R G B"
 				}
-				if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
+				if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
+				{
 					XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
-				} else {
+				}
+				else
+				{
 					int i = str2xterm(xtbuf);
 					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
 				}
-				       if (xtbuf[0]) {
-						       if (color24bit && r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255) {
-							       XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
-							       XSAFELBSTR(xtbuf, buff, bufc);
-						       } else {
-							       rgbColor rgb; rgb.r = r; rgb.g = g; rgb.b = b;
-							       int i = RGB2X11(rgb);
-							       XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-							       XSAFELBSTR(xtbuf, buff, bufc);
-							       xterm = 1;
-						       }
-				       }
+				if (xtbuf[0])
+				{
+					if (color24bit && r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
+					{
+						XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
+						XSAFELBSTR(xtbuf, buff, bufc);
+					}
+					else
+					{
+						rgbColor rgb;
+						rgb.r = r;
+						rgb.g = g;
+						rgb.b = b;
+						int i = RGB2X11(rgb);
+						XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
+						XSAFELBSTR(xtbuf, buff, bufc);
+						xterm = 1;
+					}
+				}
 			}
 		}
 	}
@@ -2618,7 +2741,7 @@ void fun_scramble(char *buff, char **bufc, dbref player __attribute__((unused)),
 
 		if (ansi_state != ansi_map[j])
 		{
-			   buf = ansi_transition_esccode(ansi_state, ansi_map[j], false);
+			buf = ansi_transition_esccode(ansi_state, ansi_map[j], false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			ansi_state = ansi_map[j];
@@ -2658,7 +2781,7 @@ void fun_reverse(char *buff, char **bufc, dbref player __attribute__((unused)), 
 	{
 		if (ansi_state != ansi_map[n])
 		{
-			   buf = ansi_transition_esccode(ansi_state, ansi_map[n], false);
+			buf = ansi_transition_esccode(ansi_state, ansi_map[n], false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			ansi_state = ansi_map[n];
@@ -4261,7 +4384,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Restore previous ansi state
 			 */
-			   buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
+			buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			/*
@@ -4271,7 +4394,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Back to ansi normal
 			 */
-			   buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
+			buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 

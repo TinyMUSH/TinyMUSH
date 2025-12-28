@@ -1396,6 +1396,26 @@ typedef struct
 #define COLOR_SCHEME_XTERM 0x02 /*!< Member of xterm 256-color palette */
 #define COLOR_SCHEME_CSS 0x04   /*!< Member of CSS named colors */
 
+typedef enum COLOR_TYPE
+{
+    COLOR_TYPE_NONE,
+    COLOR_TYPE_ANSI,
+    COLOR_TYPE_XTERM,
+    COLOR_TYPE_TRUECOLOR
+} COLOR_TYPE;
+
+typedef struct COLORDEF
+{
+    COLOR_TYPE type;    /* Type of color */
+    bool is_bg;         /* Is this a background color? */
+    union
+    {
+        uint8_t ansi_index;  /* 0-15 */
+        uint8_t xterm_index; /* 0-255 */
+        rgbColor truecolor;  /* 24-bit RGB */
+    } value;
+} COLORDEF;
+
 typedef struct
 {
     char *name;
