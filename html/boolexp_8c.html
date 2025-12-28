@@ -222,9 +222,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a7e9803b84dcc3d1ddd6cf0eb6c4afdc9" id="r_a7e9803b84dcc3d1ddd6cf0eb6c4afdc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e9803b84dcc3d1ddd6cf0eb6c4afdc9">skip_whitespace</a> (char **pBuf)</td></tr>
 <tr class="memdesc:a7e9803b84dcc3d1ddd6cf0eb6c4afdc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skip over whitespace in a string.  <br /></td></tr>
 <tr class="separator:a7e9803b84dcc3d1ddd6cf0eb6c4afdc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12e3a2937767bc6f88f7929422bce140" id="r_a12e3a2937767bc6f88f7929422bce140"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structboolexp.html">BOOLEXP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12e3a2937767bc6f88f7929422bce140">test_atr</a> (char *s, dbref parse_player)</td></tr>
-<tr class="memdesc:a12e3a2937767bc6f88f7929422bce140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test attriutes.  <br /></td></tr>
-<tr class="separator:a12e3a2937767bc6f88f7929422bce140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82c787e0e4c1b3dd958c71c8393610ff" id="r_a82c787e0e4c1b3dd958c71c8393610ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structboolexp.html">BOOLEXP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a82c787e0e4c1b3dd958c71c8393610ff">test_atr</a> (char *s, dbref parse_player, bool parsing_internal)</td></tr>
+<tr class="memdesc:a82c787e0e4c1b3dd958c71c8393610ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test attriutes.  <br /></td></tr>
+<tr class="separator:a82c787e0e4c1b3dd958c71c8393610ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3f48b709794090c6ac31e7faa46e978" id="r_ab3f48b709794090c6ac31e7faa46e978"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structboolexp.html">BOOLEXP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3f48b709794090c6ac31e7faa46e978">parse_boolexp_L</a> (char **pBuf, dbref parse_player, bool parsing_internal)</td></tr>
 <tr class="memdesc:ab3f48b709794090c6ac31e7faa46e978"><td class="mdescLeft">&#160;</td><td class="mdescRight">L -&gt; (E); L -&gt; object identifier.  <br /></td></tr>
 <tr class="separator:ab3f48b709794090c6ac31e7faa46e978"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -652,8 +652,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a12e3a2937767bc6f88f7929422bce140" name="a12e3a2937767bc6f88f7929422bce140"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12e3a2937767bc6f88f7929422bce140">&#9670;&#160;</a></span>test_atr()</h2>
+<a id="a82c787e0e4c1b3dd958c71c8393610ff" name="a82c787e0e4c1b3dd958c71c8393610ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82c787e0e4c1b3dd958c71c8393610ff">&#9670;&#160;</a></span>test_atr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -666,7 +666,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>parse_player</em></span>&#160;)</td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>parse_player</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>parsing_internal</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
