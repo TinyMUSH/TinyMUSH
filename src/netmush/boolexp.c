@@ -615,11 +615,14 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 		b = parse_boolexp_E(pBuf, parse_player, parsing_internal);
 		skip_whitespace(pBuf);
 
-		if (b == TRUE_BOOLEXP || (**pBuf)++ != ')')
+		if (b == TRUE_BOOLEXP || **pBuf != ')')
 		{
 			free_boolexp(b);
 			return TRUE_BOOLEXP;
 		}
+
+		// Consume the closing parenthesis
+		(*pBuf)++;
 
 		break;
 	default:
