@@ -2344,7 +2344,7 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	int ansi_state = 0;
 	int xterm = 0;
