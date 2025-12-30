@@ -201,13 +201,14 @@ var searchData=
   ['mstats_5fcounter_198',['mstats_counter',['../structstatedata.html#a7ba12c6db9afacbf5ae93b71e7a2414d',1,'statedata']]],
   ['multiple_20guests_199',['How do I use multiple guests?',['../md_docs_2Historical_2FAQ.html#autotoc_md350',1,'']]],
   ['munge_5fspace_200',['munge_space',['../string__util_8c.html#a17d9aec24a10b4e4273c92ac9eefd1b5',1,'string_util.c']]],
-  ['mush_5flognum_201',['mush_lognum',['../structstatedata.html#a043ddee61c66701cdb6408dded5aac16',1,'statedata']]],
-  ['mush_5fname_202',['mush_name',['../structconfdata.html#a96b28d62a6b46a783deab2fc621a3c10',1,'confdata']]],
-  ['mush_5fowner_203',['mush_owner',['../structconfdata.html#acf88ce2637cb859311b0eba30a168287',1,'confdata']]],
-  ['mush_5fshortname_204',['mush_shortname',['../structconfdata.html#a8615dc5802564ebfc0bc0e10b62c5bbf',1,'confdata']]],
-  ['my_20database_205',['How do I back up my database?',['../md_docs_2Historical_2FAQ.html#autotoc_md345',1,'']]],
-  ['my_20own_20flags_20how_20do_20i_20configure_20marker_20flags_206',['How do I create my own flags? (How do I configure marker flags?)',['../md_docs_2Historical_2FAQ.html#autotoc_md351',1,'']]],
-  ['mymodule_20so_207',['Result: build/modules/mymodule.so',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md483',1,'']]],
-  ['mymodule_5fdebug_202_208',['In netmush.conf: mymodule_debug 2',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md487',1,'']]],
-  ['myopic_209',['MYOPIC',['../constants_8h.html#a0506cdee9fe814ccc60c0fdfefca4912',1,'constants.h']]]
+  ['mush_5fcode_201',['mush_code',['../structColorEntry.html#ad8dfa8d866995d6886f69b0bcf9b35ba',1,'ColorEntry']]],
+  ['mush_5flognum_202',['mush_lognum',['../structstatedata.html#a043ddee61c66701cdb6408dded5aac16',1,'statedata']]],
+  ['mush_5fname_203',['mush_name',['../structconfdata.html#a96b28d62a6b46a783deab2fc621a3c10',1,'confdata']]],
+  ['mush_5fowner_204',['mush_owner',['../structconfdata.html#acf88ce2637cb859311b0eba30a168287',1,'confdata']]],
+  ['mush_5fshortname_205',['mush_shortname',['../structconfdata.html#a8615dc5802564ebfc0bc0e10b62c5bbf',1,'confdata']]],
+  ['my_20database_206',['How do I back up my database?',['../md_docs_2Historical_2FAQ.html#autotoc_md345',1,'']]],
+  ['my_20own_20flags_20how_20do_20i_20configure_20marker_20flags_207',['How do I create my own flags? (How do I configure marker flags?)',['../md_docs_2Historical_2FAQ.html#autotoc_md351',1,'']]],
+  ['mymodule_20so_208',['Result: build/modules/mymodule.so',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md483',1,'']]],
+  ['mymodule_5fdebug_202_209',['In netmush.conf: mymodule_debug 2',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md487',1,'']]],
+  ['myopic_210',['MYOPIC',['../constants_8h.html#a0506cdee9fe814ccc60c0fdfefca4912',1,'constants.h']]]
 ];

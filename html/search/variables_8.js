@@ -18,5 +18,7 @@ var searchData=
   ['instant_5frecycle_15',['instant_recycle',['../structconfdata.html#ad55f6e91ea27c1e2d575779b5475610b',1,'confdata']]],
   ['instdata_5fhtab_16',['instdata_htab',['../structstatedata.html#aab04a468f6d3e3b7be455f62059cb68c',1,'statedata']]],
   ['interpreter_17',['interpreter',['../structconfparm.html#a90370070d82f6f86fc1033fbff5df778',1,'confparm']]],
-  ['iter_5falist_18',['iter_alist',['../structstatedata.html#a1a99a3a4cc47e7c868868e5702239790',1,'statedata']]]
+  ['inverse_18',['inverse',['../structColorState.html#af2edafc8a99b27e56e25b978130f23ad',1,'ColorState']]],
+  ['is_5fset_19',['is_set',['../structColorInfo.html#add8bc4da342a5295fd068ed01c9a1329',1,'ColorInfo']]],
+  ['iter_5falist_20',['iter_alist',['../structstatedata.html#a1a99a3a4cc47e7c868868e5702239790',1,'statedata']]]
 ];

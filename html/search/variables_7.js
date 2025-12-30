@@ -13,6 +13,7 @@ var searchData=
   ['hfile_5fhashes_10',['hfile_hashes',['../structstatedata.html#a95bacc99fff5c4e9a95503d408f083de',1,'statedata']]],
   ['hfiletab_11',['hfiletab',['../structstatedata.html#a8957a225f3307ec0c8e8528526049665',1,'statedata']]],
   ['hfiletab_5fsize_12',['hfiletab_size',['../structstatedata.html#a96df9773cb9cc4f1d5e77780169870a1',1,'statedata']]],
-  ['htmlconn_5ffile_13',['htmlconn_file',['../structconfdata.html#a46da2f2904d612abc4ac099c8f3aa8d0',1,'confdata']]],
-  ['huh_5fmsg_14',['huh_msg',['../structconfdata.html#a4f3bc89512f8b05b23edc40fa2381c3a',1,'confdata']]]
+  ['highlight_13',['highlight',['../structColorState.html#aa88be6b94880ffb23e880eeb8f5438c2',1,'ColorState']]],
+  ['htmlconn_5ffile_14',['htmlconn_file',['../structconfdata.html#a46da2f2904d612abc4ac099c8f3aa8d0',1,'confdata']]],
+  ['huh_5fmsg_15',['huh_msg',['../structconfdata.html#a4f3bc89512f8b05b23edc40fa2381c3a',1,'confdata']]]
 ];

@@ -7,7 +7,7 @@ var searchData=
   ['terse_5fexits_4',['terse_exits',['../structconfdata.html#aa30928ec1f152663b7d7c10f633cab0b',1,'confdata']]],
   ['terse_5flook_5',['terse_look',['../structconfdata.html#aec427ca644bb7a62c8b0a7027e51b0e0',1,'confdata']]],
   ['terse_5fmovemsg_6',['terse_movemsg',['../structconfdata.html#a798fff870dd95f057e83fd6726f76e41',1,'confdata']]],
-  ['text_7',['text',['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text'],['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text']]],
+  ['text_7',['text',['../structColorSequence.html#a819a3deb820ebc8cb71e56b5f77f8a43',1,'ColorSequence::text'],['../structbque.html#a935f86b002ace2f5316387a575e9adc2',1,'bque::text'],['../structvar__entry.html#a6b506dfa53e7c7c19219397921960a97',1,'var_entry::text']]],
   ['thing_8',['thing',['../structboolexp.html#af446a5cf9b5614a1cee63ad57352fa7d',1,'boolexp']]],
   ['thing_5fdefobj_9',['thing_defobj',['../structconfdata.html#a21a9699fa587c334a38c47c575fc4cae',1,'confdata']]],
   ['thing_5fflags_10',['thing_flags',['../structconfdata.html#ac754f405b4d7a18bdd2e6fedd87c7db3',1,'confdata']]],
@@ -18,8 +18,10 @@ var searchData=
   ['topic_15',['topic',['../structhelp__indx.html#a76b7780035e9cb398d4ad3c049d7b43b',1,'help_indx']]],
   ['trace_5flimit_16',['trace_limit',['../structconfdata.html#a891c54dc2d62f114ca78c346b8d948e8',1,'confdata']]],
   ['trace_5ftopdown_17',['trace_topdown',['../structconfdata.html#a635370d57700845ce5cf4fe290297d40',1,'confdata']]],
-  ['tweak_18',['tweak',['../structversioninfo.html#a52630b139d61f71bd2b822ee2faf0a26',1,'versioninfo']]],
-  ['txthome_19',['txthome',['../structconfdata.html#ab92ad2113baf9414f48a3749b468a2d9',1,'confdata']]],
-  ['typed_5fquotas_20',['typed_quotas',['../structconfdata.html#a799cf9183f184868909d63071817d259',1,'confdata']]],
-  ['typer_5ffunc_21',['typer_func',['../structcomponent__def.html#a20f580c1cf9780a9e290ff7296513c4d',1,'component_def']]]
+  ['truecolor_18',['truecolor',['../structColorInfo.html#ae2d263cea16a3da3f0220c2371f6e21d',1,'ColorInfo::truecolor'],['../structColorEntry.html#a6e088cb139e907a5226466d10615cb7c',1,'ColorEntry::truecolor']]],
+  ['tweak_19',['tweak',['../structversioninfo.html#a52630b139d61f71bd2b822ee2faf0a26',1,'versioninfo']]],
+  ['txthome_20',['txthome',['../structconfdata.html#ab92ad2113baf9414f48a3749b468a2d9',1,'confdata']]],
+  ['type_21',['type',['../structColorEntry.html#a939def61ae5fcf5514009159ab79b525',1,'ColorEntry']]],
+  ['typed_5fquotas_22',['typed_quotas',['../structconfdata.html#a799cf9183f184868909d63071817d259',1,'confdata']]],
+  ['typer_5ffunc_23',['typer_func',['../structcomponent__def.html#a20f580c1cf9780a9e290ff7296513c4d',1,'component_def']]]
 ];

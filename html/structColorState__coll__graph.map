@@ -1,0 +1,7 @@
+<map id="ColorState" name="ColorState">
+<area shape="rect" id="Node000001" title="Complete text formatting state." alt="" coords="5,198,88,223"/>
+<area shape="rect" id="Node000002" href="$structColorInfo.html" title="Color information for a single color (foreground or background)." alt="" coords="10,94,83,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,135,49,197,44,197,44,135"/>
+<area shape="rect" id="Node000003" href="$structColorRGB.html" title="RGB color representation." alt="" coords="7,5,86,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="49,47,49,94,44,94,44,47"/>
+</map>

@@ -47,8 +47,9 @@ var searchData=
   ['mstat_5fixrss_44',['mstat_ixrss',['../structstatedata.html#a36913f5e1592e04446146d24f4e99bca',1,'statedata']]],
   ['mstat_5fsecs_45',['mstat_secs',['../structstatedata.html#ab69d539dd6910390a5c42769c78db97c',1,'statedata']]],
   ['mstats_5fcounter_46',['mstats_counter',['../structstatedata.html#a7ba12c6db9afacbf5ae93b71e7a2414d',1,'statedata']]],
-  ['mush_5flognum_47',['mush_lognum',['../structstatedata.html#a043ddee61c66701cdb6408dded5aac16',1,'statedata']]],
-  ['mush_5fname_48',['mush_name',['../structconfdata.html#a96b28d62a6b46a783deab2fc621a3c10',1,'confdata']]],
-  ['mush_5fowner_49',['mush_owner',['../structconfdata.html#acf88ce2637cb859311b0eba30a168287',1,'confdata']]],
-  ['mush_5fshortname_50',['mush_shortname',['../structconfdata.html#a8615dc5802564ebfc0bc0e10b62c5bbf',1,'confdata']]]
+  ['mush_5fcode_47',['mush_code',['../structColorEntry.html#ad8dfa8d866995d6886f69b0bcf9b35ba',1,'ColorEntry']]],
+  ['mush_5flognum_48',['mush_lognum',['../structstatedata.html#a043ddee61c66701cdb6408dded5aac16',1,'statedata']]],
+  ['mush_5fname_49',['mush_name',['../structconfdata.html#a96b28d62a6b46a783deab2fc621a3c10',1,'confdata']]],
+  ['mush_5fowner_50',['mush_owner',['../structconfdata.html#acf88ce2637cb859311b0eba30a168287',1,'confdata']]],
+  ['mush_5fshortname_51',['mush_shortname',['../structconfdata.html#a8615dc5802564ebfc0bc0e10b62c5bbf',1,'confdata']]]
 ];

@@ -15,13 +15,14 @@ var searchData=
   ['tf_5fpopen_12',['tf_popen',['../db_8c.html#a921d72976e0926ccb0faccba9ece6bbd',1,'db.c']]],
   ['tf_5fxclose_13',['tf_xclose',['../db_8c.html#ad4813f215afc67d1f84770198fc5d36f',1,'db.c']]],
   ['tf_5fxopen_14',['tf_xopen',['../db_8c.html#afd05add0245053838c6560f57b589c95',1,'db.c']]],
-  ['tobasex_15',['toBaseX',['../funmath_8c.html#a42e8f0cc3ed47a987ab43a39bc8b2efb',1,'funmath.c']]],
-  ['token_5fchar_16',['token_char',['../eval_8c.html#af91fbf8efad581eb78e23c3a11e6458a',1,'eval.c']]],
-  ['total_5frawmemory_17',['total_rawmemory',['../alloc_8c.html#a61a069393801244ea12e6842c8661650',1,'alloc.c']]],
-  ['track_5fansi_5fletters_18',['track_ansi_letters',['../string__ansi_8c.html#a291922bbc383badf03b65e647c407215',1,'string_ansi.c']]],
-  ['transform_5fsay_19',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
-  ['translate_5fstring_20',['translate_string',['../string__ansi_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_ansi.c']]],
-  ['trim_5fspace_5fsep_21',['trim_space_sep',['../fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f',1,'fnhelper.c']]],
-  ['trim_5fspaces_22',['trim_spaces',['../string__util_8c.html#a7afee6b95bb618b82165e79f6149cd92',1,'string_util.c']]],
-  ['truecolor2vt100_23',['TrueColor2VT100',['../vt100_8c.html#ad1d47a4a7935241a61d3307cab0fce7d',1,'vt100.c']]]
+  ['to_5fansi_5fescape_5fsequence_15',['to_ansi_escape_sequence',['../ansi_8c.html#a43b21f23eddfbccf6797676310288e2c',1,'ansi.c']]],
+  ['tobasex_16',['toBaseX',['../funmath_8c.html#a42e8f0cc3ed47a987ab43a39bc8b2efb',1,'funmath.c']]],
+  ['token_5fchar_17',['token_char',['../eval_8c.html#af91fbf8efad581eb78e23c3a11e6458a',1,'eval.c']]],
+  ['total_5frawmemory_18',['total_rawmemory',['../alloc_8c.html#a61a069393801244ea12e6842c8661650',1,'alloc.c']]],
+  ['track_5fansi_5fletters_19',['track_ansi_letters',['../string__ansi_8c.html#a291922bbc383badf03b65e647c407215',1,'string_ansi.c']]],
+  ['transform_5fsay_20',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
+  ['translate_5fstring_21',['translate_string',['../string__ansi_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_ansi.c']]],
+  ['trim_5fspace_5fsep_22',['trim_space_sep',['../fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f',1,'fnhelper.c']]],
+  ['trim_5fspaces_23',['trim_spaces',['../string__util_8c.html#a7afee6b95bb618b82165e79f6149cd92',1,'string_util.c']]],
+  ['truecolor2vt100_24',['TrueColor2VT100',['../vt100_8c.html#ad1d47a4a7935241a61d3307cab0fce7d',1,'vt100.c']]]
 ];

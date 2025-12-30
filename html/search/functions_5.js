@@ -32,7 +32,7 @@ var searchData=
   ['fun_5fabs_29',['fun_abs',['../funmath_8c.html#ac62c4039b53ed4bb88655ebf7ecda878',1,'funmath.c']]],
   ['fun_5fadd_30',['fun_add',['../funmath_8c.html#ababf07c085a87ceaa933160593ffe90c',1,'funmath.c']]],
   ['fun_5fafter_31',['fun_after',['../funstring_8c.html#a4e3019ca33345b3de6c9d7a331c81a20',1,'funstring.c']]],
-  ['fun_5fansi_32',['fun_ansi',['../funstring_8c.html#a5a1c62d3eb81f171dbd28667a347462d',1,'funstring.c']]],
+  ['fun_5fansi_32',['fun_ansi',['../funstring_8c.html#a3a1af4c67bb16c4a42a1fe59929497dd',1,'funstring.c']]],
   ['fun_5fband_33',['fun_band',['../funmath_8c.html#a628007d93aa1112288ce5a9bbe1215ca',1,'funmath.c']]],
   ['fun_5fbaseconv_34',['fun_baseconv',['../funmath_8c.html#a771b8fa49086e081863fc6f32b1d449d',1,'funmath.c']]],
   ['fun_5fbefore_35',['fun_before',['../funstring_8c.html#ad2285e5c4f626e39f408a50e802d8199',1,'funstring.c']]],

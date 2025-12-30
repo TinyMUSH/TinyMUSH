@@ -8,7 +8,8 @@ var searchData=
   ['xmagic_5',['XMAGIC',['../constants_8h.html#af97a57cc26b845a2952925a7991cf9a3',1,'constants.h']]],
   ['xmalloc_6',['XMALLOC',['../macros_8h.html#a1f2dc397904297d0a9ba598093b19976',1,'macros.h']]],
   ['xperms_7',['xperms',['../structfun.html#a155a81a2af8ac89c59e27d7c6a5225fc',1,'fun']]],
-  ['xyz_5fto_5fcielab_8',['xyz_to_cielab',['../namespacecompute__lab.html#a9c5e52cebb8606370852371d14dab20d',1,'compute_lab']]],
-  ['xyzcolor_9',['xyzColor',['../structxyzColor.html',1,'']]],
-  ['xyztocielab_10',['xyzToCIELAB',['../vt100_8c.html#a5793ac3d24e4f350fae8004f03b0aeda',1,'vt100.c']]]
+  ['xterm_5findex_8',['xterm_index',['../structColorInfo.html#af8506127e697f7bcb015e71725438576',1,'ColorInfo::xterm_index'],['../structColorEntry.html#aa14b458ba7e6bc878be8d064f5d62255',1,'ColorEntry::xterm_index']]],
+  ['xyz_5fto_5fcielab_9',['xyz_to_cielab',['../namespacecompute__lab.html#a9c5e52cebb8606370852371d14dab20d',1,'compute_lab']]],
+  ['xyzcolor_10',['xyzColor',['../structxyzColor.html',1,'']]],
+  ['xyztocielab_11',['xyzToCIELAB',['../vt100_8c.html#a5793ac3d24e4f350fae8004f03b0aeda',1,'vt100.c']]]
 ];
