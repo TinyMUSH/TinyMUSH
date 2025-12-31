@@ -141,13 +141,17 @@ ninja
 ### Running Tests
 
 ```bash
+# Setup Python virtual environment (only needed once)
+./setup_venv.sh
+
 # Build and install
 cd build
 cmake --build . --target install-upgrade
 
 # Run regression tests
 cd ../scripts
-python3 regression_test.py
+source ../venv/bin/activate
+TINY_USER="#1" TINY_PASS="potrzebie" python3 regression_test.py
 ```
 
 ## Code Guidelines

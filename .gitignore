@@ -73,3 +73,14 @@ core.*
 # Local database snapshots at repo root
 /netmush.db
 /netmush.db.*
+
+# Python virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

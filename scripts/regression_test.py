@@ -6,6 +6,9 @@ TinyMUSH regression test runner.
 - Reads credentials from environment to avoid hard-coding secrets.
 - Skips intentionally disconnecting commands unless explicitly allowed.
 
+Dependencies:
+- telnetlib3 (install with: pip install telnetlib3)
+
 Env vars:
     TINY_HOST   (default: 127.0.0.1)
     TINY_PORT   (default: 6250)
@@ -33,14 +36,23 @@ import argparse
 import os
 import sys
 import time
-import telnetlib
+
+try:
+    from telnetlib3 import Telnet
+except ImportError:
+    sys.stderr.write("telnetlib3 is required but not installed.\n")
+    sys.stderr.write("Install it with: pip install telnetlib3\n")
+    sys.stderr.write("Or use pipx: pipx install telnetlib3\n")
+    sys.stderr.write("Or create a virtual environment: python -m venv venv && source venv/bin/activate && pip install telnetlib3\n")
+    sys.exit(1)
+
 from typing import List, Tuple
 
 HOST = os.getenv("TINY_HOST", "127.0.0.1")
 PORT = int(os.getenv("TINY_PORT", "6250"))
 # Default to developer debug account (#1 potrzebi) unless overridden.
 USER = os.getenv("TINY_USER", "#1")
-PASS = os.getenv("TINY_PASS", "potrzebi")
+PASS = os.getenv("TINY_PASS", "potrzebie")
 # Increase default timeout to reduce occasional read races; override with TINY_TIMEOUT.
 TIMEOUT = float(os.getenv("TINY_TIMEOUT", "7"))
 DEFAULT_CONFIG = os.getenv("TINY_CONFIG_FILE", "scripts/commands_messaging.conf")
@@ -59,6 +71,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="TinyMUSH regression test runner")
     parser.add_argument("--config", "-c", default=DEFAULT_CONFIG, help="Path to the test config file")
     parser.add_argument("--allow-disconnect", action="store_true", help="Run commands that may close the session")
+    parser.add_argument("--delay", "-d", type=float, default=0.2, help="Delay between commands in seconds (default: 0.2)")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed output for debugging")
     return parser.parse_args()
 
 
@@ -98,12 +112,12 @@ def load_commands(path: str) -> List[Tuple[str, str]]:
     return commands
 
 
-def read_some(tn: telnetlib.Telnet, timeout: float) -> str:
+def read_some(tn: Telnet, timeout: float) -> str:
     """Read until no data arrives for a short idle window or timeout expires."""
     chunks: List[str] = []
     end_time = time.time() + timeout
     last_data = None
-    idle_grace = 0.5  # stop after this idle gap once we've seen data (server responses can trickle)
+    idle_grace = 0.3  # Réduit pour être plus réactif, mais toujours attendre un peu
 
     while time.time() < end_time:
         data = tn.read_very_eager()
@@ -117,14 +131,21 @@ def read_some(tn: telnetlib.Telnet, timeout: float) -> str:
             break
 
         # Avoid busy loop; small sleep before next check.
-        time.sleep(0.05)
+        time.sleep(0.02)  # Réduit pour être plus réactif
 
     return "".join(chunks)
 
 
-def send_cmd(tn: telnetlib.Telnet, cmd: str, timeout: float) -> str:
+def send_cmd(tn: Telnet, cmd: str, timeout: float, delay: float = 0.2) -> str:
     tn.write((cmd + "\n").encode())
-    return read_some(tn, timeout)
+    time.sleep(0.1)  # Petit délai pour laisser le serveur commencer à traiter
+    response = read_some(tn, timeout)
+    time.sleep(delay)  # Délai configurable pour s'assurer que la réponse est complète
+    # Lire une fois de plus au cas où il y aurait eu un délai
+    additional = read_some(tn, 0.5)
+    if additional:
+        response += additional
+    return response
 
 
 def main() -> None:
@@ -135,14 +156,17 @@ def main() -> None:
     ensure_creds()
     print(f"Connecting to {HOST}:{PORT} as {USER}…", flush=True)
     print(f"Using config: {args.config}")
+    if args.verbose:
+        print(f"Command delay: {args.delay}s, Timeout: {TIMEOUT}s")
 
-    tn = telnetlib.Telnet(HOST, PORT, timeout=TIMEOUT)
+    tn = Telnet(HOST, PORT, timeout=TIMEOUT)
     welcome = read_some(tn, TIMEOUT)
-    if welcome:
+    if welcome and args.verbose:
         print("[welcome]\n" + welcome.strip())
 
-    login_resp = send_cmd(tn, f"connect {USER} {PASS}", TIMEOUT)
-    print("[login]\n" + login_resp.strip())
+    login_resp = send_cmd(tn, f"connect {USER} {PASS}", TIMEOUT, args.delay)
+    if args.verbose:
+        print("[login]\n" + login_resp.strip())
 
     commands = []
     skipped_disconnect = []
@@ -161,13 +185,14 @@ def main() -> None:
     for cmd, expected in commands:
         # Si la commande est @create testobj, extraire l'ID de l'objet créé
         if cmd.strip().startswith("@create testobj"):
-            resp = send_cmd(tn, cmd, TIMEOUT)
+            resp = send_cmd(tn, cmd, TIMEOUT, args.delay)
             import re
             m = re.search(r'created as object #(\d+)', resp)
             if m:
                 obj_id = m.group(1)
             status = "OK" if "created as object" in resp else "ERR"
-            print(f"[{status}] {cmd}\n{resp.strip()}\n")
+            if args.verbose or status == "ERR":
+                print(f"[{status}] {cmd}\n{resp.strip()}\n")
             results.append((cmd, expected, status, resp))
             continue
         # Remplacer testobj par #ID si trouvé
@@ -177,12 +202,18 @@ def main() -> None:
         else:
             cmd_sub = cmd
             expected_sub = expected
-        resp = send_cmd(tn, cmd_sub, TIMEOUT)
+        resp = send_cmd(tn, cmd_sub, TIMEOUT, args.delay)
         if expected_sub:
-            status = "OK" if expected_sub in resp else "ERR"
+            # Pour les fonctions qui peuvent retourner une chaîne vide, considérer comme OK si expected est vide
+            if expected_sub == "" and resp.strip() == "":
+                status = "OK"
+            else:
+                status = "OK" if expected_sub in resp else "ERR"
         else:
+            # Si pas d'expectation, considérer OK tant qu'il y a une réponse (même vide)
             status = "OK"
-        print(f"[{status}] {cmd_sub}\n{resp.strip()}\n")
+        if args.verbose or status == "ERR":
+            print(f"[{status}] {cmd_sub}\n{resp.strip()}\n")
         results.append((cmd_sub, expected_sub, status, resp))
 
     # Graceful logout if possible
