@@ -2347,281 +2347,82 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
  */
 void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int ansi_state = 0;
-	int xterm = 0;
-	bool color24bit = false;
-	// Détection du flag COLOR24BIT
-	if (player != NOTHING && Color24Bit(player))
-	{
-		color24bit = true;
-	}
-	char *s = NULL, *xtp = NULL;
-	char xtbuf[SBUF_SIZE];
+	ColorState color_state = {0};
+	ColorType color_type = ColorTypeAnsi;
+	char escape_buffer[256];
+	size_t escape_offset = 0;
 
+	// Vérifier si les couleurs ANSI sont activées
 	if (!mushconf.ansi_colors)
 	{
 		XSAFELBSTR(fargs[1], buff, bufc);
 		return;
 	}
 
-	if (!fargs[0] || !*fargs[0])
+	// Vérifier les arguments
+	if (!fargs[0] || !*fargs[0] || !fargs[1])
 	{
 		XSAFELBSTR(fargs[1], buff, bufc);
 		return;
 	}
 
-	// On ne génère la séquence classique que si aucune couleur explicite n'est demandée
-	bool has_explicit_rgb = false;
-	char *tmp = fargs[0];
-	int rgb_detect_r = -1, rgb_detect_g = -1, rgb_detect_b = -1;
-	if (tmp && *tmp)
+	// Déterminer le type de couleur supporté par le joueur
+	if (player != NOTHING && Color24Bit(player))
 	{
-		if (*tmp == '#' && strlen(tmp) == 7)
-		{
-			sscanf(tmp + 1, "%2x%2x%2x", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b);
-			has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
-		}
-		else if (sscanf(tmp, "%d %d %d", &rgb_detect_r, &rgb_detect_g, &rgb_detect_b) == 3)
-		{
-			has_explicit_rgb = (rgb_detect_r >= 0 && rgb_detect_g >= 0 && rgb_detect_b >= 0 && rgb_detect_r <= 255 && rgb_detect_g <= 255 && rgb_detect_b <= 255);
-		}
+		color_type = ColorTypeTrueColor;
 	}
-	if (!has_explicit_rgb)
+	else
 	{
-		track_ansi_letters(fargs[0], &ansi_state);
-		// On passe no_default_bg = true si '/' n'est pas présent (pas de background explicite)
-		bool no_default_bg = !strchr(fargs[0], '/');
-		s = ansi_transition_esccode(ANST_NONE, ansi_state, no_default_bg);
-		XSAFELBSTR(s, buff, bufc);
-		XFREE(s);
+		color_type = ColorTypeXTerm; // Utiliser XTerm pour la compatibilité
 	}
 
-	/**
-	 * Now that normal ansi has been done, time for xterm
-	 *
-	 */
-	s = fargs[0];
-
-	// Parsing foreground color
-	XMEMSET(xtbuf, 0, SBUF_SIZE);
-	int is_chevron = 0;
-	if (*s == '<')
+	// Parser la spécification de couleur
+	if (!ansi_parse_color_from_string(&color_state, fargs[0], false))
 	{
-		is_chevron = 1;
-		s++;
-	}
-	xtp = xtbuf;
-	while (*s && ((is_chevron && *s != '>' && *s != '/' && *s != '\0') || (!is_chevron && *s != '/' && *s != '\0')))
-	{
-		XSAFESBCHR(*s, xtbuf, &xtp);
-		s++;
-	}
-	if (is_chevron && *s == '>')
-		s++;
-	*xtp = '\0';
-	int r = -1, g = -1, b = -1;
-	if (xtbuf[0] == '#' && strlen(xtbuf) == 7)
-	{
-		sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-	}
-	else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3)
-	{
-		// Format "R G B"
-	}
-	if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
-	{
-		if (color24bit)
-		{
-			XSNPRINTF(xtbuf, SBUF_SIZE, "\033[38;2;%d;%d;%dm", r, g, b);
-			XSAFELBSTR(xtbuf, buff, bufc);
-		}
-		else
-		{
-			rgbColor rgb;
-			rgb.r = r;
-			rgb.g = g;
-			rgb.b = b;
-			ColorRGB ansi_rgb = {rgb.r, rgb.g, rgb.b};
-			int i = ansi_find_closest_color_with_lab(ansi_rgb_to_cielab(ansi_rgb), ColorTypeXTerm).xterm_index;
-			XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-			XSAFELBSTR(xtbuf, buff, bufc);
-			xterm = 1;
-		}
-	}
-	else if (xtbuf[0])
-	{
-		// Si une seule lettre, utiliser la table classique
-		if (strlen(xtbuf) == 1)
-		{
-			const char *seq = ansiChar(xtbuf[0]);
-			if (seq && *seq)
-			{
-				XSAFELBSTR(seq, buff, bufc);
-			}
-		}
-		else
-		{
-			int i = str2xterm(xtbuf);
-			if (i >= 0 && i <= 255)
-			{
-				XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-				XSAFELBSTR(xtbuf, buff, bufc);
-				xterm = 1;
-			}
-		}
-	}
-	// Parsing background color only if '/' is present
-	if (*s == '/')
-	{
-		s++;
-		// Vérifie qu'il y a bien une couleur après le '/'
-		if (*s)
-		{
-			XMEMSET(xtbuf, 0, SBUF_SIZE);
-			is_chevron = 0;
-			if (*s == '<')
-			{
-				is_chevron = 1;
-				s++;
-			}
-			xtp = xtbuf;
-			while (*s && ((is_chevron && *s != '>' && *s != '\0') || (!is_chevron && *s != '\0')))
-			{
-				XSAFESBCHR(*s, xtbuf, &xtp);
-				s++;
-			}
-			if (is_chevron && *s == '>')
-				s++;
-			*xtp = '\0';
-			// Vérifie que xtbuf n'est pas vide ou uniquement des espaces
-			int only_spaces = 1;
-			for (char *p = xtbuf; *p; ++p)
-			{
-				if (!isspace((unsigned char)*p))
-				{
-					only_spaces = 0;
-					break;
-				}
-			}
-			if (xtbuf[0] && !only_spaces)
-			{
-				r = g = b = -1;
-				if (xtbuf[0] == '#' && strlen(xtbuf) == 7)
-				{
-					sscanf(xtbuf + 1, "%2x%2x%2x", &r, &g, &b);
-				}
-				else if (sscanf(xtbuf, "%d %d %d", &r, &g, &b) == 3)
-				{
-					// Format "R G B"
-				}
-				if (r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
-				{
-					XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
-				}
-				else
-				{
-					int i = str2xterm(xtbuf);
-					XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-				}
-				if (xtbuf[0])
-				{
-					if (color24bit && r >= 0 && g >= 0 && b >= 0 && r <= 255 && g <= 255 && b <= 255)
-					{
-						XSNPRINTF(xtbuf, SBUF_SIZE, "\033[48;2;%d;%d;%dm", r, g, b);
-						XSAFELBSTR(xtbuf, buff, bufc);
-					}
-					else
-					{
-						rgbColor rgb;
-						rgb.r = r;
-						rgb.g = g;
-						rgb.b = b;
-						ColorRGB ansi_rgb = {rgb.r, rgb.g, rgb.b};
-						int i = ansi_find_closest_color_with_lab(ansi_rgb_to_cielab(ansi_rgb), ColorTypeXTerm).xterm_index;
-						XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-						XSAFELBSTR(xtbuf, buff, bufc);
-						xterm = 1;
-					}
-				}
-			}
-		}
+		// Si le parsing échoue, retourner le texte sans couleur
+		XSAFELBSTR(fargs[1], buff, bufc);
+		return;
 	}
 
-	s = fargs[1];
-
-	while (*s)
+	// Générer la séquence d'échappement pour la couleur
+	if (to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &color_state, color_type) == ColorStatusSet)
 	{
-		if (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
-		else
-		{
-			++s;
-		}
+		XSAFELBSTR(escape_buffer, buff, bufc);
 	}
 
+	// Ajouter le texte
 	XSAFELBSTR(fargs[1], buff, bufc);
-	s = ansi_transition_esccode(ansi_state, ANST_NONE, false);
-	XSAFELBSTR(s, buff, bufc);
-	XFREE(s);
 
-	if (xterm)
+	// Générer la séquence de reset
+	ColorState reset_state = {0};
+	reset_state.reset = ColorStatusReset;
+	escape_offset = 0;
+	if (to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &reset_state, color_type) != ColorStatusNone)
 	{
-		XSAFEANSINORMAL(buff, bufc);
+		XSAFELBSTR(escape_buffer, buff, bufc);
 	}
 }
 
 void fun_stripansi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
 {
-	char *buf;
-	buf = strip_ansi(fargs[0]);
-	XSAFELBSTR(buf, buff, bufc);
-	XFREE(buf);
+	ColorSequence sequences;
+
+	if (!fargs[0] || !*fargs[0])
+	{
+		return;
+	}
+
+	if (ansi_parse_ansi_to_sequences(fargs[0], &sequences))
+	{
+		XSAFELBSTR(sequences.text, buff, bufc);
+		XFREE(sequences.text);
+		XFREE(sequences.data);
+	}
+	else
+	{
+		// Fallback: return original string if parsing fails
+		XSAFELBSTR(fargs[0], buff, bufc);
+	}
 }
 
 /*---------------------------------------------------------------------------
