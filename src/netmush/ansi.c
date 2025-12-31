@@ -1711,6 +1711,217 @@ char *ansi_sequences_to_embedded(const ColorSequence *sequences)
     return result;
 }
 
+/**
+ * @brief Convert ansi character code (%x?) to ansi sequence.
+ * Replacement for the ansiChar lookup table using colorDefinitions.
+ *
+ * @param ch Character to convert
+ * @return const char* ANSI sequence or empty string if not found
+ */
+const char *ansi_char_to_sequence(int ch)
+{
+    for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+    {
+        if (colorDefinitions[i].mush_code == ch)
+        {
+            // Build ANSI escape sequence for this color
+            static char buffer[16];
+            if (colorDefinitions[i].ansi_index >= 30 && colorDefinitions[i].ansi_index <= 37)
+            {
+                // Foreground color
+                snprintf(buffer, sizeof(buffer), "\033[%dm", 30 + colorDefinitions[i].ansi_index);
+                return buffer;
+            }
+            else if (colorDefinitions[i].ansi_index >= 40 && colorDefinitions[i].ansi_index <= 47)
+            {
+                // Background color
+                snprintf(buffer, sizeof(buffer), "\033[%dm", 40 + (colorDefinitions[i].ansi_index - 8));
+                return buffer;
+            }
+        }
+    }
+    return STRING_EMPTY;
+}
+
+/**
+ * @brief Convert ansi character code (%x? uppercase) to bright ansi sequence.
+ * Replacement for the ansiChar_Bright lookup table using colorDefinitions.
+ *
+ * @param ch Character to convert (should match lowercase versions)
+ * @return const char* Bright ANSI sequence or empty string if not found
+ */
+const char *ansi_char_bright_to_sequence(int ch)
+{
+    for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+    {
+        if (colorDefinitions[i].mush_code == ch)
+        {
+            // Build bright ANSI escape sequence for this color
+            static char buffer[16];
+            if (colorDefinitions[i].ansi_index >= 0 && colorDefinitions[i].ansi_index <= 7)
+            {
+                // Bright foreground color (90-97)
+                snprintf(buffer, sizeof(buffer), "\033[%dm", 90 + colorDefinitions[i].ansi_index);
+                return buffer;
+            }
+        }
+    }
+    return STRING_EMPTY;
+}
+
+/**
+ * @brief Convert ansi character code to numeric values.
+ * Replacement for the ansiNum lookup table using colorDefinitions.
+ *
+ * @param ch ANSI character
+ * @return int ANSI numeric value or 0 if not found
+ */
+int ansi_char_to_num(int ch)
+{
+    for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+    {
+        if (colorDefinitions[i].mush_code == ch)
+        {
+            return colorDefinitions[i].ansi_index;
+        }
+    }
+    return 0; // Not found
+}
+
+/**
+ * @brief Convert packed ANSI state to ColorState structure
+ * @param packed Packed ANSI state value
+ * @return ColorState structure representing the ANSI state
+ */
+ColorState ansi_packed_to_colorstate(int packed)
+{
+    ColorState state = {0};
+    
+    // Extract foreground color (bits 0-3)
+    int fg = packed & 0x00F;
+    if (fg) {
+        state.foreground.is_set = ColorStatusSet;
+        state.foreground.ansi_index = 30 + fg; // ANSI foreground color codes start at 30
+        ansi_get_color_from_index(&state, 30 + fg, false);
+    } else {
+        state.foreground.is_set = ColorStatusReset;
+    }
+    
+    // Extract background color (bits 4-7)
+    int bg = (packed >> 4) & 0x00F;
+    if (bg) {
+        state.background.is_set = ColorStatusSet;
+        state.background.ansi_index = 40 + bg; // ANSI background color codes start at 40
+        ansi_get_color_from_index(&state, 40 + bg, true);
+    } else {
+        state.background.is_set = ColorStatusReset;
+    }
+    
+    // Extract flags (bits 8-15)
+    int flags = (packed >> 8) & 0xFF;
+    
+    // Convert flags to ColorState flags
+    state.highlight = (flags & 0x01) ? ColorStatusSet : ColorStatusNone;
+    state.underline = (flags & 0x02) ? ColorStatusSet : ColorStatusNone;
+    state.flash = (flags & 0x04) ? ColorStatusSet : ColorStatusNone;
+    state.inverse = (flags & 0x08) ? ColorStatusSet : ColorStatusNone;
+    
+    return state;
+}
+
+/**
+ * @brief Convert ColorState structure to packed ANSI state
+ * @param state ColorState structure to convert
+ * @return Packed ANSI state value
+ */
+int ansi_colorstate_to_packed(ColorState state)
+{
+    int packed = 0;
+    
+    // Convert foreground color
+    if (state.foreground.is_set == ColorStatusSet && state.foreground.ansi_index >= 30 && state.foreground.ansi_index <= 37) {
+        packed |= (state.foreground.ansi_index - 30) & 0x0F;
+    }
+    
+    // Convert background color
+    if (state.background.is_set == ColorStatusSet && state.background.ansi_index >= 40 && state.background.ansi_index <= 47) {
+        packed |= ((state.background.ansi_index - 40) & 0x0F) << 4;
+    }
+    
+    // Convert flags
+    int flags = 0;
+    if (state.highlight == ColorStatusSet) flags |= 0x01;
+    if (state.underline == ColorStatusSet) flags |= 0x02;
+    if (state.flash == ColorStatusSet) flags |= 0x04;
+    if (state.inverse == ColorStatusSet) flags |= 0x08;
+    
+    packed |= flags << 8;
+    
+    return packed;
+}
+
+/**
+ * @brief Generate ANSI transition sequence from current to target state
+ * @param current Current ANSI state (packed)
+ * @param target Target ANSI state (packed) 
+ * @return Allocated string containing ANSI transition sequence, or NULL if no change needed
+ */
+char *ansi_generate_transition_sequence(int current, int target)
+{
+    if (current == target) {
+        return NULL; // No change needed
+    }
+    
+    ColorState current_state = ansi_packed_to_colorstate(current);
+    ColorState target_state = ansi_packed_to_colorstate(target);
+    
+    // Calculate the difference - what needs to change
+    ColorState diff_state = {0};
+    
+    // Handle reset first
+    if (target_state.reset == ColorStatusReset) {
+        diff_state.reset = ColorStatusReset;
+    }
+    
+    // Handle attributes
+    if (current_state.highlight != target_state.highlight) {
+        diff_state.highlight = target_state.highlight;
+    }
+    if (current_state.underline != target_state.underline) {
+        diff_state.underline = target_state.underline;
+    }
+    if (current_state.flash != target_state.flash) {
+        diff_state.flash = target_state.flash;
+    }
+    if (current_state.inverse != target_state.inverse) {
+        diff_state.inverse = target_state.inverse;
+    }
+    
+    // Handle colors
+    if (current_state.foreground.ansi_index != target_state.foreground.ansi_index ||
+        current_state.foreground.is_set != target_state.foreground.is_set) {
+        diff_state.foreground = target_state.foreground;
+    }
+    if (current_state.background.ansi_index != target_state.background.ansi_index ||
+        current_state.background.is_set != target_state.background.is_set) {
+        diff_state.background = target_state.background;
+    }
+    
+    // Generate the ANSI escape sequence
+    char buffer[256];
+    size_t offset = 0;
+    ColorStatus status = to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, &diff_state, ColorTypeAnsi);
+    
+    if (status == ColorStatusNone) {
+        return NULL; // No sequence needed
+    }
+    
+    // Allocate and return the sequence
+    char *result = XMALLOC(strlen(buffer) + 1, "ansi_generate_transition_sequence");
+    strcpy(result, buffer);
+    return result;
+}
+
 ColorEntry colorDefinitions[] = {
     {"black", ColorTypeAnsi, 120, 0, 0, {0, 0, 0}, {0.000000000000000, 0.000000000000000, 0.000000000000000}},
     {"red", ColorTypeAnsi, 114, 1, 1, {128, 0, 0}, {25.535530963463174, 48.045128262358347, 38.057349239387428}},
@@ -2117,3 +2328,60 @@ ColorEntry colorDefinitions[] = {
     {"yellowgreen", ColorTypeTrueColor, -1, 10, 112, {154, 205, 50}, {76.534808212057499, -37.987912969071225, 66.585626206666078}},
     {NULL, ColorTypeNone, -1, -1, -1, {0, 0, 0}, {0.0, 0.0, 0.0}} // End marker
 };
+
+/**
+ * @brief Parse ANSI escape sequence and return ColorState.
+ * 
+ * @param ansi_ptr Pointer to string pointer, will be advanced past the parsed sequence
+ * @return ColorState Parsed color state
+ */
+ColorState ansi_parse_sequence(const char **ansi_ptr)
+{
+    ColorState state = {0};
+    
+    if (!ansi_ptr || !*ansi_ptr || **ansi_ptr != '\033')
+        return state;
+    
+    const char *start = *ansi_ptr;
+    (*ansi_ptr)++; // skip ESC
+    
+    if (**ansi_ptr == '[')
+    {
+        (*ansi_ptr)++; // skip [
+        
+        // Find the end of the sequence (ends with 'm')
+        const char *code_start = *ansi_ptr;
+        while (**ansi_ptr && **ansi_ptr != 'm')
+            (*ansi_ptr)++;
+        
+        if (**ansi_ptr == 'm')
+        {
+            // Extract the code between [ and m
+            size_t code_len = *ansi_ptr - code_start;
+            if (code_len > 0)
+            {
+                char *code = XMALLOC(code_len + 1, "code");
+                memcpy(code, code_start, code_len);
+                code[code_len] = 0;
+                
+                // Parse the ANSI code using the existing function
+                ansi_parse_ansi_code(&state, code);
+                
+                XFREE(code);
+            }
+            (*ansi_ptr)++; // skip 'm'
+        }
+        else
+        {
+            // Invalid sequence, reset pointer
+            *ansi_ptr = start;
+        }
+    }
+    else
+    {
+        // Not a valid sequence, reset pointer
+        *ansi_ptr = start;
+    }
+    
+    return state;
+}

@@ -17,10 +17,165 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "ansi.h"
 
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+
+/**
+ * @brief Common function to convert ColorState to ANSI escape sequence based on player capabilities
+ * 
+ * @param attr The parsed color state
+ * @param ansi Player supports basic ANSI colors
+ * @param xterm Player supports xterm colors
+ * @param check_space_fn Callback to check/ensure buffer space (can be NULL)
+ * @param write_fn Callback to write data to buffer
+ * @param ctx Context pointer passed to callbacks
+ */
+static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xterm,
+                                     void (*check_space_fn)(size_t needed, void *ctx),
+                                     void (*write_fn)(const char *data, size_t len, void *ctx),
+                                     void *ctx)
+{
+    if (xterm)
+    {
+        // Player support xterm colors
+        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
+        bool has_bg = (attr->background.is_set == ColorStatusSet);
+        
+        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+        {
+            if (check_space_fn)
+                check_space_fn(64, ctx);
+            
+            char seq[64];
+            int seq_len = 0;
+            
+            // Build complete escape sequence using XSNPRINTF
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+            
+            if (has_fg)
+            {
+                int xterm_fg;
+                // Use original xterm index if available to avoid lossy RGB conversion
+                if (attr->foreground.xterm_index >= 0 && attr->foreground.xterm_index <= 255)
+                    xterm_fg = attr->foreground.xterm_index;
+                else {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    xterm_fg = closest.xterm_index;
+                }
+                
+                seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "38;5;%d", xterm_fg);
+            }
+            
+            if (has_bg)
+            {
+                int xterm_bg;
+                // Use original xterm index if available to avoid lossy RGB conversion
+                if (attr->background.xterm_index >= 0 && attr->background.xterm_index <= 255)
+                    xterm_bg = attr->background.xterm_index;
+                else {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    xterm_bg = closest.xterm_index;
+                }
+                
+                if (has_fg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "48;5;%d", xterm_bg);
+            }
+            
+            if (attr->reset == ColorStatusReset)
+            {
+                if (has_fg || has_bg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+            }
+            
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
+            
+            write_fn(seq, seq_len, ctx);
+        }
+    }
+    else if (ansi)
+    {
+        // Player support ansi colors, convert to ansi
+        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
+        bool has_bg = (attr->background.is_set == ColorStatusSet);
+        
+        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+        {
+            if (check_space_fn)
+                check_space_fn(64, ctx);
+            
+            char seq[64];
+            int seq_len = 0;
+            
+            // Build escape sequence
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+            
+            if (has_fg)
+            {
+                int f;
+                if (attr->foreground.ansi_index >= 0 && attr->foreground.ansi_index <= 15)
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    uint8_t idx = closest.xterm_index & 0xF;
+                    f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
+                }
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeAnsi);
+                    uint8_t a = closest.ansi_index;
+                    f = (a < 8) ? (30 + a) : (90 + (a - 8));
+                }
+                seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", f);
+            }
+            
+            if (has_bg)
+            {
+                int b;
+                if (attr->background.ansi_index >= 0 && attr->background.ansi_index <= 15)
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    uint8_t idx = closest.xterm_index & 0xF;
+                    b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
+                }
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeAnsi);
+                    uint8_t a = closest.ansi_index;
+                    b = (a < 8) ? (40 + a) : (100 + (a - 8));
+                }
+                
+                if (has_fg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", b);
+            }
+            
+            if (attr->reset == ColorStatusReset)
+            {
+                if (has_fg || has_bg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+            }
+            
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
+            
+            write_fn(seq, seq_len, ctx);
+        }
+    }
+}
 
 /**
  * @brief Convert ansi character code (%x?) to ansi sequence.
@@ -266,17 +421,76 @@ static inline void append_str(char **p_ptr, const char *end, const char *str)
 }
 
 /**
- * @brief Append escape sequence with format to buffer
- * @param p_ptr Pointer to current position pointer
- * @param end End of buffer
- * @param fmt Format string (simple: just digits and separators)
+ * @brief Context structure for level_ansi buffer management
  */
-static inline void append_escape_seq(char **p_ptr, const char *end, const char *fmt)
+typedef struct {
+    char **p_ptr;
+    const char *end;
+    size_t *buf_size;
+    char **buf;
+} LevelAnsiContext;
+
+/**
+ * @brief Check buffer space for level_ansi
+ */
+static void level_ansi_check_space(size_t needed, void *ctx)
 {
-	append_ch(p_ptr, end, ESC_CHAR);
-	append_ch(p_ptr, end, '[');
-	append_str(p_ptr, end, fmt);
-	append_ch(p_ptr, end, 'm');
+    LevelAnsiContext *context = (LevelAnsiContext *)ctx;
+    size_t used = *context->p_ptr - *context->buf;
+    if (used + needed >= *context->buf_size - 1) {
+        *context->buf_size *= 2;
+        *context->buf = XREALLOC(*context->buf, *context->buf_size, "buf");
+        *context->p_ptr = *context->buf + used;
+        context->end = *context->buf + *context->buf_size - 1;
+    }
+}
+
+/**
+ * @brief Write data to level_ansi buffer
+ */
+static void level_ansi_write(const char *data, size_t len, void *ctx)
+{
+    LevelAnsiContext *context = (LevelAnsiContext *)ctx;
+    size_t copy_len = (len < (size_t)(context->end - *context->p_ptr)) ? len : (context->end - *context->p_ptr);
+    XMEMCPY(*context->p_ptr, data, copy_len);
+    *context->p_ptr += copy_len;
+}
+typedef struct {
+    char *buf;
+    char **p_ptr;
+    const char *end;
+    size_t flush_threshold;
+    void (*flush_fn)(const char *data, size_t len, void *ctx);
+    void *flush_ctx;
+} LevelAnsiStreamContext;
+
+/**
+ * @brief Check buffer space for level_ansi_stream (no-op, buffer is fixed)
+ */
+static void level_ansi_stream_check_space(size_t needed, void *ctx)
+{
+    // No-op for streaming - buffer space is managed by FLUSH_IF_NEEDED
+    (void)needed;
+    (void)ctx;
+}
+
+/**
+ * @brief Write data to level_ansi_stream buffer
+ */
+static void level_ansi_stream_write(const char *data, size_t len, void *ctx)
+{
+    LevelAnsiStreamContext *context = (LevelAnsiStreamContext *)ctx;
+    size_t copy_len = (len < (size_t)(context->end - *context->p_ptr)) ? len : (context->end - *context->p_ptr);
+    XMEMCPY(*context->p_ptr, data, copy_len);
+    *context->p_ptr += copy_len;
+    
+    // Check if we need to flush
+    size_t used = *context->p_ptr - context->buf;
+    if (used >= context->flush_threshold) {
+        **context->p_ptr = '\0';
+        context->flush_fn(context->buf, used, context->flush_ctx);
+        *context->p_ptr = context->buf;
+    }
 }
 
 /**
@@ -442,136 +656,15 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 			else
 			{
 				// Player doesn't support true colors, find what is the color.
-				VT100ATTR attr = decodeVT100(&s);
+				ColorState attr = ansi_parse_sequence(&s);
 				
-				if (xterm)
-				{
-					// Player support xterm colors - use XSNPRINTF for efficient building
-					bool has_fg = attr.foreground.type;
-					bool has_bg = attr.background.type;
-					
-					if (has_fg || has_bg || attr.reset)
-					{
-						// Ensure we have space for the color sequence (max ~20 chars)
-						CHECK_BUFFER_SPACE(64);
-						char seq[64];
-						int seq_len = 0;
-						
-						// Build complete escape sequence using XSNPRINTF
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
-						
-						if (has_fg)
-						{
-							int xterm_fg;
-							// Use original xterm index if available to avoid lossy RGB conversion
-							if (attr.foreground.type == ANSICOLORTYPE_XTERM)
-								xterm_fg = attr.foreground.xterm_index;
-							else
-								xterm_fg = RGB2X11(attr.foreground.rgb);
-							
-							seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "38;5;%d", xterm_fg);
-						}
-						
-						if (has_bg)
-						{
-							int xterm_bg;
-							// Use original xterm index if available to avoid lossy RGB conversion
-							if (attr.background.type == ANSICOLORTYPE_XTERM)
-								xterm_bg = attr.background.xterm_index;
-							else
-								xterm_bg = RGB2X11(attr.background.rgb);
-							
-							if (has_fg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "48;5;%d", xterm_bg);
-						}
-						
-						if (attr.reset)
-						{
-							if (has_fg || has_bg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
-						}
-						
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-						
-						// Copy sequence to output buffer in one go
-						int copy_len = (seq_len < (end - p)) ? seq_len : (end - p);
-						XMEMCPY(p, seq, copy_len);
-						p += copy_len;
-					}
-				}
-				else if (ansi)
-				{
-					// Player support ansi colors, convert to ansi - use XSNPRINTF for efficiency
-					bool has_fg = attr.foreground.type;
-					bool has_bg = attr.background.type;
-					
-					if (has_fg || has_bg || attr.reset)
-					{
-						// Ensure we have space for the color sequence (max ~20 chars)
-						CHECK_BUFFER_SPACE(64);
-						
-						char seq[64];
-						int seq_len = 0;
-						
-						// Build escape sequence
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
-						
-						if (has_fg)
-						{
-							int f;
-							if (attr.foreground.type == ANSICOLORTYPE_STANDARD)
-							{
-								uint8_t idx = RGB2X11(attr.foreground.rgb) & 0xF;
-								f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
-							}
-							else
-							{
-								uint8_t a = RGB2Ansi(attr.foreground.rgb);
-								f = (a < 8) ? (30 + a) : (90 + (a - 8));
-							}
-							seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", f);
-						}
-						
-						if (has_bg)
-						{
-							int b;
-							if (attr.background.type == ANSICOLORTYPE_STANDARD)
-							{
-								uint8_t idx = RGB2X11(attr.background.rgb) & 0xF;
-								b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
-							}
-							else
-							{
-								uint8_t a = RGB2Ansi(attr.background.rgb);
-								b = (a < 8) ? (40 + a) : (100 + (a - 8));
-							}
-							
-							if (has_fg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", b);
-						}
-						
-						if (attr.reset)
-						{
-							if (has_fg || has_bg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
-						}
-						
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-						
-						// Copy sequence to output buffer in one go
-						int copy_len = (seq_len < (end - p)) ? seq_len : (end - p);
-						XMEMCPY(p, seq, copy_len);
-						p += copy_len;
-					}
-				}
+				LevelAnsiContext ctx = {&p, end, &buf_size, &buf};
+				convert_color_to_sequence(&attr, ansi, xterm, level_ansi_check_space, level_ansi_write, &ctx);
+				
+				// Update pointers after potential reallocation
+				p = *ctx.p_ptr;
+				end = (char *)ctx.end;
+				buf_size = *ctx.buf_size;
 			}
 		}
 		else
@@ -653,135 +746,13 @@ void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
 			else
 			{
 				// Player doesn't support true colors, find what is the color.
-				VT100ATTR attr = decodeVT100(&s);
+				ColorState attr = ansi_parse_sequence(&s);
 				
-				if (xterm)
-				{
-					// Player support xterm colors
-					bool has_fg = attr.foreground.type;
-					bool has_bg = attr.background.type;
-					
-					if (has_fg || has_bg || attr.reset)
-					{
-						char seq[64];
-						int seq_len = 0;
-						
-						// Build complete escape sequence using XSNPRINTF
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
-						
-						if (has_fg)
-						{
-							int xterm_fg;
-							// Use original xterm index if available to avoid lossy RGB conversion
-							if (attr.foreground.type == ANSICOLORTYPE_XTERM)
-								xterm_fg = attr.foreground.xterm_index;
-							else
-								xterm_fg = RGB2X11(attr.foreground.rgb);
-							
-							seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "38;5;%d", xterm_fg);
-						}
-						
-						if (has_bg)
-						{
-							int xterm_bg;
-							// Use original xterm index if available to avoid lossy RGB conversion
-							if (attr.background.type == ANSICOLORTYPE_XTERM)
-								xterm_bg = attr.background.xterm_index;
-							else
-								xterm_bg = RGB2X11(attr.background.rgb);
-							
-							if (has_fg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "48;5;%d", xterm_bg);
-						}
-						
-						if (attr.reset)
-						{
-							if (has_fg || has_bg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
-						}
-						
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-						
-						// Copy sequence to output buffer
-						int copy_len = (seq_len < (end - p)) ? seq_len : (end - p);
-						XMEMCPY(p, seq, copy_len);
-						p += copy_len;
-						
-						FLUSH_IF_NEEDED();
-					}
-				}
-				else if (ansi)
-				{
-					// Player support ansi colors, convert to ansi
-					bool has_fg = attr.foreground.type;
-					bool has_bg = attr.background.type;
-					
-					if (has_fg || has_bg || attr.reset)
-					{
-						char seq[64];
-						int seq_len = 0;
-						
-						// Build escape sequence
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
-						
-						if (has_fg)
-						{
-							int f;
-							if (attr.foreground.type == ANSICOLORTYPE_STANDARD)
-							{
-								uint8_t idx = RGB2X11(attr.foreground.rgb) & 0xF;
-								f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
-							}
-							else
-							{
-								uint8_t a = RGB2Ansi(attr.foreground.rgb);
-								f = (a < 8) ? (30 + a) : (90 + (a - 8));
-							}
-							seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", f);
-						}
-						
-						if (has_bg)
-						{
-							int b;
-							if (attr.background.type == ANSICOLORTYPE_STANDARD)
-							{
-								uint8_t idx = RGB2X11(attr.background.rgb) & 0xF;
-								b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
-							}
-							else
-							{
-								uint8_t a = RGB2Ansi(attr.background.rgb);
-								b = (a < 8) ? (40 + a) : (100 + (a - 8));
-							}
-							
-							if (has_fg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", b);
-						}
-						
-						if (attr.reset)
-						{
-							if (has_fg || has_bg)
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
-							else
-								seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
-						}
-						
-						seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-						
-						// Copy sequence to output buffer
-						int copy_len = (seq_len < (end - p)) ? seq_len : (end - p);
-						XMEMCPY(p, seq, copy_len);
-						p += copy_len;
-						
-						FLUSH_IF_NEEDED();
-					}
-				}
+				LevelAnsiStreamContext stream_ctx = {buf, &p, end, flush_threshold, flush_fn, ctx};
+				convert_color_to_sequence(&attr, ansi, xterm, level_ansi_stream_check_space, level_ansi_stream_write, &stream_ctx);
+				
+				// Update pointer after writing
+				p = *stream_ctx.p_ptr;
 			}
 		}
 		else

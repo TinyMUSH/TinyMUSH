@@ -18,6 +18,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "ansi.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -2440,7 +2441,8 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			rgb.r = r;
 			rgb.g = g;
 			rgb.b = b;
-			int i = RGB2X11(rgb);
+			ColorRGB ansi_rgb = {rgb.r, rgb.g, rgb.b};
+			int i = ansi_find_closest_color_with_lab(ansi_rgb_to_cielab(ansi_rgb), ColorTypeXTerm).xterm_index;
 			XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
 			XSAFELBSTR(xtbuf, buff, bufc);
 			xterm = 1;
@@ -2534,7 +2536,8 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 						rgb.r = r;
 						rgb.g = g;
 						rgb.b = b;
-						int i = RGB2X11(rgb);
+						ColorRGB ansi_rgb = {rgb.r, rgb.g, rgb.b};
+						int i = ansi_find_closest_color_with_lab(ansi_rgb_to_cielab(ansi_rgb), ColorTypeXTerm).xterm_index;
 						XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
 						XSAFELBSTR(xtbuf, buff, bufc);
 						xterm = 1;

@@ -1375,20 +1375,6 @@ extern void init_version(void);
 extern void log_version(void);
 extern void format_version(void);
 
-/* vt100.c */
-extern xyzColor rgbToXyz(rgbColor rgb);
-extern CIELABColor xyzToCIELAB(xyzColor xyz);
-extern float getColorDeltaE(rgbColor c1, rgbColor c2);
-extern COLORMATCH getColorMatch(rgbColor rgb, uint8_t schemes);
-extern char *TrueColor2VT100(rgbColor rgb, _Bool background);
-extern char *X112VT100(uint8_t color, _Bool background);
-extern char *Ansi2VT100(uint8_t color, _Bool background);
-extern rgbColor X112RGB(int color);
-extern uint8_t RGB2X11(rgbColor rgb);
-extern uint8_t X112Ansi(int color);
-extern uint8_t RGB2Ansi(rgbColor rgb);
-VT100ATTR decodeVT100(const char **ansi);
-
 /* walkdb.c */
 extern void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char *cargs[], int ncargs, int number, int now);
 extern void do_dolist(dbref player, dbref cause, int key, char *list, char *command, char *cargs[], int ncargs);

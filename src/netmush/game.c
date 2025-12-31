@@ -3068,15 +3068,15 @@ void usage(char *prog, int which)
 	{
 	case 0:
 		fprintf(stderr, "Usage: %s [options] [CONFIG-FILE]\n", prog);
-		fprintf(stderr, "       %s -c DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog);
-		fprintf(stderr, "       %s -r -i INPUT-DBM -o OUTPUT-DBM\n\n", prog);
-		fprintf(stderr, "When call without -c or -e option, %s accept the following options:\n\n", prog);
+		fprintf(stderr, "       %s --dbconvert DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog);
+		fprintf(stderr, "       %s --recover -i INPUT-DBM -o OUTPUT-DBM\n\n", prog);
+		fprintf(stderr, "Server Mode: When call without --dbconvert or --recover option, %s accept the following options:\n\n", prog);
 		fprintf(stderr, "  CONFIG-FILE               configuration file\n");
 		fprintf(stderr, "  -d, --debug               debug mode, do not fork to background\n");
 		fprintf(stderr, "  -m, --mindb               delete the current databases and create a new one\n\n");
-		fprintf(stderr, "When call with the -c option, %s accept the following options:\n\n", prog);
+		fprintf(stderr, "DBConvert Mode: When call with the --dbconvert option, %s accept the following options:\n\n", prog);
 		usage_dbconvert();
-		fprintf(stderr, "When call with the -r option, %s accept the following options:\n\n", prog);
+		fprintf(stderr, "Recover Mode: When call with the --recover option, %s accept the following options:\n\n", prog);
 		usage_dbrecover();
 		break;
 
@@ -3482,8 +3482,8 @@ int main(int argc, char *argv[])
 	struct option long_options[] = {
 		{"debug", no_argument, 0, 'd'},
 		{"mindb", no_argument, 0, 'm'},
-		{"convert", no_argument, 0, 'c'},
-		{"recover", no_argument, 0, 'r'},
+		{"dbconvert", no_argument, 0, 1001},
+		{"recover", no_argument, 0, 1002},
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
 	mushstate.initializing = 1;
@@ -3536,12 +3536,12 @@ int main(int argc, char *argv[])
 			mindb = 1;
 			break;
 
-		case 'c': /* dbconvert */
+		case 1001: /* dbconvert */
 			dbconvert(argc, argv);
 			exit(EXIT_SUCCESS);
 			break;
 
-		case 'r': /* recover */
+		case 1002: /* recover */
 			dbrecover(argc, argv);
 			exit(EXIT_SUCCESS);
 			break;
