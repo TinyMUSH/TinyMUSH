@@ -223,8 +223,6 @@ void ansi_get_color_from_rgb(ColorState *color, ColorRGB rgb, bool is_background
     else
     {
         color->foreground = cd;
-        if (cd.ansi_index >= 8)
-            color->highlight = ColorStatusSet;
     }
 }
 
@@ -1174,99 +1172,6 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
 }
 
 /**
- * @brief Applies ANSI escape sequences to the plain text based on parsed sequences.
- *
- * Inserts ANSI escape sequences at the positions specified in the ColorSequence
- * into the plain text.
- *
- * @param sequences The ColorSequence with positions and colors.
- * @param color_type The type of ANSI sequences to generate (ANSI, XTerm, TrueColor, or None for plain text).
- * @return A newly allocated string with ANSI sequences applied, or NULL on error.
- *
- * @note The caller is responsible for freeing the returned string.
- */
-char *ansi_apply_sequences(const ColorSequence *sequences, ColorType color_type)
-{
-    if (!sequences)
-        return NULL;
-
-    // Special case for ColorTypeNone: return the plain text
-    if (color_type == ColorTypeNone)
-    {
-        if (sequences->text)
-        {
-            size_t len = strlen(sequences->text);
-            char *result = XMALLOC(len + 1, "result");
-            if (result)
-                strcpy(result, sequences->text);
-            return result;
-        }
-        else
-        {
-            char *result = XMALLOC(1, "result");
-            if (result)
-                result[0] = '\0';
-            return result;
-        }
-    }
-
-    // For other types, apply sequences to the plain text
-    if (!sequences->text)
-        return NULL;
-
-    size_t text_len = strlen(sequences->text);
-    size_t buffer_size = text_len + sequences->count * 32 + 10; // Estimate for escape codes
-    char *result = XMALLOC(buffer_size, "result");
-    if (!result)
-        return NULL;
-
-    size_t result_pos = 0;
-    size_t text_pos = 0;
-    size_t seq_idx = 0;
-
-    while (text_pos < text_len && seq_idx < sequences->count)
-    {
-        // Copy characters until the next sequence position
-        while (text_pos < sequences->data[seq_idx].position && text_pos < text_len)
-        {
-            result[result_pos++] = sequences->text[text_pos++];
-        }
-
-        // Insert the ANSI escape sequence
-        ColorState state = sequences->data[seq_idx].color;
-        size_t offset = 0;
-        ColorStatus status = to_ansi_escape_sequence(result + result_pos, buffer_size - result_pos, &offset, &state, color_type);
-        if (status == ColorStatusSet || status == ColorStatusReset)
-        {
-            result_pos += offset;
-        }
-
-        seq_idx++;
-    }
-
-    // Copy the rest of the text
-    while (text_pos < text_len)
-    {
-        result[result_pos++] = sequences->text[text_pos++];
-    }
-
-    // If the last sequence has active attributes, append reset
-    if (sequences->count > 0 && (sequences->data[sequences->count - 1].color.foreground.is_set || sequences->data[sequences->count - 1].color.background.is_set))
-    {
-        const char *reset = C_ANSI_RESET_SEQUENCE;
-        size_t reset_len = strlen(reset);
-        if (result_pos + reset_len < buffer_size)
-        {
-            strcpy(result + result_pos, reset);
-            result_pos += reset_len;
-        }
-    }
-
-    result[result_pos] = '\0';
-    return result;
-}
-
-/**
  * @brief Sets a color by ANSI index for foreground or background.
  *
  * @param state The color state to update.
@@ -1545,7 +1450,7 @@ bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences)
  * @param color The color state.
  * @return A newly allocated string with the mushcode, or NULL on error.
  */
-static char *color_state_to_mush_code(const ColorState *color)
+char *color_state_to_mush_code(const ColorState *color)
 {
     char buffer[256];
     size_t len = 0;
@@ -1618,97 +1523,133 @@ static char *color_state_to_mush_code(const ColorState *color)
 }
 
 /**
- * @brief Converts a ColorSequence back to a string with embedded mushcode.
+ * @brief Generates a letter code string from a ColorState.
  *
- * This function takes plain text and a ColorSequence, and inserts %x<code> at the positions
- * where colors change, generating the embedded mushcode string.
- *
- * @param sequences The ColorSequence with color changes.
- * @param plain_text The plain text without colors.
- * @return A newly allocated string with embedded %x<code>, or NULL on error.
- *
- * @note The caller is responsible for freeing the returned string.
+ * @param color The color state.
+ * @return A newly allocated string with the letter codes, or NULL on error.
  */
-char *ansi_sequences_to_embedded(const ColorSequence *sequences)
+char *color_state_to_letters(const ColorState *color)
 {
-    if (!sequences->text || !sequences)
-        return NULL;
+    char buffer[256];
+    size_t len = 0;
 
-    size_t plain_len = strlen(sequences->text);
-    size_t result_size = plain_len + 1;
-    char *result = XMALLOC(result_size, "result");
-    if (!result)
-        return NULL;
-
-    size_t result_pos = 0;
-    size_t plain_pos = 0;
-    size_t seq_idx = 0;
-
-    while (plain_pos < plain_len && seq_idx < sequences->count)
+    // Reset if needed
+    if (color->reset == ColorStatusReset)
     {
-        // Copy text until the next sequence position
-        while (plain_pos < sequences->data[seq_idx].position && plain_pos < plain_len)
-        {
-            if (result_pos + 1 >= result_size)
-            {
-                result_size *= 2;
-                result = XREALLOC(result, result_size, "result buffer");
-                if (!result)
-                    return NULL;
-            }
-            result[result_pos++] = sequences->text[plain_pos++];
-        }
+        buffer[len++] = 'n';
+    }
 
-        // Insert %x<code> if color is set or reset
-        if (sequences->data[seq_idx].color.foreground.is_set || sequences->data[seq_idx].color.background.is_set || sequences->data[seq_idx].color.reset == ColorStatusReset)
+    // Highlight
+    if (color->highlight == ColorStatusSet)
+    {
+        buffer[len++] = 'h';
+    }
+
+    // Underline
+    if (color->underline == ColorStatusSet)
+    {
+        buffer[len++] = 'u';
+    }
+
+    // Flash/blink
+    if (color->flash == ColorStatusSet)
+    {
+        buffer[len++] = 'f';
+    }
+
+    // Inverse
+    if (color->inverse == ColorStatusSet)
+    {
+        buffer[len++] = 'i';
+    }
+
+    // Foreground color
+    if (color->foreground.is_set == ColorStatusSet)
+    {
+        if (color->foreground.truecolor.r != 0 || color->foreground.truecolor.g != 0 || color->foreground.truecolor.b != 0)
         {
-            char *code;
-            if (sequences->data[seq_idx].color.reset == ColorStatusReset)
+            // Truecolor is set, use hex format
+            len += sprintf(buffer + len, "#%02x%02x%02x", color->foreground.truecolor.r, color->foreground.truecolor.g, color->foreground.truecolor.b);
+        }
+        else if (color->foreground.ansi_index >= 0 && color->foreground.ansi_index < 16)
+        {
+            // Find the mush_code for this ANSI index
+            for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
             {
-                code = XMALLOC(2, "code");
-                strcpy(code, "n");
-            }
-            else
-            {
-                code = color_state_to_mush_code(&sequences->data[seq_idx].color);
-            }
-            if (code)
-            {
-                size_t code_len = strlen(code);
-                size_t insert_len = 2 + code_len; // %x + code
-                if (result_pos + insert_len >= result_size)
+                if (colorDefinitions[i].ansi_index == color->foreground.ansi_index && colorDefinitions[i].mush_code != -1)
                 {
-                    result_size = result_pos + insert_len + plain_len - plain_pos + 1;
-                    result = XREALLOC(result, result_size, "result buffer");
-                    if (!result)
-                        return NULL;
+                    buffer[len++] = (char)tolower(colorDefinitions[i].mush_code);
+                    break;
                 }
-                result[result_pos++] = '%';
-                result[result_pos++] = 'x';
-                strcpy(result + result_pos, code);
-                result_pos += code_len;
-                XFREE(code);
             }
         }
-
-        seq_idx++;
-    }
-
-    // Copy the rest
-    while (plain_pos < plain_len)
-    {
-        if (result_pos + 1 >= result_size)
+        else if (color->foreground.xterm_index >= 0)
         {
-            result_size *= 2;
-            result = XREALLOC(result, result_size, "result buffer");
-            if (!result)
-                return NULL;
+            // For XTerm colors, use 'x' followed by the index
+            len += sprintf(buffer + len, "x%d", color->foreground.xterm_index);
         }
-        result[result_pos++] = sequences->text[plain_pos++];
     }
 
-    result[result_pos] = 0;
+    // Background color (if different from foreground)
+    if (color->background.is_set == ColorStatusSet)
+    {
+        buffer[len++] = '/';
+        if (color->background.truecolor.r != 0 || color->background.truecolor.g != 0 || color->background.truecolor.b != 0)
+        {
+            // Truecolor is set, use hex format
+            len += sprintf(buffer + len, "#%02x%02x%02x", color->background.truecolor.r, color->background.truecolor.g, color->background.truecolor.b);
+        }
+        else if (color->background.ansi_index >= 0 && color->background.ansi_index < 16)
+        {
+            // Find the mush_code for this ANSI index
+            for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+            {
+                if (colorDefinitions[i].ansi_index == color->background.ansi_index && colorDefinitions[i].mush_code != -1)
+                {
+                    buffer[len++] = (char)toupper(colorDefinitions[i].mush_code);
+                    break;
+                }
+            }
+        }
+        else if (color->background.xterm_index >= 0)
+        {
+            // For XTerm colors, use 'X' followed by the index
+            len += sprintf(buffer + len, "X%d", color->background.xterm_index);
+        }
+    }
+
+    buffer[len] = '\0';
+
+    char *result = XMALLOC(len + 1, "result");
+    if (result) {
+        strcpy(result, buffer);
+    }
     return result;
+}
+
+/**
+ * @brief Generates an escape sequence string from a ColorState.
+ *
+ * @param color The color state.
+ * @param type The color type to use for the escape sequence.
+ * @return A newly allocated string with the escape sequence, or NULL on error.
+ */
+char *color_state_to_escape(const ColorState *color, ColorType type)
+{
+    char buffer[256];
+    size_t offset = 0;
+
+    if (to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, (ColorState *)color, type) == ColorStatusSet)
+    {
+        char *result = XMALLOC(offset + 1, "result");
+        if (result) {
+            memcpy(result, buffer, offset);
+            result[offset] = '\0';
+        }
+        return result;
+    }
+
+    return XMALLOC(1, "result"); // Return empty string
 }
 
 /**
@@ -1858,68 +1799,6 @@ int ansi_colorstate_to_packed(ColorState state)
     packed |= flags << 8;
     
     return packed;
-}
-
-/**
- * @brief Generate ANSI transition sequence from current to target state
- * @param current Current ANSI state (packed)
- * @param target Target ANSI state (packed) 
- * @return Allocated string containing ANSI transition sequence, or NULL if no change needed
- */
-char *ansi_generate_transition_sequence(int current, int target)
-{
-    if (current == target) {
-        return NULL; // No change needed
-    }
-    
-    ColorState current_state = ansi_packed_to_colorstate(current);
-    ColorState target_state = ansi_packed_to_colorstate(target);
-    
-    // Calculate the difference - what needs to change
-    ColorState diff_state = {0};
-    
-    // Handle reset first
-    if (target_state.reset == ColorStatusReset) {
-        diff_state.reset = ColorStatusReset;
-    }
-    
-    // Handle attributes
-    if (current_state.highlight != target_state.highlight) {
-        diff_state.highlight = target_state.highlight;
-    }
-    if (current_state.underline != target_state.underline) {
-        diff_state.underline = target_state.underline;
-    }
-    if (current_state.flash != target_state.flash) {
-        diff_state.flash = target_state.flash;
-    }
-    if (current_state.inverse != target_state.inverse) {
-        diff_state.inverse = target_state.inverse;
-    }
-    
-    // Handle colors
-    if (current_state.foreground.ansi_index != target_state.foreground.ansi_index ||
-        current_state.foreground.is_set != target_state.foreground.is_set) {
-        diff_state.foreground = target_state.foreground;
-    }
-    if (current_state.background.ansi_index != target_state.background.ansi_index ||
-        current_state.background.is_set != target_state.background.is_set) {
-        diff_state.background = target_state.background;
-    }
-    
-    // Generate the ANSI escape sequence
-    char buffer[256];
-    size_t offset = 0;
-    ColorStatus status = to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, &diff_state, ColorTypeAnsi);
-    
-    if (status == ColorStatusNone) {
-        return NULL; // No sequence needed
-    }
-    
-    // Allocate and return the sequence
-    char *result = XMALLOC(strlen(buffer) + 1, "ansi_generate_transition_sequence");
-    strcpy(result, buffer);
-    return result;
 }
 
 ColorEntry colorDefinitions[] = {

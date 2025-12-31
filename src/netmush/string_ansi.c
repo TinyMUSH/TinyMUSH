@@ -542,55 +542,6 @@ static size_t ansi_transition_mushcode_into(int ansi_before, int ansi_after, cha
 }
 
 /**
- * @brief Remove escape sequences matching given prefixes (stopping at 'm')
- */
-static char *strip_prefixed_codes(const char *s, const char *fg_prefix, const char *bg_prefix)
-{
-	char *buf, *p;
-	const char *s1 = s;
-	const size_t fg_len = strlen(fg_prefix);
-	const size_t bg_len = strlen(bg_prefix);
-	p = buf = XMALLOC(LBUF_SIZE, "buf");
-
-	while (s1 && *s1)
-	{
-		int matched = 0;
-
-		if (fg_len && strncmp(s1, fg_prefix, fg_len) == 0)
-		{
-			s1 += fg_len;
-			matched = 1;
-		}
-		else if (bg_len && strncmp(s1, bg_prefix, bg_len) == 0)
-		{
-			s1 += bg_len;
-			matched = 1;
-		}
-
-		if (matched)
-		{
-			while (*s1 && *s1 != ANSI_END)
-			{
-				s1++;
-			}
-
-			if (*s1 == ANSI_END)
-			{
-				s1++;
-			}
-
-			continue;
-		}
-
-		XSAFELBCHR(*s1, buf, &p);
-		++s1;
-	}
-
-	*p = '\0';
-	return buf;
-}
-
-/**
  * @brief Go to a string and convert ansi to the lowest supported level.
  *
  * @param s String to convert
@@ -647,6 +598,17 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 				// Ensure we have space for the escape sequence (max ~30 chars for 24-bit color)
 				CHECK_BUFFER_SPACE(s - s_start + 1);
 				
+				// Debug: print what we're copying
+				{
+					char temp[256];
+					int len = s - s_start;
+					if (len < 256) {
+						XMEMCPY(temp, s_start, len);
+						temp[len] = '\0';
+						fprintf(stderr, "DEBUG level_ansi: copying sequence: '%s'\n", temp);
+					}
+				}
+				
 				// Copy the entire escape sequence from source to destination
 				while (s_start < s && *s_start && p < end)
 				{
@@ -677,6 +639,10 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 	#undef CHECK_BUFFER_SPACE
 	
 	*p = '\0';
+	
+	// Debug
+	fprintf(stderr, "DEBUG level_ansi: output='%s'\n", buf);
+	
 	return buf;
 }
 
@@ -782,59 +748,37 @@ void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
  */
 char *strip_ansi(const char *s)
 {
-	char *buf, *p, *s1;
-	p = buf = XMALLOC(LBUF_SIZE, "buf");
-	*buf = '\0';
-	s1 = (char *)s;
+	char *buf, *p;
+	const char *s1 = s;
 
-	if (s1 && *s1)
+	if (!s || !*s)
 	{
-		while (*s1 == ESC_CHAR)
-		{
-			skip_esccode(&s1);
-		}
-
-		while (*s1)
-		{
-			XSAFELBCHR(*s1, buf, &p);
-			++s1;
-
-			while (*s1 == ESC_CHAR)
-			{
-				skip_esccode(&s1);
-			}
-		}
-
-		*p = '\0';
+		buf = XMALLOC(1, "buf");
+		*buf = '\0';
+		return buf;
 	}
 
-	return (buf);
-}
+	// Allocate buffer based on input length since output <= input
+	size_t len = strlen(s);
+	buf = XMALLOC(len + 1, "buf");
+	p = buf;
 
-/**
- * @brief Remove xterm color escape codes from a string
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param s The input string
- * @return char* New string without xterm color codes (newly allocated)
- */
-char *strip_xterm(char *s)
-{
-	return strip_prefixed_codes(s, ANSI_XTERM_FG, ANSI_XTERM_BG);
-}
+	while (*s1)
+	{
+		if (*s1 == ESC_CHAR)
+		{
+			// Skip the entire ANSI escape sequence
+			ansi_parse_sequence(&s1);
+		}
+		else
+		{
+			// Copy non-escape character
+			*p++ = *s1++;
+		}
+	}
 
-/**
- * @brief Remove 24-bit color escape codes from a string
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param s The input string
- * @return char* New string without 24-bit color codes (newly allocated)
- */
-char *strip_24bit(char *s)
-{
-	return strip_prefixed_codes(s, ANSI_24BIT_FG, ANSI_24BIT_BG);
+	*p = '\0';
+	return buf;
 }
 
 /**
@@ -1447,50 +1391,6 @@ void safe_copy_esccode(char **s, char *buff, char **bufc)
 	{
 		XSAFELBCHR(**s, buff, bufc);
 		++(*s);
-	}
-}
-
-/**
- * @brief Update ANSI state from mushcode letters
- *
- * @param t Mushcode letter sequence to parse
- * @param ansi_state In/out ANSI state to update
- */
-void track_ansi_letters(char *t, int *ansi_state)
-{
-	char *s;
-	s = t;
-
-	while (*s)
-	{
-		switch (*s)
-		{
-		case ESC_CHAR:
-			skip_esccode(&s);
-			break;
-		case '<': // Skip xterm, we handle it elsewhere
-		case '/':
-			while ((*s != '>') && (*s != 0))
-			{
-				++s;
-			}
-
-			if (*s == '>')
-			{
-				++s;
-			}
-
-			break;
-		default:
-		{
-			int ansi_code = ansiNum((unsigned char)*s);
-			if (ansi_code != 0)
-			{
-				*ansi_state = ((*ansi_state & ~ansiBitsMask(ansi_code)) | ansiBits(ansi_code));
-			}
-			++s;
-		}
-		}
 	}
 }
 

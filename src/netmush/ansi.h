@@ -157,12 +157,13 @@ bool ansi_parse_color_from_string(ColorState *color, const char *color_str, bool
 ColorStatus to_ansi_escape_sequence(char *buffer, size_t buffer_size, size_t *offset, ColorState *to, ColorType type);
 ColorState ansi_packed_to_colorstate(int packed);
 int ansi_colorstate_to_packed(ColorState state);
-char *ansi_generate_transition_sequence(int current, int target);
 int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
-char *ansi_apply_sequences(const ColorSequence *sequences, ColorType color_type);
 bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences);
 ColorState ansi_parse_sequence(const char **ansi_ptr);
-char *ansi_sequences_to_embedded(const ColorSequence *sequences);
+
+char *color_state_to_mush_code(const ColorState *color);
+char *color_state_to_letters(const ColorState *color);
+char *color_state_to_escape(const ColorState *color, ColorType type);
 
 const char *ansi_char_to_sequence(int ch);
 const char *ansi_char_bright_to_sequence(int ch);
