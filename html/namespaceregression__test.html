@@ -103,11 +103,11 @@ None&#160;</td><td class="memItemRight" valign="bottom"><b>ensure_creds</b> ()</
 <tr class="memitem:a3acad67255b1735aa58ca15685ad2dfe" id="r_a3acad67255b1735aa58ca15685ad2dfe"><td class="memItemLeft" align="right" valign="top"><a id="a3acad67255b1735aa58ca15685ad2dfe" name="a3acad67255b1735aa58ca15685ad2dfe"></a>
 List[Tuple[str, str]]&#160;</td><td class="memItemRight" valign="bottom"><b>load_commands</b> (str path)</td></tr>
 <tr class="separator:a3acad67255b1735aa58ca15685ad2dfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dcc8849acfd50c469d6347d15b952ca" id="r_a6dcc8849acfd50c469d6347d15b952ca"><td class="memItemLeft" align="right" valign="top">str&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dcc8849acfd50c469d6347d15b952ca">read_some</a> (telnetlib.Telnet tn, float timeout)</td></tr>
-<tr class="separator:a6dcc8849acfd50c469d6347d15b952ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada5612ab9ec6cb858bdbfcaf4a4f5aba" id="r_ada5612ab9ec6cb858bdbfcaf4a4f5aba"><td class="memItemLeft" align="right" valign="top"><a id="ada5612ab9ec6cb858bdbfcaf4a4f5aba" name="ada5612ab9ec6cb858bdbfcaf4a4f5aba"></a>
-str&#160;</td><td class="memItemRight" valign="bottom"><b>send_cmd</b> (telnetlib.Telnet tn, str cmd, float timeout)</td></tr>
-<tr class="separator:ada5612ab9ec6cb858bdbfcaf4a4f5aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fd1ed201e2d70733a5a610ae1ed3e66" id="r_a9fd1ed201e2d70733a5a610ae1ed3e66"><td class="memItemLeft" align="right" valign="top">str&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9fd1ed201e2d70733a5a610ae1ed3e66">read_some</a> (Telnet tn, float timeout)</td></tr>
+<tr class="separator:a9fd1ed201e2d70733a5a610ae1ed3e66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3af0fb09989d2a7610e7e21891bb6e5" id="r_ac3af0fb09989d2a7610e7e21891bb6e5"><td class="memItemLeft" align="right" valign="top"><a id="ac3af0fb09989d2a7610e7e21891bb6e5" name="ac3af0fb09989d2a7610e7e21891bb6e5"></a>
+str&#160;</td><td class="memItemRight" valign="bottom"><b>send_cmd</b> (Telnet tn, str cmd, float timeout, float delay=0.2)</td></tr>
+<tr class="separator:ac3af0fb09989d2a7610e7e21891bb6e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af19e862a45e05da3beae3dac27b6fa9d" id="r_af19e862a45e05da3beae3dac27b6fa9d"><td class="memItemLeft" align="right" valign="top"><a id="af19e862a45e05da3beae3dac27b6fa9d" name="af19e862a45e05da3beae3dac27b6fa9d"></a>
 None&#160;</td><td class="memItemRight" valign="bottom"><b>main</b> ()</td></tr>
 <tr class="separator:af19e862a45e05da3beae3dac27b6fa9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,7 +124,7 @@ Variables</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>USER</b> = os.getenv(&quot;TINY_USER&quot;, &quot;#1&quot;)</td></tr>
 <tr class="separator:ad63720518928ce27180eaea9fe8736ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1286745a42f16eaaf48fdbeb04f97f65" id="r_a1286745a42f16eaaf48fdbeb04f97f65"><td class="memItemLeft" align="right" valign="top"><a id="a1286745a42f16eaaf48fdbeb04f97f65" name="a1286745a42f16eaaf48fdbeb04f97f65"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PASS</b> = os.getenv(&quot;TINY_PASS&quot;, &quot;potrzebi&quot;)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><b>PASS</b> = os.getenv(&quot;TINY_PASS&quot;, &quot;potrzebie&quot;)</td></tr>
 <tr class="separator:a1286745a42f16eaaf48fdbeb04f97f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a432dd3bce13a4e2f2434481ddb470ac0" id="r_a432dd3bce13a4e2f2434481ddb470ac0"><td class="memItemLeft" align="right" valign="top"><a id="a432dd3bce13a4e2f2434481ddb470ac0" name="a432dd3bce13a4e2f2434481ddb470ac0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TIMEOUT</b> = float(os.getenv(&quot;TINY_TIMEOUT&quot;, &quot;7&quot;))</td></tr>
@@ -141,6 +141,9 @@ Variables</h2></td></tr>
 - Connects over telnet, reads a config file listing commands to run and the expected output substring.
 - Reads credentials from environment to avoid hard-coding secrets.
 - Skips intentionally disconnecting commands unless explicitly allowed.
+
+Dependencies:
+- telnetlib3 (install with: pip install telnetlib3)
 
 Env vars:
     TINY_HOST   (default: 127.0.0.1)
@@ -164,8 +167,8 @@ Notes:
 - If no expected substring is provided, any non-empty output is considered OK.
 - Use --allow-disconnect to run commands that terminate the session (quit/logout/etc.).
 </pre> </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a6dcc8849acfd50c469d6347d15b952ca" name="a6dcc8849acfd50c469d6347d15b952ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6dcc8849acfd50c469d6347d15b952ca">&#9670;&#160;</a></span>read_some()</h2>
+<a id="a9fd1ed201e2d70733a5a610ae1ed3e66" name="a9fd1ed201e2d70733a5a610ae1ed3e66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fd1ed201e2d70733a5a610ae1ed3e66">&#9670;&#160;</a></span>read_some()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -173,7 +176,7 @@ Notes:
         <tr>
           <td class="memname"> str regression_test.read_some </td>
           <td>(</td>
-          <td class="paramtype">telnetlib.Telnet</td>          <td class="paramname"><span class="paramname"><em>tn</em></span>, </td>
+          <td class="paramtype">Telnet</td>          <td class="paramname"><span class="paramname"><em>tn</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

@@ -103,6 +103,7 @@ $(function(){ initResizable(false); });
 <code>#include &quot;<a class="el" href="macros_8h_source.html">macros.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="externs_8h_source.html">externs.h</a>&quot;</code><br />
 <code>#include &quot;prototypes.h&quot;</code><br />
+<code>#include &quot;ansi.h&quot;</code><br />
 <code>#include &lt;ctype.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -110,191 +111,194 @@ Include dependency graph for funstring.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="funstring_8c__incl.png" border="0" usemap="#asrc_2netmush_2funstring_8c" alt=""/></div>
 <map name="asrc_2netmush_2funstring_8c" id="asrc_2netmush_2funstring_8c">
-<area shape="rect" title="String manipulation built&#45;ins: search/replace, case handling, formatting." alt="" coords="358,5,515,31"/>
-<area shape="rect" title=" " alt="" coords="85,79,150,105"/>
-<area shape="poly" title=" " alt="" coords="379,34,166,81,165,76,378,29"/>
-<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="175,79,263,105"/>
-<area shape="poly" title=" " alt="" coords="400,34,271,76,270,71,399,29"/>
-<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="262,153,342,178"/>
-<area shape="poly" title=" " alt="" coords="399,34,361,53,343,65,328,81,313,109,306,138,301,137,308,107,324,77,339,61,358,48,396,29"/>
-<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="452,79,527,105"/>
-<area shape="poly" title=" " alt="" coords="447,30,474,65,469,68,443,33"/>
-<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="550,79,624,105"/>
-<area shape="poly" title=" " alt="" coords="463,29,549,70,546,74,461,34"/>
-<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="337,79,429,105"/>
-<area shape="poly" title=" " alt="" coords="430,33,403,68,399,65,425,30"/>
-<area shape="rect" title=" " alt="" coords="648,79,710,105"/>
-<area shape="poly" title=" " alt="" coords="478,29,634,74,632,80,477,34"/>
-<area shape="rect" title=" " alt="" coords="734,79,797,105"/>
-<area shape="poly" title=" " alt="" coords="499,29,720,76,718,81,498,34"/>
-<area shape="rect" title=" " alt="" coords="131,153,187,178"/>
-<area shape="poly" title=" " alt="" coords="211,107,181,142,177,139,207,103"/>
-<area shape="rect" title=" " alt="" coords="89,226,152,252"/>
-<area shape="poly" title=" " alt="" coords="272,181,166,223,165,218,270,176"/>
-<area shape="rect" title=" " alt="" coords="5,226,65,252"/>
-<area shape="poly" title=" " alt="" coords="262,180,81,228,79,223,260,175"/>
-<area shape="rect" title=" " alt="" coords="176,226,249,252"/>
-<area shape="poly" title=" " alt="" coords="288,181,241,219,238,214,285,177"/>
-<area shape="rect" title=" " alt="" coords="274,226,330,252"/>
-<area shape="poly" title=" " alt="" coords="304,179,304,211,299,211,299,179"/>
-<area shape="rect" title=" " alt="" coords="354,226,434,252"/>
-<area shape="poly" title=" " alt="" coords="319,177,368,215,365,219,316,181"/>
-<area shape="rect" title=" " alt="" coords="458,226,542,252"/>
-<area shape="poly" title=" " alt="" coords="336,176,453,218,451,223,334,181"/>
-<area shape="poly" title=" " alt="" coords="371,107,328,144,325,140,367,103"/>
-<area shape="poly" title=" " alt="" coords="356,108,251,155,200,181,80,226,78,221,198,176,249,150,354,103"/>
-<area shape="poly" title=" " alt="" coords="387,105,394,211,389,211,381,105"/>
-<area shape="poly" title=" " alt="" coords="395,103,483,212,479,216,391,107"/>
-<area shape="rect" title=" " alt="" coords="469,153,532,178"/>
-<area shape="poly" title=" " alt="" coords="404,103,469,142,466,147,402,107"/>
-<area shape="rect" title=" " alt="" coords="556,153,623,178"/>
-<area shape="poly" title=" " alt="" coords="419,103,542,145,540,150,417,108"/>
+<area shape="rect" title="String manipulation built&#45;ins: search/replace, case handling, formatting." alt="" coords="306,5,463,31"/>
+<area shape="rect" title=" " alt="" coords="36,79,101,105"/>
+<area shape="poly" title=" " alt="" coords="327,34,117,81,115,76,326,29"/>
+<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="126,79,214,105"/>
+<area shape="poly" title=" " alt="" coords="349,34,221,76,220,71,347,29"/>
+<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="247,153,327,178"/>
+<area shape="poly" title=" " alt="" coords="372,34,351,55,329,81,312,110,299,139,294,137,307,108,325,77,347,51,368,30"/>
+<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="454,79,528,105"/>
+<area shape="poly" title=" " alt="" coords="404,29,462,68,459,72,401,34"/>
+<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="552,79,625,105"/>
+<area shape="poly" title=" " alt="" coords="420,29,540,71,539,76,418,34"/>
+<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="339,79,430,105"/>
+<area shape="poly" title=" " alt="" coords="387,31,387,63,382,63,382,31"/>
+<area shape="rect" href="ansi_8h_source.html" title=" " alt="" coords="167,153,223,178"/>
+<area shape="poly" title=" " alt="" coords="370,33,224,145,221,141,367,29"/>
+<area shape="rect" title=" " alt="" coords="649,79,712,105"/>
+<area shape="poly" title=" " alt="" coords="439,29,635,76,634,81,438,34"/>
+<area shape="rect" title=" " alt="" coords="735,79,799,105"/>
+<area shape="poly" title=" " alt="" coords="464,29,581,49,721,76,720,81,580,54,463,34"/>
+<area shape="rect" title=" " alt="" coords="87,153,143,178"/>
+<area shape="poly" title=" " alt="" coords="163,107,135,142,131,139,159,103"/>
+<area shape="rect" title=" " alt="" coords="194,226,257,252"/>
+<area shape="poly" title=" " alt="" coords="279,180,248,216,244,213,275,177"/>
+<area shape="rect" title=" " alt="" coords="361,226,421,252"/>
+<area shape="poly" title=" " alt="" coords="306,177,362,215,359,220,303,181"/>
+<area shape="rect" title=" " alt="" coords="97,226,170,252"/>
+<area shape="poly" title=" " alt="" coords="262,181,174,222,172,217,260,176"/>
+<area shape="rect" title=" " alt="" coords="282,226,338,252"/>
+<area shape="poly" title=" " alt="" coords="293,178,304,210,299,212,288,179"/>
+<area shape="rect" title=" " alt="" coords="444,226,524,252"/>
+<area shape="poly" title=" " alt="" coords="321,176,438,218,436,223,320,181"/>
+<area shape="rect" title=" " alt="" coords="549,226,633,252"/>
+<area shape="poly" title=" " alt="" coords="328,174,534,222,533,227,327,179"/>
+<area shape="poly" title=" " alt="" coords="369,107,317,146,314,141,366,103"/>
+<area shape="poly" title=" " alt="" coords="399,103,417,124,432,152,434,169,431,186,414,216,410,213,426,184,429,169,427,153,413,127,395,107"/>
+<area shape="poly" title=" " alt="" coords="403,103,428,124,452,151,468,181,480,211,475,213,464,183,447,154,424,128,400,107"/>
+<area shape="poly" title=" " alt="" coords="405,103,477,150,565,215,562,219,473,155,402,107"/>
+<area shape="rect" title=" " alt="" coords="593,153,656,178"/>
+<area shape="poly" title=" " alt="" coords="426,103,579,148,577,153,424,108"/>
+<area shape="rect" title=" " alt="" coords="351,153,418,178"/>
+<area shape="poly" title=" " alt="" coords="387,105,387,137,382,137,382,105"/>
+<area shape="poly" title=" " alt="" coords="203,178,217,211,212,213,198,180"/>
+<area shape="poly" title=" " alt="" coords="187,180,156,216,152,213,183,177"/>
+<area shape="rect" title=" " alt="" coords="5,226,73,252"/>
+<area shape="poly" title=" " alt="" coords="170,181,80,222,78,217,167,176"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a75e55c213ab0002512fe19ca977ba501" id="r_a75e55c213ab0002512fe19ca977ba501"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structCOLORDEF.html">COLORDEF</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75e55c213ab0002512fe19ca977ba501">ansi_truecolor_from_string</a> (const char *color_str, bool is_bg)</td></tr>
-<tr class="memdesc:a75e55c213ab0002512fe19ca977ba501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Génère une séquence ANSI 24bit (truecolor) pour le foreground ou background à partir d'une string couleur.  <br /></td></tr>
-<tr class="separator:a75e55c213ab0002512fe19ca977ba501"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcdd839ce8a5c200e3bff7f37419ca99" id="r_adcdd839ce8a5c200e3bff7f37419ca99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcdd839ce8a5c200e3bff7f37419ca99">fun_isword</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:adcdd839ce8a5c200e3bff7f37419ca99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is every character in the argument a letter?  <br /></td></tr>
-<tr class="separator:adcdd839ce8a5c200e3bff7f37419ca99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad714d7307f12e1c970bdd8e87c5cd1a9" id="r_ad714d7307f12e1c970bdd8e87c5cd1a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad714d7307f12e1c970bdd8e87c5cd1a9">fun_isalnum</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ad714d7307f12e1c970bdd8e87c5cd1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">isalnum: is every character in the argument a letter or number?  <br /></td></tr>
-<tr class="separator:ad714d7307f12e1c970bdd8e87c5cd1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af86c9bc4c378a13c3fd15805d7d1a759" id="r_af86c9bc4c378a13c3fd15805d7d1a759"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af86c9bc4c378a13c3fd15805d7d1a759">fun_isnum</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:af86c9bc4c378a13c3fd15805d7d1a759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a number?  <br /></td></tr>
-<tr class="separator:af86c9bc4c378a13c3fd15805d7d1a759"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bd407c61e18e6928970add92be30944" id="r_a5bd407c61e18e6928970add92be30944"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bd407c61e18e6928970add92be30944">fun_isdbref</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a5bd407c61e18e6928970add92be30944"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a valid dbref?  <br /></td></tr>
-<tr class="separator:a5bd407c61e18e6928970add92be30944"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a608b2b1b1042005bfb158af22d950c5e" id="r_a608b2b1b1042005bfb158af22d950c5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a608b2b1b1042005bfb158af22d950c5e">fun_isobjid</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a608b2b1b1042005bfb158af22d950c5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a valid objid?  <br /></td></tr>
-<tr class="separator:a608b2b1b1042005bfb158af22d950c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae29c35bb771e313320095b4ebba175ea" id="r_ae29c35bb771e313320095b4ebba175ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae29c35bb771e313320095b4ebba175ea">fun_null</a> (char *buff <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char **bufc <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ae29c35bb771e313320095b4ebba175ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Just eat the contents of the string. Handy for those times when you've output a bunch of junk in a function call and just want to dispose of the output (like if you've done an iter() that just did a bunch of side-effects, and now you have bunches of spaces you need to get rid of.  <br /></td></tr>
-<tr class="separator:ae29c35bb771e313320095b4ebba175ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1b10d2b505544b32961885fb347c414" id="r_af1b10d2b505544b32961885fb347c414"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1b10d2b505544b32961885fb347c414">fun_isword</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:af1b10d2b505544b32961885fb347c414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is every character in the argument a letter?  <br /></td></tr>
+<tr class="separator:af1b10d2b505544b32961885fb347c414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa8a72339f2b35a05d737d0a37e7280d" id="r_aaa8a72339f2b35a05d737d0a37e7280d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa8a72339f2b35a05d737d0a37e7280d">fun_isalnum</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:aaa8a72339f2b35a05d737d0a37e7280d"><td class="mdescLeft">&#160;</td><td class="mdescRight">isalnum: is every character in the argument a letter or number?  <br /></td></tr>
+<tr class="separator:aaa8a72339f2b35a05d737d0a37e7280d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3dc5bde08010bce39e36306eb4940dc" id="r_ac3dc5bde08010bce39e36306eb4940dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3dc5bde08010bce39e36306eb4940dc">fun_isnum</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ac3dc5bde08010bce39e36306eb4940dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a number?  <br /></td></tr>
+<tr class="separator:ac3dc5bde08010bce39e36306eb4940dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e1063984f431350832c2a92a4bea8b5" id="r_a5e1063984f431350832c2a92a4bea8b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e1063984f431350832c2a92a4bea8b5">fun_isdbref</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a5e1063984f431350832c2a92a4bea8b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a valid dbref?  <br /></td></tr>
+<tr class="separator:a5e1063984f431350832c2a92a4bea8b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c27892fb132480e9a4487b293064678" id="r_a9c27892fb132480e9a4487b293064678"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c27892fb132480e9a4487b293064678">fun_isobjid</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a9c27892fb132480e9a4487b293064678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the argument a valid objid?  <br /></td></tr>
+<tr class="separator:a9c27892fb132480e9a4487b293064678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5dfcbb140df57d36a92b28ec78e4692" id="r_ab5dfcbb140df57d36a92b28ec78e4692"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5dfcbb140df57d36a92b28ec78e4692">fun_null</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ab5dfcbb140df57d36a92b28ec78e4692"><td class="mdescLeft">&#160;</td><td class="mdescRight">Just eat the contents of the string. Handy for those times when you've output a bunch of junk in a function call and just want to dispose of the output (like if you've done an iter() that just did a bunch of side-effects, and now you have bunches of spaces you need to get rid of.  <br /></td></tr>
+<tr class="separator:ab5dfcbb140df57d36a92b28ec78e4692"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6680d9836fd7973b4aedd10d1e065b0" id="r_ad6680d9836fd7973b4aedd10d1e065b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad6680d9836fd7973b4aedd10d1e065b0">fun_squish</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="memdesc:ad6680d9836fd7973b4aedd10d1e065b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Squash occurrences of a given character down to 1. We do this both on leading and trailing chars, as well as internal ones; if the player wants to trim off the leading and trailing as well, they can always call trim().  <br /></td></tr>
 <tr class="separator:ad6680d9836fd7973b4aedd10d1e065b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74d042298c331aa7eae8ef44fbe129d4" id="r_a74d042298c331aa7eae8ef44fbe129d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74d042298c331aa7eae8ef44fbe129d4">fun_trim</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="memdesc:a74d042298c331aa7eae8ef44fbe129d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trim off unwanted white space.  <br /></td></tr>
 <tr class="separator:a74d042298c331aa7eae8ef44fbe129d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e3019ca33345b3de6c9d7a331c81a20" id="r_a4e3019ca33345b3de6c9d7a331c81a20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e3019ca33345b3de6c9d7a331c81a20">fun_after</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a4e3019ca33345b3de6c9d7a331c81a20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return substring after a specified string.  <br /></td></tr>
-<tr class="separator:a4e3019ca33345b3de6c9d7a331c81a20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2285e5c4f626e39f408a50e802d8199" id="r_ad2285e5c4f626e39f408a50e802d8199"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2285e5c4f626e39f408a50e802d8199">fun_before</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ad2285e5c4f626e39f408a50e802d8199"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return substring before a specified string.  <br /></td></tr>
-<tr class="separator:ad2285e5c4f626e39f408a50e802d8199"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0dbaea2768d89bd9a98de4662fd8ffed" id="r_a0dbaea2768d89bd9a98de4662fd8ffed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0dbaea2768d89bd9a98de4662fd8ffed">fun_lcstr</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a0dbaea2768d89bd9a98de4662fd8ffed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lowercase string.  <br /></td></tr>
-<tr class="separator:a0dbaea2768d89bd9a98de4662fd8ffed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31fe6795d8884b0f1d862907790ffab4" id="r_a31fe6795d8884b0f1d862907790ffab4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a31fe6795d8884b0f1d862907790ffab4">fun_ucstr</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a31fe6795d8884b0f1d862907790ffab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uppercase string.  <br /></td></tr>
-<tr class="separator:a31fe6795d8884b0f1d862907790ffab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c3411c89fe93b2968445d42ad7d162a" id="r_a6c3411c89fe93b2968445d42ad7d162a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c3411c89fe93b2968445d42ad7d162a">fun_capstr</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a6c3411c89fe93b2968445d42ad7d162a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalize string.  <br /></td></tr>
-<tr class="separator:a6c3411c89fe93b2968445d42ad7d162a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb8275483dd7f3e7030a44fdabb9453e" id="r_adb8275483dd7f3e7030a44fdabb9453e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb8275483dd7f3e7030a44fdabb9453e">fun_space</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:adb8275483dd7f3e7030a44fdabb9453e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make spaces.  <br /></td></tr>
-<tr class="separator:adb8275483dd7f3e7030a44fdabb9453e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e888229bfce2b5ef3c9b93e8a3b12b2" id="r_a7e888229bfce2b5ef3c9b93e8a3b12b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e888229bfce2b5ef3c9b93e8a3b12b2">fun_ljust</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a7e888229bfce2b5ef3c9b93e8a3b12b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left justify string, specifying fill character.  <br /></td></tr>
-<tr class="separator:a7e888229bfce2b5ef3c9b93e8a3b12b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ab29e34d3471369aab6b56ac4369b3e" id="r_a8ab29e34d3471369aab6b56ac4369b3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ab29e34d3471369aab6b56ac4369b3e">fun_rjust</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a8ab29e34d3471369aab6b56ac4369b3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Right justify string, specifying fill character.  <br /></td></tr>
-<tr class="separator:a8ab29e34d3471369aab6b56ac4369b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f9bba079b0906d62ed9bb4cc0814217" id="r_a6f9bba079b0906d62ed9bb4cc0814217"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f9bba079b0906d62ed9bb4cc0814217">fun_center</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a6f9bba079b0906d62ed9bb4cc0814217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Center string, specifying fill character.  <br /></td></tr>
-<tr class="separator:a6f9bba079b0906d62ed9bb4cc0814217"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a510886b75a6e913e0321af69d76999e3" id="r_a510886b75a6e913e0321af69d76999e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a510886b75a6e913e0321af69d76999e3">fun_left</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a510886b75a6e913e0321af69d76999e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns first n characters in a string.  <br /></td></tr>
-<tr class="separator:a510886b75a6e913e0321af69d76999e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb01b28acd9894809de7ddde99994586" id="r_abb01b28acd9894809de7ddde99994586"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb01b28acd9894809de7ddde99994586">fun_right</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:abb01b28acd9894809de7ddde99994586"><td class="mdescLeft">&#160;</td><td class="mdescRight">fun_right: Returns last n characters in a string  <br /></td></tr>
-<tr class="separator:abb01b28acd9894809de7ddde99994586"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4153444cc4552fb4c5018ca6e15f12ff" id="r_a4153444cc4552fb4c5018ca6e15f12ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4153444cc4552fb4c5018ca6e15f12ff">fun_chomp</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a4153444cc4552fb4c5018ca6e15f12ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the line ends with CRLF, CR, or LF, chop it off.  <br /></td></tr>
-<tr class="separator:a4153444cc4552fb4c5018ca6e15f12ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9835febea75cdbd1bcc3e0dd4265413" id="r_ab9835febea75cdbd1bcc3e0dd4265413"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9835febea75cdbd1bcc3e0dd4265413">fun_comp</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ab9835febea75cdbd1bcc3e0dd4265413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exact-string compare.  <br /></td></tr>
-<tr class="separator:ab9835febea75cdbd1bcc3e0dd4265413"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a674a17c89c113f6ed7b6f16795bd34ee" id="r_a674a17c89c113f6ed7b6f16795bd34ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a674a17c89c113f6ed7b6f16795bd34ee">fun_streq</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a674a17c89c113f6ed7b6f16795bd34ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">non-case-sensitive string compare  <br /></td></tr>
-<tr class="separator:a674a17c89c113f6ed7b6f16795bd34ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56cfc502764f4db1d1974cd30aaee107" id="r_a56cfc502764f4db1d1974cd30aaee107"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56cfc502764f4db1d1974cd30aaee107">fun_strmatch</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a56cfc502764f4db1d1974cd30aaee107"><td class="mdescLeft">&#160;</td><td class="mdescRight">wildcard string compare  <br /></td></tr>
-<tr class="separator:a56cfc502764f4db1d1974cd30aaee107"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abfda19d6569ff9c5b1b51f795a007cd5" id="r_abfda19d6569ff9c5b1b51f795a007cd5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abfda19d6569ff9c5b1b51f795a007cd5">fun_edit</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:abfda19d6569ff9c5b1b51f795a007cd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Edit text.  <br /></td></tr>
-<tr class="separator:abfda19d6569ff9c5b1b51f795a007cd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6754938c47dbad9ed97ed79ca4f4bc69" id="r_a6754938c47dbad9ed97ed79ca4f4bc69"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6754938c47dbad9ed97ed79ca4f4bc69">fun_merge</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a6754938c47dbad9ed97ed79ca4f4bc69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given two strings and a character, merge the two strings by replacing characters in string1 that are the same as the given character by the corresponding character in string2 (by position). The strings must be of the same length.  <br /></td></tr>
-<tr class="separator:a6754938c47dbad9ed97ed79ca4f4bc69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c5866c8e2a5dc7de21b3fc23366f84e" id="r_a9c5866c8e2a5dc7de21b3fc23366f84e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c5866c8e2a5dc7de21b3fc23366f84e">fun_secure</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:a9c5866c8e2a5dc7de21b3fc23366f84e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns &lt;string&gt; after replacing the characters [](){};,%$ with spaces.  <br /></td></tr>
-<tr class="separator:a9c5866c8e2a5dc7de21b3fc23366f84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3ab7f455e4821fb13cd7be56d7dfeda" id="r_ad3ab7f455e4821fb13cd7be56d7dfeda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3ab7f455e4821fb13cd7be56d7dfeda">fun_escape</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ad3ab7f455e4821fb13cd7be56d7dfeda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns &lt;string&gt; after adding an escape character () at the start of the string and also before each of the characters %;[]{}\ that appear in the string.  <br /></td></tr>
-<tr class="separator:ad3ab7f455e4821fb13cd7be56d7dfeda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada197c1e39ed04acf7563193c2d9d549" id="r_ada197c1e39ed04acf7563193c2d9d549"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada197c1e39ed04acf7563193c2d9d549">fun_esc</a> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="memdesc:ada197c1e39ed04acf7563193c2d9d549"><td class="mdescLeft">&#160;</td><td class="mdescRight">Less aggressive escape; it does not put a \ at the start of the string, and it only escapes %[]\ &ndash; making it more suitable for strings that you simply don't want evaluated.  <br /></td></tr>
-<tr class="separator:ada197c1e39ed04acf7563193c2d9d549"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca25b522141cc178e9b91e37d10487a4" id="r_aca25b522141cc178e9b91e37d10487a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca25b522141cc178e9b91e37d10487a4">fun_after</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:aca25b522141cc178e9b91e37d10487a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return substring after a specified string.  <br /></td></tr>
+<tr class="separator:aca25b522141cc178e9b91e37d10487a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4a7c666dce8b900902a908f5fff4a21" id="r_ac4a7c666dce8b900902a908f5fff4a21"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4a7c666dce8b900902a908f5fff4a21">fun_before</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ac4a7c666dce8b900902a908f5fff4a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return substring before a specified string.  <br /></td></tr>
+<tr class="separator:ac4a7c666dce8b900902a908f5fff4a21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94d23217a2fa94ac611782a9fe2cb691" id="r_a94d23217a2fa94ac611782a9fe2cb691"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94d23217a2fa94ac611782a9fe2cb691">fun_lcstr</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a94d23217a2fa94ac611782a9fe2cb691"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lowercase string.  <br /></td></tr>
+<tr class="separator:a94d23217a2fa94ac611782a9fe2cb691"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f69bd421f2a8521d29dcf5c7525166f" id="r_a4f69bd421f2a8521d29dcf5c7525166f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f69bd421f2a8521d29dcf5c7525166f">fun_ucstr</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a4f69bd421f2a8521d29dcf5c7525166f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uppercase string.  <br /></td></tr>
+<tr class="separator:a4f69bd421f2a8521d29dcf5c7525166f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a073ba834d31d3601e6eeabba25030abb" id="r_a073ba834d31d3601e6eeabba25030abb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a073ba834d31d3601e6eeabba25030abb">fun_capstr</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a073ba834d31d3601e6eeabba25030abb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capitalize string.  <br /></td></tr>
+<tr class="separator:a073ba834d31d3601e6eeabba25030abb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8071c269e3040e7086d3b08f7561fd7d" id="r_a8071c269e3040e7086d3b08f7561fd7d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8071c269e3040e7086d3b08f7561fd7d">fun_space</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a8071c269e3040e7086d3b08f7561fd7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make spaces.  <br /></td></tr>
+<tr class="separator:a8071c269e3040e7086d3b08f7561fd7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5d3bc9aec6dba6050257ec7767a8927" id="r_ad5d3bc9aec6dba6050257ec7767a8927"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5d3bc9aec6dba6050257ec7767a8927">fun_ljust</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ad5d3bc9aec6dba6050257ec7767a8927"><td class="mdescLeft">&#160;</td><td class="mdescRight">Left justify string, specifying fill character.  <br /></td></tr>
+<tr class="separator:ad5d3bc9aec6dba6050257ec7767a8927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a529776dd1a48d3a9c3da802f3bcc5d9e" id="r_a529776dd1a48d3a9c3da802f3bcc5d9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a529776dd1a48d3a9c3da802f3bcc5d9e">fun_rjust</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a529776dd1a48d3a9c3da802f3bcc5d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Right justify string, specifying fill character.  <br /></td></tr>
+<tr class="separator:a529776dd1a48d3a9c3da802f3bcc5d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1c17132f95232eaf48bb2d7e73747a7" id="r_af1c17132f95232eaf48bb2d7e73747a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1c17132f95232eaf48bb2d7e73747a7">fun_center</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:af1c17132f95232eaf48bb2d7e73747a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Center string, specifying fill character.  <br /></td></tr>
+<tr class="separator:af1c17132f95232eaf48bb2d7e73747a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6397d7dd74a9d601f28027016923bb05" id="r_a6397d7dd74a9d601f28027016923bb05"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6397d7dd74a9d601f28027016923bb05">fun_left</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a6397d7dd74a9d601f28027016923bb05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns first n characters in a string.  <br /></td></tr>
+<tr class="separator:a6397d7dd74a9d601f28027016923bb05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0125c2990d47ea7b87134b1b9a935d5" id="r_ad0125c2990d47ea7b87134b1b9a935d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0125c2990d47ea7b87134b1b9a935d5">fun_right</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ad0125c2990d47ea7b87134b1b9a935d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">fun_right: Returns last n characters in a string  <br /></td></tr>
+<tr class="separator:ad0125c2990d47ea7b87134b1b9a935d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77976a8784fade1325691e13584f8f4a" id="r_a77976a8784fade1325691e13584f8f4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77976a8784fade1325691e13584f8f4a">fun_chomp</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a77976a8784fade1325691e13584f8f4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the line ends with CRLF, CR, or LF, chop it off.  <br /></td></tr>
+<tr class="separator:a77976a8784fade1325691e13584f8f4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7df479fd9972774d0b03a19ccdef9e7c" id="r_a7df479fd9972774d0b03a19ccdef9e7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7df479fd9972774d0b03a19ccdef9e7c">fun_comp</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a7df479fd9972774d0b03a19ccdef9e7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exact-string compare.  <br /></td></tr>
+<tr class="separator:a7df479fd9972774d0b03a19ccdef9e7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6788ed20cc8776db8abf8ee5acf25b1d" id="r_a6788ed20cc8776db8abf8ee5acf25b1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6788ed20cc8776db8abf8ee5acf25b1d">fun_streq</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a6788ed20cc8776db8abf8ee5acf25b1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">non-case-sensitive string compare  <br /></td></tr>
+<tr class="separator:a6788ed20cc8776db8abf8ee5acf25b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a399e609f367867c89dfb72137fd86df0" id="r_a399e609f367867c89dfb72137fd86df0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a399e609f367867c89dfb72137fd86df0">fun_strmatch</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a399e609f367867c89dfb72137fd86df0"><td class="mdescLeft">&#160;</td><td class="mdescRight">wildcard string compare  <br /></td></tr>
+<tr class="separator:a399e609f367867c89dfb72137fd86df0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14b46d90cadfedcd6d535b2a3ba54866" id="r_a14b46d90cadfedcd6d535b2a3ba54866"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14b46d90cadfedcd6d535b2a3ba54866">fun_edit</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a14b46d90cadfedcd6d535b2a3ba54866"><td class="mdescLeft">&#160;</td><td class="mdescRight">Edit text.  <br /></td></tr>
+<tr class="separator:a14b46d90cadfedcd6d535b2a3ba54866"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77c36c0328aeb2ffea2c9c6c7d1b952c" id="r_a77c36c0328aeb2ffea2c9c6c7d1b952c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77c36c0328aeb2ffea2c9c6c7d1b952c">fun_merge</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:a77c36c0328aeb2ffea2c9c6c7d1b952c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given two strings and a character, merge the two strings by replacing characters in string1 that are the same as the given character by the corresponding character in string2 (by position). The strings must be of the same length.  <br /></td></tr>
+<tr class="separator:a77c36c0328aeb2ffea2c9c6c7d1b952c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1554236f4064d0428bee0b8f9777c37" id="r_ae1554236f4064d0428bee0b8f9777c37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1554236f4064d0428bee0b8f9777c37">fun_secure</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ae1554236f4064d0428bee0b8f9777c37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns &lt;string&gt; after replacing the characters [](){};,%$ with spaces.  <br /></td></tr>
+<tr class="separator:ae1554236f4064d0428bee0b8f9777c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac80f4105c773a8d60adee554adb81d8d" id="r_ac80f4105c773a8d60adee554adb81d8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac80f4105c773a8d60adee554adb81d8d">fun_escape</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:ac80f4105c773a8d60adee554adb81d8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns &lt;string&gt; after adding an escape character () at the start of the string and also before each of the characters %;[]{}\ that appear in the string.  <br /></td></tr>
+<tr class="separator:ac80f4105c773a8d60adee554adb81d8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4841fd5b7cd3dc2a00608ca4c35a334" id="r_af4841fd5b7cd3dc2a00608ca4c35a334"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4841fd5b7cd3dc2a00608ca4c35a334">fun_esc</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="memdesc:af4841fd5b7cd3dc2a00608ca4c35a334"><td class="mdescLeft">&#160;</td><td class="mdescRight">Less aggressive escape; it does not put a \ at the start of the string, and it only escapes %[]\ &ndash; making it more suitable for strings that you simply don't want evaluated.  <br /></td></tr>
+<tr class="separator:af4841fd5b7cd3dc2a00608ca4c35a334"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5624bae39f2dff1f5955c1da2c327083" id="r_a5624bae39f2dff1f5955c1da2c327083"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5624bae39f2dff1f5955c1da2c327083">fun_stripchars</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="memdesc:a5624bae39f2dff1f5955c1da2c327083"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove all of a set of characters from a string.  <br /></td></tr>
 <tr class="separator:a5624bae39f2dff1f5955c1da2c327083"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a1af4c67bb16c4a42a1fe59929497dd" id="r_a3a1af4c67bb16c4a42a1fe59929497dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a1af4c67bb16c4a42a1fe59929497dd">fun_ansi</a> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="memdesc:a3a1af4c67bb16c4a42a1fe59929497dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Highlight a string using ANSI terminal effects.  <br /></td></tr>
 <tr class="separator:a3a1af4c67bb16c4a42a1fe59929497dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a152729d1d5b48bc2cd3c3238c8ac9c0a" id="r_a152729d1d5b48bc2cd3c3238c8ac9c0a"><td class="memItemLeft" align="right" valign="top"><a id="a152729d1d5b48bc2cd3c3238c8ac9c0a" name="a152729d1d5b48bc2cd3c3238c8ac9c0a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_stripansi</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a152729d1d5b48bc2cd3c3238c8ac9c0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34fe24c796caef1d402573a61f2cb43c" id="r_a34fe24c796caef1d402573a61f2cb43c"><td class="memItemLeft" align="right" valign="top"><a id="a34fe24c796caef1d402573a61f2cb43c" name="a34fe24c796caef1d402573a61f2cb43c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_stripansi</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a34fe24c796caef1d402573a61f2cb43c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e6d7e07d11937acb7731d5f58b66087" id="r_a6e6d7e07d11937acb7731d5f58b66087"><td class="memItemLeft" align="right" valign="top"><a id="a6e6d7e07d11937acb7731d5f58b66087" name="a6e6d7e07d11937acb7731d5f58b66087"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>crunch_code</b> (char *code)</td></tr>
 <tr class="separator:a6e6d7e07d11937acb7731d5f58b66087"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bdf3febb2fc25112285e278b823cb76" id="r_a8bdf3febb2fc25112285e278b823cb76"><td class="memItemLeft" align="right" valign="top"><a id="a8bdf3febb2fc25112285e278b823cb76" name="a8bdf3febb2fc25112285e278b823cb76"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>crypt_code</b> (char *buff, char **bufc, char *code, char *text, int type)</td></tr>
 <tr class="separator:a8bdf3febb2fc25112285e278b823cb76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a3e3ed6d62247e42e2d35b85ddbb0c0" id="r_a7a3e3ed6d62247e42e2d35b85ddbb0c0"><td class="memItemLeft" align="right" valign="top"><a id="a7a3e3ed6d62247e42e2d35b85ddbb0c0" name="a7a3e3ed6d62247e42e2d35b85ddbb0c0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_encrypt</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a7a3e3ed6d62247e42e2d35b85ddbb0c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76e515b004a0e1b9fc375b3918e78d20" id="r_a76e515b004a0e1b9fc375b3918e78d20"><td class="memItemLeft" align="right" valign="top"><a id="a76e515b004a0e1b9fc375b3918e78d20" name="a76e515b004a0e1b9fc375b3918e78d20"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_decrypt</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a76e515b004a0e1b9fc375b3918e78d20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1050be29760731e3ffa51eaa28fd7204" id="r_a1050be29760731e3ffa51eaa28fd7204"><td class="memItemLeft" align="right" valign="top"><a id="a1050be29760731e3ffa51eaa28fd7204" name="a1050be29760731e3ffa51eaa28fd7204"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_scramble</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a1050be29760731e3ffa51eaa28fd7204"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a829027cdacdeaf5a28adf45af18eac3b" id="r_a829027cdacdeaf5a28adf45af18eac3b"><td class="memItemLeft" align="right" valign="top"><a id="a829027cdacdeaf5a28adf45af18eac3b" name="a829027cdacdeaf5a28adf45af18eac3b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_reverse</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a829027cdacdeaf5a28adf45af18eac3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a424f6e41b0e41b17db521b48e5bc4d70" id="r_a424f6e41b0e41b17db521b48e5bc4d70"><td class="memItemLeft" align="right" valign="top"><a id="a424f6e41b0e41b17db521b48e5bc4d70" name="a424f6e41b0e41b17db521b48e5bc4d70"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_mid</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a424f6e41b0e41b17db521b48e5bc4d70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64795392a0fd7d98e830a23ad425bace" id="r_a64795392a0fd7d98e830a23ad425bace"><td class="memItemLeft" align="right" valign="top"><a id="a64795392a0fd7d98e830a23ad425bace" name="a64795392a0fd7d98e830a23ad425bace"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_translate</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a64795392a0fd7d98e830a23ad425bace"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe488744ea7e7cec5c56691bc1fd0367" id="r_afe488744ea7e7cec5c56691bc1fd0367"><td class="memItemLeft" align="right" valign="top"><a id="afe488744ea7e7cec5c56691bc1fd0367" name="afe488744ea7e7cec5c56691bc1fd0367"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_pos</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:afe488744ea7e7cec5c56691bc1fd0367"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7d90771cae4b8af73c3d3650e783686" id="r_af7d90771cae4b8af73c3d3650e783686"><td class="memItemLeft" align="right" valign="top"><a id="af7d90771cae4b8af73c3d3650e783686" name="af7d90771cae4b8af73c3d3650e783686"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_encrypt</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:af7d90771cae4b8af73c3d3650e783686"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d705147e87a06b8aab290b1fa315a8b" id="r_a9d705147e87a06b8aab290b1fa315a8b"><td class="memItemLeft" align="right" valign="top"><a id="a9d705147e87a06b8aab290b1fa315a8b" name="a9d705147e87a06b8aab290b1fa315a8b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_decrypt</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a9d705147e87a06b8aab290b1fa315a8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace5099f09551498e9d089bae59310e5f" id="r_ace5099f09551498e9d089bae59310e5f"><td class="memItemLeft" align="right" valign="top"><a id="ace5099f09551498e9d089bae59310e5f" name="ace5099f09551498e9d089bae59310e5f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_scramble</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:ace5099f09551498e9d089bae59310e5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cccb51e242df299c3f3c7ccd7a31056" id="r_a5cccb51e242df299c3f3c7ccd7a31056"><td class="memItemLeft" align="right" valign="top"><a id="a5cccb51e242df299c3f3c7ccd7a31056" name="a5cccb51e242df299c3f3c7ccd7a31056"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_reverse</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a5cccb51e242df299c3f3c7ccd7a31056"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41837ec13a46634cb08803059e553255" id="r_a41837ec13a46634cb08803059e553255"><td class="memItemLeft" align="right" valign="top"><a id="a41837ec13a46634cb08803059e553255" name="a41837ec13a46634cb08803059e553255"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_mid</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a41837ec13a46634cb08803059e553255"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a14762be3556c5bf247e6a16c818158" id="r_a6a14762be3556c5bf247e6a16c818158"><td class="memItemLeft" align="right" valign="top"><a id="a6a14762be3556c5bf247e6a16c818158" name="a6a14762be3556c5bf247e6a16c818158"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_translate</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a6a14762be3556c5bf247e6a16c818158"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0287a031be425b48f28d43686a9201d2" id="r_a0287a031be425b48f28d43686a9201d2"><td class="memItemLeft" align="right" valign="top"><a id="a0287a031be425b48f28d43686a9201d2" name="a0287a031be425b48f28d43686a9201d2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_pos</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a0287a031be425b48f28d43686a9201d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a310198ba33f136301b2597816db6a1f1" id="r_a310198ba33f136301b2597816db6a1f1"><td class="memItemLeft" align="right" valign="top"><a id="a310198ba33f136301b2597816db6a1f1" name="a310198ba33f136301b2597816db6a1f1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_lpos</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="separator:a310198ba33f136301b2597816db6a1f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a70b67ca2a0eae7dfd5ca5f95714b2b" id="r_a4a70b67ca2a0eae7dfd5ca5f95714b2b"><td class="memItemLeft" align="right" valign="top"><a id="a4a70b67ca2a0eae7dfd5ca5f95714b2b" name="a4a70b67ca2a0eae7dfd5ca5f95714b2b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_diffpos</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a4a70b67ca2a0eae7dfd5ca5f95714b2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13a3a081224cc11c47e410ddc8265f6a" id="r_a13a3a081224cc11c47e410ddc8265f6a"><td class="memItemLeft" align="right" valign="top"><a id="a13a3a081224cc11c47e410ddc8265f6a" name="a13a3a081224cc11c47e410ddc8265f6a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_diffpos</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a13a3a081224cc11c47e410ddc8265f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02e2c0686c9ea93e5ffd738ecea544f4" id="r_a02e2c0686c9ea93e5ffd738ecea544f4"><td class="memItemLeft" align="right" valign="top"><a id="a02e2c0686c9ea93e5ffd738ecea544f4" name="a02e2c0686c9ea93e5ffd738ecea544f4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_wordpos</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="separator:a02e2c0686c9ea93e5ffd738ecea544f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa647589ed025ab8d3df2680740e36e46" id="r_aa647589ed025ab8d3df2680740e36e46"><td class="memItemLeft" align="right" valign="top"><a id="aa647589ed025ab8d3df2680740e36e46" name="aa647589ed025ab8d3df2680740e36e46"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_ansipos</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:aa647589ed025ab8d3df2680740e36e46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05bda70f843604c324ac3a34080898c0" id="r_a05bda70f843604c324ac3a34080898c0"><td class="memItemLeft" align="right" valign="top"><a id="a05bda70f843604c324ac3a34080898c0" name="a05bda70f843604c324ac3a34080898c0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_repeat</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a05bda70f843604c324ac3a34080898c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4cc81970a6c31b7fb2309aeafa1b8dc" id="r_ab4cc81970a6c31b7fb2309aeafa1b8dc"><td class="memItemLeft" align="right" valign="top"><a id="ab4cc81970a6c31b7fb2309aeafa1b8dc" name="ab4cc81970a6c31b7fb2309aeafa1b8dc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>perform_border</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:ab4cc81970a6c31b7fb2309aeafa1b8dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac01b4e8a74cff2b17c02afcb876016e0" id="r_ac01b4e8a74cff2b17c02afcb876016e0"><td class="memItemLeft" align="right" valign="top"><a id="ac01b4e8a74cff2b17c02afcb876016e0" name="ac01b4e8a74cff2b17c02afcb876016e0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_ansipos</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:ac01b4e8a74cff2b17c02afcb876016e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12dfe929f75caefd254cdb98b937e7e7" id="r_a12dfe929f75caefd254cdb98b937e7e7"><td class="memItemLeft" align="right" valign="top"><a id="a12dfe929f75caefd254cdb98b937e7e7" name="a12dfe929f75caefd254cdb98b937e7e7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_repeat</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a12dfe929f75caefd254cdb98b937e7e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bf500de93380439db8012c751f4c0d2" id="r_a9bf500de93380439db8012c751f4c0d2"><td class="memItemLeft" align="right" valign="top"><a id="a9bf500de93380439db8012c751f4c0d2" name="a9bf500de93380439db8012c751f4c0d2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>perform_border</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a9bf500de93380439db8012c751f4c0d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef1b7fd4c7c27b378d05b733a8c6328f" id="r_aef1b7fd4c7c27b378d05b733a8c6328f"><td class="memItemLeft" align="right" valign="top"><a id="aef1b7fd4c7c27b378d05b733a8c6328f" name="aef1b7fd4c7c27b378d05b733a8c6328f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>perform_align</b> (int n_cols, char **raw_colstrs, char **data, char fillc, <a class="el" href="structdelim.html">Delim</a> col_sep, <a class="el" href="structdelim.html">Delim</a> row_sep, char *buff, char **bufc)</td></tr>
 <tr class="separator:aef1b7fd4c7c27b378d05b733a8c6328f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -304,39 +308,39 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_align</b> (char *
 <tr class="memitem:a96c8216b721ec7cf5b9f79cba1e3cf38" id="r_a96c8216b721ec7cf5b9f79cba1e3cf38"><td class="memItemLeft" align="right" valign="top"><a id="a96c8216b721ec7cf5b9f79cba1e3cf38" name="a96c8216b721ec7cf5b9f79cba1e3cf38"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_lalign</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="separator:a96c8216b721ec7cf5b9f79cba1e3cf38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49e018fcbfded788d7f876129d8eafe8" id="r_a49e018fcbfded788d7f876129d8eafe8"><td class="memItemLeft" align="right" valign="top"><a id="a49e018fcbfded788d7f876129d8eafe8" name="a49e018fcbfded788d7f876129d8eafe8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_cat</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a49e018fcbfded788d7f876129d8eafe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa111318d5ced902ed828e00072f9ee81" id="r_aa111318d5ced902ed828e00072f9ee81"><td class="memItemLeft" align="right" valign="top"><a id="aa111318d5ced902ed828e00072f9ee81" name="aa111318d5ced902ed828e00072f9ee81"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_strcat</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:aa111318d5ced902ed828e00072f9ee81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd59e7c5934610d79b629c63b7c62849" id="r_acd59e7c5934610d79b629c63b7c62849"><td class="memItemLeft" align="right" valign="top"><a id="acd59e7c5934610d79b629c63b7c62849" name="acd59e7c5934610d79b629c63b7c62849"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_cat</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:acd59e7c5934610d79b629c63b7c62849"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67fb2db5ab60850ce95e496dfb3bcae3" id="r_a67fb2db5ab60850ce95e496dfb3bcae3"><td class="memItemLeft" align="right" valign="top"><a id="a67fb2db5ab60850ce95e496dfb3bcae3" name="a67fb2db5ab60850ce95e496dfb3bcae3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_strcat</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a67fb2db5ab60850ce95e496dfb3bcae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91ffd24d255dfd559a8df0e3cc1466a5" id="r_a91ffd24d255dfd559a8df0e3cc1466a5"><td class="memItemLeft" align="right" valign="top"><a id="a91ffd24d255dfd559a8df0e3cc1466a5" name="a91ffd24d255dfd559a8df0e3cc1466a5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_join</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
 <tr class="separator:a91ffd24d255dfd559a8df0e3cc1466a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7efd0d1ffdb9251fc25330c0b07d4c7c" id="r_a7efd0d1ffdb9251fc25330c0b07d4c7c"><td class="memItemLeft" align="right" valign="top"><a id="a7efd0d1ffdb9251fc25330c0b07d4c7c" name="a7efd0d1ffdb9251fc25330c0b07d4c7c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_strlen</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a7efd0d1ffdb9251fc25330c0b07d4c7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bb4932b257d07d5b53c75a949e42dfc" id="r_a0bb4932b257d07d5b53c75a949e42dfc"><td class="memItemLeft" align="right" valign="top"><a id="a0bb4932b257d07d5b53c75a949e42dfc" name="a0bb4932b257d07d5b53c75a949e42dfc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_delete</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a0bb4932b257d07d5b53c75a949e42dfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aecd45a459de9abdf7b6c3dc0112246b8" id="r_aecd45a459de9abdf7b6c3dc0112246b8"><td class="memItemLeft" align="right" valign="top"><a id="aecd45a459de9abdf7b6c3dc0112246b8" name="aecd45a459de9abdf7b6c3dc0112246b8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_lit</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:aecd45a459de9abdf7b6c3dc0112246b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9275dbe726705dcb42e6e5087e330df" id="r_ae9275dbe726705dcb42e6e5087e330df"><td class="memItemLeft" align="right" valign="top"><a id="ae9275dbe726705dcb42e6e5087e330df" name="ae9275dbe726705dcb42e6e5087e330df"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_art</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:ae9275dbe726705dcb42e6e5087e330df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a081a730f8ea07ecb6ba8ea781e4b8dfb" id="r_a081a730f8ea07ecb6ba8ea781e4b8dfb"><td class="memItemLeft" align="right" valign="top"><a id="a081a730f8ea07ecb6ba8ea781e4b8dfb" name="a081a730f8ea07ecb6ba8ea781e4b8dfb"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_alphamax</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a081a730f8ea07ecb6ba8ea781e4b8dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d188d1c5b799145345569c3279e6594" id="r_a8d188d1c5b799145345569c3279e6594"><td class="memItemLeft" align="right" valign="top"><a id="a8d188d1c5b799145345569c3279e6594" name="a8d188d1c5b799145345569c3279e6594"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_alphamin</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs, char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a8d188d1c5b799145345569c3279e6594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83b59373694fa0e631bc06d156faf870" id="r_a83b59373694fa0e631bc06d156faf870"><td class="memItemLeft" align="right" valign="top"><a id="a83b59373694fa0e631bc06d156faf870" name="a83b59373694fa0e631bc06d156faf870"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_valid</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[], int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:a83b59373694fa0e631bc06d156faf870"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0fd5290b8d7359cf860b1c0fe42ef21" id="r_ad0fd5290b8d7359cf860b1c0fe42ef21"><td class="memItemLeft" align="right" valign="top"><a id="ad0fd5290b8d7359cf860b1c0fe42ef21" name="ad0fd5290b8d7359cf860b1c0fe42ef21"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *buff, char **bufc, dbref player <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref caller <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), dbref cause <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *fargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int nfargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), char *cargs[] <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int ncargs <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)))</td></tr>
-<tr class="separator:ad0fd5290b8d7359cf860b1c0fe42ef21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8e671a4fabb3c72b806fa53a4a137c6" id="r_aa8e671a4fabb3c72b806fa53a4a137c6"><td class="memItemLeft" align="right" valign="top"><a id="aa8e671a4fabb3c72b806fa53a4a137c6" name="aa8e671a4fabb3c72b806fa53a4a137c6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_strlen</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:aa8e671a4fabb3c72b806fa53a4a137c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78ee368acfa112caaaef26f0e93fab9a" id="r_a78ee368acfa112caaaef26f0e93fab9a"><td class="memItemLeft" align="right" valign="top"><a id="a78ee368acfa112caaaef26f0e93fab9a" name="a78ee368acfa112caaaef26f0e93fab9a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_delete</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a78ee368acfa112caaaef26f0e93fab9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a80a6f6c4cfd2792a15fa47f75bce45" id="r_a9a80a6f6c4cfd2792a15fa47f75bce45"><td class="memItemLeft" align="right" valign="top"><a id="a9a80a6f6c4cfd2792a15fa47f75bce45" name="a9a80a6f6c4cfd2792a15fa47f75bce45"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_lit</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a9a80a6f6c4cfd2792a15fa47f75bce45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeff25143c408e24aef0b565be04fa0ab" id="r_aeff25143c408e24aef0b565be04fa0ab"><td class="memItemLeft" align="right" valign="top"><a id="aeff25143c408e24aef0b565be04fa0ab" name="aeff25143c408e24aef0b565be04fa0ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_art</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:aeff25143c408e24aef0b565be04fa0ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ddac614bcade2da7d258bca76add79a" id="r_a1ddac614bcade2da7d258bca76add79a"><td class="memItemLeft" align="right" valign="top"><a id="a1ddac614bcade2da7d258bca76add79a" name="a1ddac614bcade2da7d258bca76add79a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_alphamax</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a1ddac614bcade2da7d258bca76add79a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9abc166604e55f3fd20919ba53b5c03a" id="r_a9abc166604e55f3fd20919ba53b5c03a"><td class="memItemLeft" align="right" valign="top"><a id="a9abc166604e55f3fd20919ba53b5c03a" name="a9abc166604e55f3fd20919ba53b5c03a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_alphamin</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a9abc166604e55f3fd20919ba53b5c03a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e6439f59b95302f002fe5fe459bcb6d" id="r_a9e6439f59b95302f002fe5fe459bcb6d"><td class="memItemLeft" align="right" valign="top"><a id="a9e6439f59b95302f002fe5fe459bcb6d" name="a9e6439f59b95302f002fe5fe459bcb6d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_valid</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:a9e6439f59b95302f002fe5fe459bcb6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad921c969ecd399dfcfcceaefc4cd75a7" id="r_ad921c969ecd399dfcfcceaefc4cd75a7"><td class="memItemLeft" align="right" valign="top"><a id="ad921c969ecd399dfcfcceaefc4cd75a7" name="ad921c969ecd399dfcfcceaefc4cd75a7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</td></tr>
+<tr class="separator:ad921c969ecd399dfcfcceaefc4cd75a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>String manipulation built-ins: search/replace, case handling, formatting. </p>
@@ -344,41 +348,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 <dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a75e55c213ab0002512fe19ca977ba501" name="a75e55c213ab0002512fe19ca977ba501"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75e55c213ab0002512fe19ca977ba501">&#9670;&#160;</a></span>ansi_truecolor_from_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structCOLORDEF.html">COLORDEF</a> ansi_truecolor_from_string </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>color_str</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_bg</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Génère une séquence ANSI 24bit (truecolor) pour le foreground ou background à partir d'une string couleur. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">color_str</td><td>String couleur (#RRGGBB, RRGGBB, &lt;#RRGGBB&gt;, &lt;RRGGBB&gt;, &lt;R G B&gt;, R G B) </td></tr>
-    <tr><td class="paramname">out</td><td>Buffer de sortie (doit être assez grand) </td></tr>
-    <tr><td class="paramname">out_size</td><td>Taille du buffer </td></tr>
-    <tr><td class="paramname">is_bg</td><td>true pour background, false pour foreground </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true si conversion réussie, false sinon </dd></dl>
-
-</div>
-</div>
-<a id="a4e3019ca33345b3de6c9d7a331c81a20" name="a4e3019ca33345b3de6c9d7a331c81a20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e3019ca33345b3de6c9d7a331c81a20">&#9670;&#160;</a></span>fun_after()</h2>
+<a id="aca25b522141cc178e9b91e37d10487a4" name="aca25b522141cc178e9b91e37d10487a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca25b522141cc178e9b91e37d10487a4">&#9670;&#160;</a></span>fun_after()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -396,17 +367,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -421,12 +392,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -518,9 +489,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
   <table class="params">
     <tr><td class="paramname">buff</td><td>Output buffer </td></tr>
     <tr><td class="paramname">bufc</td><td>Output buffer tracker </td></tr>
-    <tr><td class="paramname">player</td><td>Not used </td></tr>
+    <tr><td class="paramname">player</td><td>Executor (fallback for color capability) </td></tr>
     <tr><td class="paramname">caller</td><td>Not used </td></tr>
-    <tr><td class="paramname">cause</td><td>Not used </td></tr>
+    <tr><td class="paramname">cause</td><td>Enactor; color capability is taken from here when available </td></tr>
     <tr><td class="paramname">fargs</td><td>Function's arguments </td></tr>
     <tr><td class="paramname">nfargs</td><td>Not used </td></tr>
     <tr><td class="paramname">cargs</td><td>Not used </td></tr>
@@ -528,12 +499,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
   </table>
   </dd>
 </dl>
-<p>Now that normal ansi has been done, time for xterm</p>
 
 </div>
 </div>
-<a id="ad2285e5c4f626e39f408a50e802d8199" name="ad2285e5c4f626e39f408a50e802d8199"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2285e5c4f626e39f408a50e802d8199">&#9670;&#160;</a></span>fun_before()</h2>
+<a id="ac4a7c666dce8b900902a908f5fff4a21" name="ac4a7c666dce8b900902a908f5fff4a21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4a7c666dce8b900902a908f5fff4a21">&#9670;&#160;</a></span>fun_before()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -551,17 +521,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -576,12 +546,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -613,8 +583,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a6c3411c89fe93b2968445d42ad7d162a" name="a6c3411c89fe93b2968445d42ad7d162a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c3411c89fe93b2968445d42ad7d162a">&#9670;&#160;</a></span>fun_capstr()</h2>
+<a id="a073ba834d31d3601e6eeabba25030abb" name="a073ba834d31d3601e6eeabba25030abb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a073ba834d31d3601e6eeabba25030abb">&#9670;&#160;</a></span>fun_capstr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -632,17 +602,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -652,17 +622,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -685,8 +655,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a6f9bba079b0906d62ed9bb4cc0814217" name="a6f9bba079b0906d62ed9bb4cc0814217"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f9bba079b0906d62ed9bb4cc0814217">&#9670;&#160;</a></span>fun_center()</h2>
+<a id="af1c17132f95232eaf48bb2d7e73747a7" name="af1c17132f95232eaf48bb2d7e73747a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1c17132f95232eaf48bb2d7e73747a7">&#9670;&#160;</a></span>fun_center()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -704,17 +674,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -729,12 +699,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -768,8 +738,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a4153444cc4552fb4c5018ca6e15f12ff" name="a4153444cc4552fb4c5018ca6e15f12ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4153444cc4552fb4c5018ca6e15f12ff">&#9670;&#160;</a></span>fun_chomp()</h2>
+<a id="a77976a8784fade1325691e13584f8f4a" name="a77976a8784fade1325691e13584f8f4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77976a8784fade1325691e13584f8f4a">&#9670;&#160;</a></span>fun_chomp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -787,17 +757,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -807,17 +777,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -840,8 +810,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="ab9835febea75cdbd1bcc3e0dd4265413" name="ab9835febea75cdbd1bcc3e0dd4265413"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9835febea75cdbd1bcc3e0dd4265413">&#9670;&#160;</a></span>fun_comp()</h2>
+<a id="a7df479fd9972774d0b03a19ccdef9e7c" name="a7df479fd9972774d0b03a19ccdef9e7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7df479fd9972774d0b03a19ccdef9e7c">&#9670;&#160;</a></span>fun_comp()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -859,17 +829,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -879,17 +849,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -912,8 +882,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="abfda19d6569ff9c5b1b51f795a007cd5" name="abfda19d6569ff9c5b1b51f795a007cd5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abfda19d6569ff9c5b1b51f795a007cd5">&#9670;&#160;</a></span>fun_edit()</h2>
+<a id="a14b46d90cadfedcd6d535b2a3ba54866" name="a14b46d90cadfedcd6d535b2a3ba54866"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14b46d90cadfedcd6d535b2a3ba54866">&#9670;&#160;</a></span>fun_edit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -931,17 +901,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -951,17 +921,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -984,8 +954,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="ada197c1e39ed04acf7563193c2d9d549" name="ada197c1e39ed04acf7563193c2d9d549"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada197c1e39ed04acf7563193c2d9d549">&#9670;&#160;</a></span>fun_esc()</h2>
+<a id="af4841fd5b7cd3dc2a00608ca4c35a334" name="af4841fd5b7cd3dc2a00608ca4c35a334"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4841fd5b7cd3dc2a00608ca4c35a334">&#9670;&#160;</a></span>fun_esc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1003,17 +973,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1023,17 +993,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1056,8 +1026,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="ad3ab7f455e4821fb13cd7be56d7dfeda" name="ad3ab7f455e4821fb13cd7be56d7dfeda"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3ab7f455e4821fb13cd7be56d7dfeda">&#9670;&#160;</a></span>fun_escape()</h2>
+<a id="ac80f4105c773a8d60adee554adb81d8d" name="ac80f4105c773a8d60adee554adb81d8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac80f4105c773a8d60adee554adb81d8d">&#9670;&#160;</a></span>fun_escape()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1075,17 +1045,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1095,17 +1065,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1128,8 +1098,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="ad714d7307f12e1c970bdd8e87c5cd1a9" name="ad714d7307f12e1c970bdd8e87c5cd1a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad714d7307f12e1c970bdd8e87c5cd1a9">&#9670;&#160;</a></span>fun_isalnum()</h2>
+<a id="aaa8a72339f2b35a05d737d0a37e7280d" name="aaa8a72339f2b35a05d737d0a37e7280d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa8a72339f2b35a05d737d0a37e7280d">&#9670;&#160;</a></span>fun_isalnum()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1147,17 +1117,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1167,17 +1137,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1200,8 +1170,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a5bd407c61e18e6928970add92be30944" name="a5bd407c61e18e6928970add92be30944"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5bd407c61e18e6928970add92be30944">&#9670;&#160;</a></span>fun_isdbref()</h2>
+<a id="a5e1063984f431350832c2a92a4bea8b5" name="a5e1063984f431350832c2a92a4bea8b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e1063984f431350832c2a92a4bea8b5">&#9670;&#160;</a></span>fun_isdbref()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1219,17 +1189,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1239,17 +1209,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1273,8 +1243,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="af86c9bc4c378a13c3fd15805d7d1a759" name="af86c9bc4c378a13c3fd15805d7d1a759"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af86c9bc4c378a13c3fd15805d7d1a759">&#9670;&#160;</a></span>fun_isnum()</h2>
+<a id="ac3dc5bde08010bce39e36306eb4940dc" name="ac3dc5bde08010bce39e36306eb4940dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3dc5bde08010bce39e36306eb4940dc">&#9670;&#160;</a></span>fun_isnum()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1292,17 +1262,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1312,17 +1282,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1345,8 +1315,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a608b2b1b1042005bfb158af22d950c5e" name="a608b2b1b1042005bfb158af22d950c5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a608b2b1b1042005bfb158af22d950c5e">&#9670;&#160;</a></span>fun_isobjid()</h2>
+<a id="a9c27892fb132480e9a4487b293064678" name="a9c27892fb132480e9a4487b293064678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c27892fb132480e9a4487b293064678">&#9670;&#160;</a></span>fun_isobjid()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1364,17 +1334,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1384,17 +1354,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1418,8 +1388,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="adcdd839ce8a5c200e3bff7f37419ca99" name="adcdd839ce8a5c200e3bff7f37419ca99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adcdd839ce8a5c200e3bff7f37419ca99">&#9670;&#160;</a></span>fun_isword()</h2>
+<a id="af1b10d2b505544b32961885fb347c414" name="af1b10d2b505544b32961885fb347c414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1b10d2b505544b32961885fb347c414">&#9670;&#160;</a></span>fun_isword()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1437,17 +1407,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1457,17 +1427,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1490,8 +1460,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a0dbaea2768d89bd9a98de4662fd8ffed" name="a0dbaea2768d89bd9a98de4662fd8ffed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0dbaea2768d89bd9a98de4662fd8ffed">&#9670;&#160;</a></span>fun_lcstr()</h2>
+<a id="a94d23217a2fa94ac611782a9fe2cb691" name="a94d23217a2fa94ac611782a9fe2cb691"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94d23217a2fa94ac611782a9fe2cb691">&#9670;&#160;</a></span>fun_lcstr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1509,17 +1479,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1529,17 +1499,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1562,8 +1532,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a510886b75a6e913e0321af69d76999e3" name="a510886b75a6e913e0321af69d76999e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a510886b75a6e913e0321af69d76999e3">&#9670;&#160;</a></span>fun_left()</h2>
+<a id="a6397d7dd74a9d601f28027016923bb05" name="a6397d7dd74a9d601f28027016923bb05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6397d7dd74a9d601f28027016923bb05">&#9670;&#160;</a></span>fun_left()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1581,17 +1551,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1601,17 +1571,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1634,8 +1604,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a7e888229bfce2b5ef3c9b93e8a3b12b2" name="a7e888229bfce2b5ef3c9b93e8a3b12b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e888229bfce2b5ef3c9b93e8a3b12b2">&#9670;&#160;</a></span>fun_ljust()</h2>
+<a id="ad5d3bc9aec6dba6050257ec7767a8927" name="ad5d3bc9aec6dba6050257ec7767a8927"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5d3bc9aec6dba6050257ec7767a8927">&#9670;&#160;</a></span>fun_ljust()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1653,17 +1623,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1678,12 +1648,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1714,8 +1684,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a6754938c47dbad9ed97ed79ca4f4bc69" name="a6754938c47dbad9ed97ed79ca4f4bc69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6754938c47dbad9ed97ed79ca4f4bc69">&#9670;&#160;</a></span>fun_merge()</h2>
+<a id="a77c36c0328aeb2ffea2c9c6c7d1b952c" name="a77c36c0328aeb2ffea2c9c6c7d1b952c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77c36c0328aeb2ffea2c9c6c7d1b952c">&#9670;&#160;</a></span>fun_merge()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1733,17 +1703,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1753,17 +1723,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1789,8 +1759,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="ae29c35bb771e313320095b4ebba175ea" name="ae29c35bb771e313320095b4ebba175ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae29c35bb771e313320095b4ebba175ea">&#9670;&#160;</a></span>fun_null()</h2>
+<a id="ab5dfcbb140df57d36a92b28ec78e4692" name="ab5dfcbb140df57d36a92b28ec78e4692"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5dfcbb140df57d36a92b28ec78e4692">&#9670;&#160;</a></span>fun_null()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1798,47 +1768,47 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="memname">void fun_null </td>
           <td>(</td>
-          <td class="paramtype">char *buff </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>buff</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char **bufc </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>bufc</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *fargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>fargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1861,8 +1831,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="abb01b28acd9894809de7ddde99994586" name="abb01b28acd9894809de7ddde99994586"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb01b28acd9894809de7ddde99994586">&#9670;&#160;</a></span>fun_right()</h2>
+<a id="ad0125c2990d47ea7b87134b1b9a935d5" name="ad0125c2990d47ea7b87134b1b9a935d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0125c2990d47ea7b87134b1b9a935d5">&#9670;&#160;</a></span>fun_right()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1880,17 +1850,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1900,17 +1870,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1933,8 +1903,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a8ab29e34d3471369aab6b56ac4369b3e" name="a8ab29e34d3471369aab6b56ac4369b3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8ab29e34d3471369aab6b56ac4369b3e">&#9670;&#160;</a></span>fun_rjust()</h2>
+<a id="a529776dd1a48d3a9c3da802f3bcc5d9e" name="a529776dd1a48d3a9c3da802f3bcc5d9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a529776dd1a48d3a9c3da802f3bcc5d9e">&#9670;&#160;</a></span>fun_rjust()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1952,17 +1922,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1977,12 +1947,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2013,8 +1983,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a9c5866c8e2a5dc7de21b3fc23366f84e" name="a9c5866c8e2a5dc7de21b3fc23366f84e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c5866c8e2a5dc7de21b3fc23366f84e">&#9670;&#160;</a></span>fun_secure()</h2>
+<a id="ae1554236f4064d0428bee0b8f9777c37" name="ae1554236f4064d0428bee0b8f9777c37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1554236f4064d0428bee0b8f9777c37">&#9670;&#160;</a></span>fun_secure()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2032,17 +2002,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2052,17 +2022,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2085,8 +2055,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="adb8275483dd7f3e7030a44fdabb9453e" name="adb8275483dd7f3e7030a44fdabb9453e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb8275483dd7f3e7030a44fdabb9453e">&#9670;&#160;</a></span>fun_space()</h2>
+<a id="a8071c269e3040e7086d3b08f7561fd7d" name="a8071c269e3040e7086d3b08f7561fd7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8071c269e3040e7086d3b08f7561fd7d">&#9670;&#160;</a></span>fun_space()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2104,17 +2074,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2124,17 +2094,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2234,8 +2204,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a674a17c89c113f6ed7b6f16795bd34ee" name="a674a17c89c113f6ed7b6f16795bd34ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a674a17c89c113f6ed7b6f16795bd34ee">&#9670;&#160;</a></span>fun_streq()</h2>
+<a id="a6788ed20cc8776db8abf8ee5acf25b1d" name="a6788ed20cc8776db8abf8ee5acf25b1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6788ed20cc8776db8abf8ee5acf25b1d">&#9670;&#160;</a></span>fun_streq()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2253,17 +2223,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2273,17 +2243,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2379,8 +2349,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a56cfc502764f4db1d1974cd30aaee107" name="a56cfc502764f4db1d1974cd30aaee107"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56cfc502764f4db1d1974cd30aaee107">&#9670;&#160;</a></span>fun_strmatch()</h2>
+<a id="a399e609f367867c89dfb72137fd86df0" name="a399e609f367867c89dfb72137fd86df0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a399e609f367867c89dfb72137fd86df0">&#9670;&#160;</a></span>fun_strmatch()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2398,17 +2368,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2418,17 +2388,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2527,8 +2497,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
 
 </div>
 </div>
-<a id="a31fe6795d8884b0f1d862907790ffab4" name="a31fe6795d8884b0f1d862907790ffab4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31fe6795d8884b0f1d862907790ffab4">&#9670;&#160;</a></span>fun_ucstr()</h2>
+<a id="a4f69bd421f2a8521d29dcf5c7525166f" name="a4f69bd421f2a8521d29dcf5c7525166f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f69bd421f2a8521d29dcf5c7525166f">&#9670;&#160;</a></span>fun_ucstr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2546,17 +2516,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref player </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>player</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref caller </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>caller</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">dbref cause </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">dbref</td>          <td class="paramname"><span class="paramname"><em>cause</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2566,17 +2536,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>fun_beep</b> (char *b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int nfargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nfargs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *cargs[]</td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused), </td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>cargs</em></span>[], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int ncargs </td>          <td class="paramname"><span class="paramname"><em>__attribute__</em></span>(unused)&#160;)</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ncargs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

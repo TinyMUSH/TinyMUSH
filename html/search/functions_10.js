@@ -25,9 +25,7 @@ var searchData=
   ['string_5fcompare_22',['string_compare',['../string__util_8c.html#afb6d7c8c2f40e28942fd60c35054915b',1,'string_util.c']]],
   ['string_5fmatch_23',['string_match',['../string__util_8c.html#a3189f6fc705ab76f9e18d2f9a1a46e1f',1,'string_util.c']]],
   ['string_5fprefix_24',['string_prefix',['../string__util_8c.html#af96d5924e7f236d5628f9ce77f8edb67',1,'string_util.c']]],
-  ['strip_5f24bit_25',['strip_24bit',['../string__ansi_8c.html#a0956358017b3ed7b51e734a99104db10',1,'string_ansi.c']]],
-  ['strip_5fansi_26',['strip_ansi',['../string__ansi_8c.html#a7464d90ae1acb37dd803284f3586b795',1,'string_ansi.c']]],
-  ['strip_5fansi_5flen_27',['strip_ansi_len',['../string__ansi_8c.html#aea1db255d5adf4ab375252c9144ba714',1,'string_ansi.c']]],
-  ['strip_5fxterm_28',['strip_xterm',['../string__ansi_8c.html#a90ad101d06cc90f7c4a60471a6fd645f',1,'string_ansi.c']]],
-  ['swap_29',['swap',['../funlist_8c.html#a3e1023fafb1c56822364d806974b4a1d',1,'funlist.c']]]
+  ['strip_5fansi_25',['strip_ansi',['../string__ansi_8c.html#a7464d90ae1acb37dd803284f3586b795',1,'string_ansi.c']]],
+  ['strip_5fansi_5flen_26',['strip_ansi_len',['../string__ansi_8c.html#aea1db255d5adf4ab375252c9144ba714',1,'string_ansi.c']]],
+  ['swap_27',['swap',['../funlist_8c.html#a3e1023fafb1c56822364d806974b4a1d',1,'funlist.c']]]
 ];

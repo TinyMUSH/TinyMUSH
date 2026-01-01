@@ -205,15 +205,42 @@ Functions</h2></td></tr>
 <tr class="memitem:ad914d89313fd7b6468491ab89e57e0ee" id="r_ad914d89313fd7b6468491ab89e57e0ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad914d89313fd7b6468491ab89e57e0ee">ansi_parse_embedded_sequences</a> (const char *input, <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences)</td></tr>
 <tr class="memdesc:ad914d89313fd7b6468491ab89e57e0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses embedded ANSI sequences in a string marked with 'x<code>'. </code> <br /></td></tr>
 <tr class="separator:ad914d89313fd7b6468491ab89e57e0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3983ef63f9724bc8ddcce48cc8b4da44" id="r_a3983ef63f9724bc8ddcce48cc8b4da44"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3983ef63f9724bc8ddcce48cc8b4da44">ansi_apply_sequences</a> (const <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences, ColorType color_type)</td></tr>
-<tr class="memdesc:a3983ef63f9724bc8ddcce48cc8b4da44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies ANSI escape sequences to the plain text based on parsed sequences.  <br /></td></tr>
-<tr class="separator:a3983ef63f9724bc8ddcce48cc8b4da44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10019119f7dc128e9848f4e04b6ce4f1" id="r_a10019119f7dc128e9848f4e04b6ce4f1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10019119f7dc128e9848f4e04b6ce4f1">ansi_parse_single_x_code</a> (char **input_ptr, <a class="el" href="structColorState.html">ColorState</a> *color_out, bool *current_highlight)</td></tr>
+<tr class="memdesc:a10019119f7dc128e9848f4e04b6ce4f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a single x color code from the current position.  <br /></td></tr>
+<tr class="separator:a10019119f7dc128e9848f4e04b6ce4f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4447edd53423a6ecc0a63320eafd3279" id="r_a4447edd53423a6ecc0a63320eafd3279"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4447edd53423a6ecc0a63320eafd3279">ansi_parse_ansi_to_sequences</a> (const char *input, <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences)</td></tr>
 <tr class="memdesc:a4447edd53423a6ecc0a63320eafd3279"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a string with ANSI escape sequences and converts it to a <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a>.  <br /></td></tr>
 <tr class="separator:a4447edd53423a6ecc0a63320eafd3279"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e2b7eeadccad8cb05c05b266470266c" id="r_a4e2b7eeadccad8cb05c05b266470266c"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e2b7eeadccad8cb05c05b266470266c">ansi_sequences_to_embedded</a> (const <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences)</td></tr>
-<tr class="memdesc:a4e2b7eeadccad8cb05c05b266470266c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a> back to a string with embedded mushcode.  <br /></td></tr>
-<tr class="separator:a4e2b7eeadccad8cb05c05b266470266c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94d0aa911d32eef8396b50b0680588e8" id="r_a94d0aa911d32eef8396b50b0680588e8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94d0aa911d32eef8396b50b0680588e8">color_state_to_mush_code</a> (const <a class="el" href="structColorState.html">ColorState</a> *color)</td></tr>
+<tr class="memdesc:a94d0aa911d32eef8396b50b0680588e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a mushcode string from a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>.  <br /></td></tr>
+<tr class="separator:a94d0aa911d32eef8396b50b0680588e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1de5e3964b9254739c4d69c548ff327" id="r_af1de5e3964b9254739c4d69c548ff327"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1de5e3964b9254739c4d69c548ff327">color_state_to_letters</a> (const <a class="el" href="structColorState.html">ColorState</a> *color)</td></tr>
+<tr class="memdesc:af1de5e3964b9254739c4d69c548ff327"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a letter code string from a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>.  <br /></td></tr>
+<tr class="separator:af1de5e3964b9254739c4d69c548ff327"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f2dfc1be1e8498eede545d0f5f3da3d" id="r_a6f2dfc1be1e8498eede545d0f5f3da3d"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f2dfc1be1e8498eede545d0f5f3da3d">color_state_to_escape</a> (const <a class="el" href="structColorState.html">ColorState</a> *color, ColorType type)</td></tr>
+<tr class="memdesc:a6f2dfc1be1e8498eede545d0f5f3da3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> to an ANSI escape sequence string.  <br /></td></tr>
+<tr class="separator:a6f2dfc1be1e8498eede545d0f5f3da3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a287dfc7f24bd306f6a627a9cec89d06e" id="r_a287dfc7f24bd306f6a627a9cec89d06e"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a287dfc7f24bd306f6a627a9cec89d06e">ansi_parse_x_to_sequence</a> (char **ptr, ColorType type)</td></tr>
+<tr class="memdesc:a287dfc7f24bd306f6a627a9cec89d06e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a x color code and generates the corresponding ANSI escape sequence.  <br /></td></tr>
+<tr class="separator:a287dfc7f24bd306f6a627a9cec89d06e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10dfbb563532866525801626d470654a" id="r_a10dfbb563532866525801626d470654a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10dfbb563532866525801626d470654a">ansi_char_to_sequence</a> (int ch)</td></tr>
+<tr class="memdesc:a10dfbb563532866525801626d470654a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x?) to ansi sequence. Replacement for the ansiChar lookup table using colorDefinitions.  <br /></td></tr>
+<tr class="separator:a10dfbb563532866525801626d470654a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a485875ebf5bbab9e634e0f1420b6251b" id="r_a485875ebf5bbab9e634e0f1420b6251b"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a485875ebf5bbab9e634e0f1420b6251b">ansi_char_bright_to_sequence</a> (int ch)</td></tr>
+<tr class="memdesc:a485875ebf5bbab9e634e0f1420b6251b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code (x? uppercase) to bright ansi sequence. Replacement for the ansiChar_Bright lookup table using colorDefinitions.  <br /></td></tr>
+<tr class="separator:a485875ebf5bbab9e634e0f1420b6251b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d695364d336b94905b4f2089ef1efc5" id="r_a0d695364d336b94905b4f2089ef1efc5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d695364d336b94905b4f2089ef1efc5">ansi_char_to_num</a> (int ch)</td></tr>
+<tr class="memdesc:a0d695364d336b94905b4f2089ef1efc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert ansi character code to numeric values. Replacement for the ansiNum lookup table using colorDefinitions.  <br /></td></tr>
+<tr class="separator:a0d695364d336b94905b4f2089ef1efc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af16d1df9b55cf32a2f0260918137c3fc" id="r_af16d1df9b55cf32a2f0260918137c3fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structColorState.html">ColorState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af16d1df9b55cf32a2f0260918137c3fc">ansi_packed_to_colorstate</a> (int packed)</td></tr>
+<tr class="memdesc:af16d1df9b55cf32a2f0260918137c3fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert packed ANSI state to <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure.  <br /></td></tr>
+<tr class="separator:af16d1df9b55cf32a2f0260918137c3fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad27c83243c0056b19d7418d376b90baf" id="r_ad27c83243c0056b19d7418d376b90baf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad27c83243c0056b19d7418d376b90baf">ansi_colorstate_to_packed</a> (<a class="el" href="structColorState.html">ColorState</a> state)</td></tr>
+<tr class="memdesc:ad27c83243c0056b19d7418d376b90baf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure to packed ANSI state.  <br /></td></tr>
+<tr class="separator:ad27c83243c0056b19d7418d376b90baf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a326bd8e19a69c35941bd1c1a0f395718" id="r_a326bd8e19a69c35941bd1c1a0f395718"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structColorState.html">ColorState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a326bd8e19a69c35941bd1c1a0f395718">ansi_parse_sequence</a> (const char **ansi_ptr)</td></tr>
+<tr class="memdesc:a326bd8e19a69c35941bd1c1a0f395718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse ANSI escape sequence and return <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>.  <br /></td></tr>
+<tr class="separator:a326bd8e19a69c35941bd1c1a0f395718"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -227,36 +254,81 @@ Variables</h2></td></tr>
 <dl class="section version"><dt>Version</dt><dd>4.0</dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 1989-2025 TinyMUSH development team. You may distribute under the terms the Artistic License, as specified in the COPYING file. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a3983ef63f9724bc8ddcce48cc8b4da44" name="a3983ef63f9724bc8ddcce48cc8b4da44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3983ef63f9724bc8ddcce48cc8b4da44">&#9670;&#160;</a></span>ansi_apply_sequences()</h2>
+<a id="a485875ebf5bbab9e634e0f1420b6251b" name="a485875ebf5bbab9e634e0f1420b6251b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a485875ebf5bbab9e634e0f1420b6251b">&#9670;&#160;</a></span>ansi_char_bright_to_sequence()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char * ansi_apply_sequences </td>
+          <td class="memname">const char * ansi_char_bright_to_sequence </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structColorSequence.html">ColorSequence</a> *</td>          <td class="paramname"><span class="paramname"><em>sequences</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype">ColorType</td>          <td class="paramname"><span class="paramname"><em>color_type</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Applies ANSI escape sequences to the plain text based on parsed sequences. </p>
-<p>Inserts ANSI escape sequences at the positions specified in the <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a> into the plain text.</p>
+<p>Convert ansi character code (x? uppercase) to bright ansi sequence. Replacement for the ansiChar_Bright lookup table using colorDefinitions. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sequences</td><td>The <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a> with positions and colors. </td></tr>
-    <tr><td class="paramname">color_type</td><td>The type of ANSI sequences to generate (ANSI, XTerm, TrueColor, or None for plain text). </td></tr>
+    <tr><td class="paramname">ch</td><td>Character to convert (should match lowercase versions) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with ANSI sequences applied, or NULL on error.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The caller is responsible for freeing the returned string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>const char* Bright ANSI sequence or empty string if not found </dd></dl>
+
+</div>
+</div>
+<a id="a0d695364d336b94905b4f2089ef1efc5" name="a0d695364d336b94905b4f2089ef1efc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d695364d336b94905b4f2089ef1efc5">&#9670;&#160;</a></span>ansi_char_to_num()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ansi_char_to_num </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert ansi character code to numeric values. Replacement for the ansiNum lookup table using colorDefinitions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ch</td><td>ANSI character </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>int ANSI numeric value or 0 if not found </dd></dl>
+
+</div>
+</div>
+<a id="a10dfbb563532866525801626d470654a" name="a10dfbb563532866525801626d470654a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10dfbb563532866525801626d470654a">&#9670;&#160;</a></span>ansi_char_to_sequence()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char * ansi_char_to_sequence </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>ch</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert ansi character code (x?) to ansi sequence. Replacement for the ansiChar lookup table using colorDefinitions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ch</td><td>Character to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>const char* ANSI sequence or empty string if not found </dd></dl>
 
 </div>
 </div>
@@ -289,6 +361,32 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The CIEDE2000 distance (smaller = more similar). </dd></dl>
+
+</div>
+</div>
+<a id="ad27c83243c0056b19d7418d376b90baf" name="ad27c83243c0056b19d7418d376b90baf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad27c83243c0056b19d7418d376b90baf">&#9670;&#160;</a></span>ansi_colorstate_to_packed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ansi_colorstate_to_packed </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structColorState.html">ColorState</a></td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure to packed ANSI state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td><a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure to convert </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Packed ANSI state value </dd></dl>
 
 </div>
 </div>
@@ -473,6 +571,32 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af16d1df9b55cf32a2f0260918137c3fc" name="af16d1df9b55cf32a2f0260918137c3fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af16d1df9b55cf32a2f0260918137c3fc">&#9670;&#160;</a></span>ansi_packed_to_colorstate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structColorState.html">ColorState</a> ansi_packed_to_colorstate </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>packed</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert packed ANSI state to <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">packed</td><td>Packed ANSI state value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure representing the ANSI state </dd></dl>
+
+</div>
+</div>
 <a id="a4447edd53423a6ecc0a63320eafd3279" name="a4447edd53423a6ecc0a63320eafd3279"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4447edd53423a6ecc0a63320eafd3279">&#9670;&#160;</a></span>ansi_parse_ansi_to_sequences()</h2>
 
@@ -578,6 +702,110 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a326bd8e19a69c35941bd1c1a0f395718" name="a326bd8e19a69c35941bd1c1a0f395718"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a326bd8e19a69c35941bd1c1a0f395718">&#9670;&#160;</a></span>ansi_parse_sequence()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structColorState.html">ColorState</a> ansi_parse_sequence </td>
+          <td>(</td>
+          <td class="paramtype">const char **</td>          <td class="paramname"><span class="paramname"><em>ansi_ptr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parse ANSI escape sequence and return <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ansi_ptr</td><td>Pointer to string pointer, will be advanced past the parsed sequence </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> Parsed color state </dd></dl>
+
+</div>
+</div>
+<a id="a10019119f7dc128e9848f4e04b6ce4f1" name="a10019119f7dc128e9848f4e04b6ce4f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10019119f7dc128e9848f4e04b6ce4f1">&#9670;&#160;</a></span>ansi_parse_single_x_code()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ansi_parse_single_x_code </td>
+          <td>(</td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>input_ptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structColorState.html">ColorState</a> *</td>          <td class="paramname"><span class="paramname"><em>color_out</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>current_highlight</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parses a single x color code from the current position. </p>
+<p>This function is designed for incremental parsing in <a class="el" href="eval_8c.html#aa8b1b12892bbf3fb39d1e11e646fdfb7" title="Execute commands.">eval_expression_string()</a>. It parses one color code starting at *input_ptr and advances the pointer past the consumed characters.</p>
+<p>Supported formats:</p><ul>
+<li>Bracketed: x&lt;color&gt;, x&lt;color/bgcolor&gt;, x+&lt;color&gt;</li>
+<li>Non-bracketed: xr, xh, xn, etc.</li>
+<li>Combined: x&lt;red&gt;/&lt;blue&gt;</li>
+</ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_ptr</td><td>Pointer to pointer to current position (after "%x"). Updated on success. </td></tr>
+    <tr><td class="paramname">color_out</td><td>Output <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structure. Must be initialized by caller. </td></tr>
+    <tr><td class="paramname">current_highlight</td><td>Pointer to persistent highlight state tracker. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of characters consumed (&gt;0) on success, 0 if invalid or no code found.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The caller must initialize color_out before calling (typically zero it). </dd>
+<dd>
+The input_ptr is only advanced on successful parsing. </dd></dl>
+
+</div>
+</div>
+<a id="a287dfc7f24bd306f6a627a9cec89d06e" name="a287dfc7f24bd306f6a627a9cec89d06e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a287dfc7f24bd306f6a627a9cec89d06e">&#9670;&#160;</a></span>ansi_parse_x_to_sequence()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * ansi_parse_x_to_sequence </td>
+          <td>(</td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>ptr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ColorType</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Parses a x color code and generates the corresponding ANSI escape sequence. </p>
+<p>Parses a color code starting from x, advances the pointer, and generates the ANSI sequence based on the specified color type (ANSI, XTerm, TrueColor).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ptr</td><td>Pointer to the string pointer (advanced after parsing). </td></tr>
+    <tr><td class="paramname">type</td><td>The color type to generate the sequence for. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with the ANSI escape sequence, or NULL on error. </dd></dl>
+
+</div>
+</div>
 <a id="aedbc240c83b027a81456f399edee9606" name="aedbc240c83b027a81456f399edee9606"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aedbc240c83b027a81456f399edee9606">&#9670;&#160;</a></span>ansi_rgb_to_cielab()</h2>
 
@@ -605,33 +833,86 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a4e2b7eeadccad8cb05c05b266470266c" name="a4e2b7eeadccad8cb05c05b266470266c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e2b7eeadccad8cb05c05b266470266c">&#9670;&#160;</a></span>ansi_sequences_to_embedded()</h2>
+<a id="a6f2dfc1be1e8498eede545d0f5f3da3d" name="a6f2dfc1be1e8498eede545d0f5f3da3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f2dfc1be1e8498eede545d0f5f3da3d">&#9670;&#160;</a></span>color_state_to_escape()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char * ansi_sequences_to_embedded </td>
+          <td class="memname">char * color_state_to_escape </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structColorSequence.html">ColorSequence</a> *</td>          <td class="paramname"><span class="paramname"><em>sequences</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="structColorState.html">ColorState</a> *</td>          <td class="paramname"><span class="paramname"><em>color</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ColorType</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Convert a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> to an ANSI escape sequence string. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">color</td><td>The <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> to convert </td></tr>
+    <tr><td class="paramname">type</td><td>The ColorType to use for the sequence </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>char* Allocated string containing the ANSI escape sequence, or NULL on failure </dd></dl>
+
+</div>
+</div>
+<a id="af1de5e3964b9254739c4d69c548ff327" name="af1de5e3964b9254739c4d69c548ff327"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1de5e3964b9254739c4d69c548ff327">&#9670;&#160;</a></span>color_state_to_letters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * color_state_to_letters </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structColorState.html">ColorState</a> *</td>          <td class="paramname"><span class="paramname"><em>color</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Converts a <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a> back to a string with embedded mushcode. </p>
-<p>This function takes plain text and a <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a>, and inserts x<code> at the positions where colors change, generating the embedded mushcode string.</code></p>
-<p><code></p><dl class="params"><dt>Parameters</dt><dd>
+<p>Generates a letter code string from a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sequences</td><td>The <a class="el" href="structColorSequence.html" title="Parsed color sequence information.">ColorSequence</a> with color changes. </td></tr>
-    <tr><td class="paramname">plain_text</td><td>The plain text without colors. </td></tr>
+    <tr><td class="paramname">color</td><td>The color state. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with embedded x<code>, or NULL on error.</code></dd></dl>
-<dl class="section note"><dt>Note</dt><dd><code> The caller is responsible for freeing the returned string. </code></dd></dl>
-<p></code></p>
+<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with the letter codes, or NULL on error. </dd></dl>
+
+</div>
+</div>
+<a id="a94d0aa911d32eef8396b50b0680588e8" name="a94d0aa911d32eef8396b50b0680588e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94d0aa911d32eef8396b50b0680588e8">&#9670;&#160;</a></span>color_state_to_mush_code()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * color_state_to_mush_code </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structColorState.html">ColorState</a> *</td>          <td class="paramname"><span class="paramname"><em>color</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generates a mushcode string from a <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">color</td><td>The color state. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with the mushcode, or NULL on error. </dd></dl>
 
 </div>
 </div>

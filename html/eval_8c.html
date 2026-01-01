@@ -106,6 +106,7 @@ $(function(){ initResizable(false); });
 <code>#include &quot;<a class="el" href="macros_8h_source.html">macros.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="externs_8h_source.html">externs.h</a>&quot;</code><br />
 <code>#include &quot;prototypes.h&quot;</code><br />
+<code>#include &quot;ansi.h&quot;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;ctype.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
@@ -114,46 +115,52 @@ Include dependency graph for eval.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="eval_8c__incl.png" border="0" usemap="#asrc_2netmush_2eval_8c" alt=""/></div>
 <map name="asrc_2netmush_2eval_8c" id="asrc_2netmush_2eval_8c">
-<area shape="rect" title="Expression parsing, evaluation, and command/function argument processing." alt="" coords="459,5,591,31"/>
-<area shape="rect" title=" " alt="" coords="104,79,170,105"/>
-<area shape="poly" title=" " alt="" coords="459,32,336,52,185,81,184,76,335,47,459,27"/>
-<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="194,79,282,105"/>
-<area shape="poly" title=" " alt="" coords="477,34,298,78,297,73,476,29"/>
-<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="414,153,494,178"/>
-<area shape="poly" title=" " alt="" coords="522,33,469,140,464,137,517,30"/>
-<area shape="rect" title=" " alt="" coords="620,226,694,252"/>
-<area shape="poly" title=" " alt="" coords="530,31,538,65,553,103,594,165,636,213,632,217,589,168,548,106,533,66,524,32"/>
-<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="562,79,637,105"/>
-<area shape="poly" title=" " alt="" coords="540,30,578,66,575,70,536,33"/>
-<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="660,79,734,105"/>
-<area shape="poly" title=" " alt="" coords="555,29,655,70,653,75,553,34"/>
-<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="306,79,397,105"/>
-<area shape="poly" title=" " alt="" coords="497,34,396,75,394,70,495,29"/>
-<area shape="rect" title=" " alt="" coords="758,79,820,105"/>
-<area shape="poly" title=" " alt="" coords="571,29,743,75,742,81,569,34"/>
-<area shape="rect" title=" " alt="" coords="844,79,907,105"/>
-<area shape="poly" title=" " alt="" coords="592,28,829,76,828,81,591,34"/>
-<area shape="rect" title=" " alt="" coords="5,153,61,178"/>
-<area shape="poly" title=" " alt="" coords="204,108,76,152,74,147,203,103"/>
-<area shape="rect" title=" " alt="" coords="533,226,597,252"/>
-<area shape="poly" title=" " alt="" coords="475,177,535,215,532,220,472,181"/>
-<area shape="rect" title=" " alt="" coords="370,226,429,252"/>
-<area shape="poly" title=" " alt="" coords="447,180,420,216,416,212,443,177"/>
-<area shape="poly" title=" " alt="" coords="490,176,609,218,607,223,488,181"/>
-<area shape="rect" title=" " alt="" coords="453,226,509,252"/>
-<area shape="poly" title=" " alt="" coords="461,178,474,211,469,213,456,179"/>
-<area shape="rect" title=" " alt="" coords="157,226,237,252"/>
-<area shape="poly" title=" " alt="" coords="414,181,253,225,251,220,413,176"/>
-<area shape="rect" title=" " alt="" coords="262,226,346,252"/>
-<area shape="poly" title=" " alt="" coords="430,181,344,222,342,217,428,176"/>
-<area shape="poly" title=" " alt="" coords="371,103,426,141,423,146,368,107"/>
-<area shape="poly" title=" " alt="" coords="358,104,393,211,388,212,353,106"/>
-<area shape="poly" title=" " alt="" coords="341,107,223,218,219,214,337,103"/>
-<area shape="poly" title=" " alt="" coords="350,106,315,212,310,211,345,104"/>
-<area shape="rect" title=" " alt="" coords="84,153,147,178"/>
-<area shape="poly" title=" " alt="" coords="312,108,162,153,161,148,311,103"/>
-<area shape="rect" title=" " alt="" coords="171,153,239,178"/>
-<area shape="poly" title=" " alt="" coords="328,108,245,148,243,143,326,103"/>
+<area shape="rect" title="Expression parsing, evaluation, and command/function argument processing." alt="" coords="319,5,450,31"/>
+<area shape="rect" title=" " alt="" coords="5,79,71,105"/>
+<area shape="poly" title=" " alt="" coords="319,34,86,81,85,76,318,29"/>
+<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
+<area shape="poly" title=" " alt="" coords="344,34,196,77,195,72,342,29"/>
+<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="308,153,389,178"/>
+<area shape="poly" title=" " alt="" coords="384,32,371,80,357,138,352,137,366,78,379,31"/>
+<area shape="rect" title=" " alt="" coords="169,226,243,252"/>
+<area shape="poly" title=" " alt="" coords="377,33,227,216,223,213,373,30"/>
+<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="496,79,570,105"/>
+<area shape="poly" title=" " alt="" coords="411,29,495,69,492,74,409,34"/>
+<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="593,79,667,105"/>
+<area shape="poly" title=" " alt="" coords="427,29,579,73,578,78,426,34"/>
+<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="380,79,472,105"/>
+<area shape="poly" title=" " alt="" coords="394,30,414,64,409,67,389,33"/>
+<area shape="rect" href="ansi_8h_source.html" title=" " alt="" coords="178,153,234,178"/>
+<area shape="poly" title=" " alt="" coords="341,34,297,53,254,81,232,109,217,139,213,137,228,106,251,77,294,48,339,29"/>
+<area shape="rect" title=" " alt="" coords="691,79,753,105"/>
+<area shape="poly" title=" " alt="" coords="451,29,676,76,675,81,450,34"/>
+<area shape="rect" title=" " alt="" coords="777,79,840,105"/>
+<area shape="poly" title=" " alt="" coords="451,25,590,45,762,76,761,81,590,51,451,30"/>
+<area shape="rect" title=" " alt="" coords="98,153,154,178"/>
+<area shape="poly" title=" " alt="" coords="140,105,134,138,128,137,135,104"/>
+<area shape="rect" title=" " alt="" coords="266,226,330,252"/>
+<area shape="poly" title=" " alt="" coords="342,180,317,215,313,212,338,177"/>
+<area shape="rect" title=" " alt="" coords="562,226,621,252"/>
+<area shape="poly" title=" " alt="" coords="390,176,548,222,546,227,389,181"/>
+<area shape="poly" title=" " alt="" coords="326,181,245,221,243,217,323,176"/>
+<area shape="rect" title=" " alt="" coords="354,226,410,252"/>
+<area shape="poly" title=" " alt="" coords="357,177,372,211,367,213,352,180"/>
+<area shape="rect" title=" " alt="" coords="654,226,734,252"/>
+<area shape="poly" title=" " alt="" coords="390,173,639,224,638,229,389,178"/>
+<area shape="rect" title=" " alt="" coords="434,226,519,252"/>
+<area shape="poly" title=" " alt="" coords="372,177,443,216,440,221,369,181"/>
+<area shape="poly" title=" " alt="" coords="415,107,375,144,371,140,411,103"/>
+<area shape="poly" title=" " alt="" coords="473,101,569,126,609,139,631,151,637,168,635,185,616,216,612,213,630,183,632,168,627,154,607,144,567,131,471,106"/>
+<area shape="poly" title=" " alt="" coords="472,101,579,126,626,140,652,151,675,179,689,211,684,213,671,182,648,155,624,145,578,132,471,106"/>
+<area shape="poly" title=" " alt="" coords="432,104,454,177,467,211,462,213,449,179,426,106"/>
+<area shape="rect" title=" " alt="" coords="463,153,525,178"/>
+<area shape="poly" title=" " alt="" coords="439,103,474,140,470,143,435,107"/>
+<area shape="rect" title=" " alt="" coords="550,153,617,178"/>
+<area shape="poly" title=" " alt="" coords="454,103,544,143,542,148,452,108"/>
+<area shape="poly" title=" " alt="" coords="223,177,272,215,269,219,220,181"/>
+<area shape="poly" title=" " alt="" coords="209,179,209,211,203,211,203,179"/>
+<area shape="rect" title=" " alt="" coords="78,226,145,252"/>
+<area shape="poly" title=" " alt="" coords="192,181,141,219,138,215,188,177"/>
 </map>
 </div>
 </div><table class="memberdecls">
@@ -328,17 +335,13 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>tcache_count</b></td><
 <p>Blank</p>
 <p>c is last command executed</p>
 <p>c is color</p>
-<p>ANSI color</p>
-<dl class="section note"><dt>Note</dt><dd>There is an interesting bug/misfeature in the implementation of v? and q? &ndash; if the second character is garbage or non-existent, it and the leading v or q gets eaten. In the interests of not changing the old behavior, this is not getting "fixed", but in this case, where moving the pointer back without exiting on an error condition ends up turning things black, the behavior must by necessity be different. So we do break out of the switch.</dd></dl>
-<p>just skip over the characters</p>
-<p>Xterm colors</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo</a></b></dt><dd>Fix bugs and streamline implementation</dd></dl>
-<p>We are dealing with background</p>
-<p>We are dealing with foreground</p>
-<p>Ok we got a color to process</p>
-<p>Ran off the end. Back up.</p>
-<p>Now we have the color string... Time to handle it</p>
-<p>Shall we continue?</p>
+<p>ANSI color - Use centralized parsing from <a class="el" href="ansi_8c.html" title="ANSI terminal control helpers and telnet negotiation support.">ansi.c</a></p>
+<p>End of string after x - back up and break</p>
+<p>ANSI colors disabled - skip the code</p>
+<p>Parse the color code using <a class="el" href="ansi_8c.html#a10019119f7dc128e9848f4e04b6ce4f1" title="Parses a single x color code from the current position.">ansi_parse_single_x_code()</a> This handles all formats: &lt;color&gt;, &lt;fg/bg&gt;, +&lt;color&gt;, simple letters, etc.</p>
+<p>Successfully parsed a color code - generate ANSI escape sequence Determine color type based on player capabilities</p>
+<p>dstr has already been advanced by <a class="el" href="ansi_8c.html#a10019119f7dc128e9848f4e04b6ce4f1" title="Parses a single x color code from the current position.">ansi_parse_single_x_code()</a>, compensate for the (*dstr)++ that will happen at the end of the switch</p>
+<p>Failed to parse - copy the character literally This maintains backward compatibility for invalid codes</p>
 <p>Ran off the end. Back up.</p>
 <p>x-variable</p>
 <p>Check for _&lt;varname&gt;</p>

@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['logfiletable_0',['logfiletable',['../structlogfiletable.html',1,'']]],
-  ['logindata_1',['logindata',['../structlogindata.html',1,'']]]
+  ['levelansicontext_0',['LevelAnsiContext',['../structLevelAnsiContext.html',1,'']]],
+  ['levelansistreamcontext_1',['LevelAnsiStreamContext',['../structLevelAnsiStreamContext.html',1,'']]],
+  ['logfiletable_2',['logfiletable',['../structlogfiletable.html',1,'']]],
+  ['logindata_3',['logindata',['../structlogindata.html',1,'']]]
 ];

@@ -48,12 +48,15 @@ var searchData=
   ['check_5fuserdef_5faccess_45',['check_userdef_access',['../command_8c.html#acbb2dabdbaf350030b44590e2128960b',1,'command.c']]],
   ['check_5fzone_46',['check_zone',['../db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594',1,'db.c']]],
   ['close_5fsockets_47',['close_sockets',['../bsd_8c.html#a82bb50e183cc30bbb2d13b75b51aec4b',1,'bsd.c']]],
-  ['commer_48',['Commer',['../db_8c.html#a13b6d190b28a3c181368d6b97c6183fb',1,'db.c']]],
-  ['connmessages_49',['connMessages',['../bsd_8c.html#adddea5b90f37f8e4d967d609c7463500',1,'bsd.c']]],
-  ['connreasons_50',['connReasons',['../bsd_8c.html#af396c975333b684dab35b6802a856f43',1,'bsd.c']]],
-  ['convert_5fflags_51',['convert_flags',['../flags_8c.html#adbd784dfc76734416697bcf76b3a61ff',1,'flags.c']]],
-  ['copy_5fesccode_52',['copy_esccode',['../string__ansi_8c.html#ae7386d146453d3709627334d65ffe158',1,'string_ansi.c']]],
-  ['countwords_53',['countwords',['../fnhelper_8c.html#ac071f133fec26286f0be1e92592ee0ab',1,'fnhelper.c']]],
-  ['crec_5fcomp_54',['crec_comp',['../funlist_8c.html#a1b3f1fe5799b3c0ffd500f3846208074',1,'funlist.c']]],
-  ['cvtfun_55',['cvtfun',['../funmath_8c.html#a5f1c5a5d2006b37956b8961c3acbb89e',1,'funmath.c']]]
+  ['color_5fstate_5fto_5fescape_48',['color_state_to_escape',['../ansi_8c.html#a6f2dfc1be1e8498eede545d0f5f3da3d',1,'ansi.c']]],
+  ['color_5fstate_5fto_5fletters_49',['color_state_to_letters',['../ansi_8c.html#af1de5e3964b9254739c4d69c548ff327',1,'ansi.c']]],
+  ['color_5fstate_5fto_5fmush_5fcode_50',['color_state_to_mush_code',['../ansi_8c.html#a94d0aa911d32eef8396b50b0680588e8',1,'ansi.c']]],
+  ['commer_51',['Commer',['../db_8c.html#a13b6d190b28a3c181368d6b97c6183fb',1,'db.c']]],
+  ['connmessages_52',['connMessages',['../bsd_8c.html#adddea5b90f37f8e4d967d609c7463500',1,'bsd.c']]],
+  ['connreasons_53',['connReasons',['../bsd_8c.html#af396c975333b684dab35b6802a856f43',1,'bsd.c']]],
+  ['convert_5fflags_54',['convert_flags',['../flags_8c.html#adbd784dfc76734416697bcf76b3a61ff',1,'flags.c']]],
+  ['copy_5fesccode_55',['copy_esccode',['../string__ansi_8c.html#ae7386d146453d3709627334d65ffe158',1,'string_ansi.c']]],
+  ['countwords_56',['countwords',['../fnhelper_8c.html#ac071f133fec26286f0be1e92592ee0ab',1,'fnhelper.c']]],
+  ['crec_5fcomp_57',['crec_comp',['../funlist_8c.html#a1b3f1fe5799b3c0ffd500f3846208074',1,'funlist.c']]],
+  ['cvtfun_58',['cvtfun',['../funmath_8c.html#a5f1c5a5d2006b37956b8961c3acbb89e',1,'funmath.c']]]
 ];

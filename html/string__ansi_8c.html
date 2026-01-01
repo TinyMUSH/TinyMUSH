@@ -90,6 +90,7 @@ $(function(){ initResizable(false); });
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">string_ansi.c File Reference</div></div>
@@ -104,6 +105,7 @@ $(function(){ initResizable(false); });
 <code>#include &quot;<a class="el" href="macros_8h_source.html">macros.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="externs_8h_source.html">externs.h</a>&quot;</code><br />
 <code>#include &quot;prototypes.h&quot;</code><br />
+<code>#include &quot;ansi.h&quot;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;ctype.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
@@ -112,49 +114,63 @@ Include dependency graph for string_ansi.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="string__ansi_8c__incl.png" border="0" usemap="#asrc_2netmush_2string__ansi_8c" alt=""/></div>
 <map name="asrc_2netmush_2string__ansi_8c" id="asrc_2netmush_2string__ansi_8c">
-<area shape="rect" title="ANSI color and escape sequence handling utilities." alt="" coords="460,5,590,46"/>
-<area shape="rect" title=" " alt="" coords="104,94,170,120"/>
-<area shape="poly" title=" " alt="" coords="460,41,185,96,184,91,459,36"/>
-<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="194,94,282,120"/>
-<area shape="poly" title=" " alt="" coords="461,47,298,92,297,87,459,42"/>
-<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="414,168,494,193"/>
-<area shape="poly" title=" " alt="" coords="518,47,469,154,464,152,514,45"/>
-<area shape="rect" title=" " alt="" coords="620,241,694,267"/>
-<area shape="poly" title=" " alt="" coords="531,46,538,81,553,119,571,150,593,180,636,228,632,232,589,183,567,153,548,121,533,82,525,47"/>
-<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="562,94,637,120"/>
-<area shape="poly" title=" " alt="" coords="545,45,580,81,576,84,542,48"/>
-<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="660,94,734,120"/>
-<area shape="poly" title=" " alt="" coords="569,44,658,85,656,90,567,49"/>
-<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="306,94,397,120"/>
-<area shape="poly" title=" " alt="" coords="483,49,393,90,391,85,481,44"/>
-<area shape="rect" title=" " alt="" coords="758,94,820,120"/>
-<area shape="poly" title=" " alt="" coords="591,44,743,89,742,94,589,49"/>
-<area shape="rect" title=" " alt="" coords="844,94,907,120"/>
-<area shape="poly" title=" " alt="" coords="590,38,830,91,828,96,589,43"/>
-<area shape="rect" title=" " alt="" coords="5,168,61,193"/>
-<area shape="poly" title=" " alt="" coords="204,123,76,167,74,162,203,118"/>
-<area shape="rect" title=" " alt="" coords="533,241,597,267"/>
-<area shape="poly" title=" " alt="" coords="475,192,535,230,532,235,472,196"/>
-<area shape="rect" title=" " alt="" coords="370,241,429,267"/>
-<area shape="poly" title=" " alt="" coords="447,195,420,231,416,227,443,192"/>
-<area shape="poly" title=" " alt="" coords="490,191,609,233,607,238,488,196"/>
-<area shape="rect" title=" " alt="" coords="453,241,509,267"/>
-<area shape="poly" title=" " alt="" coords="461,193,474,226,469,228,456,194"/>
-<area shape="rect" title=" " alt="" coords="157,241,237,267"/>
-<area shape="poly" title=" " alt="" coords="414,196,253,240,251,235,413,191"/>
-<area shape="rect" title=" " alt="" coords="262,241,346,267"/>
-<area shape="poly" title=" " alt="" coords="430,196,344,237,342,232,428,191"/>
-<area shape="poly" title=" " alt="" coords="371,118,426,156,423,161,368,122"/>
-<area shape="poly" title=" " alt="" coords="358,119,393,226,388,227,353,121"/>
-<area shape="poly" title=" " alt="" coords="341,122,223,233,219,229,337,118"/>
-<area shape="poly" title=" " alt="" coords="350,121,315,227,310,226,345,119"/>
-<area shape="rect" title=" " alt="" coords="84,168,147,193"/>
-<area shape="poly" title=" " alt="" coords="312,123,162,168,161,163,311,118"/>
-<area shape="rect" title=" " alt="" coords="171,168,239,193"/>
-<area shape="poly" title=" " alt="" coords="328,123,245,163,243,158,326,118"/>
+<area shape="rect" title="ANSI color and escape sequence handling utilities." alt="" coords="320,5,449,46"/>
+<area shape="rect" title=" " alt="" coords="5,94,71,120"/>
+<area shape="poly" title=" " alt="" coords="320,43,87,96,85,91,319,38"/>
+<area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,94,184,120"/>
+<area shape="poly" title=" " alt="" coords="324,49,193,91,191,86,323,44"/>
+<area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="308,168,389,193"/>
+<area shape="poly" title=" " alt="" coords="383,47,371,95,358,153,352,152,366,93,377,46"/>
+<area shape="rect" title=" " alt="" coords="169,241,243,267"/>
+<area shape="poly" title=" " alt="" coords="371,48,227,231,223,227,367,45"/>
+<area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="496,94,570,120"/>
+<area shape="poly" title=" " alt="" coords="423,44,498,84,496,89,420,49"/>
+<area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="593,94,667,120"/>
+<area shape="poly" title=" " alt="" coords="447,44,579,86,577,91,445,49"/>
+<area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="380,94,472,120"/>
+<area shape="poly" title=" " alt="" coords="397,45,415,79,410,81,393,48"/>
+<area shape="rect" href="ansi_8h_source.html" title=" " alt="" coords="178,168,234,193"/>
+<area shape="poly" title=" " alt="" coords="330,49,291,69,255,96,233,125,218,155,213,152,228,122,251,92,288,64,327,44"/>
+<area shape="rect" title=" " alt="" coords="691,94,753,120"/>
+<area shape="poly" title=" " alt="" coords="450,38,676,91,675,96,449,44"/>
+<area shape="rect" title=" " alt="" coords="777,94,840,120"/>
+<area shape="poly" title=" " alt="" coords="450,34,590,57,762,91,761,96,589,63,449,39"/>
+<area shape="rect" title=" " alt="" coords="98,168,154,193"/>
+<area shape="poly" title=" " alt="" coords="140,120,134,153,128,152,135,119"/>
+<area shape="rect" title=" " alt="" coords="266,241,330,267"/>
+<area shape="poly" title=" " alt="" coords="342,195,317,230,313,227,338,192"/>
+<area shape="rect" title=" " alt="" coords="562,241,621,267"/>
+<area shape="poly" title=" " alt="" coords="390,191,548,237,546,242,389,196"/>
+<area shape="poly" title=" " alt="" coords="326,196,245,236,243,232,323,191"/>
+<area shape="rect" title=" " alt="" coords="354,241,410,267"/>
+<area shape="poly" title=" " alt="" coords="357,192,372,226,367,228,352,195"/>
+<area shape="rect" title=" " alt="" coords="654,241,734,267"/>
+<area shape="poly" title=" " alt="" coords="390,188,639,239,638,244,389,193"/>
+<area shape="rect" title=" " alt="" coords="434,241,519,267"/>
+<area shape="poly" title=" " alt="" coords="372,192,443,231,440,236,369,196"/>
+<area shape="poly" title=" " alt="" coords="415,122,375,159,371,155,411,118"/>
+<area shape="poly" title=" " alt="" coords="473,116,569,141,609,154,631,166,637,183,635,200,616,231,612,228,630,198,632,183,627,169,607,159,567,146,471,121"/>
+<area shape="poly" title=" " alt="" coords="472,116,579,141,626,155,652,166,675,194,689,226,684,228,671,197,648,170,624,160,578,147,471,121"/>
+<area shape="poly" title=" " alt="" coords="432,119,454,192,467,226,462,228,449,194,426,121"/>
+<area shape="rect" title=" " alt="" coords="463,168,525,193"/>
+<area shape="poly" title=" " alt="" coords="439,118,474,155,470,158,435,122"/>
+<area shape="rect" title=" " alt="" coords="550,168,617,193"/>
+<area shape="poly" title=" " alt="" coords="454,118,544,158,542,163,452,123"/>
+<area shape="poly" title=" " alt="" coords="223,192,272,230,269,234,220,196"/>
+<area shape="poly" title=" " alt="" coords="209,194,209,226,203,226,203,194"/>
+<area shape="rect" title=" " alt="" coords="78,241,145,267"/>
+<area shape="poly" title=" " alt="" coords="192,196,141,234,138,230,188,192"/>
 </map>
 </div>
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLevelAnsiContext.html">LevelAnsiContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Context structure for level_ansi buffer management.  <a href="structLevelAnsiContext.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLevelAnsiStreamContext.html">LevelAnsiStreamContext</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a6b85d53b1d76e442c97b0a017e381d35" id="r_a6b85d53b1d76e442c97b0a017e381d35"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b85d53b1d76e442c97b0a017e381d35">CHECK_BUFFER_SPACE</a>(needed)</td></tr>
@@ -194,12 +210,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a7464d90ae1acb37dd803284f3586b795" id="r_a7464d90ae1acb37dd803284f3586b795"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7464d90ae1acb37dd803284f3586b795">strip_ansi</a> (const char *s)</td></tr>
 <tr class="memdesc:a7464d90ae1acb37dd803284f3586b795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove ANSI escape codes from a string.  <br /></td></tr>
 <tr class="separator:a7464d90ae1acb37dd803284f3586b795"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90ad101d06cc90f7c4a60471a6fd645f" id="r_a90ad101d06cc90f7c4a60471a6fd645f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90ad101d06cc90f7c4a60471a6fd645f">strip_xterm</a> (char *s)</td></tr>
-<tr class="memdesc:a90ad101d06cc90f7c4a60471a6fd645f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove xterm color escape codes from a string.  <br /></td></tr>
-<tr class="separator:a90ad101d06cc90f7c4a60471a6fd645f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0956358017b3ed7b51e734a99104db10" id="r_a0956358017b3ed7b51e734a99104db10"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0956358017b3ed7b51e734a99104db10">strip_24bit</a> (char *s)</td></tr>
-<tr class="memdesc:a0956358017b3ed7b51e734a99104db10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove 24-bit color escape codes from a string.  <br /></td></tr>
-<tr class="separator:a0956358017b3ed7b51e734a99104db10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea1db255d5adf4ab375252c9144ba714" id="r_aea1db255d5adf4ab375252c9144ba714"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aea1db255d5adf4ab375252c9144ba714">strip_ansi_len</a> (const char *s)</td></tr>
 <tr class="memdesc:aea1db255d5adf4ab375252c9144ba714"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count visible characters (ignoring ANSI escape codes)  <br /></td></tr>
 <tr class="separator:aea1db255d5adf4ab375252c9144ba714"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -227,9 +237,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a93a7ad5dc247fe32daea75ae4b5b4ff3" id="r_a93a7ad5dc247fe32daea75ae4b5b4ff3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93a7ad5dc247fe32daea75ae4b5b4ff3">safe_copy_esccode</a> (char **s, char *buff, char **bufc)</td></tr>
 <tr class="memdesc:a93a7ad5dc247fe32daea75ae4b5b4ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safely copy a single ANSI escape sequence into a bounded buffer.  <br /></td></tr>
 <tr class="separator:a93a7ad5dc247fe32daea75ae4b5b4ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a291922bbc383badf03b65e647c407215" id="r_a291922bbc383badf03b65e647c407215"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a291922bbc383badf03b65e647c407215">track_ansi_letters</a> (char *t, int *ansi_state)</td></tr>
-<tr class="memdesc:a291922bbc383badf03b65e647c407215"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update ANSI state from mushcode letters.  <br /></td></tr>
-<tr class="separator:a291922bbc383badf03b65e647c407215"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a860915ab1e4fa7b3525b4ef1e18dd4ea" id="r_a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a860915ab1e4fa7b3525b4ef1e18dd4ea">remap_colors</a> (const char *s, int *cmap)</td></tr>
 <tr class="memdesc:a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remap ANSI color indices according to a color map.  <br /></td></tr>
 <tr class="separator:a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -931,33 +938,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0956358017b3ed7b51e734a99104db10" name="a0956358017b3ed7b51e734a99104db10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0956358017b3ed7b51e734a99104db10">&#9670;&#160;</a></span>strip_24bit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char * strip_24bit </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Remove 24-bit color escape codes from a string. </p>
-<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>The input string </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>char* New string without 24-bit color codes (newly allocated) </dd></dl>
-
-</div>
-</div>
 <a id="a7464d90ae1acb37dd803284f3586b795" name="a7464d90ae1acb37dd803284f3586b795"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7464d90ae1acb37dd803284f3586b795">&#9670;&#160;</a></span>strip_ansi()</h2>
 
@@ -1008,63 +988,6 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int Number of non-escape characters </dd></dl>
-
-</div>
-</div>
-<a id="a90ad101d06cc90f7c4a60471a6fd645f" name="a90ad101d06cc90f7c4a60471a6fd645f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90ad101d06cc90f7c4a60471a6fd645f">&#9670;&#160;</a></span>strip_xterm()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char * strip_xterm </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Remove xterm color escape codes from a string. </p>
-<p>Caller is responsible for freeing the returned buffer with XFREE().</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>The input string </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>char* New string without xterm color codes (newly allocated) </dd></dl>
-
-</div>
-</div>
-<a id="a291922bbc383badf03b65e647c407215" name="a291922bbc383badf03b65e647c407215"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a291922bbc383badf03b65e647c407215">&#9670;&#160;</a></span>track_ansi_letters()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void track_ansi_letters </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>ansi_state</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Update ANSI state from mushcode letters. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">t</td><td>Mushcode letter sequence to parse </td></tr>
-    <tr><td class="paramname">ansi_state</td><td>In/out ANSI state to update </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

@@ -204,13 +204,17 @@ Build for Development</h2>
 <div class="line">ninja</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md29"></a>
 Running Tests</h2>
-<div class="fragment"><div class="line"># Build and install</div>
+<div class="fragment"><div class="line"># Setup Python virtual environment (only needed once)</div>
+<div class="line">./setup_venv.sh</div>
+<div class="line"> </div>
+<div class="line"># Build and install</div>
 <div class="line">cd build</div>
 <div class="line">cmake --build . --target install-upgrade</div>
 <div class="line"> </div>
 <div class="line"># Run regression tests</div>
 <div class="line">cd ../scripts</div>
-<div class="line">python3 regression_test.py</div>
+<div class="line">source ../venv/bin/activate</div>
+<div class="line">TINY_USER=&quot;#1&quot; TINY_PASS=&quot;potrzebie&quot; python3 regression_test.py</div>
 </div><!-- fragment --><h1><a class="anchor" id="autotoc_md30"></a>
 Code Guidelines</h1>
 <h2><a class="anchor" id="autotoc_md31"></a>
