@@ -160,7 +160,9 @@ int ansi_colorstate_to_packed(ColorState state);
 int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
 bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences);
 ColorState ansi_parse_sequence(const char **ansi_ptr);
+int ansi_parse_single_x_code(char **input_ptr, ColorState *color_out, bool *current_highlight);
 
+char *ansi_parse_x_to_sequence(char **ptr, ColorType type);
 char *color_state_to_mush_code(const ColorState *color);
 char *color_state_to_letters(const ColorState *color);
 char *color_state_to_escape(const ColorState *color, ColorType type);

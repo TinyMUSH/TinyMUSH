@@ -168,6 +168,11 @@ def main() -> None:
     if args.verbose:
         print("[login]\n" + login_resp.strip())
 
+    # Activate ANSI colors for testing
+    ansi_resp = send_cmd(tn, "@set me=ANSI", TIMEOUT, args.delay)
+    if args.verbose:
+        print("[set ANSI]\n" + ansi_resp.strip())
+
     commands = []
     skipped_disconnect = []
     for cmd, expected in commands_with_expectations:

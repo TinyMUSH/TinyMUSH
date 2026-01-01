@@ -17,6 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "ansi.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -848,7 +849,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 	int at_space = 1, nfargs = 0, gender = -1, i = 0, j = 0, alldone = 0, aflags = 0, alen = 0, feval = 0;
 	int is_trace = Trace(player) && !(eval & EV_NOTRACE), is_top = 0, save_count = 0;
 	int ansi = 0, nchar = 0, navail = 0;
-	int hilite_mode = 0;  /*!< Track hilite/bright mode for color codes */
+	bool hilite_mode = false;  /*!< Track hilite/bright mode for color codes */
 	FUN *fp = NULL;
 	UFUN *ufp = NULL;
 	VARENT *xvar = NULL;
@@ -1130,194 +1131,84 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			 */
 			case 'x':
 			case 'X':
-				/**
-				 * ANSI color
-				 *
-				 */
-				(*dstr)++;
+			/**
+			 * ANSI color - Use centralized parsing from ansi.c
+			 */
+			(*dstr)++;
 
-				if (!**dstr)
+			if (!**dstr)
+			{
+				/**
+				 * End of string after %x - back up and break
+				 */
+				(*dstr)--;
+				break;
+			}
+
+			if (!mushconf.ansi_colors)
+			{
+				/**
+				 * ANSI colors disabled - skip the code
+				 */
+				break;
+			}
+
+			/**
+			 * Parse the color code using ansi_parse_single_x_code()
+			 * This handles all formats: <color>, <fg/bg>, +<color>, simple letters, etc.
+			 */
+			{
+				ColorState color = {0};
+				int consumed = ansi_parse_single_x_code(dstr, &color, &hilite_mode);
+
+				if (consumed > 0)
 				{
 					/**
-					 * @note There is an interesting bug/misfeature in the
-					 * implementation of %v? and %q? -- if the second character
-					 * is garbage or non-existent, it and the leading v or q
-					 * gets eaten. In the interests of not changing the old
-					 * behavior, this is not getting "fixed", but in this case,
-					 * where moving the pointer back without exiting on an
-					 * error condition ends up turning things black, the
-					 * behavior must by necessity be different. So we do break
-					 * out of the switch.
-					 *
+					 * Successfully parsed a color code - generate ANSI escape sequence
+					 * Determine color type based on player capabilities
+					 */
+					ColorType color_type = ColorTypeNone;
+					
+					if (player != NOTHING && Color24Bit(player))
+					{
+						color_type = ColorTypeTrueColor;
+					}
+					else if (player != NOTHING && Color256(player))
+					{
+						color_type = ColorTypeXTerm;
+					}
+					else if (player != NOTHING && Ansi(player))
+					{
+						color_type = ColorTypeAnsi;
+					}
+					
+					char ansi_buf[256];
+					size_t ansi_offset = 0;
+					ColorStatus result = to_ansi_escape_sequence(ansi_buf, sizeof(ansi_buf), &ansi_offset, &color, color_type);
+
+					if (result != ColorStatusNone)
+					{
+						XSAFELBSTR(ansi_buf, buff, bufc);
+						ansi = (result == ColorStatusReset) ? 0 : 1;
+					}
+
+					/**
+					 * dstr has already been advanced by ansi_parse_single_x_code(),
+					 * compensate for the (*dstr)++ that will happen at the end of the switch
 					 */
 					(*dstr)--;
-					break;
 				}
-
-				if (!mushconf.ansi_colors)
+				else
 				{
 					/**
-					 * just skip over the characters
+					 * Failed to parse - copy the character literally
+					 * This maintains backward compatibility for invalid codes
 					 */
-					break;
-				}
-
-				if (**dstr == '<' || **dstr == '/')
-				{
-					/**
-					 * Xterm colors
-					 *
-					 * @todo Fix bugs and streamline implementation
-					 *
-					 */
-
-					int xterm_isbg = 0;
-
-					while (1)
-					{
-						if (**dstr == '/')
-						{
-							/**
-							 * We are dealing with background
-							 *
-							 */
-							xptr = *dstr;
-							(*dstr)++;
-
-							if (!**dstr)
-							{
-								*dstr = xptr;
-								break;
-							}
-							else
-							{
-								xterm_isbg = 1;
-							}
-						}
-						else
-						{
-							/**
-							 * We are dealing with foreground
-							 *
-							 */
-							xterm_isbg = 0;
-						}
-
-						if (**dstr == '<')
-						{
-							/**
-							 * Ok we got a color to process
-							 *
-							 */
-							xptr = *dstr;
-							(*dstr)++;
-
-							if (!**dstr)
-							{
-								*dstr = xptr;
-								break;
-							}
-
-							xtp = xtbuf;
-
-							while (**dstr && (**dstr != '>'))
-							{
-								XSAFESBCHR(**dstr, xtbuf, &xtp);
-								(*dstr)++;
-							}
-
-							if (**dstr != '>')
-							{
-								/**
-								 * Ran off the end. Back up.
-								 *
-								 */
-								*dstr = xptr;
-								break;
-							}
-
-							*xtp = '\0';
-							/**
-							 * Now we have the color string... Time to handle it
-							 *
-							 */
-							i = str2xterm(xtbuf);
-
-							if (xterm_isbg)
-							{
-								XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_BG, i, ANSI_END);
-							}
-							else
-							{
-								XSNPRINTF(xtbuf, SBUF_SIZE, "%s%d%c", ANSI_XTERM_FG, i, ANSI_END);
-							}
-
-							XSAFELBSTR(xtbuf, buff, bufc);
-							ansi = 1;
-						}
-						else
-						{
-							break;
-						}
-
-						/**
-						 * Shall we continue?
-						 *
-						 */
-						xptr = *dstr;
-						(*dstr)++;
-
-						if (**dstr != '<' && **dstr != '/')
-						{
-							*dstr = xptr;
-							break;
-						}
-					}
-
-					break;
-				}
-
-				if (!ansiChar((unsigned char)**dstr))
-				{
 					XSAFELBCHR(**dstr, buff, bufc);
 				}
-				else
-				{
-				// Track hilite/bright mode
-				if (**dstr == 'h')
-				{
-					hilite_mode = 1;
-				}
-				else if (**dstr == 'n')
-				{
-					hilite_mode = 0;
-				}
-				
-				// Use bright variant of color codes when hilite_mode is active
-				if (hilite_mode && (**dstr != 'h' && **dstr != 'n' && **dstr != 'f' && **dstr != 'u' && **dstr != 'i'))
-				{
-					const char *bright_code = ansiChar_Bright((unsigned char)**dstr);
-					if (*bright_code)
-					{
-						XSAFELBSTR(bright_code, buff, bufc);
-					}
-					else
-					{
-						XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
-					}
-				}
-				else
-				{
-					XSAFELBSTR(ansiChar((unsigned char)**dstr), buff, bufc);
-				}
-				ansi = (**dstr == 'n') ? 0 : 1;
 			}
 
 			break;
-
-		case '=':
-		        // Equivalent of generic v() attr get
-		        (*dstr)++;
 
 				if (**dstr != '<')
 				{

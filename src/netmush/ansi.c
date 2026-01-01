@@ -376,6 +376,7 @@ bool ansi_get_color_from_text(ColorState *color, char *text, bool is_background)
             // Try to parse as #RRGGBB
             if (sscanf(token[0] + 1, "%2hhx%2hhx%2hhx", &rgb.r, &rgb.g, &rgb.b) == 3)
             {
+                fprintf(stderr, "DEBUG: parsed #%02x%02x%02x from '%s'\n", rgb.r, rgb.g, rgb.b, token[0]);
                 ansi_get_color_from_rgb(color, rgb, is_background);
                 success = true;
             }
@@ -1172,6 +1173,167 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
 }
 
 /**
+ * @brief Parses a single %x color code from the current position.
+ *
+ * This function is designed for incremental parsing in eval_expression_string().
+ * It parses one color code starting at *input_ptr and advances the pointer past
+ * the consumed characters.
+ *
+ * Supported formats:
+ * - Bracketed: %x<color>, %x<color/bgcolor>, %x+<color>
+ * - Non-bracketed: %xr, %xh, %xn, etc.
+ * - Combined: %x<red>/<blue>
+ *
+ * @param input_ptr Pointer to pointer to current position (after "%x"). Updated on success.
+ * @param color_out Output ColorState structure. Must be initialized by caller.
+ * @param current_highlight Pointer to persistent highlight state tracker.
+ * @return Number of characters consumed (>0) on success, 0 if invalid or no code found.
+ *
+ * @note The caller must initialize color_out before calling (typically zero it).
+ * @note The input_ptr is only advanced on successful parsing.
+ */
+int ansi_parse_single_x_code(char **input_ptr, ColorState *color_out, bool *current_highlight)
+{
+    if (!input_ptr || !*input_ptr || !color_out)
+        return 0;
+
+    char *start = *input_ptr;
+    char *pos = start;
+    size_t code_len = 0;
+
+    // Detect if bracketed (<...> or +<...>) or plain letter code
+    bool is_bracketed = (*pos == '<' || *pos == '+');
+
+    if (is_bracketed)
+    {
+        // Bracketed format: read until closing '>' or end
+        char *bracket_start = pos;
+        size_t bracket_depth = 0;
+
+        // Find the end of the first bracketed part
+        while (*pos)
+        {
+            if (*pos == '<')
+                bracket_depth++;
+            else if (*pos == '>')
+            {
+                if (bracket_depth > 0)
+                    bracket_depth--;
+                if (bracket_depth == 0)
+                {
+                    pos++; // include closing '>'
+                    break;
+                }
+            }
+            pos++;
+        }
+
+        // Check for '/' separator for background color
+        if (*pos == '/')
+        {
+            pos++; // skip '/'
+            // Read second part (may be bracketed or not)
+            if (*pos == '<' || *pos == '+')
+            {
+                // Second part is bracketed
+                bracket_depth = 0;
+                while (*pos)
+                {
+                    if (*pos == '<')
+                        bracket_depth++;
+                    else if (*pos == '>')
+                    {
+                        if (bracket_depth > 0)
+                            bracket_depth--;
+                        if (bracket_depth == 0)
+                        {
+                            pos++; // include closing '>'
+                            break;
+                        }
+                    }
+                    pos++;
+                }
+            }
+            else
+            {
+                // Second part is non-bracketed: read until space or special char
+                while (*pos && !isspace(*pos) && *pos != '%' && *pos != '<' && *pos != '>')
+                    pos++;
+            }
+        }
+
+        code_len = pos - start;
+    }
+    else
+    {
+        // Non-bracketed: For simple letter codes like 'r', 'g', 'h', etc.
+        // Read exactly ONE character
+        // MUSHcode standard: %xr, %xg, %xb, %xh, %xn are all single-char codes
+        if (*pos)
+        {
+            pos++;
+        }
+        code_len = pos - start;
+    }
+
+    if (code_len == 0)
+        return 0;
+
+    // Extract the code string
+    char *code_buf = XMALLOC(code_len + 1, "single_x_code");
+    if (!code_buf)
+        return 0;
+    XMEMCPY(code_buf, start, code_len);
+    code_buf[code_len] = '\0';
+
+    // Attempt to parse the color code
+    ColorState temp_color = {0};
+    bool parse_success = ansi_parse_color_from_string(&temp_color, code_buf, false);
+
+    if (parse_success)
+    {
+        // Check if the parsed color actually does something
+        bool has_effect = false;
+        if (temp_color.foreground.is_set == ColorStatusSet || temp_color.background.is_set == ColorStatusSet)
+            has_effect = true;
+        if (temp_color.reset == ColorStatusReset || temp_color.highlight != ColorStatusNone ||
+            temp_color.underline != ColorStatusNone || temp_color.flash != ColorStatusNone ||
+            temp_color.inverse != ColorStatusNone)
+            has_effect = true;
+
+        if (has_effect)
+        {
+            // Update persistent highlight state if provided
+            if (current_highlight)
+            {
+                if (temp_color.highlight == ColorStatusSet)
+                    *current_highlight = true;
+                else if (temp_color.highlight == ColorStatusReset)
+                    *current_highlight = false;
+                if (temp_color.reset == ColorStatusReset)
+                    *current_highlight = false;
+
+                // Apply persistent highlight to color changes
+                if ((temp_color.foreground.is_set == ColorStatusSet || temp_color.background.is_set == ColorStatusSet) &&
+                    temp_color.highlight == ColorStatusNone && *current_highlight)
+                {
+                    temp_color.highlight = ColorStatusSet;
+                }
+            }
+
+            *color_out = temp_color;
+            *input_ptr = pos; // Advance pointer
+            XFREE(code_buf);
+            return (int)code_len;
+        }
+    }
+
+    // Parsing failed or had no effect
+    XFREE(code_buf);
+    return 0;
+}
+
+/**
  * @brief Sets a color by ANSI index for foreground or background.
  *
  * @param state The color state to update.
@@ -1628,28 +1790,147 @@ char *color_state_to_letters(const ColorState *color)
 }
 
 /**
- * @brief Generates an escape sequence string from a ColorState.
+ * @brief Convert a ColorState to an ANSI escape sequence string.
  *
- * @param color The color state.
- * @param type The color type to use for the escape sequence.
- * @return A newly allocated string with the escape sequence, or NULL on error.
+ * @param color The ColorState to convert
+ * @param type The ColorType to use for the sequence
+ * @return char* Allocated string containing the ANSI escape sequence, or NULL on failure
  */
 char *color_state_to_escape(const ColorState *color, ColorType type)
 {
     char buffer[256];
     size_t offset = 0;
-
     if (to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, (ColorState *)color, type) == ColorStatusSet)
     {
-        char *result = XMALLOC(offset + 1, "result");
+        char *result = XMALLOC(offset + 1, "escape");
         if (result) {
-            memcpy(result, buffer, offset);
+            XMEMCPY(result, buffer, offset);
             result[offset] = '\0';
         }
         return result;
     }
+    return NULL;
+}
 
-    return XMALLOC(1, "result"); // Return empty string
+/**
+ * @brief Parses a %x color code and generates the corresponding ANSI escape sequence.
+ *
+ * Parses a color code starting from %x, advances the pointer, and generates the ANSI sequence
+ * based on the specified color type (ANSI, XTerm, TrueColor).
+ *
+ * @param ptr Pointer to the string pointer (advanced after parsing).
+ * @param type The color type to generate the sequence for.
+ * @return A newly allocated string with the ANSI escape sequence, or NULL on error.
+ */
+char *ansi_parse_x_to_sequence(char **ptr, ColorType type)
+{
+    if (!ptr || !*ptr)
+        return NULL;
+
+    // No need to check for %x prefix since caller already did that
+    // *ptr should point to the character after %x
+
+    {
+        FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+        if (debug_file) {
+            fprintf(debug_file, "DEBUG: ansi_parse_x_to_sequence called with ptr='%s'\n", *ptr);
+            fclose(debug_file);
+        }
+    }
+
+    ColorState color = {0};
+    bool parsed = false;
+
+    // Check for bracketed color <...>
+    if (**ptr == '<' || **ptr == '+')
+    {
+        char *start = *ptr;
+        (*ptr)++; // Skip < or +
+        if (**ptr == '<') {
+            (*ptr)++; // Skip second <
+        }
+
+        // Find the end >
+        while (**ptr && **ptr != '>')
+            (*ptr)++;
+        if (**ptr == '>')
+        {
+            size_t len = *ptr - start + 1; // Include the closing >
+            char *code = XMALLOC(len + 1, "code");
+            if (code) {
+                XMEMCPY(code, start, len);
+                code[len] = '\0';
+                {
+                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+                    if (debug_file) {
+                        fprintf(debug_file, "DEBUG: parsing color code: '%s'\n", code);
+                        fclose(debug_file);
+                    }
+                }
+                parsed = ansi_parse_color_from_string(&color, code, false);
+                {
+                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+                    if (debug_file) {
+                        fprintf(debug_file, "DEBUG: ansi_parse_color_from_string returned %d\n", parsed);
+                        fclose(debug_file);
+                    }
+                }
+                XFREE(code);
+            }
+            (*ptr)++; // Skip >
+        }
+        else
+        {
+            {
+                FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+                if (debug_file) {
+                    fprintf(debug_file, "DEBUG: no closing > found, ptr at: '%s'\n", *ptr);
+                    fclose(debug_file);
+                }
+            }
+            *ptr = start; // Reset on error
+        }
+    }
+    else
+    {
+        // Single character code
+        char code[2] = {**ptr, '\0'};
+        if (**ptr) {
+            parsed = ansi_parse_color_from_string(&color, code, false);
+            (*ptr)++;
+        }
+    }
+
+    if (parsed)
+    {
+        char buffer[256];
+        size_t offset = 0;
+        if (to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, &color, type) == ColorStatusSet)
+        {
+            {
+                FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+                if (debug_file) {
+                    fprintf(debug_file, "DEBUG: offset = %zu, buffer starts with: '%.*s'\n", offset, (int)offset > 10 ? 10 : (int)offset, buffer);
+                    fclose(debug_file);
+                }
+            }
+            char *result = XMALLOC(offset + 1, "sequence");
+            if (result) {
+                XMEMCPY(result, buffer, offset);
+                result[offset] = '\0';
+                {
+                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
+                    if (debug_file) {
+                        fprintf(debug_file, "DEBUG: generated sequence length: %zu, first 5 chars: %02x %02x %02x %02x %02x\n", strlen(result), (unsigned char)result[0], (unsigned char)result[1], (unsigned char)result[2], (unsigned char)result[3], (unsigned char)result[4]);
+                        fclose(debug_file);
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
+    return NULL;
 }
 
 /**
