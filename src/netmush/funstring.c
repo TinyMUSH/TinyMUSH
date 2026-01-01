@@ -2260,9 +2260,9 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player Not used
+ * @param player Executor (fallback for color capability)
  * @param caller Not used
- * @param cause Not used
+ * @param cause Enactor; color capability is taken from here when available
  * @param fargs Function's arguments
  * @param nfargs Not used
  * @param cargs Not used
@@ -2272,6 +2272,7 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
 	ColorState color_state = {0};
 	ColorType color_type = ColorTypeAnsi;
+	dbref color_target = (cause != NOTHING) ? cause : player; // Prefer enactor flags for ANSI selection
 	char escape_buffer[256];
 	size_t escape_offset = 0;
 
@@ -2290,15 +2291,15 @@ void fun_ansi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	// Déterminer le type de couleur supporté par le joueur
-	if (player != NOTHING && Color24Bit(player))
+	if (color_target != NOTHING && Color24Bit(color_target))
 	{
 		color_type = ColorTypeTrueColor;
 	}
-	else if (player != NOTHING && Color256(player))
+	else if (color_target != NOTHING && Color256(color_target))
 	{
 		color_type = ColorTypeXTerm;
 	}
-	else if (player != NOTHING && Ansi(player))
+	else if (color_target != NOTHING && Ansi(color_target))
 	{
 		color_type = ColorTypeAnsi; // Use basic ANSI instead of XTerm
 	}
@@ -3061,9 +3062,23 @@ void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	{
 		// Escape sequence format
 		ColorType color_type = ColorTypeAnsi;
-		if (player != NOTHING && Color24Bit(player))
+		dbref color_target = (cause != NOTHING) ? cause : player;
+
+		if (color_target != NOTHING && Color24Bit(color_target))
 		{
 			color_type = ColorTypeTrueColor;
+		}
+		else if (color_target != NOTHING && Color256(color_target))
+		{
+			color_type = ColorTypeXTerm;
+		}
+		else if (color_target != NOTHING && Ansi(color_target))
+		{
+			color_type = ColorTypeAnsi;
+		}
+		else
+		{
+			color_type = ColorTypeNone;
 		}
 		result = color_state_to_escape(&color_state, color_type);
 	}

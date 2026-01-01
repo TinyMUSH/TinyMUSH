@@ -1168,16 +1168,17 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					 * Determine color type based on player capabilities
 					 */
 					ColorType color_type = ColorTypeNone;
-					
-					if (player != NOTHING && Color24Bit(player))
+					dbref color_target = (cause != NOTHING) ? cause : player; // Prefer enactor/viewer flags for ANSI output
+
+					if (color_target != NOTHING && Color24Bit(color_target))
 					{
 						color_type = ColorTypeTrueColor;
 					}
-					else if (player != NOTHING && Color256(player))
+					else if (color_target != NOTHING && Color256(color_target))
 					{
 						color_type = ColorTypeXTerm;
 					}
-					else if (player != NOTHING && Ansi(player))
+					else if (color_target != NOTHING && Ansi(color_target))
 					{
 						color_type = ColorTypeAnsi;
 					}
