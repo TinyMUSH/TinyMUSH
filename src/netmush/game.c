@@ -152,6 +152,16 @@ void handlestartupflatfiles(int flag)
 			recover_flatfile(flat);
 
 				log_write(LOG_ALWAYS, "INI", "LOAD", "Recovery successfull");
+				
+				/* Rename the processed KILL/CRASH file with timestamp to avoid reuse */
+				if (copy_file(flat, flat_bak, 1) == 0)
+				{
+					log_write(LOG_ALWAYS, "INI", "LOAD", "Processed %s file archived as : %s", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"), flat_bak);
+				}
+				else
+				{
+					log_write(LOG_ALWAYS, "INI", "LOAD", "Unable to archive processed %s file", (flag == HANDLE_FLAT_CRASH ? "CRASH" : "KILL"));
+				}
 			}
 			else
 			{
