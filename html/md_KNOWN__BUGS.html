@@ -88,32 +88,32 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">Known Bugs in TinyMUSH</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md415"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md416"></a></p>
 <p>As of December 20, 2025, <b>no open critical bugs</b> are known. Recent fixes and status are tracked below for awareness.</p>
-<h1><a class="anchor" id="autotoc_md416"></a>
+<h1><a class="anchor" id="autotoc_md417"></a>
 Recently Fixed</h1>
-<h2><a class="anchor" id="autotoc_md417"></a>
+<h2><a class="anchor" id="autotoc_md418"></a>
 stack-safe writes in <code>fun_write()</code> (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 19, 2025)</li>
 <li><b>Scope:</b> <code><a class="el" href="alloc_8c.html" title="Tracked memory allocation, leak detection, and buffer safety helpers.">src/netmush/alloc.c</a></code> safe string helpers (<code>__xsafestrncpy</code>, <code>__xsafestrncat</code>)</li>
 <li><b>Impact:</b> Prevented stack buffer overflow when writing to untracked (stack) buffers, which previously could abort the server during <code>fun_write()</code> execution.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md418"></a>
+<h2><a class="anchor" id="autotoc_md419"></a>
 <code>sandbox()</code> SIGSEGV (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 19, 2025)</li>
 <li><b>Scope:</b> <code>handle_ucall()</code> in <code><a class="el" href="funvars_8c.html" title="Variable/stack/regexp built-ins and helpers for structured data manipulation.">src/netmush/funvars.c</a></code></li>
 <li><b>Impact:</b> Out-of-bounds access to <code>fargs[5]</code> with too few args and null <code>preserve</code> dereference when no registers were saved.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md419"></a>
+<h2><a class="anchor" id="autotoc_md420"></a>
 List operations crash (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 2025)</li>
 <li><b>Scope:</b> List operation functions (commit: "List ops crash fix + regression suite")</li>
 <li><b>Impact:</b> Crash in list ops corrected; regression suite added to prevent recurrence.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md420"></a>
+<h1><a class="anchor" id="autotoc_md421"></a>
 Test Coverage Notes</h1>
 <ul>
 <li>Structure lifecycle regression suite: 22/22 passing.</li>

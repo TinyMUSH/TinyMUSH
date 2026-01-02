@@ -1,0 +1,9 @@
+<map id="src/netmush/udb_backend.h" name="src/netmush/udb_backend.h">
+<area shape="rect" id="Node000001" title="Abstract database backend interface for GDBM and LMDB." alt="" coords="205,5,390,31"/>
+<area shape="rect" id="Node000002" href="$udb__backend_8c.html" title="Database backend dispatcher &#45; delegates operations to GDBM or LMDB." alt="" coords="5,79,190,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="250,39,132,81,131,76,248,34"/>
+<area shape="rect" id="Node000003" href="$udb__gdbm_8c.html" title="GDBM database backend implementation." alt="" coords="214,79,381,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="300,46,300,79,295,79,295,46"/>
+<area shape="rect" id="Node000004" href="$udb__lmdb_8c.html" title="LMDB database backend implementation." alt="" coords="405,79,568,105"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="344,34,455,76,454,81,343,39"/>
+</map>

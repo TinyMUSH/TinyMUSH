@@ -93,7 +93,7 @@ $(function(){ initResizable(false); });
 <h1><a class="anchor" id="autotoc_md379"></a>
 Quick Start</h1>
 <div class="fragment"><div class="line"># Install dependencies (Ubuntu/Debian)</div>
-<div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev</div>
+<div class="line">apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev</div>
 <div class="line"> </div>
 <div class="line"># Build and install</div>
 <div class="line">mkdir -p build &amp;&amp; cd build</div>
@@ -109,10 +109,10 @@ Quick Start</h1>
 Prerequisites</h1>
 <h2><a class="anchor" id="autotoc_md381"></a>
 Ubuntu/Debian</h2>
-<div class="fragment"><div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev</div>
+<div class="fragment"><div class="line">apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md382"></a>
 macOS (Homebrew)</h2>
-<div class="fragment"><div class="line">brew install cmake gdbm pcre2</div>
+<div class="fragment"><div class="line">brew install cmake lmdb gdbm pcre2</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md383"></a>
 Optional Tools</h2>
 <ul>
@@ -150,6 +150,17 @@ Build Process</h1>
 </ul>
 <h1><a class="anchor" id="autotoc_md388"></a>
 Build Options</h1>
+<h2><a class="anchor" id="autotoc_md389"></a>
+Database backend selection</h2>
+<ul>
+<li>LMDB (default):</li>
+</ul>
+<div class="fragment"><div class="line">cmake -DUSE_LMDB=ON -DUSE_GDBM=OFF ..</div>
+</div><!-- fragment --><ul>
+<li>GDBM (legacy/alternative):</li>
+</ul>
+<div class="fragment"><div class="line">cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..</div>
+</div><!-- fragment --><p>If you need to migrate an existing database, use the <code>dbconvert</code> utility (built in <code>src/netmush/</code>) to convert between GDBM and LMDB formats.</p>
 <p>Configure CMake with these options:</p>
 <div class="fragment"><div class="line">cmake -DCMAKE_BUILD_TYPE=Release \</div>
 <div class="line">      -DTINYMUSH_USE_CCACHE=ON \</div>
@@ -157,7 +168,7 @@ Build Options</h1>
 <div class="line">      -DTINYMUSH_PRESERVE_CONFIGS=ON \</div>
 <div class="line">      -DTINYMUSH_BACKUP_CONFIGS=ON \</div>
 <div class="line">      ..</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md389"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md390"></a>
 Available Options</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -171,14 +182,18 @@ Available Options</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>TINYMUSH_PRESERVE_CONFIGS</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Preserve existing config files during install    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>TINYMUSH_BACKUP_CONFIGS</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Backup configs before upgrading   </td></tr>
+<td class="markdownTableBodyNone"><code>TINYMUSH_BACKUP_CONFIGS</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Backup configs before upgrading    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>USE_LMDB</code>   </td><td class="markdownTableBodyNone"><code>ON</code>   </td><td class="markdownTableBodyNone">Build with LMDB backend (default)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>USE_GDBM</code>   </td><td class="markdownTableBodyNone"><code>OFF</code>   </td><td class="markdownTableBodyNone">Build with GDBM backend (alternative)   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md390"></a>
+<h2><a class="anchor" id="autotoc_md391"></a>
 Using Ninja (Faster Builds)</h2>
 <div class="fragment"><div class="line">cmake -G Ninja ..</div>
 <div class="line">ninja</div>
 <div class="line">ninja install-upgrade</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md391"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md392"></a>
 Module Configuration</h1>
 <p>Modules are enabled/disabled in <code>modules.cmake</code>:</p>
 <div class="fragment"><div class="line"># List modules here; enable by leaving uncommented, disable by prefixing with &#39;#&#39;</div>
@@ -192,21 +207,21 @@ Module Configuration</h1>
 <div class="fragment"><div class="line">module mail</div>
 <div class="line">module comsys</div>
 </div><!-- fragment --><p>See <a class="el" href="md_docs_2Code_2MODULES__DEVELOPMENT.html">docs/Code/MODULES_DEVELOPMENT.md</a> for module development.</p>
-<h1><a class="anchor" id="autotoc_md392"></a>
+<h1><a class="anchor" id="autotoc_md393"></a>
 Starting the Server</h1>
-<h2><a class="anchor" id="autotoc_md393"></a>
+<h2><a class="anchor" id="autotoc_md394"></a>
 Daemon Mode (Background)</h2>
 <p>By default, the server forks to background:</p>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line">./netmush</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md394"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md395"></a>
 Foreground Mode (Debug)</h2>
 <p>Use <code>-d</code> or <code>--debug</code> to prevent forking (useful for debugging):</p>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line">./netmush -d</div>
 <div class="line"># or</div>
 <div class="line">./netmush --debug</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md395"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md396"></a>
 Check Server Status</h2>
 <div class="fragment"><div class="line"># Check if running</div>
 <div class="line">ps aux | grep netmush</div>
@@ -216,7 +231,7 @@ Check Server Status</h2>
 <div class="line"> </div>
 <div class="line"># View logs</div>
 <div class="line">tail -f game/logs/netmush.log</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md396"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md397"></a>
 Initial Setup</h1>
 <p>After first start:</p>
 <ol type="1">
@@ -225,7 +240,7 @@ Initial Setup</h1>
 <li>Change password: <code>@password old=potrzebie, new=&lt;new_password&gt;</code></li>
 <li>Set up basic configuration via <code>@admin</code> commands</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md397"></a>
+<h1><a class="anchor" id="autotoc_md398"></a>
 Configuration Files</h1>
 <p>Located in <code>game/configs/</code>:</p>
 <ul>
@@ -234,16 +249,16 @@ Configuration Files</h1>
 <li><code>compat.conf</code> - Compatibility settings</li>
 </ul>
 <p>Edit these after installation, then <code>@restart</code> or restart the server.</p>
-<h1><a class="anchor" id="autotoc_md398"></a>
+<h1><a class="anchor" id="autotoc_md399"></a>
 Common Issues</h1>
-<h2><a class="anchor" id="autotoc_md399"></a>
+<h2><a class="anchor" id="autotoc_md400"></a>
 Build Errors</h2>
 <p><b>Missing dependencies:</b> </p><div class="fragment"><div class="line"># Verify installations</div>
 <div class="line">dpkg -l | grep -E &#39;cmake|gdbm|pcre|crypt&#39;</div>
 </div><!-- fragment --><p><b>CMake cache issues:</b> </p><div class="fragment"><div class="line">rm -rf build</div>
 <div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line">cmake ..</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md400"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md401"></a>
 Runtime Errors</h2>
 <p><b>Port already in use:</b></p><ul>
 <li>Change <code>port</code> in <code>netmush.conf</code></li>
@@ -257,9 +272,9 @@ Runtime Errors</h2>
 <li>Verify <code>.so</code> exists in <code>game/modules/</code></li>
 <li>Check logs: <code>tail game/logs/netmush.log</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md401"></a>
+<h1><a class="anchor" id="autotoc_md402"></a>
 Directory Structure</h1>
-<h2><a class="anchor" id="autotoc_md402"></a>
+<h2><a class="anchor" id="autotoc_md403"></a>
 Repository Layout</h2>
 <div class="fragment"><div class="line">TinyMUSH/</div>
 <div class="line">├── CMakeLists.txt          Main build configuration</div>
@@ -280,7 +295,7 @@ Repository Layout</h2>
 <div class="line">│   ├── Code/              Development documentation</div>
 <div class="line">│   └── Historical/        Legacy documentation</div>
 <div class="line">└── scripts/               Regression test suites</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md403"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md404"></a>
 Game Directory Layout (after install)</h2>
 <div class="fragment"><div class="line">game/</div>
 <div class="line">├── netmush                 Server executable</div>
@@ -296,9 +311,9 @@ Game Directory Layout (after install)</h2>
 <div class="line">├── modules/                Compiled module .so files</div>
 <div class="line">├── scripts/                Helper scripts</div>
 <div class="line">└── systemd/                systemd service file</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md404"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md405"></a>
 Backup and Recovery</h1>
-<h2><a class="anchor" id="autotoc_md405"></a>
+<h2><a class="anchor" id="autotoc_md406"></a>
 Manual Backup</h2>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line"># Backup database</div>
@@ -306,20 +321,20 @@ Manual Backup</h2>
 <div class="line"> </div>
 <div class="line"># Backup everything</div>
 <div class="line">tar czf backups/full-$(date +%Y%m%d-%H%M%S).tar.gz .</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md406"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md407"></a>
 Restore from Backup</h2>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line">tar xzf backups/db-&lt;timestamp&gt;.tar.gz</div>
 <div class="line">./netmush</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md407"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md408"></a>
 Automated Backups</h2>
 <p>Set up <code>@daily</code> in-game on God (#1):</p>
 <div class="fragment"><div class="line">@daily me = @dump/flatfile; @wait 5={@shutdown}</div>
 </div><!-- fragment --><p>Or use cron:</p>
 <div class="fragment"><div class="line">0 3 * * * cd /path/to/game &amp;&amp; ./netmush @dump/flatfile</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md408"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md409"></a>
 Upgrading</h1>
-<h2><a class="anchor" id="autotoc_md409"></a>
+<h2><a class="anchor" id="autotoc_md410"></a>
 From Previous Version</h2>
 <ol type="1">
 <li>Stop the server: <code>killall netmush</code></li>
@@ -329,12 +344,12 @@ From Previous Version</h2>
 <li>Review config changes in <code>game/configs/netmush.conf.example</code></li>
 <li>Restart: <code>cd game &amp;&amp; ./netmush</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md410"></a>
+<h2><a class="anchor" id="autotoc_md411"></a>
 Config Migration</h2>
 <p>Config backups are stored in <code>game/backups/upgrade-&lt;timestamp&gt;/</code>:</p>
 <div class="fragment"><div class="line"># Compare old and new configs</div>
 <div class="line">diff game/backups/upgrade-*/netmush.conf game/configs/netmush.conf</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md411"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md412"></a>
 Development Setup</h1>
 <p>For active development:</p>
 <div class="fragment"><div class="line"># Debug build</div>
@@ -352,7 +367,7 @@ Development Setup</h1>
 <div class="line">./netmush</div>
 <div class="line">EOF</div>
 <div class="line">chmod +x ../rebuild.sh</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md412"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md413"></a>
 Additional Resources</h1>
 <ul>
 <li><b>Main README</b>: <a class="el" href="md_README.html">README.md</a></li>
@@ -361,7 +376,7 @@ Additional Resources</h1>
 <li><b>Known Issues</b>: <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a></li>
 <li><b>Security</b>: <a class="el" href="md_SECURITY.html">SECURITY.md</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md413"></a>
+<h1><a class="anchor" id="autotoc_md414"></a>
 Support</h1>
 <p>For issues, questions, or contributions:</p>
 <ul>

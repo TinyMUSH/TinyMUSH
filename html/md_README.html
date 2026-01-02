@@ -113,14 +113,14 @@ $(function(){ initResizable(false); });
 <li>Contributing</li>
 <li>Support</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md422"></a>
+<h1><a class="anchor" id="autotoc_md424"></a>
 TinyMUSH 4</h1>
-<h2><a class="anchor" id="autotoc_md423"></a>
+<h2><a class="anchor" id="autotoc_md425"></a>
 Introduction</h2>
 <p><b>TinyMUSH 4</b> is a modern, actively maintained Multi-User Shared Hallucination (MUSH) server. It represents a comprehensive modernization of the TinyMUSH codebase, focusing on robustness, maintainability, and alignment with contemporary C standards.</p>
 <p>TinyMUSH 4 builds upon decades of MUSH development heritage while introducing significant architectural improvements, enhanced safety mechanisms, and a more flexible module system. Whether you're running a social roleplaying game, an educational environment, or a creative collaborative space, TinyMUSH 4 provides a solid, extensible foundation.</p>
 <p><b>Current Status:</b> Active development (Alpha)</p>
-<h2><a class="anchor" id="autotoc_md424"></a>
+<h2><a class="anchor" id="autotoc_md426"></a>
 What's New in TinyMUSH 4</h2>
 <ul>
 <li><b>Modern Build System</b>: CMake-based build with fast incremental compilation (ccache, LTO support)</li>
@@ -131,14 +131,14 @@ What's New in TinyMUSH 4</h2>
 <li><b>Code Modernization</b>: Aligned with modern C standards, cleaned up legacy code patterns</li>
 <li><b>Simplified Configuration</b>: Centralized module management, easier customization</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md425"></a>
+<h2><a class="anchor" id="autotoc_md427"></a>
 Quick Start</h2>
 <div class="fragment"><div class="line"># Clone repository</div>
 <div class="line">git clone https://github.com/TinyMUSH/TinyMUSH.git</div>
 <div class="line">cd TinyMUSH</div>
 <div class="line"> </div>
 <div class="line"># Install dependencies (Ubuntu/Debian)</div>
-<div class="line">apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev</div>
+<div class="line">apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev</div>
 <div class="line"> </div>
 <div class="line"># Build and install</div>
 <div class="line">mkdir -p build &amp;&amp; cd build</div>
@@ -151,19 +151,19 @@ Quick Start</h2>
 <div class="line"> </div>
 <div class="line"># Connect: telnet localhost 6250</div>
 <div class="line"># Login as God: connect #1 potrzebie</div>
-</div><!-- fragment --><p>See <a class="el" href="md_INSTALL.html">INSTALL.md</a> for comprehensive installation instructions.</p>
-<h2><a class="anchor" id="autotoc_md426"></a>
+</div><!-- fragment --><p>See <a class="el" href="md_INSTALL.html">INSTALL.md</a> for comprehensive installation instructions and backend selection (LMDB by default, GDBM optional). The <code>dbconvert</code> utility converts databases between formats.</p>
+<h2><a class="anchor" id="autotoc_md428"></a>
 Key Features</h2>
-<h3><a class="anchor" id="autotoc_md427"></a>
+<h3><a class="anchor" id="autotoc_md429"></a>
 Core Capabilities</h3>
 <ul>
 <li><b>Rich Softcode Language</b>: Powerful scripting with 200+ built-in functions</li>
 <li><b>Flexible Permissions</b>: Granular control with flags, powers, and locks</li>
-<li><b>Persistent Storage</b>: GDBM-backed database with automatic checkpointing</li>
+<li><b>Persistent Storage</b>: LMDB-backed database by default (GDBM optional) with automatic checkpointing</li>
 <li><b>Zone-based Organization</b>: Hierarchical object management</li>
 <li><b>Attribute System</b>: Extensible object properties with inheritance</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md428"></a>
+<h3><a class="anchor" id="autotoc_md430"></a>
 Developer Features</h3>
 <ul>
 <li><b>Module System</b>: Load custom C modules dynamically at runtime (mail and comsys included by default)</li>
@@ -172,7 +172,7 @@ Developer Features</h3>
 <li><b>Safe String API</b>: Prevent buffer overflows with XSAFE* macros</li>
 <li><b>API Documentation</b>: Auto-generated Doxygen docs at <a href="https://tinymush.github.io/TinyMUSH/">https://tinymush.github.io/TinyMUSH/</a></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md429"></a>
+<h3><a class="anchor" id="autotoc_md431"></a>
 Administration</h3>
 <ul>
 <li><b>Flexible Configuration</b>: Text-based config with runtime @admin adjustments</li>
@@ -181,10 +181,10 @@ Administration</h3>
 <li><b>Command Aliases</b>: Customize command names for user preference</li>
 <li><b>Compatibility Modes</b>: Support for MUX/Penn command variations</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md430"></a>
+<h2><a class="anchor" id="autotoc_md432"></a>
 Development Goals</h2>
 <p>TinyMUSH 4 is guided by four core principles:</p>
-<h3><a class="anchor" id="autotoc_md431"></a>
+<h3><a class="anchor" id="autotoc_md433"></a>
 1. <b>Future-Proofing</b></h3>
 <ul>
 <li>Modernize codebase to ensure long-term viability</li>
@@ -192,7 +192,7 @@ Development Goals</h2>
 <li>Replace deprecated APIs and unsafe functions</li>
 <li>Support contemporary build tools and platforms</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md432"></a>
+<h3><a class="anchor" id="autotoc_md434"></a>
 2. <b>Maintainability</b></h3>
 <ul>
 <li>Reduce code complexity and technical debt</li>
@@ -200,7 +200,7 @@ Development Goals</h2>
 <li>Enhance documentation at all levels</li>
 <li>Simplify contribution process for new developers</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md433"></a>
+<h3><a class="anchor" id="autotoc_md435"></a>
 3. <b>Robustness</b></h3>
 <ul>
 <li>Eliminate undefined behavior and memory safety issues</li>
@@ -208,7 +208,7 @@ Development Goals</h2>
 <li>Implement thorough error handling</li>
 <li>Build extensive regression test coverage</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md434"></a>
+<h3><a class="anchor" id="autotoc_md436"></a>
 4. <b>Extensibility</b></h3>
 <ul>
 <li>Provide clean module API for custom extensions</li>
@@ -216,9 +216,9 @@ Development Goals</h2>
 <li>Enable easy feature addition without core modifications</li>
 <li>Support diverse use cases through configuration</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md435"></a>
+<h2><a class="anchor" id="autotoc_md437"></a>
 Project History</h2>
-<h3><a class="anchor" id="autotoc_md436"></a>
+<h3><a class="anchor" id="autotoc_md438"></a>
 Origins (TinyMUSH 3)</h3>
 <p>TinyMUSH 3 emerged from a merger of the TinyMUSH 2.2 and TinyMUX codebases, combining the strengths of both servers. The project maintained near-complete backward compatibility while introducing stability improvements and new features.</p>
 <p><b>TinyMUSH 3 Development Team:</b></p><ul>
@@ -234,7 +234,7 @@ Origins (TinyMUSH 3)</h3>
 <li><b>3.2</b>: Performance optimizations, additional features</li>
 <li><b>3.3</b>: Experimental branch (never released, discontinued)</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md437"></a>
+<h3><a class="anchor" id="autotoc_md439"></a>
 TinyMUSH 4 (Current)</h3>
 <p>TinyMUSH 4 represents a significant evolution, focusing on modernization rather than feature additions. While maintaining the essence of TinyMUSH 3, version 4 prioritizes code quality, safety, and developer experience.</p>
 <p><b>Major Changes:</b></p><ul>
@@ -247,7 +247,7 @@ TinyMUSH 4 (Current)</h3>
 <li>Active regression testing framework</li>
 </ul>
 <p>The server is currently in alpha development, with ongoing work to ensure stability before beta release.</p>
-<h1><a class="anchor" id="autotoc_md438"></a>
+<h1><a class="anchor" id="autotoc_md440"></a>
 Installation</h1>
 <p>See <a class="el" href="md_INSTALL.html">INSTALL.md</a> for complete installation instructions.</p>
 <p><b>Quick install:</b></p>
@@ -255,9 +255,9 @@ Installation</h1>
 <div class="line">cmake ..</div>
 <div class="line">cmake --build . --target install-upgrade -j$(nproc)</div>
 <div class="line">cd ../game &amp;&amp; ./netmush</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md439"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md441"></a>
 Documentation</h1>
-<h2><a class="anchor" id="autotoc_md440"></a>
+<h2><a class="anchor" id="autotoc_md442"></a>
 User &amp; Administrator Resources</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -281,7 +281,7 @@ User &amp; Administrator Resources</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="md_AUTHORS.html">AUTHORS.md</a>   </td><td class="markdownTableBodyNone">Credits and acknowledgments   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md441"></a>
+<h2><a class="anchor" id="autotoc_md443"></a>
 Developer Documentation</h2>
 <p>Located in <a href="docs/Code/">docs/Code/</a>:</p>
 <table class="markdownTable">
@@ -294,7 +294,7 @@ Developer Documentation</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html">COMMANDS_AND_REGISTRIES_REFERENCE.md</a>   </td><td class="markdownTableBodyNone">Commands, functions, flags, powers, attributes   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md442"></a>
+<h3><a class="anchor" id="autotoc_md444"></a>
 Included Modules</h3>
 <p>TinyMUSH 4 includes the following modules enabled by default:</p>
 <table class="markdownTable">
@@ -308,7 +308,7 @@ Included Modules</h3>
 <td class="markdownTableBodyNone"><a href="src/modules/skeleton/">skeleton</a>   </td><td class="markdownTableBodyNone">Template for creating new modules (<a class="el" href="md_src_2modules_2skeleton_2README.html">README</a>)   </td></tr>
 </table>
 <p>See <a class="el" href="md_INSTALL.html">INSTALL.md</a> for module configuration and <a class="el" href="md_docs_2Code_2MODULES__DEVELOPMENT.html">docs/Code/MODULES_DEVELOPMENT.md</a> for creating custom modules.</p>
-<h2><a class="anchor" id="autotoc_md443"></a>
+<h2><a class="anchor" id="autotoc_md445"></a>
 Historical Documentation</h2>
 <p><b>Note:</b> Historical documents are preserved for reference but may not reflect current TinyMUSH 4 practices.</p>
 <p>Located in <a href="docs/Historical/">docs/Historical/</a>:</p>
@@ -326,12 +326,12 @@ Historical Documentation</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="md_docs_2Historical_2CONVERTING.html">CONVERTING.md</a>   </td><td class="markdownTableBodyNone">Database conversion guide   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md444"></a>
+<h2><a class="anchor" id="autotoc_md446"></a>
 API Documentation</h2>
 <p>Auto-generated Doxygen source code documentation:</p>
 <p><b><a href="https://tinymush.github.io/TinyMUSH/">https://tinymush.github.io/TinyMUSH/</a></b></p>
 <p>Includes detailed API references for functions, structures, and macros used throughout the codebase.</p>
-<h1><a class="anchor" id="autotoc_md445"></a>
+<h1><a class="anchor" id="autotoc_md447"></a>
 Contributing</h1>
 <p>We welcome contributions! See <a class="el" href="md_CONTRIBUTING.html">CONTRIBUTING.md</a> for:</p><ul>
 <li>How to report bugs and request features</li>
@@ -341,16 +341,16 @@ Contributing</h1>
 <li>Pull request process</li>
 </ul>
 <p>For security vulnerabilities, see <a class="el" href="md_SECURITY.html">SECURITY.md</a>.</p>
-<h1><a class="anchor" id="autotoc_md446"></a>
+<h1><a class="anchor" id="autotoc_md448"></a>
 Support</h1>
-<h2><a class="anchor" id="autotoc_md447"></a>
+<h2><a class="anchor" id="autotoc_md449"></a>
 Getting Help</h2>
 <ol type="1">
 <li>Check <a class="el" href="md_INSTALL.html">INSTALL.md</a> and <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a></li>
 <li>Search <a href="https://github.com/TinyMUSH/TinyMUSH/issues">GitHub issues</a></li>
 <li>Email: <a href="#" onclick="location.href='mai'+'lto:'+'tin'+'ym'+'ush'+'@g'+'oog'+'le'+'gro'+'up'+'s.c'+'om'; return false;">tinym<span class="obfuscator">.nosp@m.</span>ush@<span class="obfuscator">.nosp@m.</span>googl<span class="obfuscator">.nosp@m.</span>egro<span class="obfuscator">.nosp@m.</span>ups.c<span class="obfuscator">.nosp@m.</span>om</a></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md448"></a>
+<h2><a class="anchor" id="autotoc_md450"></a>
 License</h2>
 <p>TinyMUSH is distributed under the Artistic License. See <a class="el" href="md_COPYING.html">COPYING.md</a> for details.</p>
 <hr  />

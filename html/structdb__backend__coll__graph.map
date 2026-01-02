@@ -1,0 +1,5 @@
+<map id="db_backend" name="db_backend">
+<area shape="rect" id="Node000001" title="Abstract database backend operations." alt="" coords="5,94,97,120"/>
+<area shape="rect" id="Node000002" href="$structudb__data.html" title=" " alt="" coords="14,5,88,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,47,54,94,48,94,48,47"/>
+</map>

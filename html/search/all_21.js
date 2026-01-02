@@ -7,15 +7,15 @@ var searchData=
   ['waittime_4',['waittime',['../structbque.html#a123f20bed72194a02b4b36ebf700500f',1,'bque']]],
   ['walkdb_2ec_5',['walkdb.c',['../walkdb_8c.html',1,'']]],
   ['warning_20br_20br_20this_20file_20is_20outdated_20and_20will_20be_20updated_20in_20the_20future_20center_6',['WARNING br br THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE center',['../md_docs_2Historical_2CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]],
-  ['watch_20logs_7',['Watch logs',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md488',1,'']]],
+  ['watch_20logs_7',['Watch logs',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md490',1,'']]],
   ['watcher_8',['WATCHER',['../constants_8h.html#a29e1b9e32da570f0aeee2a90794b3ec9',1,'constants.h']]],
-  ['what_20constitutes_20a_20security_20vulnerability_9',['What Constitutes a Security Vulnerability',['../md_SECURITY.html#autotoc_md466',1,'']]],
+  ['what_20constitutes_20a_20security_20vulnerability_9',['What Constitutes a Security Vulnerability',['../md_SECURITY.html#autotoc_md468',1,'']]],
   ['what_20do_20i_20do_10',['I found a bug! What do I do?',['../md_docs_2Historical_2FAQ.html#autotoc_md343',1,'']]],
-  ['what_20s_20new_20in_20tinymush_204_11',['What&apos;s New in TinyMUSH 4',['../md_README.html#autotoc_md424',1,'']]],
-  ['what_20to_20expect_12',['What to Expect',['../md_SECURITY.html#autotoc_md454',1,'']]],
-  ['when_20active_13',['cmds to run from queue when active',['../structconfdata.html#autotoc_md521',1,'']]],
+  ['what_20s_20new_20in_20tinymush_204_11',['What&apos;s New in TinyMUSH 4',['../md_README.html#autotoc_md426',1,'']]],
+  ['what_20to_20expect_12',['What to Expect',['../md_SECURITY.html#autotoc_md456',1,'']]],
+  ['when_20active_13',['cmds to run from queue when active',['../structconfdata.html#autotoc_md523',1,'']]],
   ['when_20data_20changes_14',['GETTING NOTIFIED WHEN DATA CHANGES',['../md_docs_2Historical_2MODULES.html#autotoc_md377',1,'']]],
-  ['when_20idle_15',['cmds to run from queue when idle',['../structconfdata.html#autotoc_md520',1,'']]],
+  ['when_20idle_15',['cmds to run from queue when idle',['../structconfdata.html#autotoc_md522',1,'']]],
   ['which_20method_20of_20storing_20data_20to_20use_16',['WHICH METHOD OF STORING DATA TO USE',['../md_docs_2Historical_2MODULES.html#autotoc_md376',1,'']]],
   ['wild_2ec_17',['wild.c',['../wild_8c.html',1,'']]],
   ['wild_5ftimes_5flev_18',['wild_times_lev',['../structstatedata.html#acb9e5d831c5c92b8ed7cb4aee272a1f6',1,'statedata']]],
@@ -36,5 +36,5 @@ var searchData=
   ['work_33',['How do logfiles work?',['../md_docs_2Historical_2FAQ.html#autotoc_md349',1,'']]],
   ['wrappers_34',['Macro Wrappers',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md125',1,'']]],
   ['write_5fattr_35',['Write_attr',['../macros_8h.html#a69e1ff5f1ff1c0f33952edf592e1f90f',1,'macros.h']]],
-  ['writes_20in_20tt_20fun_5fwrite_20tt_20resolved_36',['stack-safe writes in &lt;tt&gt;fun_write()&lt;/tt&gt; (Resolved)',['../md_KNOWN__BUGS.html#autotoc_md417',1,'']]]
+  ['writes_20in_20tt_20fun_5fwrite_20tt_20resolved_36',['stack-safe writes in &lt;tt&gt;fun_write()&lt;/tt&gt; (Resolved)',['../md_KNOWN__BUGS.html#autotoc_md418',1,'']]]
 ];

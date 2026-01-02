@@ -19,13 +19,12 @@ var searchData=
   ['sighandler_16',['sighandler',['../bsd_8c.html#abd382ad3c8079e6bd94332234d24f5a0',1,'bsd.c']]],
   ['skip_5fesccode_17',['skip_esccode',['../string__ansi_8c.html#a0fb5ff887ca132e1e1a2b797ca59894e',1,'string_ansi.c']]],
   ['skip_5fwhitespace_18',['skip_whitespace',['../boolexp_8c.html#a7e9803b84dcc3d1ddd6cf0eb6c4afdc9',1,'boolexp.c']]],
-  ['special_5fchar_19',['special_char',['../eval_8c.html#a387f7728c587b3851257e6fe7740b2b0',1,'eval.c']]],
-  ['split_5ftoken_20',['split_token',['../fnhelper_8c.html#a463de420ec886256594c64ace598a065',1,'fnhelper.c']]],
-  ['str2xterm_21',['str2xterm',['../string__ansi_8c.html#af13548100dd67edeb1f53c49482d4ba3',1,'string_ansi.c']]],
-  ['string_5fcompare_22',['string_compare',['../string__util_8c.html#afb6d7c8c2f40e28942fd60c35054915b',1,'string_util.c']]],
-  ['string_5fmatch_23',['string_match',['../string__util_8c.html#a3189f6fc705ab76f9e18d2f9a1a46e1f',1,'string_util.c']]],
-  ['string_5fprefix_24',['string_prefix',['../string__util_8c.html#af96d5924e7f236d5628f9ce77f8edb67',1,'string_util.c']]],
-  ['strip_5fansi_25',['strip_ansi',['../string__ansi_8c.html#a7464d90ae1acb37dd803284f3586b795',1,'string_ansi.c']]],
-  ['strip_5fansi_5flen_26',['strip_ansi_len',['../string__ansi_8c.html#aea1db255d5adf4ab375252c9144ba714',1,'string_ansi.c']]],
-  ['swap_27',['swap',['../funlist_8c.html#a3e1023fafb1c56822364d806974b4a1d',1,'funlist.c']]]
+  ['split_5ftoken_19',['split_token',['../fnhelper_8c.html#a463de420ec886256594c64ace598a065',1,'fnhelper.c']]],
+  ['str2xterm_20',['str2xterm',['../string__ansi_8c.html#af13548100dd67edeb1f53c49482d4ba3',1,'string_ansi.c']]],
+  ['string_5fcompare_21',['string_compare',['../string__util_8c.html#afb6d7c8c2f40e28942fd60c35054915b',1,'string_util.c']]],
+  ['string_5fmatch_22',['string_match',['../string__util_8c.html#a3189f6fc705ab76f9e18d2f9a1a46e1f',1,'string_util.c']]],
+  ['string_5fprefix_23',['string_prefix',['../string__util_8c.html#af96d5924e7f236d5628f9ce77f8edb67',1,'string_util.c']]],
+  ['strip_5fansi_24',['strip_ansi',['../string__ansi_8c.html#a7464d90ae1acb37dd803284f3586b795',1,'string_ansi.c']]],
+  ['strip_5fansi_5flen_25',['strip_ansi_len',['../string__ansi_8c.html#aea1db255d5adf4ab375252c9144ba714',1,'string_ansi.c']]],
+  ['swap_26',['swap',['../funlist_8c.html#a3e1023fafb1c56822364d806974b4a1d',1,'funlist.c']]]
 ];

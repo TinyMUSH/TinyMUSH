@@ -22,7 +22,7 @@ var searchData=
   ['va_20tt_19',['&lt;tt&gt;__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)&lt;/tt&gt;',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md90',1,'']]],
   ['va_5flist_20va_20tt_20',['&lt;tt&gt;__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)&lt;/tt&gt;',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md90',1,'']]],
   ['validate_5flist_5fargs_21',['validate_list_args',['../funlist_8c.html#ac58586c2f7a343dcc079d3c06e3c771d',1,'funlist.c']]],
-  ['validation_22',['Input Validation',['../md_SECURITY.html#autotoc_md461',1,'']]],
+  ['validation_22',['Input Validation',['../md_SECURITY.html#autotoc_md463',1,'']]],
   ['var_20const_20char_20format_20tt_23',['&lt;tt&gt;__xasprintf(const char *file, int line, const char *function, const char *var, const char *format, ...)&lt;/tt&gt;',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md88',1,'']]],
   ['var_20const_20char_20format_20va_5flist_20va_20tt_24',['&lt;tt&gt;__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)&lt;/tt&gt;',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md90',1,'']]],
   ['var_20tt_25',['var tt',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md74',1,'&lt;tt&gt;__xcalloc(size_t nmemb, size_t size, const char *file, int line, const char *function, const char *var)&lt;/tt&gt;'],['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md72',1,'&lt;tt&gt;__xmalloc(size_t size, const char *file, int line, const char *function, const char *var)&lt;/tt&gt;'],['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md76',1,'&lt;tt&gt;__xrealloc(void *ptr, size_t size, const char *file, int line, const char *function, const char *var)&lt;/tt&gt;'],['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md98',1,'&lt;tt&gt;__xstrdup(const char *s, const char *file, int line, const char *function, const char *var)&lt;/tt&gt;']]],
@@ -48,13 +48,13 @@ var searchData=
   ['verb_5fpresent_45',['VERB_PRESENT',['../constants_8h.html#a9b264c9f80a70d86af92b405f5163fcd',1,'constants.h']]],
   ['verb_5fspeech_46',['VERB_SPEECH',['../constants_8h.html#a3811fd8e05167b9ab437c46787d7873f',1,'constants.h']]],
   ['verbose_47',['VERBOSE',['../constants_8h.html#a42f8c497a1968074f38bf5055c650dca',1,'constants.h']]],
-  ['version_48',['From Previous Version',['../md_INSTALL.html#autotoc_md409',1,'']]],
+  ['version_48',['From Previous Version',['../md_INSTALL.html#autotoc_md410',1,'']]],
   ['version_49',['version',['../structstatedata.html#a0072b0e3f1bfd84ea7dfec76d3be6824',1,'statedata']]],
   ['version_20information_50',['Version Information',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md158',1,'']]],
   ['version_20management_51',['7. Version Management',['../md_docs_2Code_2MODULES__DEVELOPMENT.html#autotoc_md212',1,'']]],
   ['version_2ec_52',['version.c',['../version_8c.html',1,'']]],
   ['versioninfo_53',['versioninfo',['../structversioninfo.html',1,'versioninfo'],['../structversioninfo.html#a806525d01a8027750a98669a1b7b033a',1,'versioninfo::versioninfo()']]],
-  ['versions_54',['Supported Versions',['../md_SECURITY.html#autotoc_md451',1,'']]],
+  ['versions_54',['Supported Versions',['../md_SECURITY.html#autotoc_md453',1,'']]],
   ['visible_5fwizzes_55',['visible_wizzes',['../structconfdata.html#a8881d0469775df15c6c9814ab4a3fdaa',1,'confdata']]],
   ['visual_56',['VISUAL',['../constants_8h.html#a5719963d148e344fe549ddff3b70f9b2',1,'constants.h']]],
   ['void_20dest_20const_20void_20src_20int_20c_20size_5ft_20n_20tt_57',['&lt;tt&gt;__xmemccpy(void *dest, const void *src, int c, size_t n)&lt;/tt&gt;',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md110',1,'']]],
@@ -68,5 +68,5 @@ var searchData=
   ['vt100attr_65',['VT100ATTR',['../structVT100ATTR.html',1,'']]],
   ['vt100color_66',['VT100COLOR',['../structVT100COLOR.html',1,'']]],
   ['vulnerabilities_67',['Security Vulnerabilities',['../md_CONTRIBUTING.html#autotoc_md24',1,'']]],
-  ['vulnerability_68',['Vulnerability',['../md_SECURITY.html#autotoc_md452',1,'Reporting a Vulnerability'],['../md_SECURITY.html#autotoc_md466',1,'What Constitutes a Security Vulnerability']]]
+  ['vulnerability_68',['Vulnerability',['../md_SECURITY.html#autotoc_md454',1,'Reporting a Vulnerability'],['../md_SECURITY.html#autotoc_md468',1,'What Constitutes a Security Vulnerability']]]
 ];

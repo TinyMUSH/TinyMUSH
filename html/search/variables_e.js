@@ -46,10 +46,12 @@ var searchData=
   ['powers_5fhtab_43',['powers_htab',['../structstatedata.html#ac8065347f2ee8bb22a692306370eb272',1,'statedata']]],
   ['powervalue_44',['powervalue',['../structpower__entry.html#a032ef23f6672f124505747cdee4da633',1,'power_entry']]],
   ['pref_5ftype_45',['pref_type',['../structmatch__state.html#a0431f4e90e3f35089b76272301cc6fdd',1,'match_state']]],
-  ['propdir_5fhtab_46',['propdir_htab',['../structstatedata.html#aecd7bdde06b043e9b5fee8d726b6414a',1,'statedata']]],
-  ['propdir_5flim_47',['propdir_lim',['../structconfdata.html#a9b2cda34ca31c32291af229d2a78094a',1,'confdata']]],
-  ['pub_5fflags_48',['pub_flags',['../structconfdata.html#ae557ac2320872af7ebc3e08ef7e26779',1,'confdata']]],
-  ['pueblo_5fmsg_49',['pueblo_msg',['../structconfdata.html#a24f2436215c4a3f7fdc3fd2a323b76fa',1,'confdata']]],
-  ['pueblo_5fversion_50',['pueblo_version',['../structconfdata.html#aa356a768475aefdeb06d1bc5582d9b05',1,'confdata']]],
-  ['purenames_51',['purenames',['../db_8c.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c'],['../externs_8h.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c']]]
+  ['private_5fdata_46',['private_data',['../structdb__backend.html#a9548640348970937ac93be314a7dd4da',1,'db_backend']]],
+  ['propdir_5fhtab_47',['propdir_htab',['../structstatedata.html#aecd7bdde06b043e9b5fee8d726b6414a',1,'statedata']]],
+  ['propdir_5flim_48',['propdir_lim',['../structconfdata.html#a9b2cda34ca31c32291af229d2a78094a',1,'confdata']]],
+  ['pub_5fflags_49',['pub_flags',['../structconfdata.html#ae557ac2320872af7ebc3e08ef7e26779',1,'confdata']]],
+  ['pueblo_5fmsg_50',['pueblo_msg',['../structconfdata.html#a24f2436215c4a3f7fdc3fd2a323b76fa',1,'confdata']]],
+  ['pueblo_5fversion_51',['pueblo_version',['../structconfdata.html#aa356a768475aefdeb06d1bc5582d9b05',1,'confdata']]],
+  ['purenames_52',['purenames',['../db_8c.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c'],['../externs_8h.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c']]],
+  ['put_53',['put',['../structdb__backend.html#aa138dc5c185e73ece8a12edf607be7c9',1,'db_backend']]]
 ];

@@ -22,5 +22,6 @@ var searchData=
   ['mod_5fskeleton_5fset_5fdata_19',['mod_skeleton_set_data',['../skeleton_8c.html#abcacc6885c863fe01915f3ba1ad947e2',1,'mod_skeleton_set_data(char *key, int *data):&#160;skeleton.c'],['../skeleton_8h.html#abdcf85d2721aeebb2a23dd4f020e76c3',1,'mod_skeleton_set_data(char *, int *):&#160;skeleton.c']]],
   ['mode_5ftxt_20',['mode_txt',['../db_8c.html#a4615843657a00d7f02ec99c35e38d0a9',1,'db.c']]],
   ['modify_5fxfuncs_21',['modify_xfuncs',['../conf_8c.html#a200953a534900eeed30b799daead0e3c',1,'conf.c']]],
-  ['munge_5fspace_22',['munge_space',['../string__util_8c.html#a17d9aec24a10b4e4273c92ac9eefd1b5',1,'string_util.c']]]
+  ['mundane_5fchar_5ftable_5finit_22',['mundane_char_table_init',['../eval_8c.html#a4f82e8ea186ff9417497bf0ed99adf1b',1,'eval.c']]],
+  ['munge_5fspace_23',['munge_space',['../string__util_8c.html#a17d9aec24a10b4e4273c92ac9eefd1b5',1,'string_util.c']]]
 ];

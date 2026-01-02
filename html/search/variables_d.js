@@ -9,7 +9,8 @@ var searchData=
   ['olist_6',['olist',['../structstatedata.html#acaebcc9012b52b7b0e602f4e4224fbfa',1,'statedata']]],
   ['one_5fcoin_7',['one_coin',['../structconfdata.html#a8a6da8a440d9ae62eab4361b29948f0a',1,'confdata']]],
   ['opencost_8',['opencost',['../structconfdata.html#a106bb5d8ae19251a3b5dfa8944a11199',1,'confdata']]],
-  ['output_5fblock_5fsize_9',['output_block_size',['../structconfdata.html#a8b9791cb4e25859d4f750d45d97ad251',1,'confdata']]],
-  ['output_5flimit_10',['output_limit',['../structconfdata.html#a2699ea6645659fbababc7e17b4d275c1',1,'confdata']]],
-  ['owner_11',['owner',['../structobject.html#abec30fb1788baf2f1660d5630fe08642',1,'object::owner'],['../structdump__object.html#a1d1c1ad46b9563e8b1cb9837768aa746',1,'dump_object::owner']]]
+  ['optimize_9',['optimize',['../structdb__backend.html#a154d8f5d1ce708525278be4a17f617e2',1,'db_backend']]],
+  ['output_5fblock_5fsize_10',['output_block_size',['../structconfdata.html#a8b9791cb4e25859d4f750d45d97ad251',1,'confdata']]],
+  ['output_5flimit_11',['output_limit',['../structconfdata.html#a2699ea6645659fbababc7e17b4d275c1',1,'confdata']]],
+  ['owner_12',['owner',['../structobject.html#abec30fb1788baf2f1660d5630fe08642',1,'object::owner'],['../structdump__object.html#a1d1c1ad46b9563e8b1cb9837768aa746',1,'dump_object::owner']]]
 ];

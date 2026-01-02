@@ -428,9 +428,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>putlong</b> (FILE *f,
 <tr class="memitem:a7b28b28557d692ebdcb44e905f5f7a51" id="r_a7b28b28557d692ebdcb44e905f5f7a51"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b28b28557d692ebdcb44e905f5f7a51">getlong</a> (FILE *f)</td></tr>
 <tr class="memdesc:a7b28b28557d692ebdcb44e905f5f7a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get long int from file.  <br /></td></tr>
 <tr class="separator:a7b28b28557d692ebdcb44e905f5f7a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f78c045f1c8eda4c346f6c682364bb1" id="r_a6f78c045f1c8eda4c346f6c682364bb1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f78c045f1c8eda4c346f6c682364bb1">init_gdbm_db</a> (char *gdbmfile)</td></tr>
-<tr class="memdesc:a6f78c045f1c8eda4c346f6c682364bb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializing a GDBM file.  <br /></td></tr>
-<tr class="separator:a6f78c045f1c8eda4c346f6c682364bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa22f124a4e9d71b3717ebc3e938b6f0b" id="r_aa22f124a4e9d71b3717ebc3e938b6f0b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa22f124a4e9d71b3717ebc3e938b6f0b">init_database</a> (char *dbfile)</td></tr>
+<tr class="memdesc:aa22f124a4e9d71b3717ebc3e938b6f0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize database backend (LMDB or GDBM)  <br /></td></tr>
+<tr class="separator:aa22f124a4e9d71b3717ebc3e938b6f0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac88f57aa95b0fd622fc4a1ec2f64a594" id="r_ac88f57aa95b0fd622fc4a1ec2f64a594"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a> (dbref player, dbref thing)</td></tr>
 <tr class="memdesc:ac88f57aa95b0fd622fc4a1ec2f64a594"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks back through a zone tree for control  <br /></td></tr>
 <tr class="separator:ac88f57aa95b0fd622fc4a1ec2f64a594"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2169,29 +2169,29 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a6f78c045f1c8eda4c346f6c682364bb1" name="a6f78c045f1c8eda4c346f6c682364bb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f78c045f1c8eda4c346f6c682364bb1">&#9670;&#160;</a></span>init_gdbm_db()</h2>
+<a id="aa22f124a4e9d71b3717ebc3e938b6f0b" name="aa22f124a4e9d71b3717ebc3e938b6f0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa22f124a4e9d71b3717ebc3e938b6f0b">&#9670;&#160;</a></span>init_database()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int init_gdbm_db </td>
+          <td class="memname">int init_database </td>
           <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>gdbmfile</em></span></td><td>)</td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>dbfile</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initializing a GDBM file. </p>
+<p>Initialize database backend (LMDB or GDBM) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">gdbmfile</td><td>Filename </td></tr>
+    <tr><td class="paramname">dbfile</td><td>Database filename </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>int 0 on success, non-zero on error </dd></dl>
 <p>Calculate proper database block size</p>
 
 </div>
