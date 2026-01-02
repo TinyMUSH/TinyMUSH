@@ -208,8 +208,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 		*e = '\0';
 		if (mushconf.have_pueblo == 1 && Html(player))
 		{
-			XSAFELBCHR('\r', buff, &e);
-			XSAFELBCHR('\n', buff, &e);
+			XSAFELBSTR("\r\n", buff, &e);
 			*e = '\0';
 			notify_html(player, buff);
 		}

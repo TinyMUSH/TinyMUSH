@@ -411,7 +411,7 @@ void list_funcaccess(dbref player)
         char *buff = XASPRINTF("s", "mod_%s_%s", mp->modname, "functable");
         if ((ftab = (FUN *)dlsym(mp->handle, buff)) != NULL)
         {
-            raw_notify(player, "\nModule %-23.23s Access", mp->modname);
+            raw_notify(player, "\r\nModule %-23.23s Access", mp->modname);
             notify(player, "------------------------------ ------------------------------------------------");
             helper_list_funcaccess(player, ftab);
         }
@@ -425,7 +425,7 @@ void list_funcaccess(dbref player)
         {
             if (!header)
             {
-                notify(player, "\nUser-defined                   Access");
+                notify(player, "\r\nUser-defined                   Access");
                 notify(player, "------------------------------ ------------------------------------------------");
                 header = true;
             }

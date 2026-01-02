@@ -1158,12 +1158,12 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			{
 				flag = 0;
 				destitute = 0;
-				notify(player, "\nROOMS:");
+				notify(player, "ROOMS:");
 			}
 
 			buff = unparse_object(player, thing, 0);
 			XSAFELBSTR(buff, outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
+			XSAFELBSTR("\r\n", outbuf, &bp);
 			XFREE(buff);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
@@ -1193,7 +1193,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			{
 				flag = 0;
 				destitute = 0;
-				notify(player, "\nEXITS:");
+				notify(player, "EXITS:");
 			}
 
 			from = Exits(thing);
@@ -1224,8 +1224,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				XSAFELBSTR(buff, outbuf, &bp);
 				XFREE(buff);
 			}
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
+			XSAFELBSTR("]\r\n", outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1254,7 +1253,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			{
 				flag = 0;
 				destitute = 0;
-				notify(player, "\nOBJECTS:");
+				notify(player, "OBJECTS:");
 			}
 
 			buff = unparse_object(player, thing, 0);
@@ -1264,8 +1263,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			buff = unparse_object(player, Owner(thing), 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
+			XSAFELBSTR("]\r\n", outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1294,7 +1292,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			{
 				flag = 0;
 				destitute = 0;
-				notify(player, "\nGARBAGE:");
+				notify(player, "GARBAGE:");
 			}
 
 			buff = unparse_object(player, thing, 0);
@@ -1304,8 +1302,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			buff = unparse_object(player, Owner(thing), 0);
 			XSAFELBSTR(buff, outbuf, &bp);
 			XFREE(buff);
-			XSAFELBCHR(']', outbuf, &bp);
-			XSAFELBCHR('\n', outbuf, &bp);
+			XSAFELBSTR("]\r\n", outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1334,7 +1331,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 			{
 				flag = 0;
 				destitute = 0;
-				notify(player, "\nPLAYERS:");
+				notify(player, "PLAYERS:");
 			}
 
 			buff = unparse_object(player, thing, 0);
@@ -1350,7 +1347,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 				XSAFELBCHR(']', outbuf, &bp);
 			}
 
-			XSAFELBCHR('\n', outbuf, &bp);
+			XSAFELBSTR("\r\n", outbuf, &bp);
 			if ((size_t)(LBUF_SIZE - (bp - outbuf)) < 64)
 			{
 				flush_lines(player, outbuf, &bp);
@@ -1370,7 +1367,7 @@ void do_search(dbref player, dbref cause, int key, char *arg)
 	}
 	else
 	{
-		XSPRINTF(outbuf, "\nFound:  Rooms...%d  Exits...%d  Objects...%d  Players...%d  Garbage...%d", rcount, ecount, tcount, pcount, gcount);
+		XSPRINTF(outbuf, "Found:  Rooms...%d  Exits...%d  Objects...%d  Players...%d  Garbage...%d", rcount, ecount, tcount, pcount, gcount);
 		notify(player, outbuf);
 	}
 

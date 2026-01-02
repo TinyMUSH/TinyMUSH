@@ -1050,11 +1050,11 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	{
 		if (mushconf.ansi_colors)
 		{
-			raw_notify(player, "\n%sMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mushconf.motd_msg);
+			raw_notify(player, "\r\n%sMOTD:%s %s\r\n", ANSI_HILITE, ANSI_NORMAL, mushconf.motd_msg);
 		}
 		else
 		{
-			raw_notify(player, "\nMOTD: %s\n", mushconf.motd_msg);
+			raw_notify(player, "\r\nMOTD: %s\r\n", mushconf.motd_msg);
 		}
 	}
 
@@ -1064,11 +1064,11 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		{
 			if (mushconf.ansi_colors)
 			{
-				raw_notify(player, "%sWIZMOTD:%s %s\n", ANSI_HILITE, ANSI_NORMAL, mushconf.wizmotd_msg);
+				raw_notify(player, "\r\n%sWIZMOTD:%s %s\r\n", ANSI_HILITE, ANSI_NORMAL, mushconf.wizmotd_msg);
 			}
 			else
 			{
-				raw_notify(player, "WIZMOTD: %s\n", mushconf.wizmotd_msg);
+				raw_notify(player, "\r\nWIZMOTD: %s\r\n", mushconf.wizmotd_msg);
 			}
 		}
 
@@ -2010,7 +2010,7 @@ int check_connect(DESC *d, char *msg)
 		{
 			if ((p = make_guest(d)) == NULL)
 			{
-				queue_string(d, NULL, "All guests are tied up, please try again later.\n");
+				queue_string(d, NULL, "All guests are tied up, please try again later.\r\n");
 				XFREE(command);
 				XFREE(user);
 				XFREE(password);
