@@ -2210,7 +2210,14 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
             *zp = '\0';
         }
 
-        cf_set(cp, ap, player);
+        /**
+         * Skip empty lines (lines with only whitespace or comments)
+         *
+         */
+        if (*cp)
+        {
+            cf_set(cp, ap, player);
+        }
 
         if (fgets(buf, LBUF_SIZE, fp) == NULL)
         {
