@@ -3737,12 +3737,12 @@ long getlong(FILE *f)
 }
 
 /**
- * @brief Initializing a GDBM file
+ * @brief Initialize database backend (LMDB or GDBM)
  *
- * @param gdbmfile Filename
- * @return int
+ * @param dbfile Database filename
+ * @return int 0 on success, non-zero on error
  */
-int init_gdbm_db(char *gdbmfile)
+int init_database(char *dbfile)
 {
     for (mushstate.db_block_size = 1; mushstate.db_block_size < (LBUF_SIZE * 4); mushstate.db_block_size = mushstate.db_block_size << 1)
     {
@@ -3753,9 +3753,9 @@ int init_gdbm_db(char *gdbmfile)
     }
 
     cache_init(mushconf.cache_width);
-    dddb_setfile(gdbmfile);
+    dddb_setfile(dbfile);
     dddb_init();
-    log_write(LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", gdbmfile);
+    log_write(LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", dbfile);
     db_free();
     return (0);
 }

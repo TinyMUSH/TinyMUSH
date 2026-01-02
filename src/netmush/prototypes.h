@@ -304,7 +304,7 @@ extern void putlong(FILE *f, long l);
 extern char *getstring(FILE *f, _Bool new_strings);
 extern dbref getref(FILE *f);
 extern long getlong(FILE *f);
-extern int init_gdbm_db(char *gdbmfile);
+extern int init_database(char *dbfile);
 extern _Bool check_zone(dbref player, dbref thing);
 extern _Bool check_zone_for_player(dbref player, dbref thing);
 extern void dump_restart_db(void);
@@ -329,20 +329,11 @@ extern dbref db_write(void);
 extern FILE *db_module_flatfile(char *filename, _Bool wrflag);
 
 /* eval.c */
-extern char *parse_to_cleanup(int eval, _Bool first, char *cstr, char *rstr, char *zstr);
 extern char *parse_to(char **dstr, char delim, int eval);
-extern char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char delim, dbref eval, char *fargs[], dbref nfargs, char *cargs[], dbref ncargs);
+extern char *parse_arglist(dbref player, dbref caller, dbref cause, char *dstr, char delim, int eval, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern int get_gender(dbref player);
+extern void mundane_char_table_init(void);
 extern void tcache_init(void);
-extern int tcache_empty(void);
-extern void tcache_add(char *orig, char *result);
-extern void tcache_finish(dbref player);
-extern _Bool special_char(unsigned char ch);
-extern _Bool token_char(int ch);
-extern char *get_subj(int subj);
-extern char *get_poss(int poss);
-extern char *get_obj(int obj);
-extern char *get_absp(int absp);
 extern void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller, dbref cause, int eval, char **dstr, char *cargs[], int ncargs);
 extern GDATA *save_global_regs(const char *funcname);
 extern void restore_global_regs(const char *funcname, GDATA *preserve);
@@ -850,7 +841,9 @@ extern void do_readcache(dbref player, dbref cause, int key);
 extern void process_preload(void);
 extern void info(int fmt, int flags, int ver);
 extern void usage_dbconvert(void);
+#ifdef USE_GDBM
 extern void usage_dbrecover(void);
+#endif
 extern void usage(char *prog, int which);
 extern void recover_flatfile(char *flat);
 extern int dbconvert(int argc, char *argv[]);
@@ -1193,8 +1186,10 @@ extern void show_quota_header(dbref player);
 extern void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2);
 
 /* recover.c */
+#ifdef USE_GDBM
 extern void gdbm_panic(const char *mesg);
 extern int dbrecover(int argc, char *argv[]);
+#endif
 
 /* rob.c */
 extern void do_kill(dbref player, dbref cause, int key, char *what, char *costchar);

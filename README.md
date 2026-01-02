@@ -44,7 +44,7 @@ git clone https://github.com/TinyMUSH/TinyMUSH.git
 cd TinyMUSH
 
 # Install dependencies (Ubuntu/Debian)
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
+apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev
 
 # Build and install
 mkdir -p build && cd build
@@ -59,14 +59,14 @@ cd ../game
 # Login as God: connect #1 potrzebie
 ```
 
-See [INSTALL.md](INSTALL.md) for comprehensive installation instructions.
+See [INSTALL.md](INSTALL.md) for comprehensive installation instructions and backend selection (LMDB by default, GDBM optional). The `dbconvert` utility converts databases between formats.
 
 ## Key Features
 
 ### Core Capabilities
 - **Rich Softcode Language**: Powerful scripting with 200+ built-in functions
 - **Flexible Permissions**: Granular control with flags, powers, and locks
-- **Persistent Storage**: GDBM-backed database with automatic checkpointing
+- **Persistent Storage**: LMDB-backed database by default (GDBM optional) with automatic checkpointing
 - **Zone-based Organization**: Hierarchical object management
 - **Attribute System**: Extensible object properties with inheritance
 

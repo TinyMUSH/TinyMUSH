@@ -123,14 +123,17 @@ void handlestartupflatfiles(int flag)
 	{
 		fstat(i, &sb1);
 		close(i);
-		if (stat(db, &sb2) != 0)
+		
+		/* Check for LMDB directory first, then GDBM file */
+		char *db_lmdb = XASPRINTF("db_lmdb", "%s.lmdb", db);
+		bool db_exists = (stat(db_lmdb, &sb2) == 0 || stat(db, &sb2) == 0);
+		XFREE(db_lmdb);
+		
+		if (!db_exists)
 		{
-			log_write(LOG_ALWAYS, "INI", "LOAD", "Unable to stat db file: %s", db);
-			XFREE(db);
-			XFREE(flat);
-			XFREE(db_bak);
-			XFREE(flat_bak);
-			return;
+			/* No database exists - initialize sb2 with epoch time for comparison */
+			sb2.st_mtime = 0;
+			log_write(LOG_ALWAYS, "INI", "LOAD", "No database exists, flatfile %s will be loaded if valid", flat);
 		}
 
 		if (tailfind(flat, "***END OF DUMP***\n"))
@@ -146,12 +149,7 @@ void handlestartupflatfiles(int flag)
 					log_write(LOG_ALWAYS, "INI", "LOAD", "Unable to archive previous db to : %s", db_bak);
 				}
 
-				recover_flatfile(flat);
-
-				if (unlink(flat) != 0)
-				{
-					log_write(LOG_ALWAYS, "INI", "LOAD", "Unable to delete : %s", flat);
-				}
+			recover_flatfile(flat);
 
 				log_write(LOG_ALWAYS, "INI", "LOAD", "Recovery successfull");
 			}
@@ -3054,11 +3052,13 @@ void usage_dbconvert(void)
 	fprintf(stderr, "  -o, --output=<number>     set output version number\n\n");
 }
 
+#ifdef USE_GDBM
 void usage_dbrecover(void)
 {
 	fprintf(stderr, "  -i, --input               dbm file to recover\n");
 	fprintf(stderr, "  -o, --output              recovered db file\n\n");
 }
+#endif
 
 void usage(char *prog, int which)
 {
@@ -3069,15 +3069,21 @@ void usage(char *prog, int which)
 	case 0:
 		fprintf(stderr, "Usage: %s [options] [CONFIG-FILE]\n", prog);
 		fprintf(stderr, "       %s --dbconvert DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog);
+#ifdef USE_GDBM
 		fprintf(stderr, "       %s --recover -i INPUT-DBM -o OUTPUT-DBM\n\n", prog);
+#else
+		fprintf(stderr, "\n");
+#endif
 		fprintf(stderr, "Server Mode: When call without --dbconvert or --recover option, %s accept the following options:\n\n", prog);
 		fprintf(stderr, "  CONFIG-FILE               configuration file\n");
 		fprintf(stderr, "  -d, --debug               debug mode, do not fork to background\n");
 		fprintf(stderr, "  -m, --mindb               delete the current databases and create a new one\n\n");
 		fprintf(stderr, "DBConvert Mode: When call with the --dbconvert option, %s accept the following options:\n\n", prog);
 		usage_dbconvert();
+#ifdef USE_GDBM
 		fprintf(stderr, "Recover Mode: When call with the --recover option, %s accept the following options:\n\n", prog);
 		usage_dbrecover();
+#endif
 		break;
 
 	case 1:
@@ -3086,10 +3092,12 @@ void usage(char *prog, int which)
 		usage_dbconvert();
 		break;
 
+#ifdef USE_GDBM
 	case 2:
 		fprintf(stderr, "Usage: recover -i INPUT-DBM -o OUTPUT-DBM\n");
 		usage_dbrecover();
 		break;
+#endif
 	}
 
 	fprintf(stderr, "\nDefault configuration file : %s\n\n", DEFAULT_CONFIG_FILE);
@@ -3104,9 +3112,9 @@ void recover_flatfile(char *flat)
 	char *s, *s1;
 	vattr_init();
 
-	if (init_gdbm_db(mushconf.db_file) < 0)
+	if (init_database(mushconf.db_file) < 0)
 	{
-		log_write_raw(1, "Can't open GDBM file\n");
+		log_write_raw(1, "Can't open database file\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -3145,7 +3153,7 @@ void recover_flatfile(char *flat)
 	db_flags = (db_flags & ~clrflags) | setflags;
 	db_write();
 	/*
-	 * Call all modules to write to GDBM
+	 * Call all modules to write to backend database
 	 */
 	call_all_modules_nocache("db_write");
 	db_unlock();
@@ -3160,7 +3168,7 @@ int dbconvert(int argc, char *argv[])
 	int c, dbclean, errflg = 0;
 	char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
 	char *opt_datadir = (char *)DEFAULT_DATABASE_HOME;
-	char *opt_gdbmfile = (char *)DEFAULT_CONFIG_FILE;
+	char *opt_dbfile = (char *)DEFAULT_CONFIG_FILE;
 	char *s, *s1;
 	FILE *f;
 	MODULE *mp;
@@ -3215,7 +3223,7 @@ int dbconvert(int argc, char *argv[])
 			break;
 
 		case 'D':
-			opt_gdbmfile = optarg;
+			opt_dbfile = optarg;
 			break;
 
 		case 'C':
@@ -3314,20 +3322,20 @@ int dbconvert(int argc, char *argv[])
 	}
 
 	mushconf.dbhome = XSTRDUP(opt_datadir, "argv");
-	mushconf.db_file = XSTRDUP(opt_gdbmfile, "argv");
+	mushconf.db_file = XSTRDUP(opt_dbfile, "argv");
 	cf_init();
 	mushstate.standalone = 1;
 	cf_read(opt_conf);
 	mushstate.initializing = 0;
 
 	/*
-	 * Open the gdbm file
+	 * Open the database file
 	 */
 	vattr_init();
 
-	if (init_gdbm_db(argv[optind]) < 0)
+	if (init_database(argv[optind]) < 0)
 	{
-		log_write_raw(1, "Can't open GDBM file\n");
+		log_write_raw(1, "Can't open database file\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -3506,10 +3514,12 @@ int main(int argc, char *argv[])
 		dbconvert(argc, argv);
 	}
 
+#ifdef USE_GDBM
 	if (s && *s && !strcmp(s, "recover"))
 	{
 		dbrecover(argc, argv);
 	}
+#endif
 
 	/*
 	 * Configure the minimum default values we need to start.
@@ -3541,10 +3551,12 @@ int main(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 			break;
 
+#ifdef USE_GDBM
 		case 1002: /* recover */
 			dbrecover(argc, argv);
 			exit(EXIT_SUCCESS);
 			break;
+#endif
 
 		default:
 			errflg++;
@@ -3597,6 +3609,7 @@ int main(int argc, char *argv[])
 	time(&mushstate.start_time);
 	mushstate.restart_time = mushstate.start_time;
 	time(&mushstate.cpu_count_from);
+	mundane_char_table_init();
 	tcache_init();
 	pcache_init();
 	templog = XSTRDUP("netmush.XXXXXX", "templog");
@@ -3832,22 +3845,55 @@ int main(int argc, char *argv[])
 	/*
 	 * If after doing all that stuff, there is still no db, create a minimal one.
 	 */
+	/* Detect presence of an existing database. For LMDB, the environment is a directory
+	 * named <db_file>.lmdb containing data.mdb. For legacy flat/GDBM, we still check
+	 * the flat file name. If neither exists, we will bootstrap a minimal database. */
 	s = XASPRINTF("s", "%s/%s", mushconf.dbhome, mushconf.db_file);
+	int have_flat_db = fileexist(s);
+	XFREE(s);
 
-	if (!fileexist(s))
+	int have_lmdb_db = 0;
+#ifdef USE_LMDB
+	char *lmdb_dir = XASPRINTF("lmdb_dir", "%s/%s.lmdb", mushconf.dbhome, mushconf.db_file);
+	char *lmdb_data = XASPRINTF("lmdb_data", "%s/data.mdb", lmdb_dir);
+	if (fileexist(lmdb_dir) || fileexist(lmdb_data))
+	{
+		have_lmdb_db = 1;
+	}
+
+	/* Also check legacy LMDB path without the .db suffix (netmush.lmdb) to avoid
+	 * discarding existing data created before the path change. */
+	char *basename = XSTRDUP(mushconf.db_file, "lmdb_base");
+	char *dot = strrchr(basename, '.');
+	if (dot)
+	{
+		*dot = '\0';
+		char *lmdb_dir_legacy = XASPRINTF("lmdb_dir_legacy", "%s/%s.lmdb", mushconf.dbhome, basename);
+		char *lmdb_data_legacy = XASPRINTF("lmdb_data_legacy", "%s/data.mdb", lmdb_dir_legacy);
+		if (fileexist(lmdb_dir_legacy) || fileexist(lmdb_data_legacy))
+		{
+			have_lmdb_db = 1;
+		}
+		XFREE(lmdb_data_legacy);
+		XFREE(lmdb_dir_legacy);
+	}
+	XFREE(basename);
+	XFREE(lmdb_data);
+	XFREE(lmdb_dir);
+#endif
+
+	if (!have_flat_db && !have_lmdb_db)
 	{
 		log_write(LOG_ALWAYS, "INI", "LOAD", "No database exist, creating a new database.");
 		mindb = 1;
 	}
-
-	XFREE(s);
 
 	if (mindb)
 	{
 		unlink(mushconf.db_file);
 	}
 
-	if (init_gdbm_db(mushconf.db_file) < 0)
+	if (init_database(mushconf.db_file) < 0)
 	{
 		log_write(LOG_ALWAYS, "INI", "FATAL", "Couldn't load text database: %s", mushconf.db_file);
 		exit(EXIT_FAILURE);

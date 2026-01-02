@@ -1,13 +1,89 @@
-add_executable(netmush alloc.c ansi.c ansi.h api.c boolexp.c bsd.c command.c conf.c constants.h cque.c create.c db.c db_rw.c eval.c externs.h file_c.c flags.c fnhelper.c functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c powers.c predicates.c prototypes.h quota.c recover.c rob.c set.c speech.c string_ansi.c string_util.c timer.c typedefs.h udb_misc.c udb_obj.c udb_ocache.c udb_ochunk.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c)
+# Database backend selection: USE_LMDB (default) or USE_GDBM
+option(USE_LMDB "Use LMDB database backend" ON)
+option(USE_GDBM "Use GDBM database backend" OFF)
+
+# Ensure at least one backend is selected
+if(NOT USE_LMDB AND NOT USE_GDBM)
+    message(FATAL_ERROR "At least one database backend must be enabled (USE_LMDB or USE_GDBM)")
+endif()
+
+# Ensure only one backend is selected
+if(USE_LMDB AND USE_GDBM)
+    message(FATAL_ERROR "Only one database backend can be enabled at a time. Choose either USE_LMDB or USE_GDBM.")
+endif()
+
+# Base source files
+set(NETMUSH_SOURCES
+    alloc.c ansi.c ansi.h api.c boolexp.c bsd.c command.c conf.c constants.h 
+    cque.c create.c db.c db_rw.c eval.c externs.h file_c.c flags.c fnhelper.c 
+    functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
+    funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
+    mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
+    powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
+    string_ansi.c string_util.c timer.c typedefs.h udb_misc.c udb_obj.c 
+    udb_ocache.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+    udb_backend.c udb_backend.h
+)
+
+# Add backend-specific source files
+if(USE_LMDB)
+    list(APPEND NETMUSH_SOURCES udb_lmdb.c)
+    add_compile_definitions(USE_LMDB)
+    message(STATUS "Database backend: LMDB")
+endif()
+
+if(USE_GDBM)
+    list(APPEND NETMUSH_SOURCES udb_gdbm.c recover.c)
+    add_compile_definitions(USE_GDBM)
+    message(STATUS "Database backend: GDBM")
+endif()
+
+add_executable(netmush ${NETMUSH_SOURCES})
+
 find_library(C_LIBRARY c REQUIRED)
-find_library(GDBM_LIBRARY gdbm REQUIRED)
 find_library(MATH_LIBRARY m REQUIRED)
 find_library(PCRE_LIBRARY pcre2-8 REQUIRED)
 find_library(DL_LIBRARY dl REQUIRED)
+
+# Backend-specific libraries
+if(USE_LMDB)
+    find_library(LMDB_LIBRARY lmdb REQUIRED)
+endif()
+
+if(USE_GDBM)
+    find_library(GDBM_LIBRARY gdbm REQUIRED)
+endif()
+
 if(NOT APPLE)
     find_library(CRYPT_LIBRARY crypt REQUIRED)
 endif(NOT APPLE)
-target_link_libraries(netmush PRIVATE ${C_LIBRARY} ${CRYPT_LIBRARY} ${GDBM_LIBRARY} ${MATH_LIBRARY} ${NSL_LIBRARY} ${PCRE_LIBRARY} ${RESOLV_LIBRARY} ${DL_LIBRARY})
+
+# Link libraries based on backend
+set(NETMUSH_LIBRARIES ${C_LIBRARY} ${CRYPT_LIBRARY} ${MATH_LIBRARY} ${NSL_LIBRARY} ${PCRE_LIBRARY} ${RESOLV_LIBRARY} ${DL_LIBRARY})
+
+if(USE_LMDB)
+    list(APPEND NETMUSH_LIBRARIES ${LMDB_LIBRARY})
+endif()
+
+if(USE_GDBM)
+    list(APPEND NETMUSH_LIBRARIES ${GDBM_LIBRARY})
+endif()
+
+target_link_libraries(netmush PRIVATE ${NETMUSH_LIBRARIES})
 install(TARGETS netmush DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+
+# Database converter utility (requires both GDBM and LMDB). Build only if both are available.
+find_library(GDBM_LIBRARY_DBCONVERT gdbm)
+if(USE_LMDB)
+    find_library(LMDB_LIBRARY_DBCONVERT lmdb)
+endif()
+
+if(GDBM_LIBRARY_DBCONVERT AND LMDB_LIBRARY_DBCONVERT)
+    add_executable(dbconvert dbconvert.c)
+    target_link_libraries(dbconvert PRIVATE ${GDBM_LIBRARY_DBCONVERT} ${LMDB_LIBRARY_DBCONVERT})
+    install(TARGETS dbconvert DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+else()
+    message(STATUS "dbconvert skipped (requires both GDBM and LMDB libraries)")
+endif()
 
 ## Removed temporary vt100 test and benchmark executables

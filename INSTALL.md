@@ -6,7 +6,7 @@ TinyMUSH 4.0 uses CMake as its build system. This guide covers installation, con
 
 ```bash
 # Install dependencies (Ubuntu/Debian)
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
+apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev
 
 # Build and install
 mkdir -p build && cd build
@@ -26,13 +26,13 @@ Default God password: **potrzebie**
 ### Ubuntu/Debian
 
 ```bash
-apt install build-essential cmake libcrypt-dev libgdbm-dev libpcre2-dev
+apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-dev
 ```
 
 ### macOS (Homebrew)
 
 ```bash
-brew install cmake gdbm pcre2
+brew install cmake lmdb gdbm pcre2
 ```
 
 ### Optional Tools
@@ -90,6 +90,22 @@ cmake --build . --target install-fresh
 
 ## Build Options
 
+### Database backend selection
+
+- LMDB (default):
+
+```bash
+cmake -DUSE_LMDB=ON -DUSE_GDBM=OFF ..
+```
+
+- GDBM (legacy/alternative):
+
+```bash
+cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..
+```
+
+If you need to migrate an existing database, use the `dbconvert` utility (built in `src/netmush/`) to convert between GDBM and LMDB formats.
+
 Configure CMake with these options:
 
 ```bash
@@ -110,6 +126,8 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 | `TINYMUSH_USE_LTO` | `ON` | Enable link-time optimization (Release only) |
 | `TINYMUSH_PRESERVE_CONFIGS` | `ON` | Preserve existing config files during install |
 | `TINYMUSH_BACKUP_CONFIGS` | `ON` | Backup configs before upgrading |
+| `USE_LMDB` | `ON` | Build with LMDB backend (default) |
+| `USE_GDBM` | `OFF` | Build with GDBM backend (alternative) |
 
 ### Using Ninja (Faster Builds)
 
