@@ -88,32 +88,144 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">Known Bugs in TinyMUSH</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md416"></a></p>
-<p>As of December 20, 2025, <b>no open critical bugs</b> are known. Recent fixes and status are tracked below for awareness.</p>
-<h1><a class="anchor" id="autotoc_md417"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md418"></a></p>
+<p>As of January 3, 2026, <b>no open critical bugs</b> are known. Recent fixes and status are tracked below for awareness.</p>
+<h1><a class="anchor" id="autotoc_md419"></a>
 Recently Fixed</h1>
-<h2><a class="anchor" id="autotoc_md418"></a>
+<h2><a class="anchor" id="autotoc_md420"></a>
+Graceful shutdown with database dump (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (January 2, 2026)</li>
+<li><b>Scope:</b> <code>do_shutdown()</code> in <code><a class="el" href="game_8c.html" title="Server startup/shutdown, main loop orchestration, and core engine glue.">src/netmush/game.c</a></code> and SIGTERM handler in <code><a class="el" href="bsd_8c.html" title="Unix socket I/O, descriptor management, and signal handling for the server loop.">src/netmush/bsd.c</a></code></li>
+<li><b>Impact:</b> Server now performs complete database dump before shutdown via <code>@shutdown</code> command or SIGTERM signal, ensuring all changes are saved. Previously, <code>@shutdown</code> would set shutdown flag without dumping, risking data loss.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md421"></a>
+Flatfile loading continues server startup (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (January 2, 2026)</li>
+<li><b>Scope:</b> <code>--load-flatfile</code> parameter handling in <code><a class="el" href="game_8c.html" title="Server startup/shutdown, main loop orchestration, and core engine glue.">src/netmush/game.c</a></code></li>
+<li><b>Impact:</b> Server now continues running after loading flatfile instead of exiting, allowing seamless database restoration and migration workflows. Added support for database backend migration (GDBM to LMDB).</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md422"></a>
+Empty config lines cause parser error (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (January 2, 2026)</li>
+<li><b>Scope:</b> Configuration file parser in <code><a class="el" href="conf_8c.html" title="Configuration parsing, defaults, and runtime reload support.">src/netmush/conf.c</a></code></li>
+<li><b>Impact:</b> Server now correctly skips empty lines in configuration files, preventing "Config directive not found" errors that could prevent startup.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md423"></a>
+KILL/CRASH flatfiles reused incorrectly (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (January 2, 2026)</li>
+<li><b>Scope:</b> Crash dump file handling in <code><a class="el" href="game_8c.html" title="Server startup/shutdown, main loop orchestration, and core engine glue.">src/netmush/game.c</a></code></li>
+<li><b>Impact:</b> KILL and CRASH flatfiles are now renamed with timestamps to prevent accidental reuse of old crash dumps as recovery sources.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md424"></a>
+Telnet line endings missing carriage return (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (January 2, 2026)</li>
+<li><b>Scope:</b> Network output in <code><a class="el" href="netcommon_8c.html" title="Shared networking helpers for telnet negotiation, buffers, and descriptor bookkeeping.">src/netmush/netcommon.c</a></code></li>
+<li><b>Impact:</b> Fixed network output to use proper <code>\r\n</code> line endings instead of bare <code>\n</code>, improving compatibility with telnet clients.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md425"></a>
+ANSI color parsing loses characters (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 31, 2025)</li>
+<li><b>Scope:</b> ANSI color handler <code>x</code> in <code><a class="el" href="string__ansi_8c.html" title="ANSI color and escape sequence handling utilities.">src/netmush/string_ansi.c</a></code></li>
+<li><b>Impact:</b> Fixed character loss during ANSI color code parsing, ensuring all text is preserved when using color codes.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md426"></a>
+ANSI color sequences lack reset (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 31, 2025)</li>
+<li><b>Scope:</b> <code><a class="el" href="funstring_8c.html#a3a1af4c67bb16c4a42a1fe59929497dd" title="Highlight a string using ANSI terminal effects.">fun_ansi()</a></code> in <code><a class="el" href="funstring_8c.html" title="String manipulation built-ins: search/replace, case handling, formatting.">src/netmush/funstring.c</a></code></li>
+<li><b>Impact:</b> ANSI color output now always terminates with proper reset sequences (<code>\033[0m</code>), preventing color bleed to subsequent output.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md427"></a>
+ANSI truecolor support incomplete (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 31, 2025)</li>
+<li><b>Scope:</b> Color handling in <code><a class="el" href="ansi_8c.html" title="ANSI terminal control helpers and telnet negotiation support.">src/netmush/ansi.c</a></code> and <code>src/netmush/vt100.c</code></li>
+<li><b>Impact:</b> Complete truecolor (24-bit RGB) support now integrated with proper sequence generation and ansipos() compatibility.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md428"></a>
+RGB color mapping incorrect (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 21, 2025)</li>
+<li><b>Scope:</b> <code>RGB2X11()</code> conversion function in <code><a class="el" href="ansi_8c.html" title="ANSI terminal control helpers and telnet negotiation support.">src/netmush/ansi.c</a></code></li>
+<li><b>Impact:</b> Fixed white color mapping: <code>(192,192,192)</code> now correctly maps to X11 color 7 instead of bright green, <code>(255,255,255)</code> now maps to 15 as expected.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md429"></a>
+Xterm 256 color rendering broken (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 21, 2025)</li>
+<li><b>Scope:</b> <code>COLOR256</code> flag handling in <code><a class="el" href="string__ansi_8c.html" title="ANSI color and escape sequence handling utilities.">src/netmush/string_ansi.c</a></code></li>
+<li><b>Impact:</b> Xterm 256-color palette rendering now works correctly for both standard and truecolor modes.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md430"></a>
+Bright ANSI color codes inverted (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 21, 2025)</li>
+<li><b>Scope:</b> Bright color handling in <code><a class="el" href="ansi_8c.html" title="ANSI terminal control helpers and telnet negotiation support.">src/netmush/ansi.c</a></code></li>
+<li><b>Impact:</b> <code>xh</code> (bright/high intensity) flag now correctly activates bright variants (codes 90-97) instead of producing dark codes with bold attribute.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md431"></a>
+Boolean expression parenthesis parsing fails (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 25, 2025)</li>
+<li><b>Scope:</b> <code><a class="el" href="boolexp_8c.html#ab3f48b709794090c6ac31e7faa46e978" title="L -&gt; (E); L -&gt; object identifier.">parse_boolexp_L()</a></code> in <code><a class="el" href="boolexp_8c.html" title="Parse, evaluate, and render lock boolean expressions.">src/netmush/boolexp.c</a></code></li>
+<li><b>Impact:</b> Fixed parsing bug affecting parenthesized boolean expressions in lock evaluation.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md432"></a>
+Numeric attribute locks not evaluated internally (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 25, 2025)</li>
+<li><b>Scope:</b> Lock evaluation in <code><a class="el" href="boolexp_8c.html" title="Parse, evaluate, and render lock boolean expressions.">src/netmush/boolexp.c</a></code></li>
+<li><b>Impact:</b> Numeric attribute locks now correctly evaluated when check is internal, fixing permission evaluation issues.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md433"></a>
+Attribute %= substitution parsing broken (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 22, 2025)</li>
+<li><b>Scope:</b> Parameter substitution in <code><a class="el" href="eval_8c.html" title="Expression parsing, evaluation, and command/function argument processing.">src/netmush/eval.c</a></code></li>
+<li><b>Impact:</b> Fixed parsing of <code>%=</code> substitution parameters in attributes and softcode.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md434"></a>
+@trigger/now always executes action (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 22, 2025)</li>
+<li><b>Scope:</b> <code>did_it()</code> function in <code><a class="el" href="predicates_8c.html" title="Predicate helpers that gate command execution and permission checks.">src/netmush/predicates.c</a></code></li>
+<li><b>Impact:</b> Fixed <code>@trigger/now</code> to respect conditions instead of always executing the action attribute unconditionally.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md435"></a>
+Attributes lost on server dump (Resolved)</h2>
+<ul>
+<li><b>Status:</b> Fixed (December 22, 2025)</li>
+<li><b>Scope:</b> Attribute persistence before dumps in <code><a class="el" href="game_8c.html" title="Server startup/shutdown, main loop orchestration, and core engine glue.">src/netmush/game.c</a></code></li>
+<li><b>Impact:</b> Added <code><a class="el" href="db_8c.html#a7926ca58d55efd00cde49964ba1fcde6" title="Write modified attribute list.">al_store()</a></code> before all database dumps to persist in-memory attribute lists, preventing loss of attribute changes.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md436"></a>
 stack-safe writes in <code>fun_write()</code> (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 19, 2025)</li>
 <li><b>Scope:</b> <code><a class="el" href="alloc_8c.html" title="Tracked memory allocation, leak detection, and buffer safety helpers.">src/netmush/alloc.c</a></code> safe string helpers (<code>__xsafestrncpy</code>, <code>__xsafestrncat</code>)</li>
 <li><b>Impact:</b> Prevented stack buffer overflow when writing to untracked (stack) buffers, which previously could abort the server during <code>fun_write()</code> execution.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md419"></a>
+<h2><a class="anchor" id="autotoc_md437"></a>
 <code>sandbox()</code> SIGSEGV (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 19, 2025)</li>
 <li><b>Scope:</b> <code>handle_ucall()</code> in <code><a class="el" href="funvars_8c.html" title="Variable/stack/regexp built-ins and helpers for structured data manipulation.">src/netmush/funvars.c</a></code></li>
 <li><b>Impact:</b> Out-of-bounds access to <code>fargs[5]</code> with too few args and null <code>preserve</code> dereference when no registers were saved.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md420"></a>
+<h2><a class="anchor" id="autotoc_md438"></a>
 List operations crash (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 2025)</li>
 <li><b>Scope:</b> List operation functions (commit: "List ops crash fix + regression suite")</li>
 <li><b>Impact:</b> Crash in list ops corrected; regression suite added to prevent recurrence.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md421"></a>
+<h1><a class="anchor" id="autotoc_md439"></a>
 Test Coverage Notes</h1>
 <ul>
 <li>Structure lifecycle regression suite: 22/22 passing.</li>

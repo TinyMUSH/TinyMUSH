@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['4_0',['4',['../md_SECURITY.html#autotoc_md469',1,'Known Security Enhancements in TinyMUSH 4'],['../md_docs_2ChangeLog.html',1,'TinyMUSH 4'],['../md_README.html#autotoc_md424',1,'TinyMUSH 4'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md264',1,'TinyMUX 1.4'],['../md_README.html#autotoc_md426',1,'What&apos;s New in TinyMUSH 4']]],
+  ['4_0',['4',['../md_SECURITY.html#autotoc_md490',1,'Known Security Enhancements in TinyMUSH 4'],['../md_docs_2ChangeLog.html',1,'TinyMUSH 4'],['../md_README.html#autotoc_md442',1,'TinyMUSH 4'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md264',1,'TinyMUX 1.4'],['../md_README.html#autotoc_md444',1,'What&apos;s New in TinyMUSH 4']]],
   ['4_200_1',['TinyMUSH 4.0',['../md_docs_2ChangeLog.html#autotoc_md62',1,'']]],
   ['4_200_20credits_2',['TinyMUSH 4.0 Credits',['../md_AUTHORS.html',1,'']]],
   ['4_200_20news_3',['TinyMUSH 4.0 NEWS',['../md_NEWS.html',1,'']]],
@@ -9,9 +9,9 @@ var searchData=
   ['4_2010_2027_2092_6',['TinyMUSH 2.0.8 patchlevel 4 (10/27/92)',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md315',1,'']]],
   ['4_2011_2021_2097_7',['TinyMUSH 2.2.4 (11/21/97)',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md295',1,'']]],
   ['4_2095_8',['TinyMUSH 2.2.1 (6/4/95)',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md298',1,'']]],
-  ['4_20current_9',['TinyMUSH 4 (Current)',['../md_README.html#autotoc_md439',1,'']]],
+  ['4_20current_9',['TinyMUSH 4 (Current)',['../md_README.html#autotoc_md460',1,'']]],
   ['4_20database_20integrity_10',['4. Database Integrity',['../md_docs_2Code_2MODULES__DEVELOPMENT.html#autotoc_md209',1,'']]],
-  ['4_20functions_11',['4. Functions',['../md_src_2modules_2skeleton_2README.html#autotoc_md509',1,'']]],
+  ['4_20functions_11',['4. Functions',['../md_src_2modules_2skeleton_2README.html#autotoc_md530',1,'']]],
   ['4_20june_208th_202002_12',['3.0 Patchlevel 4 (June 8th, 2002)',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md247',1,'']]],
   ['4_20ndash_20december_2019th_202006_13',['3.1 Patchlevel 4 &amp;ndash; December 19th, 2006',['../md_docs_2Historical_2ChangeLog_8History.html#autotoc_md228',1,'']]],
   ['4_20patchlevel_200_3a_14',['TinyMUX 1.4 patchlevel 0:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md265',1,'']]],
@@ -30,7 +30,7 @@ var searchData=
   ['4_20patchlevel_207_3a_27',['TinyMUX 1.4 patchlevel 7:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md272',1,'']]],
   ['4_20patchlevel_208_3a_28',['TinyMUX 1.4 patchlevel 8:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md273',1,'']]],
   ['4_20patchlevel_209_3a_29',['TinyMUX 1.4 patchlevel 9:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md274',1,'']]],
-  ['4_20strong_20extensibility_20strong_30',['4. &lt;strong&gt;Extensibility&lt;/strong&gt;',['../md_README.html#autotoc_md436',1,'']]],
+  ['4_20strong_20extensibility_20strong_30',['4. &lt;strong&gt;Extensibility&lt;/strong&gt;',['../md_README.html#autotoc_md457',1,'']]],
   ['4_3a_31',['4:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md306',1,'TinyMUSH 2.0 patchlevel 4:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md250',1,'TinyMUX 1.0 patchlevel 4:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md263',1,'TinyMUX 1.3 patchlevel 4:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md269',1,'TinyMUX 1.4 patchlevel 4:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md286',1,'TinyMUX 1.5 patchlevel 4:']]],
   ['4_3a_20buffer_20overflow_20detection_32',['Pattern 4: Buffer Overflow Detection',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md133',1,'']]]
 ];

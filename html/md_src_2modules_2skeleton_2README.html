@@ -88,9 +88,9 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">Skeleton Module - Complete Template for TinyMUSH Modules</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md502"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md523"></a></p>
 <p>This skeleton is a working TinyMUSH module that shows the minimal but complete pattern: version metadata, configuration table, command table, function table, hash table usage, init/cleanup, and simple handlers.</p>
-<h1><a class="anchor" id="autotoc_md503"></a>
+<h1><a class="anchor" id="autotoc_md524"></a>
 Quick Start (5 minutes)</h1>
 <div class="fragment"><div class="line"># Copy skeleton as your new module</div>
 <div class="line">cp -r src/modules/skeleton src/modules/mymodule</div>
@@ -114,7 +114,7 @@ Quick Start (5 minutes)</h1>
 <div class="line"> </div>
 <div class="line"># Restart</div>
 <div class="line">cd ../game &amp;&amp; ./netmush -D</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md504"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md525"></a>
 File Structure</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -130,9 +130,9 @@ File Structure</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>QUICK_REFERENCE.md</code>   </td><td class="markdownTableBodyNone">Cheat sheet   </td><td class="markdownTableBodyNone">~150   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md505"></a>
+<h1><a class="anchor" id="autotoc_md526"></a>
 Core Concepts</h1>
-<h2><a class="anchor" id="autotoc_md506"></a>
+<h2><a class="anchor" id="autotoc_md527"></a>
 1. Module Initialization (REQUIRED)</h2>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8c.html#a0cc28d02ce83a0fe6bb273b2d90e6282">mod_skeleton_init</a>(<span class="keywordtype">void</span>)</div>
 <div class="line">{</div>
@@ -157,7 +157,7 @@ Core Concepts</h1>
 <div class="ttc" id="askeleton_8c_html_a0cc28d02ce83a0fe6bb273b2d90e6282"><div class="ttname"><a href="skeleton_8c.html#a0cc28d02ce83a0fe6bb273b2d90e6282">mod_skeleton_init</a></div><div class="ttdeci">void mod_skeleton_init(void)</div><div class="ttdef"><b>Definition</b> skeleton.c:204</div></div>
 <div class="ttc" id="askeleton_8c_html_aae4eef9a8a40d8f00d79ac9dfd143c49"><div class="ttname"><a href="skeleton_8c.html#aae4eef9a8a40d8f00d79ac9dfd143c49">mod_skeleton_config</a></div><div class="ttdeci">struct mod_skeleton_confstorage mod_skeleton_config</div><div class="ttdef"><b>Definition</b> skeleton.c:56</div></div>
 <div class="ttc" id="askeleton_8c_html_ab3fca4618a027fc1d6f7ab42d1c75d74"><div class="ttname"><a href="skeleton_8c.html#ab3fca4618a027fc1d6f7ab42d1c75d74">mod_skeleton_data_htab</a></div><div class="ttdeci">HASHTAB mod_skeleton_data_htab</div><div class="ttdef"><b>Definition</b> skeleton.c:62</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md507"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md528"></a>
 2. Configuration (netmush.conf)</h2>
 <div class="fragment"><div class="line">module skeleton</div>
 <div class="line">skeleton_enabled yes</div>
@@ -173,7 +173,7 @@ Core Concepts</h1>
 <div class="ttc" id="askeleton_8c_html_ad0443ebf2b26285bf93fb4b0d01750a9"><div class="ttname"><a href="skeleton_8c.html#ad0443ebf2b26285bf93fb4b0d01750a9">mod_skeleton_conftable</a></div><div class="ttdeci">CONF mod_skeleton_conftable[]</div><div class="ttdef"><b>Definition</b> skeleton.c:89</div></div>
 <div class="ttc" id="astructconfparm_html"><div class="ttname"><a href="structconfparm.html">confparm</a></div><div class="ttdef"><b>Definition</b> typedefs.h:775</div></div>
 </div><!-- fragment --><p>Types used: <code>cf_bool</code>; Perms: <code>CA_GOD</code>, <code>CA_PUBLIC</code>.</p>
-<h2><a class="anchor" id="autotoc_md508"></a>
+<h2><a class="anchor" id="autotoc_md529"></a>
 3. Commands</h2>
 <p>Executed by players, can notify feedback:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8c.html#a43c9cb1608fda8b8f1181f6ff22502b6">mod_do_skeleton_command</a>(dbref player, dbref cause, <span class="keywordtype">int</span> key, <span class="keywordtype">char</span> *arg1)</div>
@@ -197,7 +197,7 @@ Core Concepts</h1>
 <div class="ttc" id="adb_8c_html_ad0d9086dc6e11c897a0e93db0fb0b280"><div class="ttname"><a href="db_8c.html#ad0d9086dc6e11c897a0e93db0fb0b280">Name</a></div><div class="ttdeci">char * Name(dbref thing)</div><div class="ttdoc">Get the name of a thing.</div><div class="ttdef"><b>Definition</b> db.c:966</div></div>
 <div class="ttc" id="amacros_8h_html_abe044d79896c3d56e758f742f4765f61"><div class="ttname"><a href="macros_8h.html#abe044d79896c3d56e758f742f4765f61">notify</a></div><div class="ttdeci">#define notify(p, m,...)</div><div class="ttdef"><b>Definition</b> macros.h:227</div></div>
 <div class="ttc" id="askeleton_8c_html_a43c9cb1608fda8b8f1181f6ff22502b6"><div class="ttname"><a href="skeleton_8c.html#a43c9cb1608fda8b8f1181f6ff22502b6">mod_do_skeleton_command</a></div><div class="ttdeci">void mod_do_skeleton_command(dbref player, dbref cause, int key, char *arg1)</div><div class="ttdef"><b>Definition</b> skeleton.c:128</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md509"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md530"></a>
 4. Functions</h2>
 <p>Called from softcode, return values via result buffer:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="skeleton_8c.html#aa8b3921d5c32918b378238c7af3abf4a">mod_do_skeleton_function</a>(<span class="keywordtype">char</span> *buff, <span class="keywordtype">char</span> **bufc, dbref player, dbref caller, dbref cause, <span class="keywordtype">char</span> *fargs[], <span class="keywordtype">int</span> nfargs, <span class="keywordtype">char</span> *cargs[], <span class="keywordtype">int</span> ncargs)</div>
@@ -233,7 +233,7 @@ Core Concepts</h1>
 <div class="line">    <a class="code hl_define" href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a>(<a class="code hl_define" href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a>, <span class="stringliteral">&quot;MOD&quot;</span>, <span class="stringliteral">&quot;SKEL&quot;</span>, <span class="stringliteral">&quot;dbref: #%d, caller #%d, nfargs: %d, ncargs: %d&quot;</span>, player, caller, nfargs, ncargs);</div>
 <div class="line">}</div>
 <div class="ttc" id="askeleton_8c_html_aa8b3921d5c32918b378238c7af3abf4a"><div class="ttname"><a href="skeleton_8c.html#aa8b3921d5c32918b378238c7af3abf4a">mod_do_skeleton_function</a></div><div class="ttdeci">void mod_do_skeleton_function(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)</div><div class="ttdef"><b>Definition</b> skeleton.c:156</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md510"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md531"></a>
 5. Hash Tables</h2>
 <p>Store and retrieve data efficiently (integer data for the example):</p>
 <div class="fragment"><div class="line"><span class="comment">// Initialize (in mod_skeleton_init)</span></div>
@@ -253,7 +253,7 @@ Core Concepts</h1>
 <div class="ttc" id="askeleton_8c_html_ac206f4681ab2a5fe6d4c6f5b56155af1"><div class="ttname"><a href="skeleton_8c.html#ac206f4681ab2a5fe6d4c6f5b56155af1">mod_skeleton_list_data</a></div><div class="ttdeci">void mod_skeleton_list_data(dbref player)</div><div class="ttdef"><b>Definition</b> skeleton.c:267</div></div>
 <div class="ttc" id="askeleton_8c_html_adb46c6f46d960ea546296d7843c7abb9"><div class="ttname"><a href="skeleton_8c.html#adb46c6f46d960ea546296d7843c7abb9">mod_skeleton_get_data</a></div><div class="ttdeci">int * mod_skeleton_get_data(char *key)</div><div class="ttdef"><b>Definition</b> skeleton.c:229</div></div>
 <div class="ttc" id="askeleton_8c_html_ade97ecb74c394c043a669b07e18a5360"><div class="ttname"><a href="skeleton_8c.html#ade97ecb74c394c043a669b07e18a5360">mod_skeleton_delete_data</a></div><div class="ttdeci">bool mod_skeleton_delete_data(char *key)</div><div class="ttdef"><b>Definition</b> skeleton.c:253</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md511"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md532"></a>
 Helper Functions Provided</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -271,7 +271,7 @@ Helper Functions Provided</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code><a class="el" href="skeleton_8c.html#a9147d4aa44f95b9ec96c752ce1704fea">mod_skeleton_cleanup()</a></code>   </td><td class="markdownTableBodyNone">Clean up on module unload   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md512"></a>
+<h1><a class="anchor" id="autotoc_md533"></a>
 Safe String Operations</h1>
 <p>Always use safe functions - never use raw <code>strcpy</code>/<code>strcat</code>/<code>sprintf</code>:</p>
 <div class="fragment"><div class="line"><span class="comment">// SAFE - All of these are safe</span></div>
@@ -284,7 +284,7 @@ Safe String Operations</h1>
 <div class="line">strcpy(dest, src);              <span class="comment">// BUFFER OVERFLOW!</span></div>
 <div class="line">strcat(dest, src);              <span class="comment">// BUFFER OVERFLOW!</span></div>
 <div class="line">sprintf(dest, <span class="stringliteral">&quot;%s&quot;</span>, src);       <span class="comment">// BUFFER OVERFLOW!</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md513"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md534"></a>
 Memory Management</h1>
 <p>Track all allocations and deallocate in cleanup:</p>
 <div class="fragment"><div class="line"><span class="comment">// Allocate</span></div>
@@ -296,7 +296,7 @@ Memory Management</h1>
 <div class="line">XFREE(str, <span class="stringliteral">&quot;function&quot;</span>);</div>
 <div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:21</div></div>
 </div><!-- fragment --><p>The <code><a class="el" href="skeleton_8c.html#a9147d4aa44f95b9ec96c752ce1704fea">mod_skeleton_cleanup()</a></code> function shows the pattern for proper cleanup.</p>
-<h1><a class="anchor" id="autotoc_md514"></a>
+<h1><a class="anchor" id="autotoc_md535"></a>
 Customization Steps</h1>
 <ol type="1">
 <li><b>Rename module</b> - Change <code>skeleton</code> → <code>mymodule</code> everywhere</li>
@@ -308,7 +308,7 @@ Customization Steps</h1>
 <li><b>Build</b> - <code>cmake .. &amp;&amp; make</code></li>
 <li><b>Test</b> - Check logs and try in-game</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md515"></a>
+<h1><a class="anchor" id="autotoc_md536"></a>
 Testing</h1>
 <div class="fragment"><div class="line"># In-game (after loading)</div>
 <div class="line">@version               # Check it loads</div>
@@ -320,7 +320,7 @@ Testing</h1>
 <div class="line"> </div>
 <div class="line"># Enable debug output</div>
 <div class="line">netmush.conf: skeleton_debug 2</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md516"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md537"></a>
 Common Issues</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -338,7 +338,7 @@ Common Issues</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Buffer overflow   </td><td class="markdownTableBodyNone">Never use <code>strcpy</code>, use <code>xstrncpy</code>   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md517"></a>
+<h1><a class="anchor" id="autotoc_md538"></a>
 Development Checklist</h1>
 <ul class="check">
 <li class="unchecked">Module renamed in all files</li>
@@ -370,7 +370,7 @@ Development Checklist</h1>
 <ul class="check">
 <li class="unchecked">Cleanup function updated</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md518"></a>
+<h1><a class="anchor" id="autotoc_md539"></a>
 Reference</h1>
 <ul>
 <li><b>Quick patterns:</b> See <code>QUICK_REFERENCE.md</code></li>

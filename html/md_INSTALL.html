@@ -160,7 +160,21 @@ Database backend selection</h2>
 <li>GDBM (legacy/alternative):</li>
 </ul>
 <div class="fragment"><div class="line">cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..</div>
-</div><!-- fragment --><p>If you need to migrate an existing database, use the <code>dbconvert</code> utility (built in <code>src/netmush/</code>) to convert between GDBM and LMDB formats.</p>
+</div><!-- fragment --><p><b>Migrating between database backends:</b></p>
+<p>To migrate from GDBM to LMDB (or vice versa):</p>
+<ol type="1">
+<li>Export flatfile with current backend: <div class="fragment"><div class="line"># With GDBM backend</div>
+<div class="line">./netmush --dbconvert &lt; game/db/netmush.db &gt; migration.flat</div>
+</div><!-- fragment --></li>
+<li>Rebuild with new backend: <div class="fragment"><div class="line">cd build</div>
+<div class="line">cmake -DUSE_LMDB=ON -DUSE_GDBM=OFF ..</div>
+<div class="line">cmake --build . --target install-upgrade</div>
+</div><!-- fragment --></li>
+<li>Load flatfile with new backend: <div class="fragment"><div class="line">cd game</div>
+<div class="line">./netmush --load-flatfile ../migration.flat</div>
+</div><!-- fragment --></li>
+</ol>
+<p><b>Note:</b> Direct conversion between GDBM and LMDB database files is not supported. You must export to flatfile first, recompile with the desired backend, then import the flatfile.</p>
 <p>Configure CMake with these options:</p>
 <div class="fragment"><div class="line">cmake -DCMAKE_BUILD_TYPE=Release \</div>
 <div class="line">      -DTINYMUSH_USE_CCACHE=ON \</div>
@@ -273,8 +287,47 @@ Runtime Errors</h2>
 <li>Check logs: <code>tail game/logs/netmush.log</code></li>
 </ul>
 <h1><a class="anchor" id="autotoc_md402"></a>
-Directory Structure</h1>
+Database Restoration</h1>
 <h2><a class="anchor" id="autotoc_md403"></a>
+Loading from Flatfile</h2>
+<p>The <code>--load-flatfile</code> option allows loading a database from a flat text file at startup. This is useful for:</p>
+<ul>
+<li>Database restoration from backups</li>
+<li>Database migration between instances</li>
+<li>Database reset to a known good state</li>
+<li>Loading test data</li>
+</ul>
+<p><b>Usage:</b> </p><div class="fragment"><div class="line">./netmush --load-flatfile &lt;path/to/flatfile&gt; [CONFIG-FILE]</div>
+</div><!-- fragment --><p><b>Examples:</b></p>
+<p>Load a flatfile with default config: </p><div class="fragment"><div class="line">./netmush --load-flatfile ./backups/netmush.db.FLAT</div>
+</div><!-- fragment --><p>Load with specific config file: </p><div class="fragment"><div class="line">./netmush --load-flatfile ./backups/netmush.db.FLAT ./configs/netmush.conf</div>
+</div><!-- fragment --><p>Load in debug mode (no fork): </p><div class="fragment"><div class="line">./netmush -d --load-flatfile ./backups/netmush.db.FLAT</div>
+</div><!-- fragment --><p><b>How It Works:</b></p>
+<ol type="1">
+<li>Server initializes with specified config</li>
+<li>Database backend is initialized</li>
+<li>Flatfile is loaded instead of existing database</li>
+<li>Data is parsed and imported into active database</li>
+<li><b>Server continues running normally</b> with the loaded database</li>
+</ol>
+<p><b>Important Notes:</b></p>
+<ul>
+<li>Always backup current database before loading a flatfile: <div class="fragment"><div class="line">cp -r game/db/netmush.db.lmdb game/db/netmush.db.lmdb.backup</div>
+</div><!-- fragment --></li>
+<li>Flatfile must be in TinyMUSH standard format (typically <code>*.FLAT</code> files)</li>
+<li>If flatfile doesn't exist, server exits with error message</li>
+<li>Loading overwrites the current LMDB/GDBM database</li>
+<li>All changes are preserved when server shuts down normally</li>
+</ul>
+<p><b>Related Commands:</b></p>
+<ul>
+<li>Database conversion: <code>netmush --dbconvert</code></li>
+<li>Database recovery (GDBM): <code>netmush --recover</code></li>
+<li>Minimal database: <code>netmush -m</code></li>
+</ul>
+<h1><a class="anchor" id="autotoc_md404"></a>
+Directory Structure</h1>
+<h2><a class="anchor" id="autotoc_md405"></a>
 Repository Layout</h2>
 <div class="fragment"><div class="line">TinyMUSH/</div>
 <div class="line">├── CMakeLists.txt          Main build configuration</div>
@@ -295,7 +348,7 @@ Repository Layout</h2>
 <div class="line">│   ├── Code/              Development documentation</div>
 <div class="line">│   └── Historical/        Legacy documentation</div>
 <div class="line">└── scripts/               Regression test suites</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md404"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md406"></a>
 Game Directory Layout (after install)</h2>
 <div class="fragment"><div class="line">game/</div>
 <div class="line">├── netmush                 Server executable</div>
@@ -311,9 +364,9 @@ Game Directory Layout (after install)</h2>
 <div class="line">├── modules/                Compiled module .so files</div>
 <div class="line">├── scripts/                Helper scripts</div>
 <div class="line">└── systemd/                systemd service file</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md405"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md407"></a>
 Backup and Recovery</h1>
-<h2><a class="anchor" id="autotoc_md406"></a>
+<h2><a class="anchor" id="autotoc_md408"></a>
 Manual Backup</h2>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line"># Backup database</div>
@@ -321,20 +374,20 @@ Manual Backup</h2>
 <div class="line"> </div>
 <div class="line"># Backup everything</div>
 <div class="line">tar czf backups/full-$(date +%Y%m%d-%H%M%S).tar.gz .</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md407"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md409"></a>
 Restore from Backup</h2>
 <div class="fragment"><div class="line">cd game</div>
 <div class="line">tar xzf backups/db-&lt;timestamp&gt;.tar.gz</div>
 <div class="line">./netmush</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md408"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md410"></a>
 Automated Backups</h2>
 <p>Set up <code>@daily</code> in-game on God (#1):</p>
 <div class="fragment"><div class="line">@daily me = @dump/flatfile; @wait 5={@shutdown}</div>
 </div><!-- fragment --><p>Or use cron:</p>
 <div class="fragment"><div class="line">0 3 * * * cd /path/to/game &amp;&amp; ./netmush @dump/flatfile</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md409"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md411"></a>
 Upgrading</h1>
-<h2><a class="anchor" id="autotoc_md410"></a>
+<h2><a class="anchor" id="autotoc_md412"></a>
 From Previous Version</h2>
 <ol type="1">
 <li>Stop the server: <code>killall netmush</code></li>
@@ -344,12 +397,12 @@ From Previous Version</h2>
 <li>Review config changes in <code>game/configs/netmush.conf.example</code></li>
 <li>Restart: <code>cd game &amp;&amp; ./netmush</code></li>
 </ol>
-<h2><a class="anchor" id="autotoc_md411"></a>
+<h2><a class="anchor" id="autotoc_md413"></a>
 Config Migration</h2>
 <p>Config backups are stored in <code>game/backups/upgrade-&lt;timestamp&gt;/</code>:</p>
 <div class="fragment"><div class="line"># Compare old and new configs</div>
 <div class="line">diff game/backups/upgrade-*/netmush.conf game/configs/netmush.conf</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md412"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md414"></a>
 Development Setup</h1>
 <p>For active development:</p>
 <div class="fragment"><div class="line"># Debug build</div>
@@ -367,7 +420,7 @@ Development Setup</h1>
 <div class="line">./netmush</div>
 <div class="line">EOF</div>
 <div class="line">chmod +x ../rebuild.sh</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md413"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md415"></a>
 Additional Resources</h1>
 <ul>
 <li><b>Main README</b>: <a class="el" href="md_README.html">README.md</a></li>
@@ -376,7 +429,7 @@ Additional Resources</h1>
 <li><b>Known Issues</b>: <a class="el" href="md_KNOWN__BUGS.html">KNOWN_BUGS.md</a></li>
 <li><b>Security</b>: <a class="el" href="md_SECURITY.html">SECURITY.md</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md414"></a>
+<h1><a class="anchor" id="autotoc_md416"></a>
 Support</h1>
 <p>For issues, questions, or contributions:</p>
 <ul>
