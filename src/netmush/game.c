@@ -3039,7 +3039,7 @@ void usage_dbconvert(void)
 	fprintf(stderr, "  -f, --config=<filename>   config file\n");
 	fprintf(stderr, "  -C, --check               perform consistency check\n");
 	fprintf(stderr, "  -d, --data=<path>         data directory\n");
-	fprintf(stderr, "  -D, --dbfile=<filename>   database directory\n");
+	fprintf(stderr, "  -D, --dbdir=<path>        database directory\n");
 	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
 	fprintf(stderr, "  --lmdb                    write in LMDB format (default)\n");
 	fprintf(stderr, "  -g, --flat                write in flat text format\n");
@@ -3226,7 +3226,7 @@ int dbconvert(int argc, char *argv[])
 		{"config", required_argument, 0, 'f'},
 		{"check", no_argument, 0, 'C'},
 		{"data", required_argument, 0, 'd'},
-		{"dbfile", required_argument, 0, 'D'},
+		{"dbdir", required_argument, 0, 'D'},  /* Directory for LMDB */
 		{"cleanattr", no_argument, 0, 'q'},
 		{"lmdb", no_argument, 0, '1'},          /* Output as LMDB (default), long-only */
 		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
@@ -3504,7 +3504,7 @@ int dbconvert(int argc, char *argv[])
 		{"config", required_argument, 0, 'f'},
 		{"check", no_argument, 0, 'C'},
 		{"data", required_argument, 0, 'd'},
-		{"dbfile", required_argument, 0, 'D'},
+		{"dbfile", required_argument, 0, 'D'},  /* Single file for GDBM */
 		{"cleanattr", no_argument, 0, 'q'},
 		{"gdbm", no_argument, 0, 'G'},          /* Output as GDBM (default) */
 		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
