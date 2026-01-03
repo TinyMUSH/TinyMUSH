@@ -2476,38 +2476,74 @@ void fun_decrypt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 /* Borrowed from PennMUSH 1.50 */
 void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int n, i, j, ansi_state, *ansi_map;
-	char *stripped, *buf;
+	int n, i, j;
+	ColorState *color_states;
+	char *stripped, *seq_buf;
+	char escape_buffer[256];
+	size_t escape_offset;
+	ColorType color_type = ColorTypeNone;
+	dbref color_target = (cause != NOTHING) ? cause : player;
 
 	if (!fargs[0] || !*fargs[0])
 	{
 		return;
 	}
 
-	n = ansi_map_states(fargs[0], &ansi_map, &stripped);
-	ansi_state = ANST_NORMAL;
+	// Determine color type for output
+	if (color_target != NOTHING && Color24Bit(color_target))
+	{
+		color_type = ColorTypeTrueColor;
+	}
+	else if (color_target != NOTHING && Color256(color_target))
+	{
+		color_type = ColorTypeXTerm;
+	}
+	else if (color_target != NOTHING && Ansi(color_target))
+	{
+		color_type = ColorTypeAnsi;
+	}
+
+	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
 
 	for (i = 0; i < n; i++)
 	{
 		j = random_range(i, n - 1);
 
-		if (ansi_state != ansi_map[j])
+		// Output color transition if state changed
+		ColorState before = (i > 0) ? color_states[i - 1] : (ColorState){0};
+		if (memcmp(&before, &color_states[j], sizeof(ColorState)) != 0)
 		{
-			buf = ansi_transition_esccode(ansi_state, ansi_map[j], false);
-			XSAFELBSTR(buf, buff, bufc);
-			XFREE(buf);
-			ansi_state = ansi_map[j];
+			escape_offset = 0;
+			to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &color_states[j], color_type);
+			if (escape_offset > 0)
+			{
+				XSAFELBSTR(escape_buffer, buff, bufc);
+			}
 		}
 
+		// Output the scrambled character
 		XSAFELBCHR(stripped[j], buff, bufc);
-		ansi_map[j] = ansi_map[i];
+		
+		// Swap color states and characters
+		ColorState temp_state = color_states[j];
+		color_states[j] = color_states[i];
+		color_states[i] = temp_state;
+		
+		char temp_char = stripped[j];
 		stripped[j] = stripped[i];
+		stripped[i] = temp_char;
 	}
 
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
-	XSAFELBSTR(buf, buff, bufc);
-	XFREE(buf);
-	XFREE(ansi_map);
+	// Reset to normal at the end
+	escape_offset = 0;
+	ColorState reset_state = (ColorState){.reset = ColorStatusReset};
+	to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &reset_state, color_type);
+	if (escape_offset > 0)
+	{
+		XSAFELBSTR(escape_buffer, buff, bufc);
+	}
+
+	XFREE(color_states);
 	XFREE(stripped);
 }
 
@@ -2518,34 +2554,64 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int n, *ansi_map, ansi_state;
-	char *stripped, *buf;
+	int n, i;
+	ColorState *color_states;
+	char *stripped;
+	char escape_buffer[256];
+	size_t escape_offset;
+	ColorType color_type = ColorTypeNone;
+	dbref color_target = (cause != NOTHING) ? cause : player;
 
 	if (!fargs[0] || !*fargs[0])
 	{
 		return;
 	}
 
-	n = ansi_map_states(fargs[0], &ansi_map, &stripped);
-	ansi_state = ansi_map[n];
-
-	while (n--)
+	// Determine color type for output
+	if (color_target != NOTHING && Color24Bit(color_target))
 	{
-		if (ansi_state != ansi_map[n])
-		{
-			buf = ansi_transition_esccode(ansi_state, ansi_map[n], false);
-			XSAFELBSTR(buf, buff, bufc);
-			XFREE(buf);
-			ansi_state = ansi_map[n];
-		}
-
-		XSAFELBCHR(stripped[n], buff, bufc);
+		color_type = ColorTypeTrueColor;
+	}
+	else if (color_target != NOTHING && Color256(color_target))
+	{
+		color_type = ColorTypeXTerm;
+	}
+	else if (color_target != NOTHING && Ansi(color_target))
+	{
+		color_type = ColorTypeAnsi;
 	}
 
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
-	XSAFELBSTR(buf, buff, bufc);
-	XFREE(buf);
-	XFREE(ansi_map);
+	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
+
+	// Reverse iteration through characters
+	for (i = n - 1; i >= 0; i--)
+	{
+		// Output color transition if state changed
+		ColorState before = (i < n - 1) ? color_states[i + 1] : (ColorState){0};
+		if (memcmp(&before, &color_states[i], sizeof(ColorState)) != 0)
+		{
+			escape_offset = 0;
+			to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &color_states[i], color_type);
+			if (escape_offset > 0)
+			{
+				XSAFELBSTR(escape_buffer, buff, bufc);
+			}
+		}
+
+		// Output the reversed character
+		XSAFELBCHR(stripped[i], buff, bufc);
+	}
+
+	// Reset to normal at the end
+	escape_offset = 0;
+	ColorState reset_state = (ColorState){.reset = ColorStatusReset};
+	to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &reset_state, color_type);
+	if (escape_offset > 0)
+	{
+		XSAFELBSTR(escape_buffer, buff, bufc);
+	}
+
+	XFREE(color_states);
 	XFREE(stripped);
 }
 

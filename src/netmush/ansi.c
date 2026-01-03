@@ -2986,6 +2986,77 @@ int ansi_map_states(const char *s, int **m, char **p)
 }
 
 /**
+ * @brief Map ANSI state for every character using modern ColorState format.
+ * 
+ * Supports ANSI basic, xterm 256-color, and truecolor.
+ * 
+ * Caller must free `*states` with XFREE(states, "ansi_map_states_colorstate_states")
+ * and `*stripped` with XFREE(stripped, "ansi_map_states_colorstate_stripped").
+ *
+ * @param s Input string (may contain ANSI/xterm/truecolor escape sequences)
+ * @param states Out: allocated array of ColorState for each character
+ * @param stripped Out: stripped string without ANSI codes
+ * @return int Number of characters mapped
+ */
+int ansi_map_states_colorstate(const char *s, ColorState **states, char **stripped)
+{
+    ColorState *color_states;
+    char *text;
+    const char *p;
+    ColorState current_state = {0};
+    int n = 0;
+    const int map_cap = HBUF_SIZE - 1;
+    const int strip_cap = LBUF_SIZE - 1;
+    
+    color_states = (ColorState *)XCALLOC(HBUF_SIZE, sizeof(ColorState), "ansi_map_states_colorstate_states");
+    text = XMALLOC(LBUF_SIZE, "ansi_map_states_colorstate_stripped");
+    
+    if (!s || !*s)
+    {
+        color_states[0] = current_state;
+        text[0] = '\0';
+        *states = color_states;
+        *stripped = text;
+        return 0;
+    }
+
+    p = s;
+    while (*p && n < map_cap && n < strip_cap)
+    {
+        if (*p == ESC_CHAR)
+        {
+            // Parse ANSI sequence and update current_state
+            parse_and_apply_ansi_sequence(&p, &current_state);
+        }
+        else
+        {
+            // Record color state for this character
+            color_states[n] = current_state;
+            text[n++] = *p++;
+        }
+    }
+
+    // Skip any trailing ANSI sequences
+    while (*p)
+    {
+        if (*p == ESC_CHAR)
+        {
+            parse_and_apply_ansi_sequence(&p, &current_state);
+        }
+        else
+        {
+            ++p;
+        }
+    }
+
+    color_states[n] = current_state;  // Final state for transition at end
+    text[n] = '\0';
+    *states = color_states;
+    *stripped = text;
+    return n;
+}
+
+/**
  * @brief Parse ANSI escape sequence and return ColorState.
  * 
  * @param ansi_ptr Pointer to string pointer, will be advanced past the parsed sequence
