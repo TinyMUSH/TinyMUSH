@@ -2845,6 +2845,147 @@ int ansi_strip_ansi_len(const char *str)
 }
 
 /**
+ * @brief Map ANSI state for every character using legacy packed state format.
+ *
+ * Caller must free `*m` with XFREE(m, "ansi_map_states_ansi_map") and
+ * `*p` with XFREE(p, "ansi_map_states_stripped").
+ *
+ * @param s Input string
+ * @param m Out: allocated array of ANSI states per character
+ * @param p Out: stripped string without ANSI codes
+ * @return int Number of characters mapped
+ */
+int ansi_map_states(const char *s, int **m, char **p)
+{
+    int *ansi_map;
+    char *stripped;
+    char *s1, *s2;
+    int n = 0, ansi_state = ANST_NORMAL;
+    const int map_cap = HBUF_SIZE - 1;
+    const int strip_cap = LBUF_SIZE - 1;
+    
+    ansi_map = (int *)XCALLOC(HBUF_SIZE, sizeof(int), "ansi_map");
+    stripped = XMALLOC(LBUF_SIZE, "stripped");
+    
+    if (!s)
+    {
+        ansi_map[0] = ANST_NORMAL;
+        stripped[0] = '\0';
+        *m = ansi_map;
+        *p = stripped;
+        return 0;
+    }
+
+    s2 = s1 = XSTRDUP(s, "s1");
+
+    while (*s1 && n < map_cap && n < strip_cap)
+    {
+        if (*s1 == ESC_CHAR)
+        {
+            do
+            {
+                int ansi_mask = 0;
+                int ansi_diff = 0;
+                unsigned int param_val = 0;
+                int is_xterm = 0;  // Flag to skip xterm 256-color sequences
+                ++(s1);
+                if (*(s1) == ANSI_CSI)
+                {
+                    while ((*(++(s1)) & 0xf0) == 0x30)
+                    {
+                        if (*(s1) < 0x3a)
+                        {
+                            param_val <<= 1;
+                            param_val += (param_val << 2) + (*(s1) & 0x0f);
+                        }
+                        else
+                        {
+                            // Check for xterm 256-color codes: 38;5;N or 48;5;N
+                            if ((param_val == 38 || param_val == 48) && *(s1) == ';')
+                            {
+                                // Peek ahead for ;5; safely
+                                if (s1[1] && s1[1] == '5' && s1[2] && s1[2] == ';')
+                                {
+                                    is_xterm = 1;
+                                    break;  // Skip this entire sequence
+                                }
+                            }
+                            
+                            if (param_val < I_ANSI_LIM)
+                            {
+                                ansi_mask |= ansiBitsMask(param_val);
+                                ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+                            }
+                            param_val = 0;
+                        }
+                    }
+                }
+                
+                // Skip to end of sequence
+                while ((*(s1) & 0xf0) == 0x20)
+                {
+                    ++(s1);
+                }
+                
+                // Skip remaining digits/separators if xterm
+                if (is_xterm)
+                {
+                    while (*s1 && *s1 != ANSI_END)
+                    {
+                        ++(s1);
+                    }
+                }
+                
+                if (*(s1) == ANSI_END)
+                {
+                    if (!is_xterm && param_val < I_ANSI_LIM)
+                    {
+                        ansi_mask |= ansiBitsMask(param_val);
+                        ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
+                    }
+                    if (!is_xterm)
+                    {
+                        ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
+                    }
+                    ++(s1);
+                }
+                else if (*(s1))
+                {
+                    ++(s1);
+                }
+            } while (0);
+        }
+        else
+        {
+            ansi_map[n] = ansi_state;
+            stripped[n++] = *s1++;
+        }
+    }
+
+    /* If we stopped due to buffer limits, continue consuming escape codes only
+     * to keep the input pointer consistent; ansi_state beyond this point is not
+     * recorded to avoid overruns. */
+    while (*s1)
+    {
+        if (*s1 == ESC_CHAR)
+        {
+            skip_esccode(&s1);
+        }
+        else
+        {
+            ++s1;
+        }
+    }
+
+    ansi_map[n] = ANST_NORMAL;
+    stripped[n] = '\0';
+    *m = ansi_map;
+    *p = stripped;
+    XFREE(s2);
+    return n;
+}
+
+/**
  * @brief Parse ANSI escape sequence and return ColorState.
  * 
  * @param ansi_ptr Pointer to string pointer, will be advanced past the parsed sequence
