@@ -3041,8 +3041,22 @@ void usage_dbconvert(void)
 	fprintf(stderr, "  -d, --data=<path>         data directory\n");
 	fprintf(stderr, "  -D, --dbfile=<filename>   database directory\n");
 	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
-	fprintf(stderr, "  -L, --lmdb                write in LMDB format (default)\n");
+	fprintf(stderr, "  --lmdb                    write in LMDB format (default)\n");
 	fprintf(stderr, "  -g, --flat                write in flat text format\n");
+	fprintf(stderr, "  -K, --keyattr             store keys as object attributes\n");
+	fprintf(stderr, "  -k, --keyhdr              store keys in object header\n");
+	fprintf(stderr, "  -L, --links               include link information\n");
+	fprintf(stderr, "  -l, --nolinks             don't include link information\n");
+	fprintf(stderr, "  -M, --maps                include attribute maps\n");
+	fprintf(stderr, "  -m, --nomaps              don't include attribute maps\n");
+	fprintf(stderr, "  -N, --nameattr            store names as object attributes\n");
+	fprintf(stderr, "  -H, --namehdr             store names in object header\n");
+	fprintf(stderr, "  -P, --parents             include parent information\n");
+	fprintf(stderr, "  -p, --noparents           don't include parent information\n");
+	fprintf(stderr, "  -W, --write               write database to output\n");
+	fprintf(stderr, "  -w, --nowrite             don't write database\n");
+	fprintf(stderr, "  -X, --mindb               create minimal database\n");
+	fprintf(stderr, "  -x, --minflat             create minimal flat file\n");
 	fprintf(stderr, "  -Z, --zones               include zone information\n");
 	fprintf(stderr, "  -z, --nozones             don't include zone information\n");
 	fprintf(stderr, "  -o, --output=<number>     set output version number\n\n");
@@ -3056,6 +3070,20 @@ void usage_dbconvert(void)
 	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
 	fprintf(stderr, "  -G, --gdbm                write in GDBM format (default)\n");
 	fprintf(stderr, "  -g, --flat                write in flat text format\n");
+	fprintf(stderr, "  -K, --keyattr             store keys as object attributes\n");
+	fprintf(stderr, "  -k, --keyhdr              store keys in object header\n");
+	fprintf(stderr, "  -L, --links               include link information\n");
+	fprintf(stderr, "  -l, --nolinks             don't include link information\n");
+	fprintf(stderr, "  -M, --maps                include attribute maps\n");
+	fprintf(stderr, "  -m, --nomaps              don't include attribute maps\n");
+	fprintf(stderr, "  -N, --nameattr            store names as object attributes\n");
+	fprintf(stderr, "  -H, --namehdr             store names in object header\n");
+	fprintf(stderr, "  -P, --parents             include parent information\n");
+	fprintf(stderr, "  -p, --noparents           don't include parent information\n");
+	fprintf(stderr, "  -W, --write               write database to output\n");
+	fprintf(stderr, "  -w, --nowrite             don't write database\n");
+	fprintf(stderr, "  -X, --mindb               create minimal database\n");
+	fprintf(stderr, "  -x, --minflat             create minimal flat file\n");
 	fprintf(stderr, "  -Z, --zones               include zone information\n");
 	fprintf(stderr, "  -z, --nozones             don't include zone information\n");
 	fprintf(stderr, "  -o, --output=<number>     set output version number\n\n");
@@ -3183,6 +3211,7 @@ int dbconvert(int argc, char *argv[])
 	int ver;
 	int db_ver, db_format, db_flags, do_check, do_write;
 	int c, dbclean, errflg = 0;
+	int setflags, clrflags;
 	char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
 	char *opt_datadir = (char *)DEFAULT_DATABASE_HOME;
 	char *opt_dbfile = (char *)DEFAULT_CONFIG_FILE;
@@ -3199,11 +3228,25 @@ int dbconvert(int argc, char *argv[])
 		{"data", required_argument, 0, 'd'},
 		{"dbfile", required_argument, 0, 'D'},
 		{"cleanattr", no_argument, 0, 'q'},
-		{"lmdb", no_argument, 0, 'L'},          /* Output as LMDB (default) */
+		{"lmdb", no_argument, 0, '1'},          /* Output as LMDB (default), long-only */
 		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
-		{"zones", no_argument, 0, 'Z'},
-		{"nozones", no_argument, 0, 'z'},
-		{"output", required_argument, 0, 'o'},
+		{"keyattr", no_argument, 0, 'K'},       /* Store keys as attributes */
+		{"keyhdr", no_argument, 0, 'k'},        /* Store keys in header */
+		{"links", no_argument, 0, 'L'},         /* Include link information */
+		{"nolinks", no_argument, 0, 'l'},       /* Exclude link information */
+		{"maps", no_argument, 0, 'M'},          /* Include attribute maps */
+		{"nomaps", no_argument, 0, 'm'},        /* Exclude attribute maps */
+		{"nameattr", no_argument, 0, 'N'},      /* Store names as attributes */
+		{"namehdr", no_argument, 0, 'H'},       /* Store names in header */
+		{"parents", no_argument, 0, 'P'},       /* Include parent information */
+		{"noparents", no_argument, 0, 'p'},     /* Exclude parent information */
+		{"write", no_argument, 0, 'W'},         /* Write database */
+		{"nowrite", no_argument, 0, 'w'},       /* Don't write database */
+		{"mindb", no_argument, 0, 'X'},         /* Create minimal database */
+		{"minflat", no_argument, 0, 'x'},       /* Create minimal flat file */
+		{"zones", no_argument, 0, 'Z'},         /* Include zone information */
+		{"nozones", no_argument, 0, 'z'},       /* Exclude zone information */
+		{"output", required_argument, 0, 'o'},  /* Output version number */
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
 	
@@ -3213,8 +3256,10 @@ int dbconvert(int argc, char *argv[])
 	ver = do_check = 0;
 	do_write = 1;
 	dbclean = V_DBCLEAN;
+	setflags = 0;
+	clrflags = 0;
 
-	while ((c = getopt_long(argc, argv, "f:Cd:D:q:LgZzo:?", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "f:Cd:D:q:gKkLlMmNHPpWwXxZzo:?", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
@@ -3238,7 +3283,7 @@ int dbconvert(int argc, char *argv[])
 			dbclean = 0;
 			break;
 
-		case 'L':
+		case '1':  /* --lmdb */
 			do_output_lmdb = 1;
 			break;
 
@@ -3246,11 +3291,80 @@ int dbconvert(int argc, char *argv[])
 			do_output_lmdb = 0;
 			break;
 
+		case 'K':
+			setflags |= V_ATRNAME;
+			clrflags &= ~V_ATRNAME;
+			break;
+
+		case 'k':
+			clrflags |= V_ATRNAME;
+			setflags &= ~V_ATRNAME;
+			break;
+
+		case 'L':
+			setflags |= V_LINK;
+			clrflags &= ~V_LINK;
+			break;
+
+		case 'l':
+			clrflags |= V_LINK;
+			setflags &= ~V_LINK;
+			break;
+
+		case 'M':
+			setflags |= V_ATRKEY;
+			clrflags &= ~V_ATRKEY;
+			break;
+
+		case 'm':
+			clrflags |= V_ATRKEY;
+			setflags &= ~V_ATRKEY;
+			break;
+
+		case 'N':
+			setflags |= V_ATRNAME;
+			clrflags &= ~V_ATRNAME;
+			break;
+
+		case 'H':
+			clrflags |= V_ATRNAME;
+			setflags &= ~V_ATRNAME;
+			break;
+
+		case 'P':
+			setflags |= V_PARENT;
+			clrflags &= ~V_PARENT;
+			break;
+
+		case 'p':
+			clrflags |= V_PARENT;
+			setflags &= ~V_PARENT;
+			break;
+
+		case 'W':
+			do_write = 1;
+			break;
+
+		case 'w':
+			do_write = 0;
+			break;
+
+		case 'X':
+			dbclean = V_DBCLEAN;
+			break;
+
+		case 'x':
+			dbclean = 0;
+			break;
+
 		case 'Z':
-			/* Zone flags - preserved for future attribute filtering */
+			setflags |= V_ZONE;
+			clrflags &= ~V_ZONE;
 			break;
 
 		case 'z':
+			clrflags |= V_ZONE;
+			setflags &= ~V_ZONE;
 			break;
 
 		case 'o':
@@ -3291,6 +3405,9 @@ int dbconvert(int argc, char *argv[])
 	db_format = F_TINYMUSH;
 	db_ver = OUTPUT_VERSION;
 	db_flags = OUTPUT_FLAGS;
+
+	/* Apply conversion flags from command line */
+	db_flags = (db_flags & ~clrflags) | setflags;
 
 	log_write_raw(1, "Input: ");
 	info(db_format, db_flags, db_ver);
@@ -3372,6 +3489,7 @@ int dbconvert(int argc, char *argv[])
 	int ver;
 	int db_ver, db_format, db_flags, do_check, do_write;
 	int c, dbclean, errflg = 0;
+	int setflags, clrflags;
 	char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
 	char *opt_datadir = (char *)DEFAULT_DATABASE_HOME;
 	char *opt_dbfile = (char *)DEFAULT_CONFIG_FILE;
@@ -3390,9 +3508,23 @@ int dbconvert(int argc, char *argv[])
 		{"cleanattr", no_argument, 0, 'q'},
 		{"gdbm", no_argument, 0, 'G'},          /* Output as GDBM (default) */
 		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
-		{"zones", no_argument, 0, 'Z'},
-		{"nozones", no_argument, 0, 'z'},
-		{"output", required_argument, 0, 'o'},
+		{"keyattr", no_argument, 0, 'K'},       /* Store keys as attributes */
+		{"keyhdr", no_argument, 0, 'k'},        /* Store keys in header */
+		{"links", no_argument, 0, 'L'},         /* Include link information */
+		{"nolinks", no_argument, 0, 'l'},       /* Exclude link information */
+		{"maps", no_argument, 0, 'M'},          /* Include attribute maps */
+		{"nomaps", no_argument, 0, 'm'},        /* Exclude attribute maps */
+		{"nameattr", no_argument, 0, 'N'},      /* Store names as attributes */
+		{"namehdr", no_argument, 0, 'H'},       /* Store names in header */
+		{"parents", no_argument, 0, 'P'},       /* Include parent information */
+		{"noparents", no_argument, 0, 'p'},     /* Exclude parent information */
+		{"write", no_argument, 0, 'W'},         /* Write database */
+		{"nowrite", no_argument, 0, 'w'},       /* Don't write database */
+		{"mindb", no_argument, 0, 'X'},         /* Create minimal database */
+		{"minflat", no_argument, 0, 'x'},       /* Create minimal flat file */
+		{"zones", no_argument, 0, 'Z'},         /* Include zone information */
+		{"nozones", no_argument, 0, 'z'},       /* Exclude zone information */
+		{"output", required_argument, 0, 'o'},  /* Output version number */
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
 	
@@ -3402,8 +3534,10 @@ int dbconvert(int argc, char *argv[])
 	ver = do_check = 0;
 	do_write = 1;
 	dbclean = V_DBCLEAN;
+	setflags = 0;
+	clrflags = 0;
 
-	while ((c = getopt_long(argc, argv, "f:Cd:D:q:GgZzo:?", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "f:Cd:D:q:gGKkLlMmNHPpWwXxZzo:?", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
@@ -3435,11 +3569,80 @@ int dbconvert(int argc, char *argv[])
 			do_output_gdbm = 0;
 			break;
 
+		case 'K':
+			setflags |= V_ATRNAME;
+			clrflags &= ~V_ATRNAME;
+			break;
+
+		case 'k':
+			clrflags |= V_ATRNAME;
+			setflags &= ~V_ATRNAME;
+			break;
+
+		case 'L':
+			setflags |= V_LINK;
+			clrflags &= ~V_LINK;
+			break;
+
+		case 'l':
+			clrflags |= V_LINK;
+			setflags &= ~V_LINK;
+			break;
+
+		case 'M':
+			setflags |= V_ATRKEY;
+			clrflags &= ~V_ATRKEY;
+			break;
+
+		case 'm':
+			clrflags |= V_ATRKEY;
+			setflags &= ~V_ATRKEY;
+			break;
+
+		case 'N':
+			setflags |= V_ATRNAME;
+			clrflags &= ~V_ATRNAME;
+			break;
+
+		case 'H':
+			clrflags |= V_ATRNAME;
+			setflags &= ~V_ATRNAME;
+			break;
+
+		case 'P':
+			setflags |= V_PARENT;
+			clrflags &= ~V_PARENT;
+			break;
+
+		case 'p':
+			clrflags |= V_PARENT;
+			setflags &= ~V_PARENT;
+			break;
+
+		case 'W':
+			do_write = 1;
+			break;
+
+		case 'w':
+			do_write = 0;
+			break;
+
+		case 'X':
+			dbclean = V_DBCLEAN;
+			break;
+
+		case 'x':
+			dbclean = 0;
+			break;
+
 		case 'Z':
-			/* Zone flags - preserved for future attribute filtering */
+			setflags |= V_ZONE;
+			clrflags &= ~V_ZONE;
 			break;
 
 		case 'z':
+			clrflags |= V_ZONE;
+			setflags &= ~V_ZONE;
 			break;
 
 		case 'o':
@@ -3514,6 +3717,9 @@ int dbconvert(int argc, char *argv[])
 		XFREE(s1);
 	}
 
+	/* Apply conversion flags from command line */
+	db_flags = (db_flags & ~clrflags) | setflags;
+
 	log_write_raw(1, "Input: ");
 	info(db_format, db_flags, db_ver);
 
@@ -3538,7 +3744,7 @@ int dbconvert(int argc, char *argv[])
 		if (do_output_gdbm)
 		{
 			/* Write to GDBM database */
-			info(F_TINYMUSH, OUTPUT_FLAGS, db_ver);
+			info(F_TINYMUSH, db_flags, db_ver);
 			db_write();
 			db_lock();
 			call_all_modules_nocache("db_write");
