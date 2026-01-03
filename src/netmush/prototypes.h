@@ -1249,8 +1249,7 @@ extern void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecol
 extern char *ansi_strip_ansi(const char *str);
 extern int ansi_strip_ansi_len(const char *s);
 extern char *normal_to_white(const char *raw);
-extern char *ansi_transition_esccode(int ansi_before, int ansi_after, bool no_default_bg);
-extern int ansi_map_states(const char *s, int **m, char **p);
+extern char *ansi_transition_colorstate(const ColorState from, const ColorState to, ColorType type, bool no_default_bg);
 extern int ansi_map_states_colorstate(const char *s, ColorState **states, char **stripped);
 extern void skip_esccode(char **s);
 extern char *remap_colors(const char *s, int *cmap);

@@ -523,7 +523,7 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	if (rest)
 	{
-				s = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
+				s = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 		XSAFELBSTR(rest, buff, bufc);
@@ -597,7 +597,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 		} while (*s);
 
-				buf = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
+				buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		XSAFESTRNCAT(buff, bufc, last, s - last, LBUF_SIZE);
@@ -2873,7 +2873,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 			 * If we had a previous state, we have to write it.
 			 *
 			 */
-						buf = ansi_transition_esccode(ANST_NONE, states[wcount], false);
+						buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NONE), ansi_packed_to_colorstate(states[wcount]), ColorTypeAnsi, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 
@@ -2884,7 +2884,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 			if (lens[wcount] <= col_widths[cpos])
 			{
 				over = XSAFELBSTR(words[wcount], buff, bufc);
-								buf = ansi_transition_esccode(states[wcount + 1], ANST_NONE, false);
+								buf = ansi_transition_colorstate(ansi_packed_to_colorstate(states[wcount + 1]), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 			}
@@ -2958,7 +2958,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 				}
 
 				XSAFESTRNCAT(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
-								buf = ansi_transition_esccode(ansi_state, ANST_NONE, false);
+								buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 			}

@@ -1135,7 +1135,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     }
 
     *bufc = s;
-    buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
+    buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
     XSAFELBSTR(buf, buff, bufc);
     XFREE(buf);
 }

@@ -817,7 +817,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 		}
 	}
 
-	p = ansi_transition_esccode(ansi_state, ANST_NONE, false);
+	p = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
 	XSAFELBSTR(p, *dst, &cp);
 	XFREE(p);
 }

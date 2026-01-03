@@ -883,6 +883,64 @@ ColorStatus to_ansi_escape_sequence(char *buffer, size_t buffer_size, size_t *of
 }
 
 /**
+ * @brief Build an ANSI escape sequence to transition between two ColorState values.
+ *
+ * Uses the modern ColorState API and honors the requested ColorType (ANSI, XTerm,
+ * TrueColor). When attributes or colors are being cleared, the function emits a
+ * reset (ESC[0m) before applying the target state to keep the transition safe.
+ *
+ * Caller must free the returned buffer with XFREE().
+ */
+char *ansi_transition_colorstate(const ColorState from, const ColorState to, ColorType type, bool no_default_bg)
+{
+    static const ColorState kEmpty = {0};
+
+    char *buffer = XMALLOC(SBUF_SIZE, "ansi_transition_colorstate");
+    size_t offset = 0;
+
+    if (memcmp(&from, &to, sizeof(ColorState)) == 0)
+    {
+        buffer[0] = '\0';
+        return buffer;
+    }
+
+    ColorState state = to;
+
+    /* Respect no_default_bg: do not emit a background reset when target is default. */
+    if (no_default_bg)
+    {
+        bool dst_bg_default = (state.background.is_set != ColorStatusSet) ||
+                              (state.background.ansi_index == 0 && state.background.xterm_index == 0 &&
+                               state.background.truecolor.r == 0 && state.background.truecolor.g == 0 && state.background.truecolor.b == 0);
+        if (dst_bg_default)
+        {
+            state.background.is_set = ColorStatusNone;
+        }
+    }
+
+    /* Emit a reset when clearing attributes or colors. */
+    bool clearing_attr = (from.highlight == ColorStatusSet && state.highlight != ColorStatusSet) ||
+                         (from.underline == ColorStatusSet && state.underline != ColorStatusSet) ||
+                         (from.flash == ColorStatusSet && state.flash != ColorStatusSet) ||
+                         (from.inverse == ColorStatusSet && state.inverse != ColorStatusSet);
+
+    bool clearing_fg = (from.foreground.is_set == ColorStatusSet) && (state.foreground.is_set != ColorStatusSet);
+    bool clearing_bg = (from.background.is_set == ColorStatusSet) && (state.background.is_set != ColorStatusSet);
+
+    if (clearing_attr || clearing_fg || clearing_bg)
+    {
+        state.reset = ColorStatusReset;
+    }
+
+    if (to_ansi_escape_sequence(buffer, SBUF_SIZE, &offset, &state, type) == ColorStatusNone)
+    {
+        buffer[0] = '\0';
+    }
+
+    return buffer;
+}
+
+/**
  * @brief Parses embedded ANSI sequences in a string marked with '%x<code>'.
  *
  * Scans the input string for patterns like '%xred' or '%xred/blue', parses the code
@@ -2064,36 +2122,69 @@ int mushcode_to_sgr(int ch)
 ColorState ansi_packed_to_colorstate(int packed)
 {
     ColorState state = {0};
-    
-    // Extract foreground color (bits 0-3)
-    int fg = packed & 0x00F;
-    if (fg) {
-        state.foreground.is_set = ColorStatusSet;
-        state.foreground.ansi_index = 30 + fg; // ANSI foreground color codes start at 30
-        ansi_get_color_from_index(&state, 30 + fg, false);
-    } else {
+
+    /*
+     * Legacy packed layout (string_ansi.c documentation):
+     * 0x2000 bright color flag
+     * 0x1000 no ansi
+     * 0x0800 inverse
+     * 0x0400 flash
+     * 0x0200 underline
+     * 0x0100 highlight
+     * 0x0080 default bg
+     * 0x0070 bg color bits
+     * 0x0008 default fg
+     * 0x0007 fg color bits
+     */
+
+    /* If ANSI is explicitly disabled, leave state unset. */
+    if (packed & 0x1000)
+    {
+        return state;
+    }
+
+    const bool bright = (packed & 0x2000) != 0;
+
+    /* Foreground */
+    const bool fg_default = (packed & 0x0008) != 0;
+    int fg_bits = packed & 0x0007;
+    if (!fg_default)
+    {
+        int idx = fg_bits & 0x7;
+        if (bright && idx < 8)
+        {
+            idx += 8;
+        }
+        ansi_get_color_from_index(&state, idx, false);
+    }
+    else
+    {
         state.foreground.is_set = ColorStatusReset;
     }
-    
-    // Extract background color (bits 4-7)
-    int bg = (packed >> 4) & 0x00F;
-    if (bg) {
-        state.background.is_set = ColorStatusSet;
-        state.background.ansi_index = 40 + bg; // ANSI background color codes start at 40
-        ansi_get_color_from_index(&state, 40 + bg, true);
-    } else {
+
+    /* Background */
+    const bool bg_default = (packed & 0x0080) != 0;
+    int bg_bits = (packed >> 4) & 0x0007;
+    if (!bg_default)
+    {
+        int idx = bg_bits & 0x7;
+        if (bright && idx < 8)
+        {
+            idx += 8;
+        }
+        ansi_get_color_from_index(&state, idx, true);
+    }
+    else
+    {
         state.background.is_set = ColorStatusReset;
     }
-    
-    // Extract flags (bits 8-15)
-    int flags = (packed >> 8) & 0xFF;
-    
-    // Convert flags to ColorState flags
-    state.highlight = (flags & 0x01) ? ColorStatusSet : ColorStatusNone;
-    state.underline = (flags & 0x02) ? ColorStatusSet : ColorStatusNone;
-    state.flash = (flags & 0x04) ? ColorStatusSet : ColorStatusNone;
-    state.inverse = (flags & 0x08) ? ColorStatusSet : ColorStatusNone;
-    
+
+    /* Attributes */
+    state.highlight = (packed & 0x0100) ? ColorStatusSet : ColorStatusNone;
+    state.underline = (packed & 0x0200) ? ColorStatusSet : ColorStatusNone;
+    state.flash = (packed & 0x0400) ? ColorStatusSet : ColorStatusNone;
+    state.inverse = (packed & 0x0800) ? ColorStatusSet : ColorStatusNone;
+
     return state;
 }
 
@@ -2105,26 +2196,55 @@ ColorState ansi_packed_to_colorstate(int packed)
 int ansi_colorstate_to_packed(ColorState state)
 {
     int packed = 0;
-    
-    // Convert foreground color
-    if (state.foreground.is_set == ColorStatusSet && state.foreground.ansi_index >= 30 && state.foreground.ansi_index <= 37) {
-        packed |= (state.foreground.ansi_index - 30) & 0x0F;
+    bool bright = false;
+
+    /* Foreground */
+    if (state.foreground.is_set == ColorStatusSet && state.foreground.ansi_index >= 0 && state.foreground.ansi_index <= 15)
+    {
+        int idx = state.foreground.ansi_index;
+        if (idx >= 8)
+        {
+            bright = true;
+            idx -= 8;
+        }
+        packed |= (idx & 0x7);
     }
-    
-    // Convert background color
-    if (state.background.is_set == ColorStatusSet && state.background.ansi_index >= 40 && state.background.ansi_index <= 47) {
-        packed |= ((state.background.ansi_index - 40) & 0x0F) << 4;
+    else
+    {
+        packed |= 0x0008; /* default fg */
     }
-    
-    // Convert flags
-    int flags = 0;
-    if (state.highlight == ColorStatusSet) flags |= 0x01;
-    if (state.underline == ColorStatusSet) flags |= 0x02;
-    if (state.flash == ColorStatusSet) flags |= 0x04;
-    if (state.inverse == ColorStatusSet) flags |= 0x08;
-    
-    packed |= flags << 8;
-    
+
+    /* Background */
+    if (state.background.is_set == ColorStatusSet && state.background.ansi_index >= 0 && state.background.ansi_index <= 15)
+    {
+        int idx = state.background.ansi_index;
+        if (idx >= 8)
+        {
+            bright = true;
+            idx -= 8;
+        }
+        packed |= (idx & 0x7) << 4;
+    }
+    else
+    {
+        packed |= 0x0080; /* default bg */
+    }
+
+    if (bright)
+    {
+        packed |= 0x2000;
+    }
+
+    /* Attributes */
+    if (state.highlight == ColorStatusSet)
+        packed |= 0x0100;
+    if (state.underline == ColorStatusSet)
+        packed |= 0x0200;
+    if (state.flash == ColorStatusSet)
+        packed |= 0x0400;
+    if (state.inverse == ColorStatusSet)
+        packed |= 0x0800;
+
     return packed;
 }
 
@@ -2842,147 +2962,6 @@ int ansi_strip_ansi_len(const char *str)
     }
 
     return len;
-}
-
-/**
- * @brief Map ANSI state for every character using legacy packed state format.
- *
- * Caller must free `*m` with XFREE(m, "ansi_map_states_ansi_map") and
- * `*p` with XFREE(p, "ansi_map_states_stripped").
- *
- * @param s Input string
- * @param m Out: allocated array of ANSI states per character
- * @param p Out: stripped string without ANSI codes
- * @return int Number of characters mapped
- */
-int ansi_map_states(const char *s, int **m, char **p)
-{
-    int *ansi_map;
-    char *stripped;
-    char *s1, *s2;
-    int n = 0, ansi_state = ANST_NORMAL;
-    const int map_cap = HBUF_SIZE - 1;
-    const int strip_cap = LBUF_SIZE - 1;
-    
-    ansi_map = (int *)XCALLOC(HBUF_SIZE, sizeof(int), "ansi_map");
-    stripped = XMALLOC(LBUF_SIZE, "stripped");
-    
-    if (!s)
-    {
-        ansi_map[0] = ANST_NORMAL;
-        stripped[0] = '\0';
-        *m = ansi_map;
-        *p = stripped;
-        return 0;
-    }
-
-    s2 = s1 = XSTRDUP(s, "s1");
-
-    while (*s1 && n < map_cap && n < strip_cap)
-    {
-        if (*s1 == ESC_CHAR)
-        {
-            do
-            {
-                int ansi_mask = 0;
-                int ansi_diff = 0;
-                unsigned int param_val = 0;
-                int is_xterm = 0;  // Flag to skip xterm 256-color sequences
-                ++(s1);
-                if (*(s1) == ANSI_CSI)
-                {
-                    while ((*(++(s1)) & 0xf0) == 0x30)
-                    {
-                        if (*(s1) < 0x3a)
-                        {
-                            param_val <<= 1;
-                            param_val += (param_val << 2) + (*(s1) & 0x0f);
-                        }
-                        else
-                        {
-                            // Check for xterm 256-color codes: 38;5;N or 48;5;N
-                            if ((param_val == 38 || param_val == 48) && *(s1) == ';')
-                            {
-                                // Peek ahead for ;5; safely
-                                if (s1[1] && s1[1] == '5' && s1[2] && s1[2] == ';')
-                                {
-                                    is_xterm = 1;
-                                    break;  // Skip this entire sequence
-                                }
-                            }
-                            
-                            if (param_val < I_ANSI_LIM)
-                            {
-                                ansi_mask |= ansiBitsMask(param_val);
-                                ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-                            }
-                            param_val = 0;
-                        }
-                    }
-                }
-                
-                // Skip to end of sequence
-                while ((*(s1) & 0xf0) == 0x20)
-                {
-                    ++(s1);
-                }
-                
-                // Skip remaining digits/separators if xterm
-                if (is_xterm)
-                {
-                    while (*s1 && *s1 != ANSI_END)
-                    {
-                        ++(s1);
-                    }
-                }
-                
-                if (*(s1) == ANSI_END)
-                {
-                    if (!is_xterm && param_val < I_ANSI_LIM)
-                    {
-                        ansi_mask |= ansiBitsMask(param_val);
-                        ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-                    }
-                    if (!is_xterm)
-                    {
-                        ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-                    }
-                    ++(s1);
-                }
-                else if (*(s1))
-                {
-                    ++(s1);
-                }
-            } while (0);
-        }
-        else
-        {
-            ansi_map[n] = ansi_state;
-            stripped[n++] = *s1++;
-        }
-    }
-
-    /* If we stopped due to buffer limits, continue consuming escape codes only
-     * to keep the input pointer consistent; ansi_state beyond this point is not
-     * recorded to avoid overruns. */
-    while (*s1)
-    {
-        if (*s1 == ESC_CHAR)
-        {
-            skip_esccode(&s1);
-        }
-        else
-        {
-            ++s1;
-        }
-    }
-
-    ansi_map[n] = ANST_NORMAL;
-    stripped[n] = '\0';
-    *m = ansi_map;
-    *p = stripped;
-    XFREE(s2);
-    return n;
 }
 
 /**

@@ -737,7 +737,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 				 * Yup, return what follows
 				 *
 				 */
-				buf = ansi_transition_esccode(ANST_NORMAL, ansi_haystack2, false);
+				buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_haystack2), ColorTypeAnsi, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 				XSAFELBSTR(cp, buff, bufc);
@@ -1012,7 +1012,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 			 */
 			*bp = '\0';
 			XSAFELBSTR(haystack, buff, bufc);
-			buf = ansi_transition_esccode(ansi_haystack, ANST_NORMAL, false);
+			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_haystack), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			return;
@@ -1689,7 +1689,7 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	XSAFESTRNCAT(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
-	s = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
+	s = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 	XSAFELBSTR(s, buff, bufc);
 	XFREE(s);
 }
@@ -1838,7 +1838,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}
@@ -2751,7 +2751,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ANST_NORMAL, ansi_state, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}
@@ -2816,7 +2816,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	}
 
 	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
-	buf = ansi_transition_esccode(ansi_state, ANST_NORMAL, false);
+	buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 	XSAFELBSTR(buf, buff, bufc);
 	XFREE(buf);
 }
@@ -3569,7 +3569,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		/*
 		 * Restore previous ansi state
 		 */
-		buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(sl_ansi_state), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		/*
@@ -3579,7 +3579,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		/*
 		 * Back to ansi normal
 		 */
-		buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(el_ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 
@@ -4225,7 +4225,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Restore previous ansi state
 			 */
-			buf = ansi_transition_esccode(ANST_NORMAL, sl_ansi_state, false);
+			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(sl_ansi_state), ColorTypeAnsi, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			/*
@@ -4235,7 +4235,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Back to ansi normal
 			 */
-			buf = ansi_transition_esccode(el_ansi_state, ANST_NORMAL, false);
+			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(el_ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 
@@ -4743,14 +4743,14 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (*s)
 	{
-		buf = ansi_transition_esccode(ansi_state_l, ansi_state_r, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state_l), ansi_packed_to_colorstate(ansi_state_r), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		XSAFELBSTR(s, buff, bufc);
 	}
 	else
 	{
-		buf = ansi_transition_esccode(ansi_state_l, ANST_NORMAL, false);
+		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state_l), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 	}
