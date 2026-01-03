@@ -1064,7 +1064,7 @@ static void init_char_table(void)
 	char_valid_table[0x07] = 1;  /* BEEP */
 	char_valid_table[0x09] = 1;  /* TAB */
 	char_valid_table[0x0A] = 1;  /* LF */
-	char_valid_table[0x0D] = 1;  /* CR */
+	/* char_valid_table[0x0D] = 1; */  /* CR - handled separately, not added to buffer */
 	char_valid_table[0x1B] = 1;  /* ESC */
 	char_valid_table[0x7F] = 1;  /* DEL */
 	
@@ -1117,9 +1117,20 @@ int process_input(DESC *d)
 	 * Single-pass processing: IAC handling, filtering, and line assembly
 	 * This eliminates two complete buffer passes from the original code
 	 */
+	int skip_next_lf = 0;  /* Flag to skip LF after CR */
+	
 	for (q = buf, qend = buf + got; q < qend; q++)
 	{
 		ch = (unsigned char)*q;
+		
+		/* Skip LF if it immediately follows a CR (handle CRLF properly) */
+		if (skip_next_lf && ch == '\n')
+		{
+			skip_next_lf = 0;
+			in--;
+			continue;
+		}
+		skip_next_lf = 0;
 		
 		/* Fast path: handle telnet IAC protocol sequences */
 		if (ch == 0xFF && q + 1 < qend)
@@ -1195,16 +1206,13 @@ int process_input(DESC *d)
 			}
 		}
 		
-		/* Filter: reject invalid control characters using lookup table */
-		if (!char_valid_table[ch])
+		/* Handle line terminators first (before validation check) */
+		if (ch == '\n' || ch == '\r')
 		{
-			in--;  /* Discount rejected character */
-			continue;
-		}
-		
-		/* Process character based on type */
-		if (ch == '\n')
-		{
+			/* Set flag to skip LF after CR */
+			if (ch == '\r')
+				skip_next_lf = 1;
+				
 			*p = '\0';
 			
 			if (p > d->raw_input->cmd)
@@ -1218,6 +1226,12 @@ int process_input(DESC *d)
 			{
 				in--;  /* Empty line */
 			}
+		}
+		/* Filter: reject invalid control characters using lookup table */
+		else if (!char_valid_table[ch])
+		{
+			in--;  /* Discount rejected character */
+			continue;
 		}
 		else if (ch == '\b' || ch == 0x7F)
 		{
