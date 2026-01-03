@@ -104,7 +104,30 @@ cmake -DUSE_LMDB=ON -DUSE_GDBM=OFF ..
 cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..
 ```
 
-If you need to migrate an existing database, use the `dbconvert` utility (built in `src/netmush/`) to convert between GDBM and LMDB formats.
+**Migrating between database backends:**
+
+To migrate from GDBM to LMDB (or vice versa):
+
+1. Export flatfile with current backend:
+   ```bash
+   # With GDBM backend
+   ./netmush --dbconvert < game/db/netmush.db > migration.flat
+   ```
+
+2. Rebuild with new backend:
+   ```bash
+   cd build
+   cmake -DUSE_LMDB=ON -DUSE_GDBM=OFF ..
+   cmake --build . --target install-upgrade
+   ```
+
+3. Load flatfile with new backend:
+   ```bash
+   cd game
+   ./netmush --load-flatfile ../migration.flat
+   ```
+
+**Note:** Direct conversion between GDBM and LMDB database files is not supported. You must export to flatfile first, recompile with the desired backend, then import the flatfile.
 
 Configure CMake with these options:
 
@@ -253,6 +276,63 @@ cp db/*.db backups/
 - Verify `.so` exists in `game/modules/`
 - Check logs: `tail game/logs/netmush.log`
 
+## Database Restoration
+
+### Loading from Flatfile
+
+The `--load-flatfile` option allows loading a database from a flat text file at startup. This is useful for:
+
+- Database restoration from backups
+- Database migration between instances
+- Database reset to a known good state
+- Loading test data
+
+**Usage:**
+```bash
+./netmush --load-flatfile <path/to/flatfile> [CONFIG-FILE]
+```
+
+**Examples:**
+
+Load a flatfile with default config:
+```bash
+./netmush --load-flatfile ./backups/netmush.db.FLAT
+```
+
+Load with specific config file:
+```bash
+./netmush --load-flatfile ./backups/netmush.db.FLAT ./configs/netmush.conf
+```
+
+Load in debug mode (no fork):
+```bash
+./netmush -d --load-flatfile ./backups/netmush.db.FLAT
+```
+
+**How It Works:**
+
+1. Server initializes with specified config
+2. Database backend is initialized
+3. Flatfile is loaded instead of existing database
+4. Data is parsed and imported into active database
+5. **Server continues running normally** with the loaded database
+
+**Important Notes:**
+
+- Always backup current database before loading a flatfile:
+  ```bash
+  cp -r game/db/netmush.db.lmdb game/db/netmush.db.lmdb.backup
+  ```
+- Flatfile must be in TinyMUSH standard format (typically `*.FLAT` files)
+- If flatfile doesn't exist, server exits with error message
+- Loading overwrites the current LMDB/GDBM database
+- All changes are preserved when server shuts down normally
+
+**Related Commands:**
+
+- Database conversion: `netmush --dbconvert`
+- Database recovery (GDBM): `netmush --recover`
+- Minimal database: `netmush -m`
 
 ## Directory Structure
 

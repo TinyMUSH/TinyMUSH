@@ -2302,6 +2302,31 @@ void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, cha
 
 	write_status_file(player, message);
 	/*
+	 * Force a database dump before shutdown to save all changes
+	 */
+	if (mushconf.dump_msg)
+	{
+		if (*mushconf.dump_msg)
+		{
+			raw_broadcast(0, "%s", mushconf.dump_msg);
+		}
+	}
+
+	mushstate.epoch++;
+	mushstate.dumping = 1;
+	log_write(LOG_DBSAVES, "DMP", "SHTDN", "Dumping database before shutdown: %s.#%d#", mushconf.db_file, mushstate.epoch);
+	dump_database_internal(DUMP_DB_NORMAL);
+	mushstate.dumping = 0;
+
+	if (mushconf.postdump_msg)
+	{
+		if (*mushconf.postdump_msg)
+		{
+			raw_broadcast(0, "%s", mushconf.postdump_msg);
+		}
+	}
+
+	/*
 	 * Set up for normal shutdown
 	 */
 	mushstate.shutdown_flag = 1;
@@ -3108,14 +3133,14 @@ void usage(char *prog, int which)
 		fprintf(stderr, "Usage: %s [options] [CONFIG-FILE]\n", prog);
 		fprintf(stderr, "       %s --dbconvert DBM-FILE [< INPUT-FILE] [> OUTPUT-FILE]\n", prog);
 #ifdef USE_GDBM
-		fprintf(stderr, "       %s --recover -i INPUT-DBM -o OUTPUT-DBM\n\n", prog);
-#else
-		fprintf(stderr, "\n");
+		fprintf(stderr, "       %s --recover -i INPUT-DBM -o OUTPUT-DBM\n", prog);
 #endif
-		fprintf(stderr, "Server Mode: When call without --dbconvert or --recover option, %s accept the following options:\n\n", prog);
+		fprintf(stderr, "       %s --load-flatfile FLATFILE [CONFIG-FILE]\n\n", prog);
+		fprintf(stderr, "Server Mode: When call without --dbconvert, --recover or --load-flatfile option, %s accept the following options:\n\n", prog);
 		fprintf(stderr, "  CONFIG-FILE               configuration file\n");
 		fprintf(stderr, "  -d, --debug               debug mode, do not fork to background\n");
-		fprintf(stderr, "  -m, --mindb               delete the current databases and create a new one\n\n");
+		fprintf(stderr, "  -m, --mindb               delete the current databases and create a new one\n");
+		fprintf(stderr, "  --load-flatfile FLATFILE  load database from a flatfile and replace current database\n\n");
 		fprintf(stderr, "DBConvert Mode: When call with the --dbconvert option, %s accept the following options:\n\n", prog);
 		usage_dbconvert();
 #ifdef USE_GDBM
@@ -3813,11 +3838,13 @@ int main(int argc, char *argv[])
 	MODHASHES *m_htab, *hp;
 	MODHASHES *m_ntab, *np;
 	int option_index = 0;
+	char *load_flatfile = NULL;
 	struct option long_options[] = {
 		{"debug", no_argument, 0, 'd'},
 		{"mindb", no_argument, 0, 'm'},
 		{"dbconvert", no_argument, 0, 1001},
 		{"recover", no_argument, 0, 1002},
+		{"load-flatfile", required_argument, 0, 1003},
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
 	mushstate.initializing = 1;
@@ -3883,6 +3910,10 @@ int main(int argc, char *argv[])
 			exit(EXIT_SUCCESS);
 			break;
 #endif
+
+		case 1003: /* load-flatfile */
+			load_flatfile = XSTRDUP(optarg, "load_flatfile");
+			break;
 
 		default:
 			errflg++;
@@ -4232,6 +4263,20 @@ int main(int argc, char *argv[])
 	{
 		db_make_minimal();
 		call_all_modules_nocache("make_minimal");
+	}
+	else if (load_flatfile != NULL)
+	{
+		log_write(LOG_ALWAYS, "INI", "LOAD", "Loading flatfile from: %s", load_flatfile);
+		if (!fileexist(load_flatfile))
+		{
+			log_write(LOG_ALWAYS, "INI", "FATAL", "Flatfile does not exist: %s", load_flatfile);
+			exit(EXIT_FAILURE);
+		}
+		recover_flatfile(load_flatfile);
+		log_write(LOG_ALWAYS, "INI", "DONE", "Flatfile successfully loaded and written to database");
+		log_write(LOG_ALWAYS, "INI", "DONE", "Database is ready. Starting server.");
+		XFREE(load_flatfile);
+		/* Continue to server startup instead of exiting */
 	}
 	else if (load_game() < 0)
 	{

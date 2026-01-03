@@ -1391,15 +1391,15 @@ void sighandler(int sig)
 		mushstate.shutdown_flag = 1;
 		break;
 
-	case SIGTERM: /*!< Killed shutdown now */
+	case SIGTERM: /*!< Graceful shutdown with full database dump */
 #ifdef SIGXCPU
 	case SIGXCPU:
 #endif
 		check_panicking(sig);
 		log_signal(signames[sig]);
-		raw_broadcast(0, "GAME: Caught signal %s, exiting.", signames[sig]);
-		al_store(); /* Persist any in-memory attribute list before forced exit */
-		dump_database_internal(DUMP_DB_KILLED);
+		raw_broadcast(0, "GAME: Caught signal %s, shutting down gracefully.", signames[sig]);
+		al_store(); /* Persist any in-memory attribute list before exit */
+		dump_database_internal(DUMP_DB_NORMAL); /* Use normal dump for graceful shutdown */
 		s = XASPRINTF("s", "Caught signal %s", signames[sig]);
 		write_status_file(NOTHING, s);
 		XFREE(s);

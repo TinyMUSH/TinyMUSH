@@ -29,12 +29,63 @@ TinyMUSH 4 builds upon decades of MUSH development heritage while introducing si
 ## What's New in TinyMUSH 4
 
 - **Modern Build System**: CMake-based build with fast incremental compilation (ccache, LTO support)
+- **LMDB Database Backend**: Lightning Memory-Mapped Database replaces GDBM as default (see [Database Backend](#database-backend))
 - **Enhanced Safety**: Comprehensive stack-safe string operations, memory tracking, bounds checking
 - **Modular Architecture**: Dynamic module loading system with template skeleton for rapid development
 - **Improved Robustness**: Fixed critical bugs, eliminated buffer overflows, crash prevention
 - **Better Developer Experience**: Streamlined API, clear documentation, regression test suites
 - **Code Modernization**: Aligned with modern C standards, cleaned up legacy code patterns
 - **Simplified Configuration**: Centralized module management, easier customization
+
+## Database Backend
+
+### LMDB (Default)
+
+TinyMUSH 4 uses **LMDB** (Lightning Memory-Mapped Database) as the default storage backend, replacing the legacy GDBM backend. LMDB offers significant advantages:
+
+**Performance Benefits:**
+- **Memory-mapped I/O**: Direct memory access eliminates serialization overhead
+- **Zero-copy reads**: Data accessed directly from mapped memory pages
+- **MVCC (Multi-Version Concurrency Control)**: Readers never block writers
+- **Crash resilience**: Full ACID transactions with automatic recovery
+- **Optimized writes**: Copy-on-write B+ tree structure minimizes disk I/O
+
+**Operational Advantages:**
+- **No corruption**: Atomic operations prevent partial writes and database corruption
+- **Concurrent access**: Multiple readers without locking, consistent snapshots
+- **Small footprint**: Minimal overhead, efficient memory usage
+- **Cross-platform**: Portable across Linux, macOS, BSD, Windows
+- **Active maintenance**: Modern, well-maintained library with ongoing development
+
+**Migration from GDBM:**
+
+GDBM remains available for backward compatibility but is considered **legacy and will be removed in a future release**. To migrate existing databases:
+
+# 1. Build with GDBM backend
+```bash
+mkdir -p build && cd build
+cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..
+cmake --build . --target install-upgrade
+```
+
+```bash
+# 2. Export flatfile with GDBM backend
+cd ../game
+./netmush --dbconvert < game/db/netmush.db > migration.flat
+
+# 3. Rebuild with LMDB backend
+rm -rf build && cd build
+cmake ..
+cmake --build . --target install-upgrade
+
+# 4. Load flatfile with LMDB backend
+cd ../game
+./netmush --load-flatfile ../migration.flat
+```
+
+**Important:** Migrate to LMDB as soon as possible. GDBM support will be deprecated and eventually removed from TinyMUSH.
+
+See [INSTALL.md](INSTALL.md#database-backend-selection) for detailed backend configuration and migration instructions.
 
 ## Quick Start
 
@@ -49,7 +100,7 @@ apt install build-essential cmake libcrypt-dev liblmdb-dev libgdbm-dev libpcre2-
 # Build and install
 mkdir -p build && cd build
 cmake ..
-cmake --build . --target install-upgrade -j$(nproc)
+cmake --build . --target install-upgrade
 
 # Start server
 cd ../game
@@ -66,7 +117,7 @@ See [INSTALL.md](INSTALL.md) for comprehensive installation instructions and bac
 ### Core Capabilities
 - **Rich Softcode Language**: Powerful scripting with 200+ built-in functions
 - **Flexible Permissions**: Granular control with flags, powers, and locks
-- **Persistent Storage**: LMDB-backed database by default (GDBM optional) with automatic checkpointing
+- **Persistent Storage**: LMDB-backed database with automatic checkpointing, crash resilience, and zero-copy reads
 - **Zone-based Organization**: Hierarchical object management
 - **Attribute System**: Extensible object properties with inheritance
 
@@ -155,7 +206,7 @@ See [INSTALL.md](INSTALL.md) for complete installation instructions.
 ```bash
 mkdir -p build && cd build
 cmake ..
-cmake --build . --target install-upgrade -j$(nproc)
+cmake --build . --target install-upgrade
 cd ../game && ./netmush
 ```
 
