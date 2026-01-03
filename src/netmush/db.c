@@ -1072,72 +1072,51 @@ void s_Name(dbref thing, char *s)
  */
 void safe_exit_name(dbref it, char *buff, char **bufc)
 {
-    char *s = *bufc;
-    char *buf = NULL;
-    int ansi_state = ANST_NORMAL;
+    char *start = *bufc;
+    char *cursor = NULL;
+    char saved = '\0';
+    ColorState *states = NULL;
+    char *stripped = NULL;
+    ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+    ColorType color_type = ColorTypeAnsi;
 
     safe_name(it, buff, bufc);
 
-    while (*s && (*s != EXIT_DELIMITER))
+    cursor = start;
+    while (*cursor && (*cursor != EXIT_DELIMITER))
     {
-        if (*s == ESC_CHAR)
+        ++cursor;
+    }
+
+    saved = *cursor;
+    *cursor = '\0';
+
+    int len = ansi_map_states_colorstate(start, &states, &stripped);
+    ColorState final_state = (states && len >= 0) ? states[len] : normal;
+
+    *cursor = saved;
+    *bufc = cursor;
+
+    if (memcmp(&final_state, &normal, sizeof(ColorState)) != 0)
+    {
+        char *seq = ansi_transition_colorstate(final_state, normal, color_type, false);
+
+        if (seq)
         {
-            do
-            {
-                int ansi_mask = 0;
-                int ansi_diff = 0;
-                unsigned int param_val = 0;
-                ++(s);
-                if (*(s) == ANSI_CSI)
-                {
-                    while ((*(++(s)) & 0xf0) == 0x30)
-                    {
-                        if (*(s) < 0x3a)
-                        {
-                            param_val <<= 1;
-                            param_val += (param_val << 2) + (*(s) & 0x0f);
-                        }
-                        else
-                        {
-                            if (param_val < I_ANSI_LIM)
-                            {
-                                ansi_mask |= ansiBitsMask(param_val);
-                                ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-                            }
-                            param_val = 0;
-                        }
-                    }
-                }
-                while ((*(s) & 0xf0) == 0x20)
-                {
-                    ++(s);
-                }
-                if (*(s) == ANSI_END)
-                {
-                    if (param_val < I_ANSI_LIM)
-                    {
-                        ansi_mask |= ansiBitsMask(param_val);
-                        ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-                    }
-                    ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-                    ++(s);
-                }
-                else if (*(s))
-                {
-                    ++(s);
-                }
-            } while (0);
-        }
-        else
-        {
-            ++s;
+            XSAFELBSTR(seq, buff, bufc);
+            XFREE(seq);
         }
     }
 
-    *bufc = s;
-    buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
-    XSAFELBSTR(buf, buff, bufc);
-    XFREE(buf);
+    if (states)
+    {
+        XFREE(states);
+    }
+
+    if (stripped)
+    {
+        XFREE(stripped);
+    }
 }
 
 /**

@@ -160,6 +160,8 @@ int ansi_colorstate_to_packed(ColorState state);
 int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
 bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences);
 ColorState ansi_parse_sequence(const char **ansi_ptr);
+bool ansi_apply_sequence(const char **ptr, ColorState *state);
+bool ansi_apply_sequence_packed(const char **ptr, int *packed_state);
 int ansi_parse_single_x_code(char **input_ptr, ColorState *color_out, bool *current_highlight);
 
 char *ansi_parse_x_to_sequence(char **ptr, ColorType type);

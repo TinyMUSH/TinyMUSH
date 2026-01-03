@@ -206,51 +206,12 @@ char *split_token(char **sp, const Delim *sep)
 #define PARSE_ANSI_SEQUENCE(strp, ansi_state)                                                       \
 	do                                                                                              \
 	{                                                                                               \
-		int ansi_mask = 0;                                                                          \
-		int ansi_diff = 0;                                                                          \
-		unsigned int param_val = 0;                                                                 \
-		++(strp);                                                                                   \
-		if (!*(strp))                                                                               \
+		const char *cursor__ = (const char *)(strp);                                                 \
+		if (ansi_apply_sequence_packed(&cursor__, &(ansi_state)))                                   \
 		{                                                                                           \
-			break;                                                                                  \
+			(strp) = (char *)cursor__;                                                              \
 		}                                                                                           \
-		if (*(strp) == ANSI_CSI)                                                                    \
-		{                                                                                           \
-			++(strp);                                                                               \
-			while (*(strp) && (*(strp) & 0xf0) == 0x30)                                             \
-			{                                                                                       \
-				if (*(strp) < 0x3a)                                                                 \
-				{                                                                                   \
-					param_val <<= 1;                                                                \
-					param_val += (param_val << 2) + (*(strp) & 0x0f);                               \
-				}                                                                                   \
-				else                                                                                \
-				{                                                                                   \
-					if (param_val < I_ANSI_LIM)                                                     \
-					{                                                                               \
-						ansi_mask |= ansiBitsMask(param_val);                                       \
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val)); \
-					}                                                                               \
-					param_val = 0;                                                                  \
-				}                                                                                   \
-				++(strp);                                                                           \
-			}                                                                                       \
-		}                                                                                           \
-		while (*(strp) && (*(strp) & 0xf0) == 0x20)                                                 \
-		{                                                                                           \
-			++(strp);                                                                               \
-		}                                                                                           \
-		if (*(strp) == ANSI_END)                                                                    \
-		{                                                                                           \
-			if (param_val < I_ANSI_LIM)                                                             \
-			{                                                                                       \
-				ansi_mask |= ansiBitsMask(param_val);                                               \
-				ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));         \
-			}                                                                                       \
-			ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;                                     \
-			++(strp);                                                                               \
-		}                                                                                           \
-		else if (*(strp))                                                                           \
+		else                                                                                        \
 		{                                                                                           \
 			++(strp);                                                                               \
 		}                                                                                           \

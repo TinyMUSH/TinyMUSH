@@ -440,6 +440,105 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * string.
  */
 
+static ColorType resolve_color_type(dbref player, dbref cause)
+{
+	dbref target = (cause != NOTHING) ? cause : player;
+
+	if (target != NOTHING && Color24Bit(target))
+	{
+		return ColorTypeTrueColor;
+	}
+
+	if (target != NOTHING && Color256(target))
+	{
+		return ColorTypeXTerm;
+	}
+
+	if (target != NOTHING && Ansi(target))
+	{
+		return ColorTypeAnsi;
+	}
+
+	return ColorTypeNone;
+}
+
+static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
+{
+	return memcmp(a, b, sizeof(ColorState)) == 0;
+}
+
+static void append_color_transition(const ColorState *from, const ColorState *to, ColorType type, char *buff, char **bufc)
+{
+	if (type == ColorTypeNone || colorstate_equal(from, to))
+	{
+		return;
+	}
+
+	char *seq = ansi_transition_colorstate(*from, *to, type, false);
+
+	if (seq)
+	{
+		XSAFELBSTR(seq, buff, bufc);
+		XFREE(seq);
+	}
+}
+
+static void emit_colored_range(const char *text, const ColorState *states, int start, int end, ColorState initial_state, ColorState final_state, ColorType type, char *buff, char **bufc)
+{
+	if (start < 0)
+	{
+		start = 0;
+	}
+
+	if (end < start)
+	{
+		end = start;
+	}
+
+	if (type == ColorTypeNone)
+	{
+		if (text && end > start)
+		{
+			XSAFESTRNCAT(buff, bufc, text + start, end - start, LBUF_SIZE);
+		}
+		return;
+	}
+
+	ColorState current = initial_state;
+
+	if (text && end > start)
+	{
+		append_color_transition(&current, &states[start], type, buff, bufc);
+		current = states[start];
+
+		for (int i = start; i < end; ++i)
+		{
+			XSAFELBCHR(text[i], buff, bufc);
+			ColorState next_state = (i + 1 < end) ? states[i + 1] : final_state;
+			append_color_transition(&current, &next_state, type, buff, bufc);
+			current = next_state;
+		}
+	}
+	else
+	{
+		append_color_transition(&current, &final_state, type, buff, bufc);
+	}
+}
+
+static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state)
+{
+	const char *ptr = *cursor;
+
+	if (ansi_apply_sequence_packed(&ptr, packed_state))
+	{
+		*cursor = (char *)ptr;
+	}
+	else
+	{
+		++(*cursor);
+	}
+}
+
 /**
  * @brief Return substring after a specified string.
  *
@@ -455,8 +554,17 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  */
 void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *bp = NULL, *cp = NULL, *mp = NULL, *np = NULL, *buf = NULL;
-	int ansi_needle = 0, ansi_needle2 = 0, ansi_haystack = 0, ansi_haystack2 = 0;
+	char *haystack = NULL;
+	char *needle = NULL;
+	ColorState *hay_states = NULL;
+	ColorState *needle_states = NULL;
+	char *hay_text = NULL;
+	char *needle_text = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
+	ColorState zero_state = {0};
+	int match_pos = -1;
+	bool needle_has_color = false;
 
 	if (nfargs == 0)
 	{
@@ -468,298 +576,101 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	bp = fargs[0]; /*!< haystack */
-	mp = fargs[1]; /*!< needle */
+	haystack = fargs[0];
+	needle = fargs[1];
 
-	/**
-	 * Sanity-check arg1 and arg2
-	 *
-	 */
-	if (bp == NULL)
+	if (!haystack)
 	{
-		bp = "";
+		haystack = "";
 	}
 
-	if (mp == NULL)
+	if (needle == NULL)
 	{
-		mp = " ";
+		needle = " ";
 	}
 
-	if (!mp || !*mp)
+	if (!needle || !*needle)
 	{
-		mp = (char *)" ";
+		needle = (char *)" ";
 	}
 
-	if ((mp[0] == ' ') && (mp[1] == '\0'))
+	if ((needle[0] == ' ') && (needle[1] == '\0'))
 	{
-		bp = Eat_Spaces(bp);
+		haystack = Eat_Spaces(haystack);
 	}
 
-	/**
-	 * Get ansi state of the first needle char
-	 *
-	 */
-	ansi_needle = ANST_NONE;
+	int hay_len = ansi_map_states_colorstate(haystack, &hay_states, &hay_text);
+	int needle_len = ansi_map_states_colorstate(needle, &needle_states, &needle_text);
 
-	while (*mp == ESC_CHAR)
+	if (needle_len == 0 || hay_len < needle_len)
 	{
-		do
+		goto cleanup_after;
+	}
+
+	for (int i = 0; i < needle_len; ++i)
+	{
+		if (!colorstate_equal(&needle_states[i], &zero_state))
 		{
-			int ansi_mask = 0;
-			int ansi_diff = 0;
-			unsigned int param_val = 0;
-			++(mp);
-			if (*(mp) == ANSI_CSI)
-			{
-				while ((*(++(mp)) & 0xf0) == 0x30)
-				{
-					if (*(mp) < 0x3a)
-					{
-						param_val <<= 1;
-						param_val += (param_val << 2) + (*(mp) & 0x0f);
-					}
-					else
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						param_val = 0;
-					}
-				}
-			}
-			while ((*(mp) & 0xf0) == 0x20)
-			{
-				++(mp);
-			}
-			if (*(mp) == ANSI_END)
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-				ansi_needle = (ansi_needle & ~ansi_mask) | ansi_diff;
-				++(mp);
-			}
-			else if (*(mp))
-			{
-				++(mp);
-			}
-		} while (0);
-
-		if (!*mp)
-		{
-			mp = (char *)" ";
+			needle_has_color = true;
+			break;
 		}
 	}
 
-	ansi_haystack = ANST_NORMAL;
-
-	/**
-	 * Look for the needle string
-	 *
-	 */
-	while (*bp)
+	for (int i = 0; i <= hay_len - needle_len; ++i)
 	{
-		while (*bp == ESC_CHAR)
+		if (memcmp(hay_text + i, needle_text, (size_t)needle_len) != 0)
 		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(bp);
-				if (*(bp) == ANSI_CSI)
-				{
-					while ((*(++(bp)) & 0xf0) == 0x30)
-					{
-						if (*(bp) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(bp) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(bp) & 0xf0) == 0x20)
-				{
-					++(bp);
-				}
-				if (*(bp) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_haystack = (ansi_haystack & ~ansi_mask) | ansi_diff;
-					++(bp);
-				}
-				else if (*(bp))
-				{
-					++(bp);
-				}
-			} while (0);
+			continue;
 		}
 
-		if ((*bp == *mp) && (ansi_needle == ANST_NONE || ansi_haystack == ansi_needle))
+		if (needle_has_color)
 		{
-			/**
-			 * See if what follows is what we are looking for
-			 *
-			 */
-			ansi_needle2 = ansi_needle;
-			ansi_haystack2 = ansi_haystack;
-			cp = bp;
-			np = mp;
+			bool states_match = true;
 
-			while (1)
+			for (int j = 0; j < needle_len; ++j)
 			{
-				while (*cp == ESC_CHAR)
+				if (!colorstate_equal(&hay_states[i + j], &needle_states[j]))
 				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(cp);
-						if (*(cp) == ANSI_CSI)
-						{
-							while ((*(++(cp)) & 0xf0) == 0x30)
-							{
-								if (*(cp) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(cp) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*(cp) & 0xf0) == 0x20)
-						{
-							++(cp);
-						}
-						if (*(cp) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_haystack2 = (ansi_haystack2 & ~ansi_mask) | ansi_diff;
-							++(cp);
-						}
-						else if (*(cp))
-						{
-							++(cp);
-						}
-					} while (0);
-				}
-
-				while (*np == ESC_CHAR)
-				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(np);
-						if (*(np) == ANSI_CSI)
-						{
-							while ((*(++(np)) & 0xf0) == 0x30)
-							{
-								if (*(np) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(np) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*(np) & 0xf0) == 0x20)
-						{
-							++(np);
-						}
-						if (*(np) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_needle2 = (ansi_needle2 & ~ansi_mask) | ansi_diff;
-							++(np);
-						}
-						else if (*(np))
-						{
-							++(np);
-						}
-					} while (0);
-				}
-
-				if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
-				{
+					states_match = false;
 					break;
 				}
-
-				++cp, ++np;
 			}
 
-			if (!*np)
+			if (!states_match)
 			{
-				/**
-				 * Yup, return what follows
-				 *
-				 */
-				buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_haystack2), ColorTypeAnsi, false);
-				XSAFELBSTR(buf, buff, bufc);
-				XFREE(buf);
-				XSAFELBSTR(cp, buff, bufc);
-				return;
+				continue;
 			}
 		}
 
-		/**
-		 * Nope, continue searching
-		 *
-		 */
-		if (*bp)
-		{
-			++bp;
-		}
+		match_pos = i + needle_len;
+		break;
 	}
 
-	/**
-	 * Ran off the end without finding it
-	 *
-	 */
-	return;
+	if (match_pos != -1)
+	{
+		emit_colored_range(hay_text, hay_states, match_pos, hay_len, normal, hay_states[hay_len], color_type, buff, bufc);
+	}
+
+cleanup_after:
+	if (hay_states)
+	{
+		XFREE(hay_states);
+	}
+
+	if (hay_text)
+	{
+		XFREE(hay_text);
+	}
+
+	if (needle_states)
+	{
+		XFREE(needle_states);
+	}
+
+	if (needle_text)
+	{
+		XFREE(needle_text);
+	}
 }
 
 /**
@@ -777,8 +688,17 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  */
 void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *haystack = NULL, *bp = NULL, *cp = NULL, *mp = NULL, *np = NULL, *buf = NULL;
-	int ansi_needle = 0, ansi_needle2 = 0, ansi_haystack = 0, ansi_haystack2 = 0;
+	char *haystack = NULL;
+	char *needle = NULL;
+	ColorState *hay_states = NULL;
+	ColorState *needle_states = NULL;
+	char *hay_text = NULL;
+	char *needle_text = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
+	ColorState zero_state = {0};
+	int match_pos = -1;
+	bool needle_has_color = false;
 
 	if (nfargs == 0)
 	{
@@ -791,298 +711,104 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	haystack = fargs[0]; /*!< haystack */
-	mp = fargs[1];		 /*!< needle */
+	needle = fargs[1];		 /*!< needle */
 
-	/**
-	 * Sanity-check arg1 and arg2
-	 *
-	 */
 	if (haystack == NULL)
 	{
 		haystack = "";
 	}
 
-	if (mp == NULL)
+	if (needle == NULL)
 	{
-		mp = " ";
+		needle = " ";
 	}
 
-	if (!mp || !*mp)
+	if (!needle || !*needle)
 	{
-		mp = (char *)" ";
+		needle = (char *)" ";
 	}
 
-	if ((mp[0] == ' ') && (mp[1] == '\0'))
+	if ((needle[0] == ' ') && (needle[1] == '\0'))
 	{
 		haystack = Eat_Spaces(haystack);
 	}
 
-	bp = haystack;
+	int hay_len = ansi_map_states_colorstate(haystack, &hay_states, &hay_text);
+	int needle_len = ansi_map_states_colorstate(needle, &needle_states, &needle_text);
 
-	/**
-	 * Get ansi state of the first needle char
-	 *
-	 */
-	ansi_needle = ANST_NONE;
-
-	while (*mp == ESC_CHAR)
+	if (needle_len == 0 || hay_len < needle_len)
 	{
-		do
-		{
-			int ansi_mask = 0;
-			int ansi_diff = 0;
-			unsigned int param_val = 0;
-			++(mp);
-			if (*(mp) == ANSI_CSI)
-			{
-				while ((*(++(mp)) & 0xf0) == 0x30)
-				{
-					if (*(mp) < 0x3a)
-					{
-						param_val <<= 1;
-						param_val += (param_val << 2) + (*(mp) & 0x0f);
-					}
-					else
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						param_val = 0;
-					}
-				}
-			}
-			while ((*(mp) & 0xf0) == 0x20)
-			{
-				++(mp);
-			}
-			if (*(mp) == ANSI_END)
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-				ansi_needle = (ansi_needle & ~ansi_mask) | ansi_diff;
-				++(mp);
-			}
-			else if (*(mp))
-			{
-				++(mp);
-			}
-		} while (0);
+		goto cleanup_before;
+	}
 
-		if (!*mp)
+	for (int i = 0; i < needle_len; ++i)
+	{
+		if (!colorstate_equal(&needle_states[i], &zero_state))
 		{
-			mp = (char *)" ";
+			needle_has_color = true;
+			break;
 		}
 	}
 
-	ansi_haystack = ANST_NORMAL;
-
-	/**
-	 * Look for the needle string
-	 *
-	 */
-	while (*bp)
+	for (int i = 0; i <= hay_len - needle_len; ++i)
 	{
-		/**
-		 * See if what follows is what we are looking for
-		 *
-		 */
-		ansi_needle2 = ansi_needle;
-		ansi_haystack2 = ansi_haystack;
-		cp = bp;
-		np = mp;
-
-		while (1)
+		if (memcmp(hay_text + i, needle_text, (size_t)needle_len) != 0)
 		{
-			while (*cp == ESC_CHAR)
+			continue;
+		}
+
+		if (needle_has_color)
+		{
+			bool states_match = true;
+
+			for (int j = 0; j < needle_len; ++j)
 			{
-				do
+				if (!colorstate_equal(&hay_states[i + j], &needle_states[j]))
 				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
-					++(cp);
-					if (*(cp) == ANSI_CSI)
-					{
-						while ((*(++(cp)) & 0xf0) == 0x30)
-						{
-							if (*(cp) < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*(cp) & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*(cp) & 0xf0) == 0x20)
-					{
-						++(cp);
-					}
-					if (*(cp) == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						ansi_haystack2 = (ansi_haystack2 & ~ansi_mask) | ansi_diff;
-						++(cp);
-					}
-					else if (*(cp))
-					{
-						++(cp);
-					}
-				} while (0);
+					states_match = false;
+					break;
+				}
 			}
 
-			while (*np == ESC_CHAR)
+			if (!states_match)
 			{
-				do
-				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
-					++(np);
-					if (*(np) == ANSI_CSI)
-					{
-						while ((*(++(np)) & 0xf0) == 0x30)
-						{
-							if (*(np) < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*(np) & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*(np) & 0xf0) == 0x20)
-					{
-						++(np);
-					}
-					if (*(np) == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						ansi_needle2 = (ansi_needle2 & ~ansi_mask) | ansi_diff;
-						++(np);
-					}
-					else if (*(np))
-					{
-						++(np);
-					}
-				} while (0);
+				continue;
 			}
-
-			if ((*cp != *np) || (ansi_needle2 != ANST_NONE && ansi_haystack2 != ansi_needle2) || !*cp || !*np)
-			{
-				break;
-			}
-
-			++cp, ++np;
 		}
 
-		if (!*np)
-		{
-			/**
-			 * Yup, return what came before this
-			 *
-			 */
-			*bp = '\0';
-			XSAFELBSTR(haystack, buff, bufc);
-			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_haystack), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
-			XSAFELBSTR(buf, buff, bufc);
-			XFREE(buf);
-			return;
-		}
-
-		/**
-		 * Nope, continue searching
-		 *
-		 */
-		while (*bp == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(bp);
-				if (*(bp) == ANSI_CSI)
-				{
-					while ((*(++(bp)) & 0xf0) == 0x30)
-					{
-						if (*(bp) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(bp) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(bp) & 0xf0) == 0x20)
-				{
-					++(bp);
-				}
-				if (*(bp) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_haystack = (ansi_haystack & ~ansi_mask) | ansi_diff;
-					++(bp);
-				}
-				else if (*(bp))
-				{
-					++(bp);
-				}
-			} while (0);
-		}
-
-		if (*bp)
-		{
-			++bp;
-		}
+		match_pos = i;
+		break;
 	}
 
-	/**
-	 * Ran off the end without finding it
-	 *
-	 */
-	XSAFELBSTR(haystack, buff, bufc);
-	return;
+	if (match_pos != -1)
+	{
+		emit_colored_range(hay_text, hay_states, 0, match_pos, normal, normal, color_type, buff, bufc);
+	}
+	else
+	{
+		emit_colored_range(hay_text, hay_states, 0, hay_len, normal, hay_states ? hay_states[hay_len] : normal, color_type, buff, bufc);
+	}
+
+cleanup_before:
+	if (hay_states)
+	{
+		XFREE(hay_states);
+	}
+
+	if (hay_text)
+	{
+		XFREE(hay_text);
+	}
+
+	if (needle_states)
+	{
+		XFREE(needle_states);
+	}
+
+	if (needle_text)
+	{
+		XFREE(needle_text);
+	}
 }
 
 /*
@@ -1622,76 +1348,35 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  */
 void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s = fargs[0];
+	ColorState *states = NULL;
+	char *stripped = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
 	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
-	int ansi_state = ANST_NORMAL;
 
 	if (nchars <= 0)
 	{
 		return;
 	}
 
-	for (int count = 0; (count < nchars) && *s; count++)
-	{
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
+	int len = ansi_map_states_colorstate(fargs[0], &states, &stripped);
 
-		if (*s)
-		{
-			++s;
-		}
+	if (nchars > len)
+	{
+		nchars = len;
 	}
 
-	XSAFESTRNCAT(buff, bufc, fargs[0], s - fargs[0], LBUF_SIZE);
-	s = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
-	XSAFELBSTR(s, buff, bufc);
-	XFREE(s);
+	emit_colored_range(stripped, states, 0, nchars, normal, normal, color_type, buff, bufc);
+
+	if (states)
+	{
+		XFREE(states);
+	}
+
+	if (stripped)
+	{
+		XFREE(stripped);
+	}
 }
 
 /**
@@ -1709,141 +1394,49 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  */
 void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s, *buf;
-	int count, start, nchars;
-	int ansi_state = ANST_NORMAL;
-	s = fargs[0];
-	nchars = (int)strtol(fargs[1], (char **)NULL, 10);
-	start = ansi_strip_ansi_len(s) - nchars;
+	ColorState *states = NULL;
+	char *stripped = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
+	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (nchars <= 0)
 	{
 		return;
 	}
 
+	int len = ansi_map_states_colorstate(fargs[0], &states, &stripped);
+	int start = len - nchars;
+
 	if (start < 0)
 	{
 		nchars += start;
-
-		if (nchars <= 0)
-		{
-			return;
-		}
-
 		start = 0;
 	}
 
-	while (*s == ESC_CHAR)
+	if (nchars <= 0 || start > len)
 	{
-		do
-		{
-			int ansi_mask = 0;
-			int ansi_diff = 0;
-			unsigned int param_val = 0;
-			++(s);
-			if (*(s) == ANSI_CSI)
-			{
-				while ((*(++(s)) & 0xf0) == 0x30)
-				{
-					if (*(s) < 0x3a)
-					{
-						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s) & 0x0f);
-					}
-					else
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						param_val = 0;
-					}
-				}
-			}
-			while ((*(s) & 0xf0) == 0x20)
-			{
-				++(s);
-			}
-			if (*(s) == ANSI_END)
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-				ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-				++(s);
-			}
-			else if (*(s))
-			{
-				++(s);
-			}
-		} while (0);
+		goto cleanup_right;
 	}
 
-	for (count = 0; (count < start) && *s; count++)
+	int end = start + nchars;
+	if (end > len)
 	{
-		++s;
-
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
+		end = len;
 	}
 
-	if (*s)
+	emit_colored_range(stripped, states, start, end, normal, states ? states[len] : normal, color_type, buff, bufc);
+
+cleanup_right:
+	if (states)
 	{
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
-		XSAFELBSTR(buf, buff, bufc);
-		XFREE(buf);
+		XFREE(states);
 	}
 
-	XSAFELBSTR(s, buff, bufc);
+	if (stripped)
+	{
+		XFREE(stripped);
+	}
 }
 
 /**
@@ -2622,203 +2215,49 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s, *savep, *buf;
-	int count, start, nchars;
-	int ansi_state = ANST_NORMAL;
-	s = fargs[0];
-	start = (int)strtol(fargs[1], (char **)NULL, 10);
-	nchars = (int)strtol(fargs[2], (char **)NULL, 10);
+	ColorState *states = NULL;
+	char *stripped = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
+	int start = (int)strtol(fargs[1], (char **)NULL, 10);
+	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
 	if (nchars <= 0)
 	{
 		return;
 	}
 
+	int len = ansi_map_states_colorstate(fargs[0], &states, &stripped);
+
 	if (start < 0)
 	{
 		nchars += start;
-
-		if (nchars <= 0)
-		{
-			return;
-		}
-
 		start = 0;
 	}
 
-	while (*s == ESC_CHAR)
+	if (nchars <= 0 || start >= len)
 	{
-		do
-		{
-			int ansi_mask = 0;
-			int ansi_diff = 0;
-			unsigned int param_val = 0;
-			++(s);
-			if (*(s) == ANSI_CSI)
-			{
-				while ((*(++(s)) & 0xf0) == 0x30)
-				{
-					if (*(s) < 0x3a)
-					{
-						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s) & 0x0f);
-					}
-					else
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						param_val = 0;
-					}
-				}
-			}
-			while ((*(s) & 0xf0) == 0x20)
-			{
-				++(s);
-			}
-			if (*(s) == ANSI_END)
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-				ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-				++(s);
-			}
-			else if (*(s))
-			{
-				++(s);
-			}
-		} while (0);
+		goto cleanup_mid;
 	}
 
-	for (count = 0; (count < start) && *s; ++count)
+	int end = start + nchars;
+	if (end > len)
 	{
-		++s;
-
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
+		end = len;
 	}
 
-	if (*s)
+	emit_colored_range(stripped, states, start, end, normal, normal, color_type, buff, bufc);
+
+cleanup_mid:
+	if (states)
 	{
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
-		XSAFELBSTR(buf, buff, bufc);
-		XFREE(buf);
+		XFREE(states);
 	}
 
-	savep = s;
-
-	for (count = 0; (count < nchars) && *s; ++count)
+	if (stripped)
 	{
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
-
-		if (*s)
-		{
-			++s;
-		}
+		XFREE(stripped);
 	}
-
-	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
-	buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
-	XSAFELBSTR(buf, buff, bufc);
-	XFREE(buf);
 }
 
 /*
@@ -3289,53 +2728,11 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			switch (*sw)
 			{
 			case ESC_CHAR:
-				do
-				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
-					++(sw);
-					if (*(sw) == ANSI_CSI)
-					{
-						while ((*(++(sw)) & 0xf0) == 0x30)
-						{
-							if (*(sw) < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*(sw) & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*(sw) & 0xf0) == 0x20)
-					{
-						++(sw);
-					}
-					if (*(sw) == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						sw_ansi_state = (sw_ansi_state & ~ansi_mask) | ansi_diff;
-						++(sw);
-					}
-					else if (*(sw))
-					{
-						++(sw);
-					}
-				} while (0);
+			{
+				consume_ansi_sequence_packed(&sw, &sw_ansi_state);
 				--sw;
 				continue;
+			}
 
 			case '\t':
 			case '\r':
@@ -3406,53 +2803,11 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 				switch (*ew)
 				{
 				case ESC_CHAR:
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(ew);
-						if (*(ew) == ANSI_CSI)
-						{
-							while ((*(++(ew)) & 0xf0) == 0x30)
-							{
-								if (*(ew) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(ew) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*(ew) & 0xf0) == 0x20)
-						{
-							++(ew);
-						}
-						if (*(ew) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ew_ansi_state = (ew_ansi_state & ~ansi_mask) | ansi_diff;
-							++(ew);
-						}
-						else if (*(ew))
-						{
-							++(ew);
-						}
-					} while (0);
+				{
+					consume_ansi_sequence_packed(&ew, &ew_ansi_state);
 					--ew;
 					continue;
+				}
 
 				case '\r':
 				case '\t':
@@ -3883,53 +3238,11 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					switch (*sw)
 					{
 					case ESC_CHAR:
-						do
-						{
-							int ansi_mask = 0;
-							int ansi_diff = 0;
-							unsigned int param_val = 0;
-							++(sw);
-							if (*(sw) == ANSI_CSI)
-							{
-								while ((*(++(sw)) & 0xf0) == 0x30)
-								{
-									if (*(sw) < 0x3a)
-									{
-										param_val <<= 1;
-										param_val += (param_val << 2) + (*(sw) & 0x0f);
-									}
-									else
-									{
-										if (param_val < I_ANSI_LIM)
-										{
-											ansi_mask |= ansiBitsMask(param_val);
-											ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-										}
-										param_val = 0;
-									}
-								}
-							}
-							while ((*(sw) & 0xf0) == 0x20)
-							{
-								++(sw);
-							}
-							if (*(sw) == ANSI_END)
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								sw_ansi_state = (sw_ansi_state & ~ansi_mask) | ansi_diff;
-								++(sw);
-							}
-							else if (*(sw))
-							{
-								++(sw);
-							}
-						} while (0);
+					{
+						consume_ansi_sequence_packed(&sw, &sw_ansi_state);
 						--sw;
 						continue;
+					}
 
 					case '\t':
 					case '\r':
@@ -4069,53 +3382,11 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						switch (*ew)
 						{
 						case ESC_CHAR:
-							do
-							{
-								int ansi_mask = 0;
-								int ansi_diff = 0;
-								unsigned int param_val = 0;
-								++(ew);
-								if (*(ew) == ANSI_CSI)
-								{
-									while ((*(++(ew)) & 0xf0) == 0x30)
-									{
-										if (*(ew) < 0x3a)
-										{
-											param_val <<= 1;
-											param_val += (param_val << 2) + (*(ew) & 0x0f);
-										}
-										else
-										{
-											if (param_val < I_ANSI_LIM)
-											{
-												ansi_mask |= ansiBitsMask(param_val);
-												ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-											}
-											param_val = 0;
-										}
-									}
-								}
-								while ((*(ew) & 0xf0) == 0x20)
-								{
-									++(ew);
-								}
-								if (*(ew) == ANSI_END)
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									ew_ansi_state = (ew_ansi_state & ~ansi_mask) | ansi_diff;
-									++(ew);
-								}
-								else if (*(ew))
-								{
-									++(ew);
-								}
-							} while (0);
-							--ew;
-							continue;
+					{
+						consume_ansi_sequence_packed(&ew, &ew_ansi_state);
+						--ew;
+						continue;
+					}
 
 						case '\r':
 						case '\t':
@@ -4562,197 +3833,50 @@ void fun_strlen(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s, *savep, *buf;
-	int count, start, nchars;
-	int ansi_state_l = ANST_NORMAL;
-	int ansi_state_r = ANST_NORMAL;
-	s = fargs[0];
-	start = (int)strtol(fargs[1], (char **)NULL, 10);
-	nchars = (int)strtol(fargs[2], (char **)NULL, 10);
+	ColorState *states = NULL;
+	char *stripped = NULL;
+	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorType color_type = resolve_color_type(player, cause);
+	int start = (int)strtol(fargs[1], (char **)NULL, 10);
+	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
 	if ((nchars <= 0) || (start + nchars <= 0))
 	{
-		XSAFELBSTR(s, buff, bufc);
+		XSAFELBSTR(fargs[0], buff, bufc);
 		return;
 	}
 
-	savep = s;
+	int len = ansi_map_states_colorstate(fargs[0], &states, &stripped);
 
-	for (count = 0; (count < start) && *s; ++count)
+	int start_idx = (start < 0) ? 0 : start;
+	if (start_idx > len)
 	{
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state_l = (ansi_state_l & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
-
-		if (*s)
-		{
-			++s;
-		}
+		start_idx = len;
 	}
 
-	XSAFESTRNCAT(buff, bufc, savep, s - savep, LBUF_SIZE);
-	ansi_state_r = ansi_state_l;
-
-	while (*s == ESC_CHAR)
+	int delete_len = (start < 0) ? start + nchars : nchars;
+	if (delete_len < 0)
 	{
-		do
-		{
-			int ansi_mask = 0;
-			int ansi_diff = 0;
-			unsigned int param_val = 0;
-			++(s);
-			if (*(s) == ANSI_CSI)
-			{
-				while ((*(++(s)) & 0xf0) == 0x30)
-				{
-					if (*(s) < 0x3a)
-					{
-						param_val <<= 1;
-						param_val += (param_val << 2) + (*(s) & 0x0f);
-					}
-					else
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						param_val = 0;
-					}
-				}
-			}
-			while ((*(s) & 0xf0) == 0x20)
-			{
-				++(s);
-			}
-			if (*(s) == ANSI_END)
-			{
-				if (param_val < I_ANSI_LIM)
-				{
-					ansi_mask |= ansiBitsMask(param_val);
-					ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-				}
-				ansi_state_r = (ansi_state_r & ~ansi_mask) | ansi_diff;
-				++(s);
-			}
-			else if (*(s))
-			{
-				++(s);
-			}
-		} while (0);
+		delete_len = 0;
 	}
 
-	for (; (count < start + nchars) && *s; ++count)
+	int end_idx = start_idx + delete_len;
+	if (end_idx > len)
 	{
-		++s;
-
-		while (*s == ESC_CHAR)
-		{
-			do
-			{
-				int ansi_mask = 0;
-				int ansi_diff = 0;
-				unsigned int param_val = 0;
-				++(s);
-				if (*(s) == ANSI_CSI)
-				{
-					while ((*(++(s)) & 0xf0) == 0x30)
-					{
-						if (*(s) < 0x3a)
-						{
-							param_val <<= 1;
-							param_val += (param_val << 2) + (*(s) & 0x0f);
-						}
-						else
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							param_val = 0;
-						}
-					}
-				}
-				while ((*(s) & 0xf0) == 0x20)
-				{
-					++(s);
-				}
-				if (*(s) == ANSI_END)
-				{
-					if (param_val < I_ANSI_LIM)
-					{
-						ansi_mask |= ansiBitsMask(param_val);
-						ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-					}
-					ansi_state_r = (ansi_state_r & ~ansi_mask) | ansi_diff;
-					++(s);
-				}
-				else if (*(s))
-				{
-					++(s);
-				}
-			} while (0);
-		}
+		end_idx = len;
 	}
 
-	if (*s)
+	emit_colored_range(stripped, states, 0, start_idx, normal, states ? states[start_idx] : normal, color_type, buff, bufc);
+	emit_colored_range(stripped, states, end_idx, len, states ? states[start_idx] : normal, normal, color_type, buff, bufc);
+
+	if (states)
 	{
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state_l), ansi_packed_to_colorstate(ansi_state_r), ColorTypeAnsi, false);
-		XSAFELBSTR(buf, buff, bufc);
-		XFREE(buf);
-		XSAFELBSTR(s, buff, bufc);
+		XFREE(states);
 	}
-	else
+
+	if (stripped)
 	{
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state_l), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
-		XSAFELBSTR(buf, buff, bufc);
-		XFREE(buf);
+		XFREE(stripped);
 	}
 }
 

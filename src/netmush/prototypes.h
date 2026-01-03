@@ -1242,8 +1242,6 @@ extern void do_pemit_list(dbref player, char *list, const char *message, int do_
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
 /* string_ansi.c */
-extern const int ansiBitsMask(int num);
-extern const int ansiBits(int num);
 extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
 extern void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors, void (*flush_fn)(const char *, size_t, void *), void *ctx);
 extern char *ansi_strip_ansi(const char *str);
@@ -1254,6 +1252,8 @@ extern int ansi_map_states_colorstate(const char *s, ColorState **states, char *
 extern void skip_esccode(char **s);
 extern char *remap_colors(const char *s, int *cmap);
 extern char *translate_string_ansi(const char *str, int type);
+extern bool ansi_apply_sequence(const char **ptr, ColorState *state);
+extern bool ansi_apply_sequence_packed(const char **ptr, int *packed_state);
 extern int mushcode_to_sgr(int ch);
 
 /* string_util.c */

@@ -22,6 +22,20 @@
 #include <ctype.h>
 #include <string.h>
 
+static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state)
+{
+	const char *ptr = *cursor;
+
+	if (ansi_apply_sequence_packed(&ptr, packed_state))
+	{
+		*cursor = (char *)ptr;
+	}
+	else
+	{
+		++(*cursor);
+	}
+}
+
 /**
  * @brief Thread-safe wrapper for strerror
  *
@@ -453,62 +467,18 @@ void edit_string(char *src, char **dst, char *from, char *to)
 
 	do
 	{
-		p = to;
-		while (*p)
-		{
-			if (*p == ESC_CHAR)
+			p = to;
+			while (*p)
 			{
-				do
+				if (*p == ESC_CHAR)
 				{
-					int ansi_mask = 0;
-					int ansi_diff = 0;
-					unsigned int param_val = 0;
+					consume_ansi_sequence_packed(&p, &ansi_state);
+				}
+				else
+				{
 					++p;
-					if (*p == ANSI_CSI)
-					{
-						while ((*(++p) & 0xf0) == 0x30)
-						{
-							if (*p < 0x3a)
-							{
-								param_val <<= 1;
-								param_val += (param_val << 2) + (*p & 0x0f);
-							}
-							else
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								param_val = 0;
-							}
-						}
-					}
-					while ((*p & 0xf0) == 0x20)
-					{
-						++p;
-					}
-					if (*p == ANSI_END)
-					{
-						if (param_val < I_ANSI_LIM)
-						{
-							ansi_mask |= ansiBitsMask(param_val);
-							ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-						}
-						ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-						++p;
-					}
-					else if (*p)
-					{
-						++p;
-					}
-				} while (0);
+				}
 			}
-			else
-			{
-				++p;
-			}
-		}
 	} while (0);
 
 	to_ansi_set = (~ANST_NONE) & ansi_state;
@@ -529,51 +499,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*p == ESC_CHAR)
 				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++p;
-						if (*p == ANSI_CSI)
-						{
-							while ((*(++p) & 0xf0) == 0x30)
-							{
-								if (*p < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*p & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*p & 0xf0) == 0x20)
-						{
-							++p;
-						}
-						if (*p == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-							++p;
-						}
-						else if (*p)
-						{
-							++p;
-						}
-					} while (0);
+					consume_ansi_sequence_packed(&p, &ansi_state);
 				}
 				else
 				{
@@ -596,51 +522,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*p == ESC_CHAR)
 				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++p;
-						if (*p == ANSI_CSI)
-						{
-							while ((*(++p) & 0xf0) == 0x30)
-							{
-								if (*p < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*p & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*p & 0xf0) == 0x20)
-						{
-							++p;
-						}
-						if (*p == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-							++p;
-						}
-						else if (*p)
-						{
-							++p;
-						}
-					} while (0);
+					consume_ansi_sequence_packed(&p, &ansi_state);
 				}
 				else
 				{
@@ -677,51 +559,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*src == ESC_CHAR)
 				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(src);
-						if (*(src) == ANSI_CSI)
-						{
-							while ((*(++(src)) & 0xf0) == 0x30)
-							{
-								if (*(src) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(src) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-							}
-						}
-						while ((*(src) & 0xf0) == 0x20)
-						{
-							++(src);
-						}
-						if (*(src) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-							++(src);
-						}
-						else if (*(src))
-						{
-							++(src);
-						}
-					} while (0);
+					consume_ansi_sequence_packed(&src, &ansi_state);
 				}
 				else
 				{
@@ -760,51 +598,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					if (*from == ESC_CHAR)
 					{
 						p = src;
-						do
-						{
-							int ansi_mask = 0;
-							int ansi_diff = 0;
-							unsigned int param_val = 0;
-							++(src);
-							if (*(src) == ANSI_CSI)
-							{
-								while ((*(++(src)) & 0xf0) == 0x30)
-								{
-									if (*(src) < 0x3a)
-									{
-										param_val <<= 1;
-										param_val += (param_val << 2) + (*(src) & 0x0f);
-									}
-									else
-									{
-										if (param_val < I_ANSI_LIM)
-										{
-											ansi_mask |= ansiBitsMask(param_val);
-											ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-										}
-										param_val = 0;
-									}
-								}
-							}
-							while ((*(src) & 0xf0) == 0x20)
-							{
-								++(src);
-							}
-							if (*(src) == ANSI_END)
-							{
-								if (param_val < I_ANSI_LIM)
-								{
-									ansi_mask |= ansiBitsMask(param_val);
-									ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-								}
-								ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-								++(src);
-							}
-							else if (*(src))
-							{
-								++(src);
-							}
-						} while (0);
+						consume_ansi_sequence_packed(&src, &ansi_state);
 						XSAFESTRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else

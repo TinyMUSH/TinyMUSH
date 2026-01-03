@@ -2761,6 +2761,46 @@ static bool parse_and_apply_ansi_sequence(const char **ptr, ColorState *state)
     return true;
 }
 
+bool ansi_apply_sequence(const char **ptr, ColorState *state)
+{
+    if (!ptr || !*ptr || !state)
+    {
+        return false;
+    }
+
+    ColorState next = *state;
+    const char *cursor = *ptr;
+
+    if (!parse_and_apply_ansi_sequence(&cursor, &next))
+    {
+        return false;
+    }
+
+    *state = next;
+    *ptr = cursor;
+    return true;
+}
+
+bool ansi_apply_sequence_packed(const char **ptr, int *packed_state)
+{
+    if (!ptr || !*ptr || !packed_state)
+    {
+        return false;
+    }
+
+    ColorState state = ansi_packed_to_colorstate(*packed_state);
+    const char *cursor = *ptr;
+
+    if (!ansi_apply_sequence(&cursor, &state))
+    {
+        return false;
+    }
+
+    *packed_state = ansi_colorstate_to_packed(state);
+    *ptr = cursor;
+    return true;
+}
+
 /**
  * @brief Convert ANSI escape sequences to mushcode or strip ANSI codes using the new ANSI API.
  *
