@@ -3035,31 +3035,31 @@ void info(int fmt, int flags, int ver)
 
 void usage_dbconvert(void)
 {
+#ifdef USE_LMDB
 	fprintf(stderr, "  -f, --config=<filename>   config file\n");
 	fprintf(stderr, "  -C, --check               perform consistency check\n");
 	fprintf(stderr, "  -d, --data=<path>         data directory\n");
-	fprintf(stderr, "  -D, --gdbmdb=<filename>   gdbm database\n");
-	fprintf(stderr, "  -r, --crashdb=<filename>  gdbm crash db\n");
+	fprintf(stderr, "  -D, --dbfile=<filename>   database directory\n");
 	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
-	fprintf(stderr, "  -G, --gdbm                write in gdbm format\n");
-	fprintf(stderr, "  -g, --flat                write in flat file format\n");
-	fprintf(stderr, "  -K, --keyattr             store key as an attribute\n");
-	fprintf(stderr, "  -k, --keyhdr              store key in the header\n");
-	fprintf(stderr, "  -L, --links               include link information\n");
-	fprintf(stderr, "  -l, --nolinks             don't include link information\n");
-	fprintf(stderr, "  -M, --maps                store attr map if GDBM\n");
-	fprintf(stderr, "  -m, --nomaps              don't store attr map if GDBM\n");
-	fprintf(stderr, "  -N, --nameattr            store name as an attribute\n");
-	fprintf(stderr, "  -n, --namehdr             store name in the header\n");
-	fprintf(stderr, "  -P, --parents             include parent information\n");
-	fprintf(stderr, "  -p, --noparents           don't include parent information\n");
-	fprintf(stderr, "  -W, --write               write the output file\n");
-	fprintf(stderr, "  -w, --nowrite             don't write the output file.\n");
-	fprintf(stderr, "  -X, --mindb               create a default GDBM db\n");
-	fprintf(stderr, "  -x, --minflat             create a default flat file db\n");
+	fprintf(stderr, "  -L, --lmdb                write in LMDB format (default)\n");
+	fprintf(stderr, "  -g, --flat                write in flat text format\n");
 	fprintf(stderr, "  -Z, --zones               include zone information\n");
 	fprintf(stderr, "  -z, --nozones             don't include zone information\n");
 	fprintf(stderr, "  -o, --output=<number>     set output version number\n\n");
+#endif  /* USE_LMDB */
+
+#ifdef USE_GDBM
+	fprintf(stderr, "  -f, --config=<filename>   config file\n");
+	fprintf(stderr, "  -C, --check               perform consistency check\n");
+	fprintf(stderr, "  -d, --data=<path>         data directory\n");
+	fprintf(stderr, "  -D, --dbfile=<filename>   database file\n");
+	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
+	fprintf(stderr, "  -G, --gdbm                write in GDBM format (default)\n");
+	fprintf(stderr, "  -g, --flat                write in flat text format\n");
+	fprintf(stderr, "  -Z, --zones               include zone information\n");
+	fprintf(stderr, "  -z, --nozones             don't include zone information\n");
+	fprintf(stderr, "  -o, --output=<number>     set output version number\n\n");
+#endif  /* USE_GDBM */
 }
 
 #ifdef USE_GDBM
@@ -3171,9 +3171,16 @@ void recover_flatfile(char *flat)
 	dddb_close();
 }
 
+#ifdef USE_LMDB
+/**
+ * LMDB-specific dbconvert implementation
+ * Converts between LMDB database and flat text formats.
+ * LMDB creates directory-based databases (e.g., game.gdbm.lmdb/)
+ * with internal data.mdb and lock.mdb files.
+ */
 int dbconvert(int argc, char *argv[])
 {
-	int setflags, clrflags, ver;
+	int ver;
 	int db_ver, db_format, db_flags, do_check, do_write;
 	int c, dbclean, errflg = 0;
 	char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
@@ -3184,47 +3191,34 @@ int dbconvert(int argc, char *argv[])
 	MODULE *mp;
 	void (*modfunc)(FILE *);
 	int option_index = 0;
+	int do_output_lmdb = 1;  /* Default to LMDB output */
+	
 	struct option long_options[] = {
 		{"config", required_argument, 0, 'f'},
 		{"check", no_argument, 0, 'C'},
 		{"data", required_argument, 0, 'd'},
-		{"gdbmdb", required_argument, 0, 'D'},
-		{"crashdb", required_argument, 0, 'r'},
+		{"dbfile", required_argument, 0, 'D'},
 		{"cleanattr", no_argument, 0, 'q'},
-		{"gdbm", no_argument, 0, 'G'},
-		{"flat", no_argument, 0, 'g'},
-		{"keyattr", no_argument, 0, 'K'},
-		{"keyhdr", no_argument, 0, 'k'},
-		{"links", no_argument, 0, 'L'},
-		{"nolinks", no_argument, 0, 'l'},
-		{"maps", no_argument, 0, 'M'},
-		{"nomaps", no_argument, 0, 'm'},
-		{"nameattr", no_argument, 0, 'N'},
-		{"namehdr", no_argument, 0, 'n'},
-		{"parents", no_argument, 0, 'P'},
-		{"noparents", no_argument, 0, 'p'},
-		{"write", no_argument, 0, 'W'},
-		{"nowrite", no_argument, 0, 'w'},
-		{"mindb", no_argument, 0, 'X'},
-		{"minflat", no_argument, 0, 'x'},
+		{"lmdb", no_argument, 0, 'L'},          /* Output as LMDB (default) */
+		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
 		{"zones", no_argument, 0, 'Z'},
 		{"nozones", no_argument, 0, 'z'},
 		{"output", required_argument, 0, 'o'},
 		{"help", no_argument, 0, '?'},
 		{0, 0, 0, 0}};
+	
 	logfile_init(NULL);
-	/*
-	 * Decide what conversions to do and how to format the output file
-	 */
-	setflags = clrflags = ver = do_check = 0;
+	
+	/* Initialize conversion parameters */
+	ver = do_check = 0;
 	do_write = 1;
 	dbclean = V_DBCLEAN;
 
-	while ((c = getopt_long(argc, argv, "f:Cd:D:r:qGgKkLlMmNnPpWwXxZzo:?", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "f:Cd:D:q:LgZzo:?", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
-		case 'c':
+		case 'f':
 			opt_conf = optarg;
 			break;
 
@@ -3244,80 +3238,23 @@ int dbconvert(int argc, char *argv[])
 			dbclean = 0;
 			break;
 
-		case 'G':
-			clrflags = 0xffffffff;
-			setflags = OUTPUT_FLAGS;
-			ver = OUTPUT_VERSION;
+		case 'L':
+			do_output_lmdb = 1;
 			break;
 
 		case 'g':
-			clrflags = 0xffffffff;
-			setflags = UNLOAD_OUTFLAGS;
-			ver = UNLOAD_VERSION;
+			do_output_lmdb = 0;
 			break;
 
 		case 'Z':
-			setflags |= V_ZONE;
+			/* Zone flags - preserved for future attribute filtering */
 			break;
 
 		case 'z':
-			clrflags |= V_ZONE;
-			break;
-
-		case 'L':
-			setflags |= V_LINK;
-			break;
-
-		case 'l':
-			clrflags |= V_LINK;
-			break;
-
-		case 'N':
-			setflags |= V_ATRNAME;
-			break;
-
-		case 'n':
-			clrflags |= V_ATRNAME;
-			break;
-
-		case 'K':
-			setflags |= V_ATRKEY;
-			break;
-
-		case 'k':
-			clrflags |= V_ATRKEY;
-			break;
-
-		case 'P':
-			setflags |= V_PARENT;
-			break;
-
-		case 'p':
-			clrflags |= V_PARENT;
-			break;
-
-		case 'W':
-			do_write = 1;
-			break;
-
-		case 'w':
-			do_write = 0;
-			break;
-
-		case 'X':
-			clrflags = 0xffffffff;
-			setflags = OUTPUT_FLAGS;
-			ver = OUTPUT_VERSION;
-			break;
-
-		case 'x':
-			clrflags = 0xffffffff;
-			setflags = UNLOAD_OUTFLAGS;
-			ver = UNLOAD_VERSION;
 			break;
 
 		case 'o':
-			ver = ver * 10 + (int)strtol(optarg, NULL, 10);
+			ver = (int)strtol(optarg, NULL, 10);
 			break;
 
 		default:
@@ -3338,9 +3275,6 @@ int dbconvert(int argc, char *argv[])
 	cf_read(opt_conf);
 	mushstate.initializing = 0;
 
-	/*
-	 * Open the database file
-	 */
 	vattr_init();
 
 	if (init_database(argv[optind]) < 0)
@@ -3349,21 +3283,202 @@ int dbconvert(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	/*
-	 * Lock the database
-	 */
 	db_lock();
 
-	/*
-	 * Go do it
-	 */
+	/* Read from current LMDB database */
+	db_read();
+	call_all_modules_nocache("db_read");
+	db_format = F_TINYMUSH;
+	db_ver = OUTPUT_VERSION;
+	db_flags = OUTPUT_FLAGS;
 
-	if (!(setflags & V_GDBM))
+	log_write_raw(1, "Input: ");
+	info(db_format, db_flags, db_ver);
+
+	if (do_check)
+	{
+		do_dbck(NOTHING, NOTHING, DBCK_FULL);
+	}
+
+	if (do_write)
+	{
+		if (ver != 0)
+		{
+			db_ver = ver;
+		}
+		else
+		{
+			db_ver = 3;
+		}
+
+		log_write_raw(1, "Output: ");
+
+		if (do_output_lmdb)
+		{
+			/* Write to LMDB database */
+			info(F_TINYMUSH, db_flags, db_ver);
+			db_write();
+			db_lock();
+			call_all_modules_nocache("db_write");
+			db_unlock();
+		}
+		else
+		{
+			/* Write to flat text file */
+			info(F_TINYMUSH, UNLOAD_OUTFLAGS, db_ver);
+			db_write_flatfile(stdout, F_TINYMUSH, db_ver | UNLOAD_OUTFLAGS | dbclean);
+			
+			/* Call all modules to write to flatfile */
+			s1 = XMALLOC(MBUF_SIZE, "s1");
+
+			for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
+			{
+				XSNPRINTF(s1, MBUF_SIZE, "mod_%s_%s", mp->modname, "db_write_flatfile");
+
+				if ((modfunc = (void (*)(FILE *))dlsym(mp->handle, s1)) != NULL)
+				{
+					s = XASPRINTF("s", "%s/%s_mod_%s.db", mushconf.dbhome, mushconf.mush_shortname, mp->modname);
+					f = db_module_flatfile(s, 1);
+
+					if (f)
+					{
+						(*modfunc)(f);
+						tf_fclose(f);
+					}
+
+					XFREE(s);
+				}
+			}
+
+			XFREE(s1);
+		}
+	}
+
+	db_unlock();
+	cache_sync();
+	dddb_close();
+	exit(EXIT_SUCCESS);
+}
+#endif  /* USE_LMDB */
+
+#ifdef USE_GDBM
+/**
+ * GDBM-specific dbconvert implementation
+ * Converts between GDBM database and flat text formats.
+ * GDBM creates single-file databases (e.g., game.gdbm)
+ */
+int dbconvert(int argc, char *argv[])
+{
+	int ver;
+	int db_ver, db_format, db_flags, do_check, do_write;
+	int c, dbclean, errflg = 0;
+	char *opt_conf = (char *)DEFAULT_CONFIG_FILE;
+	char *opt_datadir = (char *)DEFAULT_DATABASE_HOME;
+	char *opt_dbfile = (char *)DEFAULT_CONFIG_FILE;
+	char *s, *s1;
+	FILE *f;
+	MODULE *mp;
+	void (*modfunc)(FILE *);
+	int option_index = 0;
+	int do_output_gdbm = 1;  /* Default to GDBM output */
+	
+	struct option long_options[] = {
+		{"config", required_argument, 0, 'f'},
+		{"check", no_argument, 0, 'C'},
+		{"data", required_argument, 0, 'd'},
+		{"dbfile", required_argument, 0, 'D'},
+		{"cleanattr", no_argument, 0, 'q'},
+		{"gdbm", no_argument, 0, 'G'},          /* Output as GDBM (default) */
+		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
+		{"zones", no_argument, 0, 'Z'},
+		{"nozones", no_argument, 0, 'z'},
+		{"output", required_argument, 0, 'o'},
+		{"help", no_argument, 0, '?'},
+		{0, 0, 0, 0}};
+	
+	logfile_init(NULL);
+	
+	/* Initialize conversion parameters */
+	ver = do_check = 0;
+	do_write = 1;
+	dbclean = V_DBCLEAN;
+
+	while ((c = getopt_long(argc, argv, "f:Cd:D:q:GgZzo:?", long_options, &option_index)) != -1)
+	{
+		switch (c)
+		{
+		case 'f':
+			opt_conf = optarg;
+			break;
+
+		case 'd':
+			opt_datadir = optarg;
+			break;
+
+		case 'D':
+			opt_dbfile = optarg;
+			break;
+
+		case 'C':
+			do_check = 1;
+			break;
+
+		case 'q':
+			dbclean = 0;
+			break;
+
+		case 'G':
+			do_output_gdbm = 1;
+			break;
+
+		case 'g':
+			do_output_gdbm = 0;
+			break;
+
+		case 'Z':
+			/* Zone flags - preserved for future attribute filtering */
+			break;
+
+		case 'z':
+			break;
+
+		case 'o':
+			ver = (int)strtol(optarg, NULL, 10);
+			break;
+
+		default:
+			errflg++;
+		}
+	}
+
+	if (errflg || optind >= argc)
+	{
+		usage(basename(argv[0]), 1);
+		exit(EXIT_FAILURE);
+	}
+
+	mushconf.dbhome = XSTRDUP(opt_datadir, "argv");
+	mushconf.db_file = XSTRDUP(opt_dbfile, "argv");
+	cf_init();
+	mushstate.standalone = 1;
+	cf_read(opt_conf);
+	mushstate.initializing = 0;
+
+	vattr_init();
+
+	if (init_database(argv[optind]) < 0)
+	{
+		log_write_raw(1, "Can't open database file\n");
+		exit(EXIT_FAILURE);
+	}
+
+	db_lock();
+
+	/* Determine input format based on flags or default behavior */
+	/* Try reading as GDBM first */
+	if (fileexist(argv[optind]))
 	{
 		db_read();
-		/*
-		 * Call all modules to read from GDBM
-		 */
 		call_all_modules_nocache("db_read");
 		db_format = F_TINYMUSH;
 		db_ver = OUTPUT_VERSION;
@@ -3371,10 +3486,10 @@ int dbconvert(int argc, char *argv[])
 	}
 	else
 	{
+		/* Fall back to reading from stdin as flatfile */
 		db_read_flatfile(stdin, &db_format, &db_ver, &db_flags);
-		/*
-		 * Call modules to load their flatfiles
-		 */
+		
+		/* Call modules to load their flatfiles */
 		s1 = XMALLOC(MBUF_SIZE, "s1");
 
 		for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -3409,8 +3524,6 @@ int dbconvert(int argc, char *argv[])
 
 	if (do_write)
 	{
-		db_flags = (db_flags & ~clrflags) | setflags;
-
 		if (ver != 0)
 		{
 			db_ver = ver;
@@ -3421,24 +3534,23 @@ int dbconvert(int argc, char *argv[])
 		}
 
 		log_write_raw(1, "Output: ");
-		info(F_TINYMUSH, db_flags, db_ver);
 
-		if (db_flags & V_GDBM)
+		if (do_output_gdbm)
 		{
+			/* Write to GDBM database */
+			info(F_TINYMUSH, OUTPUT_FLAGS, db_ver);
 			db_write();
-			/*
-			 * Call all modules to write to GDBM
-			 */
 			db_lock();
 			call_all_modules_nocache("db_write");
 			db_unlock();
 		}
 		else
 		{
-			db_write_flatfile(stdout, F_TINYMUSH, db_ver | db_flags | dbclean);
-			/*
-			 * Call all modules to write to flatfile
-			 */
+			/* Write to flat text file */
+			info(F_TINYMUSH, UNLOAD_OUTFLAGS, db_ver);
+			db_write_flatfile(stdout, F_TINYMUSH, db_ver | UNLOAD_OUTFLAGS | dbclean);
+			
+			/* Call all modules to write to flatfile */
 			s1 = XMALLOC(MBUF_SIZE, "s1");
 
 			for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
@@ -3464,14 +3576,12 @@ int dbconvert(int argc, char *argv[])
 		}
 	}
 
-	/*
-	 * Unlock the database
-	 */
 	db_unlock();
 	cache_sync();
 	dddb_close();
 	exit(EXIT_SUCCESS);
 }
+#endif  /* USE_GDBM */
 
 /**
  * \fn int main ( int argc, char *argv[] )
