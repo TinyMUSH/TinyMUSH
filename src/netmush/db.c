@@ -3755,7 +3755,18 @@ int init_database(char *dbfile)
     cache_init(mushconf.cache_width);
     dddb_setfile(dbfile);
     dddb_init();
-    log_write(LOG_ALWAYS, "INI", "LOAD", "Using db file: %s", dbfile);
+    
+    /*
+     * Log database backend and location
+     */
+#ifdef USE_LMDB
+    log_write(LOG_ALWAYS, "INI", "LOAD", "Using LMDB database: %s.lmdb/", dbfile);
+#elif USE_GDBM
+    log_write(LOG_ALWAYS, "INI", "LOAD", "Using GDBM database: %s.gdbm", dbfile);
+#else
+    log_write(LOG_ALWAYS, "INI", "LOAD", "Using flatfile database: %s", dbfile);
+#endif
+    
     db_free();
     return (0);
 }

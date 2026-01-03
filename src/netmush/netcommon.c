@@ -663,6 +663,31 @@ void desc_delhash(DESC *d)
 
 void welcome_user(DESC *d)
 {
+	/*
+	 * Send TELNET options to inform client about server capabilities
+	 * This helps clients like TinyFugue properly handle ANSI codes without
+	 * requiring manual emulation mode changes.
+	 * 
+	 * Standard MUD telnet negotiation sequence:
+	 * - WILL SUPPRESS_GO_AHEAD: Server won't send GA after each line
+	 * - WONT ECHO: Client handles local echo (standard MUD behavior)
+	 * 
+	 * This combination triggers automatic ANSI mode in TinyFugue and similar clients.
+	 */
+	unsigned char telnet_opts[3];
+	
+	/* Send WILL SUPPRESS_GO_AHEAD (option 3) */
+	telnet_opts[0] = 0xFF;  /* IAC */
+	telnet_opts[1] = 0xFB;  /* WILL */
+	telnet_opts[2] = 0x03;  /* SUPPRESS_GO_AHEAD */
+	queue_write(d, (char *)telnet_opts, 3);
+	
+	/* Send WONT ECHO (option 1) - client does local echo (MUD standard) */
+	telnet_opts[0] = 0xFF;  /* IAC */
+	telnet_opts[1] = 0xFC;  /* WONT */
+	telnet_opts[2] = 0x01;  /* ECHO */
+	queue_write(d, (char *)telnet_opts, 3);
+	
 	if (mushconf.have_pueblo == 1)
 	{
 		queue_rawstring(d, NULL, mushconf.pueblo_version);

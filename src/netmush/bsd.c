@@ -1139,21 +1139,47 @@ int process_input(DESC *d)
 			{
 				option = (unsigned char)q[2];
 				
-				/* Respond to prevent client hang - queue instead of sync write */
-				if (cmd == 0xFD)  /* DO -> respond WONT */
+				/* 
+				 * Respond to prevent client hang
+				 * Accept options we advertised (SUPPRESS_GO_AHEAD, ECHO)
+				 * Refuse everything else
+				 */
+				if (cmd == 0xFD)  /* DO -> check if we can/want to do it */
 				{
-					response[0] = 0xFF;  /* IAC */
-					response[1] = 0xFC;  /* WONT */
-					response[2] = option;
-					queue_write(d, (char *)response, 3);
+					if (option == 0x03)  /* SUPPRESS_GO_AHEAD - we advertised this */
+					{
+						/* Accept: send WILL (already sent in welcome, but confirm) */
+						/* No response needed - we already sent WILL */
+					}
+					else
+					{
+						/* Refuse: send WONT */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFC;  /* WONT */
+						response[2] = option;
+						queue_write(d, (char *)response, 3);
+					}
 				}
-				else if (cmd == 0xFB)  /* WILL -> respond DONT */
+				else if (cmd == 0xFB)  /* WILL -> respond based on option */
 				{
-					response[0] = 0xFF;  /* IAC */
-					response[1] = 0xFE;  /* DONT */
-					response[2] = option;
-					queue_write(d, (char *)response, 3);
+					if (option == 0x01)  /* ECHO - we said WONT, accept their WILL */
+					{
+						/* Accept: send DO */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFD;  /* DO */
+						response[2] = option;
+						queue_write(d, (char *)response, 3);
+					}
+					else
+					{
+						/* Refuse: send DONT */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFE;  /* DONT */
+						response[2] = option;
+						queue_write(d, (char *)response, 3);
+					}
 				}
+				/* For WONT and DONT, no response needed */
 				
 				q += 2;  /* Skip IAC, command, and option */
 				in -= 2;  /* Discount from input count */
