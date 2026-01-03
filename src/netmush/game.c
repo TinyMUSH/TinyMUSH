@@ -3041,7 +3041,7 @@ void usage_dbconvert(void)
 	fprintf(stderr, "  -d, --data=<path>         data directory\n");
 	fprintf(stderr, "  -D, --dbdir=<path>        database directory\n");
 	fprintf(stderr, "  -q, --cleanattr           clean attribute table\n");
-	fprintf(stderr, "  --lmdb                    write in LMDB format (default)\n");
+	fprintf(stderr, "  -G, --lmdb                write in LMDB format (default)\n");
 	fprintf(stderr, "  -g, --flat                write in flat text format\n");
 	fprintf(stderr, "  -K, --keyattr             store keys as object attributes\n");
 	fprintf(stderr, "  -k, --keyhdr              store keys in object header\n");
@@ -3228,7 +3228,7 @@ int dbconvert(int argc, char *argv[])
 		{"data", required_argument, 0, 'd'},
 		{"dbdir", required_argument, 0, 'D'},  /* Directory for LMDB */
 		{"cleanattr", no_argument, 0, 'q'},
-		{"lmdb", no_argument, 0, '1'},          /* Output as LMDB (default), long-only */
+		{"lmdb", no_argument, 0, 'G'},          /* Output as LMDB (default) */
 		{"flat", no_argument, 0, 'g'},          /* Output as flat text */
 		{"keyattr", no_argument, 0, 'K'},       /* Store keys as attributes */
 		{"keyhdr", no_argument, 0, 'k'},        /* Store keys in header */
@@ -3259,7 +3259,7 @@ int dbconvert(int argc, char *argv[])
 	setflags = 0;
 	clrflags = 0;
 
-	while ((c = getopt_long(argc, argv, "f:Cd:D:q:gKkLlMmNHPpWwXxZzo:?", long_options, &option_index)) != -1)
+	while ((c = getopt_long(argc, argv, "f:Cd:D:q:GgKkLlMmNHPpWwXxZzo:?", long_options, &option_index)) != -1)
 	{
 		switch (c)
 		{
@@ -3283,7 +3283,7 @@ int dbconvert(int argc, char *argv[])
 			dbclean = 0;
 			break;
 
-		case '1':  /* --lmdb */
+		case 'G':
 			do_output_lmdb = 1;
 			break;
 
