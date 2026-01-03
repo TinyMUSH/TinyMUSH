@@ -211,7 +211,7 @@ void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	/*
 	 * check for bad name
 	 */
-	if ((*newname == '\0') || (strip_ansi_len(newname) == 0))
+	if ((*newname == '\0') || (ansi_strip_ansi_len(newname) == 0))
 	{
 		notify_quiet(player, "Give it what new name?");
 		return;

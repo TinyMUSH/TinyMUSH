@@ -565,13 +565,13 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
     char *buf;
     /*
      * Report generic powers.
-     * thingname is assumed non-NULL from caller; it will be strip_ansi'd once for output.
+     * thingname is assumed non-NULL from caller; it will be ansi_strip_ansi'd once for output.
      */
     f1 = Powers(thing);
     f2 = Powers2(thing);
 
     /* Strip ANSI codes once before the loop instead of repeatedly inside */
-    buf = strip_ansi(thingname);
+    buf = ansi_strip_ansi(thingname);
     if (!buf)
     {
         return;

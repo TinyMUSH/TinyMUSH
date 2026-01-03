@@ -2773,6 +2773,78 @@ char *translate_string_ansi(const char *str, int type)
 }
 
 /**
+ * @brief Remove ANSI escape codes using the ansi.c parser utilities.
+ *
+ * Caller frees the returned buffer with XFREE().
+ */
+char *ansi_strip_ansi(const char *str)
+{
+    if (!str || !*str)
+    {
+        char *empty = XMALLOC(1, "ansi_strip_ansi");
+        *empty = '\0';
+        return empty;
+    }
+
+    size_t len = strlen(str);
+    char *buf = XMALLOC(len + 1, "ansi_strip_ansi");
+    char *bp = buf;
+    const char *p = str;
+    ColorState discard = {0};
+
+    while (*p)
+    {
+        if (*p == ESC_CHAR && *(p + 1) == '[')
+        {
+            const char *cursor = p;
+            if (parse_and_apply_ansi_sequence(&cursor, &discard))
+            {
+                p = cursor;
+                continue;
+            }
+        }
+
+        *bp++ = *p++;
+    }
+
+    *bp = '\0';
+    return buf;
+}
+
+/**
+ * @brief Count visible characters ignoring ANSI escape sequences using ansi.c parser utilities.
+ */
+int ansi_strip_ansi_len(const char *str)
+{
+    if (!str || !*str)
+    {
+        return 0;
+    }
+
+    int len = 0;
+    const char *p = str;
+    ColorState discard = {0};
+
+    while (*p)
+    {
+        if (*p == ESC_CHAR && *(p + 1) == '[')
+        {
+            const char *cursor = p;
+            if (parse_and_apply_ansi_sequence(&cursor, &discard))
+            {
+                p = cursor;
+                continue;
+            }
+        }
+
+        ++len;
+        ++p;
+    }
+
+    return len;
+}
+
+/**
  * @brief Parse ANSI escape sequence and return ColorState.
  * 
  * @param ansi_ptr Pointer to string pointer, will be advanced past the parsed sequence

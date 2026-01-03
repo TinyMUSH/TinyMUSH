@@ -362,7 +362,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "SHOUT", "%s shouts: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -396,7 +396,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "BCAST", "%s broadcasts: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -434,7 +434,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "ASHOUT", "%s yells: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -451,7 +451,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLposes: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -468,7 +468,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "BCAST", "%s WIZposes: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -485,7 +485,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "SHOUT", "%s WALLemits: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);
@@ -502,7 +502,7 @@ void do_say(dbref player, __attribute__((unused)) dbref cause, int key, char *me
 		}
 
 		name = log_getname(player);
-		buf2 = strip_ansi(message);
+		buf2 = ansi_strip_ansi(message);
 		log_write(LOG_SHOUTS, "WIZ", "BCAST", "%s WIZemits: '%s'", name, buf2);
 		XFREE(buf2);
 		XFREE(name);

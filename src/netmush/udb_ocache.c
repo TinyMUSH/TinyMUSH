@@ -274,7 +274,7 @@ void list_cached_objs(dbref player)
     {
         if (count_array[x] > 0)
         {
-            s = strip_ansi(Name(x));
+            s = ansi_strip_ansi(Name(x));
             raw_notify(player, "%-34.34s #%-13d %14d %14d", s, x, count_array[x], size_array[x]);
             XFREE(s);
             oco++;
@@ -305,7 +305,7 @@ void list_cached_objs(dbref player)
     {
         if (count_array[x] > 0)
         {
-            s = strip_ansi(Name(x));
+            s = ansi_strip_ansi(Name(x));
             raw_notify(player, "%-34.34s #%-13d %14d %14d", s, x, count_array[x], size_array[x]);
             XFREE(s);
             moco++;

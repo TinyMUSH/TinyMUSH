@@ -419,7 +419,7 @@ void giveto(dbref who, int pennies)
 int ok_name(const char *name)
 {
 	const char *cp;
-	char *purename = strip_ansi(name);
+	char *purename = ansi_strip_ansi(name);
 	int i;
 
 	/*

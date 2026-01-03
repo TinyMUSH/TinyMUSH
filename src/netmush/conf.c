@@ -2294,7 +2294,7 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
                 status = XSTRDUP("Strange.", "status");
             }
 
-            buf = strip_ansi(buff);
+            buf = ansi_strip_ansi(buff);
             log_write(LOG_CONFIGMODS, "CFG", "UPDAT", "%s entered config directive: %s with args '%s'. Status: %s", name, cp, buf, status);
             XFREE(buf);
             XFREE(name);

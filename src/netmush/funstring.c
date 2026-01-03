@@ -246,7 +246,11 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		{
 			if (*tp == ESC_CHAR)
 			{
-				copy_esccode(&tp, &bp);
+				char *esc_start = tp;
+				skip_esccode(&tp);
+				size_t esc_len = (size_t)(tp - esc_start);
+				memmove(bp, esc_start, esc_len);
+				bp += esc_len;
 			}
 			else
 			{
@@ -1253,7 +1257,7 @@ void fun_ljust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
+	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - ansi_strip_ansi_len(fargs[0]);
 	XSAFELBSTR(fargs[0], buff, bufc);
 
 	/**
@@ -1275,7 +1279,7 @@ void fun_ljust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (fargs[2])
 	{
-		fillchars = strip_ansi(fargs[2]);
+		fillchars = ansi_strip_ansi(fargs[2]);
 		slen = strlen(fillchars);
 		slen = (slen > spaces) ? spaces : slen;
 
@@ -1359,7 +1363,7 @@ void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		return;
 	}
 
-	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - strip_ansi_len(fargs[0]);
+	spaces = (int)strtol(fargs[1], (char **)NULL, 10) - ansi_strip_ansi_len(fargs[0]);
 
 	/**
 	 * Sanitize number of spaces
@@ -1381,7 +1385,7 @@ void fun_rjust(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (fargs[2])
 	{
-		fillchars = strip_ansi(fargs[2]);
+		fillchars = ansi_strip_ansi(fargs[2]);
 		slen = strlen(fillchars);
 		slen = (slen > spaces) ? spaces : slen;
 
@@ -1466,7 +1470,7 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	width = (int)strtol(fargs[1], (char **)NULL, 10);
-	len = strip_ansi_len(fargs[0]);
+	len = ansi_strip_ansi_len(fargs[0]);
 	width = (width > LBUF_SIZE - 1) ? LBUF_SIZE - 1 : width;
 
 	if (len >= width)
@@ -1482,7 +1486,7 @@ void fun_center(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (fargs[2])
 	{
-		fillchars = (char *)strip_ansi(fargs[2]);
+		fillchars = (char *)ansi_strip_ansi(fargs[2]);
 		slen = strlen(fillchars);
 		slen = (slen > lead_chrs) ? lead_chrs : slen;
 
@@ -1710,7 +1714,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	int ansi_state = ANST_NORMAL;
 	s = fargs[0];
 	nchars = (int)strtol(fargs[1], (char **)NULL, 10);
-	start = strip_ansi_len(s) - nchars;
+	start = ansi_strip_ansi_len(s) - nchars;
 
 	if (nchars <= 0)
 	{
@@ -2048,16 +2052,19 @@ void fun_merge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  */
 void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s = fargs[0];
+	char *s = fargs[0], *escape_start = NULL;
 
 	while (*s)
 	{
 		switch (*s)
 		{
 		case ESC_CHAR:
-			safe_copy_esccode(&s, buff, bufc);
-			continue;
-
+			escape_start = s;
+			skip_esccode(&s);
+			for (char *seq = escape_start; seq < s; ++seq)
+			{
+				XSAFELBCHR(*seq, buff, bufc);
+			}
 		case '%':
 		case '$':
 		case '\\':
@@ -2098,7 +2105,7 @@ void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  */
 void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s = fargs[0], *d = NULL;
+	char *s = fargs[0], *d = NULL, *escape_start = NULL;
 
 	if (!*s)
 	{
@@ -2113,9 +2120,12 @@ void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		switch (*s)
 		{
 		case ESC_CHAR:
-			safe_copy_esccode(&s, buff, bufc);
-			continue;
-
+			escape_start  = s;
+			skip_esccode(&s);
+			for (char *seq = escape_start; seq < s; ++seq)
+			{
+				XSAFELBCHR(*seq, buff, bufc);
+			}
 		case '%':
 		case '\\':
 		case '[':
@@ -2155,7 +2165,7 @@ void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  */
 void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	char *s = fargs[0];
+	char *s = fargs[0], *escape_start = NULL;
 
 	if (!*s)
 	{
@@ -2167,16 +2177,19 @@ void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 		switch (*s)
 		{
 		case ESC_CHAR:
-			safe_copy_esccode(&s, buff, bufc);
-			continue;
-
+			escape_start = s;
+			skip_esccode(&s);
+			for (char *seq = escape_start; seq < s; ++seq)
+			{
+				XSAFELBCHR(*seq, buff, bufc);
+			}
 		case '%':
 		case '\\':
 		case '[':
 		case ']':
 			XSAFELBCHR('\\', buff, bufc);
-			//[[fallthrough]];
-			__attribute__((fallthrough));
+			XSAFELBCHR(*s, buff, bufc);
+			break;
 		default:
 			XSAFELBCHR(*s, buff, bufc);
 			break;
@@ -2791,8 +2804,8 @@ void fun_pos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	int i = 1;
 	char *b, *b1, *s, *s1, *t, *u;
 	i = 1;
-	b1 = b = strip_ansi(fargs[0]);
-	s1 = s = strip_ansi(fargs[1]);
+	b1 = b = ansi_strip_ansi(fargs[0]);
+	s1 = s = ansi_strip_ansi(fargs[1]);
 
 	if (*b && !*(b + 1))
 	{ /* single character */
@@ -2883,7 +2896,7 @@ void fun_lpos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	bb_p = *bufc;
-	buf = s = strip_ansi(fargs[0]);
+	buf = s = ansi_strip_ansi(fargs[0]);
 
 	for (i = 0; *s; i++, s++)
 	{
@@ -2958,7 +2971,7 @@ void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	charpos = (int)strtol(fargs[1], (char **)NULL, 10);
-	buf = cp = strip_ansi(fargs[0]);
+	buf = cp = ansi_strip_ansi(fargs[0]);
 
 	if ((charpos > 0) && (charpos <= (int)strlen(cp)))
 	{
@@ -3021,7 +3034,7 @@ void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	// Map charpos to position in stripped text
-	char *stripped = strip_ansi(fargs[0]);
+	char *stripped = ansi_strip_ansi(fargs[0]);
 	int stripped_len = strlen(stripped);
 	if (charpos >= stripped_len)
 	{
@@ -4478,7 +4491,7 @@ void fun_join(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 void fun_strlen(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	XSAFELTOS(buff, bufc, strip_ansi_len(fargs[0]), LBUF_SIZE);
+	XSAFELTOS(buff, bufc, ansi_strip_ansi_len(fargs[0]), LBUF_SIZE);
 }
 
 void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)

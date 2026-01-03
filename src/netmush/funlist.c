@@ -2666,7 +2666,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	{
 		objstring = split_token(&cp, &isep);
 		ansinumber = number;
-		striplen = strip_ansi_len(objstring);
+		striplen = ansi_strip_ansi_len(objstring);
 
 		if (ansinumber > striplen)
 		{
@@ -2809,7 +2809,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 
 	for (i = 0; i < nwords; i++)
 	{
-		lens[i] = strip_ansi_len(words[i]);
+		lens[i] = ansi_strip_ansi_len(words[i]);
 	}
 
 	over = wcount = 0;
@@ -3292,7 +3292,7 @@ void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 	else
 	{
-		field_sep_width = strip_ansi_len(field_sep.str);
+		field_sep_width = ansi_strip_ansi_len(field_sep.str);
 	}
 
 	n_columns = (int)(line_length / (field_width + field_sep_width));

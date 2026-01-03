@@ -1772,9 +1772,16 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 			break;
 
 		case ESC_CHAR:
-			safe_copy_esccode(&(*dstr), buff, bufc);
+		{
+			char *escape_start = *dstr;
+			skip_esccode(dstr);
+			for (char *seq = escape_start; seq < *dstr; ++seq)
+			{
+				XSAFELBCHR(*seq, buff, bufc);
+			}
 			(*dstr)--;
 			break;
+		}
 		}
 
 		(*dstr)++;

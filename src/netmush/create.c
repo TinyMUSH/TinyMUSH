@@ -638,7 +638,7 @@ void do_create(dbref player, dbref cause __attribute__((unused)), int key __attr
     char *endptr = NULL;
     long val = 0;
 
-    if (!name || !*name || (strip_ansi_len(name) == 0))
+    if (!name || !*name || (ansi_strip_ansi_len(name) == 0))
     {
         notify_quiet(player, "Create what?");
         return;

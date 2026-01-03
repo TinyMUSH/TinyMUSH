@@ -1366,7 +1366,7 @@ void decompile_flags(dbref player, dbref thing, char *thingname)
          *
          */
 
-        s = strip_ansi(thingname);
+        s = ansi_strip_ansi(thingname);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@set %s=%s", s, fp->flagname);
         XFREE(s);
     }

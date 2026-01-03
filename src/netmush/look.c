@@ -174,7 +174,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 						/*
 						 * XXX Just stripping ansi isn't really enough.
 						 */
-						buf = strip_ansi(buff1);
+						buf = ansi_strip_ansi(buff1);
 						if (buf)
 						{
 							XSAFELBSTR(buf, buff, &e);
@@ -389,7 +389,7 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 		return;
 	}
 
-	str = strip_ansi(atext);
+	str = ansi_strip_ansi(atext);
 	if (!str)
 	{
 		return;
@@ -2902,7 +2902,7 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 		}
 	}
 
-	buf = strip_ansi(thingname);
+	buf = ansi_strip_ansi(thingname);
 	XSTRCPY(thingname, buf);
 	XFREE(buf);
 

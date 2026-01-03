@@ -939,7 +939,7 @@ void safe_name(dbref thing, char *outbuf, char **bufc)
     if (!purenames[thing])
     {
         buff = atr_get(thing, A_NAME, &aowner, &aflags, &alen);
-        buf = strip_ansi(buff);
+        buf = ansi_strip_ansi(buff);
         purenames[thing] = XSTRDUP(buf, "purenames[thing]");
         XFREE(buf);
         XFREE(buff);
@@ -973,7 +973,7 @@ char *Name(dbref thing)
     if (!purenames[thing])
     {
         buff = atr_get(thing, A_NAME, &aowner, &aflags, &alen);
-        buf = strip_ansi(buff);
+        buf = ansi_strip_ansi(buff);
         purenames[thing] = XSTRDUP(buf, "purenames[thing]");
         XFREE(buf);
         XFREE(buff);
@@ -1015,7 +1015,7 @@ char *PureName(dbref thing)
     if (!purenames[thing])
     {
         buff = atr_get(thing, A_NAME, &aowner, &aflags, &alen);
-        buf = strip_ansi(buff);
+        buf = ansi_strip_ansi(buff);
         purenames[thing] = XSTRDUP(buf, "purenames[thing]");
         XFREE(buf);
         XFREE(buff);
@@ -1058,7 +1058,7 @@ void s_Name(dbref thing, char *s)
     atr_add_raw(thing, A_NAME, (char *)s);
     s_NameLen(thing, len);
     names[thing] = XSTRDUP(s, "names[thing]");
-    buf = strip_ansi(s);
+    buf = ansi_strip_ansi(s);
     purenames[thing] = XSTRDUP(buf, "purenames[thing]");
     XFREE(buf);
 }
@@ -1459,7 +1459,7 @@ void do_fixdb(dbref player, dbref cause __attribute__((unused)), int key, char *
             }
 
             tname = log_getname(thing);
-            buf = strip_ansi(arg2);
+            buf = ansi_strip_ansi(arg2);
             log_write(LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", buf);
             XFREE(buf);
             XFREE(tname);

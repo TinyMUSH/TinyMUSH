@@ -487,83 +487,6 @@ void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
 }
 
 /**
- * @brief Remove ANSI escape codes from a string
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param s The input string (may be NULL)
- * @return char* New string without ANSI codes (newly allocated)
- */
-char *strip_ansi(const char *s)
-{
-	char *buf, *p;
-	const char *s1 = s;
-
-	if (!s || !*s)
-	{
-		buf = XMALLOC(1, "buf");
-		*buf = '\0';
-		return buf;
-	}
-
-	// Allocate buffer based on input length since output <= input
-	size_t len = strlen(s);
-	buf = XMALLOC(len + 1, "buf");
-	p = buf;
-
-	while (*s1)
-	{
-		if (*s1 == ESC_CHAR)
-		{
-			// Skip the entire ANSI escape sequence
-			ansi_parse_sequence(&s1);
-		}
-		else
-		{
-			// Copy non-escape character
-			*p++ = *s1++;
-		}
-	}
-
-	*p = '\0';
-	return buf;
-}
-
-/**
- * @brief Count visible characters (ignoring ANSI escape codes)
- *
- * @param s The input string
- * @return int Number of non-escape characters
- */
-int strip_ansi_len(const char *s)
-{
-	int n = 0;
-
-	if (!s)
-	{
-		return 0;
-	}
-
-	while (*s == ESC_CHAR)
-	{
-		skip_esccode((char **)&s);
-	}
-
-	while (*s)
-	{
-		++n;
-		++s;
-
-		while (*s == ESC_CHAR)
-		{
-			skip_esccode((char **)&s);
-		}
-	}
-
-	return n;
-}
-
-/**
  * @brief Implement the NOBLEED flag by translating ANSI normal to white
  *
  * Caller is responsible for freeing the returned buffer with XFREE().
@@ -673,7 +596,12 @@ char *normal_to_white(const char *raw)
 			}
 			else
 			{
-				safe_copy_esccode(&p, buf, &q);
+				char *escape_start = p;
+				skip_esccode(&p);
+				for (char *seq = escape_start; seq < p; ++seq)
+				{
+					XSAFELBCHR(*seq, buf, &q);
+				}
 			}
 
 			just_after_esccode = p;
@@ -947,95 +875,6 @@ void skip_esccode(char **s)
 
 	if (**s)
 	{
-		++(*s);
-	}
-}
-
-/**
- * @brief Copy a single ANSI escape sequence to another buffer
- *
- * @param s Pointer to source string pointer (advanced past sequence)
- * @param t Pointer to destination pointer (advanced after copy)
- */
-void copy_esccode(char **s, char **t)
-{
-	**t = **s;
-	++(*s);
-	++(*t);
-
-	if (!**s)
-	{
-		return;
-	}
-
-	if (**s == ANSI_CSI)
-	{
-		do
-		{
-			**t = **s;
-			++(*s);
-			++(*t);
-			if (!**s)
-			{
-				return;
-			}
-		} while ((**s & 0xf0) == 0x30);
-	}
-
-	while (**s && (**s & 0xf0) == 0x20)
-	{
-		**t = **s;
-		++(*s);
-		++(*t);
-	}
-
-	if (**s)
-	{
-		**t = **s;
-		++(*s);
-		++(*t);
-	}
-}
-
-/**
- * @brief Safely copy a single ANSI escape sequence into a bounded buffer
- *
- * @param s Pointer to source string pointer (advanced past sequence)
- * @param buff Destination buffer
- * @param bufc Pointer to current write position within destination buffer
- */
-void safe_copy_esccode(char **s, char *buff, char **bufc)
-{
-	XSAFELBCHR(**s, buff, bufc);
-	++(*s);
-
-	if (!**s)
-	{
-		return;
-	}
-
-	if (**s == ANSI_CSI)
-	{
-		do
-		{
-			XSAFELBCHR(**s, buff, bufc);
-			++(*s);
-			if (!**s)
-			{
-				return;
-			}
-		} while ((**s & 0xf0) == 0x30);
-	}
-
-	while (**s && (**s & 0xf0) == 0x20)
-	{
-		XSAFELBCHR(**s, buff, bufc);
-		++(*s);
-	}
-
-	if (**s)
-	{
-		XSAFELBCHR(**s, buff, bufc);
 		++(*s);
 	}
 }

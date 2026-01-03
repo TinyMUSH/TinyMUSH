@@ -510,7 +510,7 @@ char *log_getname(dbref target)
         s = unparse_object_numonly(target);
     }
 
-    name = strip_ansi(s);
+    name = ansi_strip_ansi(s);
     XFREE(s);
 
     if (!name)
