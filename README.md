@@ -61,8 +61,8 @@ TinyMUSH 4 uses **LMDB** (Lightning Memory-Mapped Database) as the default stora
 
 GDBM remains available for backward compatibility but is considered **legacy and will be removed in a future release**. To migrate existing databases:
 
-# 1. Build with GDBM backend
 ```bash
+# 1. Build with GDBM backend
 mkdir -p build && cd build
 cmake -DUSE_LMDB=OFF -DUSE_GDBM=ON ..
 cmake --build . --target install-upgrade
@@ -72,12 +72,16 @@ cmake --build . --target install-upgrade
 # 2. Export flatfile with GDBM backend
 cd ../game
 ./netmush --dbconvert < game/db/netmush.db > migration.flat
+```
 
+```bash
 # 3. Rebuild with LMDB backend
 rm -rf build && cd build
 cmake ..
 cmake --build . --target install-upgrade
+```
 
+```bash
 # 4. Load flatfile with LMDB backend
 cd ../game
 ./netmush --load-flatfile ../migration.flat

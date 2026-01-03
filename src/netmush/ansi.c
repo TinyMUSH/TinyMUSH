@@ -2011,6 +2011,52 @@ int ansi_char_to_num(int ch)
 }
 
 /**
+ * @brief Convert a mushcode color letter to an ANSI SGR number (30-37 / 40-47).
+ *
+ * Supports attribute letters used by ansiNum for compatibility (h,u,f,i,n).
+ *
+ * @param ch Mushcode character (foreground lowercase, background uppercase)
+ * @return int Corresponding SGR code, or 0 if not found/unsupported
+ */
+int mushcode_to_sgr(int ch)
+{
+    /* Attribute shorthands retained for compatibility. */
+    switch (ch)
+    {
+    case 'h':
+        return 1; /* highlight/bold */
+    case 'u':
+        return 4; /* underline */
+    case 'f':
+        return 5; /* flash/blink */
+    case 'i':
+        return 7; /* inverse */
+    case 'n':
+        return 0; /* normal */
+    default:
+        break;
+    }
+
+    bool background = isupper(ch) ? true : false;
+    int mush_code = tolower(ch);
+
+    for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+    {
+        if (colorDefinitions[i].type != ColorTypeAnsi)
+            continue;
+
+        if (colorDefinitions[i].mush_code == mush_code &&
+            colorDefinitions[i].ansi_index >= 0 && colorDefinitions[i].ansi_index <= 15)
+        {
+            int idx = colorDefinitions[i].ansi_index & 0xF;
+            return (background ? 40 : 30) + idx;
+        }
+    }
+
+    return 0;
+}
+
+/**
  * @brief Convert packed ANSI state to ColorState structure
  * @param packed Packed ANSI state value
  * @return ColorState structure representing the ANSI state
@@ -2488,6 +2534,243 @@ ColorEntry colorDefinitions[] = {
     {"yellowgreen", ColorTypeTrueColor, -1, 10, 112, {154, 205, 50}, {76.534808212057499, -37.987912969071225, 66.585626206666078}},
     {NULL, ColorTypeNone, -1, -1, -1, {0, 0, 0}, {0.0, 0.0, 0.0}} // End marker
 };
+
+/*
+ * ---------------------------------------------------------------------------
+ * ANSI → MUSH conversion helpers
+ */
+
+static char mushcode_for_index(int ansi_index)
+{
+    if (ansi_index < 0)
+        return '\0';
+
+    for (size_t i = 0; colorDefinitions[i].name != NULL; i++)
+    {
+        if (colorDefinitions[i].type == ColorTypeAnsi && colorDefinitions[i].ansi_index == ansi_index)
+        {
+            if (colorDefinitions[i].mush_code > 0 && colorDefinitions[i].mush_code < 256)
+            {
+                return (char)colorDefinitions[i].mush_code;
+            }
+        }
+    }
+
+    return '\0';
+}
+
+static void append_mush_from_state(const ColorState *state, char *buff, char **bp)
+{
+    /* Always start from a known baseline. */
+    XSAFELBSTR("%xn", buff, bp);
+
+    if (state->highlight == ColorStatusSet)
+    {
+        XSAFELBSTR("%xh", buff, bp);
+    }
+
+    if (state->underline == ColorStatusSet)
+    {
+        XSAFELBSTR("%xu", buff, bp);
+    }
+
+    if (state->flash == ColorStatusSet)
+    {
+        XSAFELBSTR("%xf", buff, bp);
+    }
+
+    if (state->inverse == ColorStatusSet)
+    {
+        XSAFELBSTR("%xi", buff, bp);
+    }
+
+    if (state->foreground.is_set == ColorStatusSet)
+    {
+        char mush = mushcode_for_index(state->foreground.ansi_index);
+        if (mush)
+        {
+            char seq[4] = {'%', 'x', mush, '\0'};
+            XSAFELBSTR(seq, buff, bp);
+        }
+    }
+
+    if (state->background.is_set == ColorStatusSet)
+    {
+        char mush = mushcode_for_index(state->background.ansi_index);
+        if (mush)
+        {
+            char seq[4] = {'%', 'x', (char)toupper(mush), '\0'};
+            XSAFELBSTR(seq, buff, bp);
+        }
+    }
+}
+
+static bool parse_and_apply_ansi_sequence(const char **ptr, ColorState *state)
+{
+    if (!ptr || !*ptr || **ptr != ESC_CHAR)
+        return false;
+
+    const char *p = *ptr;
+
+    /* Expect ESC [ ... m */
+    if (*p != ESC_CHAR || *(p + 1) != '[')
+        return false;
+
+    p += 2; /* Skip ESC [ */
+    const char *code_start = p;
+    while (*p && *p != 'm')
+    {
+        p++;
+    }
+
+    if (*p != 'm')
+    {
+        return false; /* Unterminated sequence, do not advance */
+    }
+
+    size_t code_len = (size_t)(p - code_start);
+    char *code = XMALLOC(code_len + 1, "ansi_code");
+    XMEMCPY(code, code_start, code_len);
+    code[code_len] = '\0';
+
+    ansi_parse_ansi_code(state, code);
+
+    XFREE(code);
+    p++;          /* Skip trailing 'm' */
+    *ptr = p;     /* Advance caller pointer */
+    return true;
+}
+
+/**
+ * @brief Convert ANSI escape sequences to mushcode or strip ANSI codes using the new ANSI API.
+ *
+ * This mirrors translate_string() but relies solely on ansi.c helpers.
+ *
+ * @param str Input string (not modified)
+ * @param type When 1 converts to mushcode, when 0 strips ANSI
+ * @return Newly allocated string; caller frees with XFREE()
+ */
+char *translate_string_ansi(const char *str, int type)
+{
+    char *buff, *bp;
+
+    bp = buff = XMALLOC(LBUF_SIZE, "buff");
+
+    if (!str)
+    {
+        *bp = '\0';
+        return buff;
+    }
+
+    if (type)
+    {
+        ColorState current = {0};
+        const char *p = str;
+
+        while (*p)
+        {
+            if (*p == ESC_CHAR && *(p + 1) == '[')
+            {
+                const char *cursor = p;
+                ColorState next = current;
+
+                if (parse_and_apply_ansi_sequence(&cursor, &next))
+                {
+                    if (memcmp(&next, &current, sizeof(ColorState)) != 0)
+                    {
+                        append_mush_from_state(&next, buff, &bp);
+                        current = next;
+                    }
+
+                    p = cursor;
+                    continue;
+                }
+            }
+
+            switch (*p)
+            {
+            case ' ':
+                if (*(p + 1) == ' ')
+                {
+                    XSAFESTRNCAT(buff, &bp, "%b", 2, LBUF_SIZE);
+                }
+                else
+                {
+                    XSAFELBCHR(' ', buff, &bp);
+                }
+                break;
+
+            case '\\':
+            case '%':
+            case '[':
+            case ']':
+            case '{':
+            case '}':
+            case '(':
+            case ')':
+                XSAFELBCHR('%', buff, &bp);
+                XSAFELBCHR(*p, buff, &bp);
+                break;
+
+            case '\r':
+                break;
+
+            case '\n':
+                XSAFESTRNCAT(buff, &bp, "%r", 2, LBUF_SIZE);
+                break;
+
+            case '\t':
+                XSAFESTRNCAT(buff, &bp, "%t", 2, LBUF_SIZE);
+                break;
+
+            default:
+                XSAFELBCHR(*p, buff, &bp);
+                break;
+            }
+
+            p++;
+        }
+    }
+    else
+    {
+        const char *p = str;
+
+        while (*p)
+        {
+            if (*p == ESC_CHAR && *(p + 1) == '[')
+            {
+                /* Skip ANSI sequence */
+                const char *cursor = p;
+                ColorState discard = {0};
+                if (parse_and_apply_ansi_sequence(&cursor, &discard))
+                {
+                    p = cursor;
+                    continue;
+                }
+            }
+
+            switch (*p)
+            {
+            case '\r':
+                break;
+
+            case '\n':
+            case '\t':
+                XSAFELBCHR(' ', buff, &bp);
+                break;
+
+            default:
+                XSAFELBCHR(*p, buff, &bp);
+                break;
+            }
+
+            p++;
+        }
+    }
+
+    *bp = '\0';
+    return buff;
+}
 
 /**
  * @brief Parse ANSI escape sequence and return ColorState.

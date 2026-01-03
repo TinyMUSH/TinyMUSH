@@ -1241,11 +1241,6 @@ extern void do_pemit_list(dbref player, char *list, const char *message, int do_
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
 /* string_ansi.c */
-extern const char *ansiChar(int ch);
-extern const char *ansiChar_Bright(int ch);
-extern const int ansiNum(int ch);
-extern const char ansiLetter(int num);
-extern const char ansiMushCode(int num, bool bg);
 extern const int ansiBitsMask(int num);
 extern const int ansiBits(int num);
 extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
@@ -1254,16 +1249,13 @@ extern char *strip_ansi(const char *s);
 extern int strip_ansi_len(const char *s);
 extern char *normal_to_white(const char *raw);
 extern char *ansi_transition_esccode(int ansi_before, int ansi_after, bool no_default_bg);
-extern char *ansi_transition_mushcode(int ansi_before, int ansi_after);
-extern char *ansi_transition_letters(int ansi_before, int ansi_after);
 extern int ansi_map_states(const char *s, int **m, char **p);
 extern void skip_esccode(char **s);
 extern void copy_esccode(char **s, char **t);
 extern void safe_copy_esccode(char **s, char *buff, char **bufc);
 extern char *remap_colors(const char *s, int *cmap);
-extern char *translate_string(char *str, int type);
-extern int rgb2xterm(long rgb);
-extern int str2xterm(char *str);
+extern char *translate_string_ansi(const char *str, int type);
+extern int mushcode_to_sgr(int ch);
 
 /* string_util.c */
 extern const char *safe_strerror(int errnum);

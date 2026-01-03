@@ -2763,19 +2763,19 @@ void fun_translate(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 
 	if (nfargs > 1 && (fargs[1][0] == 's' || fargs[1][0] == '0'))
 	{
-		char *s = translate_string(fargs[0], 0);
+		char *s = translate_string_ansi(fargs[0], 0);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 	}
 	else if (nfargs > 1 && fargs[1][0] == 'p')
 	{
-		char *s = translate_string(fargs[0], 1);
+		char *s = translate_string_ansi(fargs[0], 1);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 	}
 	else
 	{
-		char *s = translate_string(fargs[0], 1);
+		char *s = translate_string_ansi(fargs[0], 1);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 	}

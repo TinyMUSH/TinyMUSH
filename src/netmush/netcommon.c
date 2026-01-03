@@ -1784,8 +1784,8 @@ void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __at
 {
 	DESC *d;
 	int from_color, to_color, i, x;
-	from_color = ansiNum((unsigned char)*fstr);
-	to_color = ansiNum((unsigned char)*tstr);
+	from_color = mushcode_to_sgr((unsigned char)*fstr);
+	to_color = mushcode_to_sgr((unsigned char)*tstr);
 
 	if ((from_color < I_ANSI_BLACK) || (from_color >= I_ANSI_NUM))
 	{

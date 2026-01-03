@@ -2874,14 +2874,14 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 		case TYPE_THING:
 			XSTRCPY(thingname, Name(thing));
 			val = OBJECT_DEPOSIT(Pennies(thing));
-			buf = translate_string(thingname, 1);
+			buf = translate_string_ansi(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@create %s=%d", buf, val);
 			XFREE(buf);
 			break;
 
 		case TYPE_ROOM:
 			XSTRCPY(thingname, Name(thing));
-			buf = translate_string(thingname, 1);
+			buf = translate_string_ansi(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@dig/teleport %s", buf);
 			XFREE(buf);
 			XSTRCPY(thingname, "here");
@@ -2889,7 +2889,7 @@ void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char 
 
 		case TYPE_EXIT:
 			XSTRCPY(thingname, Name(thing));
-			buf = translate_string(thingname, 1);
+			buf = translate_string_ansi(thingname, 1);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@open %s", buf);
 			XFREE(buf);
 			got = thingname;

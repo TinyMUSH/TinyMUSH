@@ -178,153 +178,6 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
 }
 
 /**
- * @brief Convert ansi character code (%x?) to ansi sequence.
- * Lookup table for fast O(1) character to ANSI code conversion.
- *
- * @param ch Character to convert
- * @return char* Ansi sequence
- */
-const char *ansiChar(int ch)
-{
-	static const char *ansi_table[256] = {
-		['B'] = ANSI_BBLUE,
-		['C'] = ANSI_BCYAN,
-		['G'] = ANSI_BGREEN,
-		['M'] = ANSI_BMAGENTA,
-		['R'] = ANSI_BRED,
-		['W'] = ANSI_BWHITE,
-		['X'] = ANSI_BBLACK,
-		['Y'] = ANSI_BYELLOW,
-		['b'] = ANSI_BLUE,
-		['c'] = ANSI_CYAN,
-		['f'] = ANSI_BLINK,
-		['g'] = ANSI_GREEN,
-		['h'] = ANSI_HILITE,
-		['i'] = ANSI_INVERSE,
-		['m'] = ANSI_MAGENTA,
-		['n'] = ANSI_NORMAL,
-		['r'] = ANSI_RED,
-		['u'] = ANSI_UNDER,
-		['w'] = ANSI_WHITE,
-		['x'] = ANSI_BLACK,
-		['y'] = ANSI_YELLOW,
-	};
-	
-	unsigned char uch = (unsigned char)ch;
-	return ansi_table[uch] ? ansi_table[uch] : STRING_EMPTY;
-}
-
-/**
- * @brief Convert ansi character code (%x? uppercase) to bright ansi sequence.
- * Returns the bright/high intensity variant (90-97) for foreground colors.
- *
- * @param ch Character to convert (should match lowercase versions)
- * @return char* Bright ansi sequence
- */
-const char *ansiChar_Bright(int ch)
-{
-	static const char *bright_table[256] = {
-		['b'] = ANSI_BRIGHT_BLUE,
-		['c'] = ANSI_BRIGHT_CYAN,
-		['g'] = ANSI_BRIGHT_GREEN,
-		['m'] = ANSI_BRIGHT_MAGENTA,
-		['r'] = ANSI_BRIGHT_RED,
-		['w'] = ANSI_BRIGHT_WHITE,
-		['x'] = ANSI_BRIGHT_BLACK,
-		['y'] = ANSI_BRIGHT_YELLOW,
-	};
-	
-	unsigned char uch = (unsigned char)ch;
-	return bright_table[uch] ? bright_table[uch] : STRING_EMPTY;
-}
-
-/**
- * @brief Convert ansi character code (%x?) to numeric values.
- * Lookup table for fast O(1) character to ANSI numeric code conversion.
- *
- * @param ch ANSI character
- * @return int ANSI numeric values
- */
-const int ansiNum(int ch)
-{
-	static const int ansi_num_table[256] = {
-		['B'] = 44,
-		['C'] = 46,
-		['G'] = 42,
-		['M'] = 45,
-		['R'] = 41,
-		['W'] = 47,
-		['X'] = 40,
-		['Y'] = 43,
-		['b'] = 34,
-		['c'] = 36,
-		['f'] = 5,
-		['g'] = 32,
-		['h'] = 1,
-		['i'] = 7,
-		['m'] = 35,
-		['n'] = 0,
-		['r'] = 31,
-		['u'] = 4,
-		['w'] = 37,
-		['x'] = 30,
-		['y'] = 33,
-	};
-	
-	unsigned char uch = (unsigned char)ch;
-	return ansi_num_table[uch];
-}
-
-/**
- * @brief Convert ansi numeric code to ansi character code.
- * Lookup table for fast O(1) numeric to ANSI character conversion.
- *
- * @param num ANSI numeric code
- * @return char ANSI character
- */
-const char ansiLetter(int num)
-{
-	static const char letter_table[48] = {
-		[0] = 'n', [1] = 'h', [4] = 'u', [5] = 'f', [7] = 'i',
-		[30] = 'X', [31] = 'R', [32] = 'G', [33] = 'Y',
-		[34] = 'B', [35] = 'M', [36] = 'C', [37] = 'W',
-		[40] = 'x', [41] = 'r', [42] = 'g', [43] = 'y',
-		[44] = 'b', [45] = 'm', [46] = 'c', [47] = 'w',
-	};
-	
-	return (num >= 0 && num < 48) ? letter_table[num] : '\0';
-}
-
-/**
- * @brief Convert ansi numeric code to mushcode character for foreground/background
- * Lookup table for fast O(1) numeric to ANSI mushcode character conversion.
- *
- * @param num ANSI numeric code (0-7)
- * @param bg true for background color, false for foreground
- * @return char ANSI mushcode character
- */
-const char ansiMushCode(int num, bool bg)
-{
-	static const char fg_table[8] = {'x', 'r', 'g', 'y', 'b', 'm', 'c', 'w'};
-	static const char bg_table[8] = {'X', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'};
-	
-	if (num < 0 || num > 7)
-		return '\0';
-	
-	return bg ? bg_table[num] : fg_table[num];
-}
-
-/*
-int ansi_mask_bits[I_ANSI_LIM] = {
-
-	0x1fff, 0x1100, 0x1100, 0x0000, 0x1200, 0x1400, 0x0000, 0x1800, 0x0000, 0x0000,
-	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x1100, 0x1100, 0x0000, 0x1200, 0x1400, 0x0000, 0x1800, 0x0000, 0x0000,
-	0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x100f, 0x0000, 0x0000,
-	0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x10f0, 0x0000, 0x0000};
-*/
-
-/**
  * @brief ANSI packed state definitions -- number-to-bitmask translation
  *
  * The mask specifies the state bits that are altered by a particular ansi
@@ -406,21 +259,6 @@ static inline void append_ch(char **p_ptr, const char *end, char ch)
 }
 
 /**
- * @brief Append a string to buffer with bounds checking
- * @param p_ptr Pointer to current position pointer
- * @param end End of buffer
- * @param str String to append
- */
-static inline void append_str(char **p_ptr, const char *end, const char *str)
-{
-	while (*str && (*p_ptr < end))
-	{
-		**p_ptr = *str++;
-		(*p_ptr)++;
-	}
-}
-
-/**
  * @brief Context structure for level_ansi buffer management
  */
 typedef struct {
@@ -465,13 +303,28 @@ typedef struct {
 } LevelAnsiStreamContext;
 
 /**
+ * @brief Flush streaming buffer when the threshold is reached
+ */
+static inline void flush_if_needed(char **p_ptr, char *buf, size_t flush_threshold,
+								   void (*flush_fn)(const char *data, size_t len, void *ctx),
+								   void *ctx)
+{
+	size_t used = (size_t)(*p_ptr - buf);
+	if (used >= flush_threshold)
+	{
+		**p_ptr = '\0';
+		flush_fn(buf, used, ctx);
+		*p_ptr = buf;
+	}
+}
+
+/**
  * @brief Check buffer space for level_ansi_stream (no-op, buffer is fixed)
  */
 static void level_ansi_stream_check_space(size_t needed, void *ctx)
 {
-    // No-op for streaming - buffer space is managed by FLUSH_IF_NEEDED
-    (void)needed;
-    (void)ctx;
+	(void)needed;
+	(void)ctx;
 }
 
 /**
@@ -479,66 +332,30 @@ static void level_ansi_stream_check_space(size_t needed, void *ctx)
  */
 static void level_ansi_stream_write(const char *data, size_t len, void *ctx)
 {
-    LevelAnsiStreamContext *context = (LevelAnsiStreamContext *)ctx;
-    size_t copy_len = (len < (size_t)(context->end - *context->p_ptr)) ? len : (context->end - *context->p_ptr);
-    XMEMCPY(*context->p_ptr, data, copy_len);
-    *context->p_ptr += copy_len;
-    
-    // Check if we need to flush
-    size_t used = *context->p_ptr - context->buf;
-    if (used >= context->flush_threshold) {
-        **context->p_ptr = '\0';
-        context->flush_fn(context->buf, used, context->flush_ctx);
-        *context->p_ptr = context->buf;
-    }
+	LevelAnsiStreamContext *context = (LevelAnsiStreamContext *)ctx;
+	size_t copy_len = (len < (size_t)(context->end - *context->p_ptr)) ? len : (context->end - *context->p_ptr);
+	XMEMCPY(*context->p_ptr, data, copy_len);
+	*context->p_ptr += copy_len;
+
+	size_t used = *context->p_ptr - context->buf;
+	if (used >= context->flush_threshold)
+	{
+		**context->p_ptr = '\0';
+		context->flush_fn(context->buf, used, context->flush_ctx);
+		*context->p_ptr = context->buf;
+	}
 }
 
-/**
- * @brief Write mushcode transition between ANSI states into a caller buffer.
- */
-static size_t ansi_transition_mushcode_into(int ansi_before, int ansi_after, char *buffer, size_t cap)
+static inline void ensure_buffer_space(size_t needed, char **buf, char **p, char **end, size_t *buf_size)
 {
-	char *p = buffer;
-	char *end = (cap > 0) ? (buffer + cap - 1) : buffer;
-
-	if (!cap)
-		return 0;
-
-	*p = '\0';
-
-	if (ansi_before != ansi_after)
+	size_t used = (size_t)(*p - *buf);
+	if (used + needed >= *buf_size - 1)
 	{
-		int ansi_bits_set = (~ansi_before) & ansi_after;
-		int ansi_bits_clr = ansi_before & (~ansi_after);
-
-		if ((ansi_bits_clr & 0xf00) || (ansi_bits_set & 0x088) || (ansi_bits_clr == 0x1000))
-		{
-			append_str(&p, end, "%xn");
-			ansi_bits_set = (~ansiBits(0)) & ansi_after;
-			ansi_bits_clr = ansiBits(0) & (~ansi_after);
-		}
-
-		if (ansi_bits_set & 0x100)
-			append_str(&p, end, "%xh");
-
-		if (ansi_bits_set & 0x200)
-			append_str(&p, end, "%xu");
-
-		if (ansi_bits_set & 0x400)
-			append_str(&p, end, "%xf");
-
-		if (ansi_bits_set & 0x800)
-			append_str(&p, end, "%xi");
-
-		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-			append_ch(&p, end, ansiMushCode(ansi_after & 0x00f, false));
-
-		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-			append_ch(&p, end, ansiMushCode((ansi_after & 0x0f0) >> 4, true));
+		*buf_size *= 2;
+		*buf = XREALLOC(*buf, *buf_size, "buf");
+		*p = *buf + used;
+		*end = *buf + *buf_size - 1;
 	}
-
-	*p = '\0';
-	return (size_t)(p - buffer);
 }
 
 /**
@@ -554,62 +371,32 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 {
 	char *buf, *p, *end;
 	size_t buf_size = LBUF_SIZE;
-	size_t used;
-	
+
 	p = buf = XMALLOC(buf_size, "buf");
 	end = buf + buf_size - 1;
 
 	if (!s || !*s)
 		return buf;
-	
-	// Macro pour vérifier et agrandir le buffer si nécessaire
-	#define CHECK_BUFFER_SPACE(needed) \
-		do { \
-			used = p - buf; \
-			if (used + (needed) >= buf_size - 1) { \
-				buf_size *= 2; \
-				buf = XREALLOC(buf, buf_size, "buf"); \
-				p = buf + used; \
-				end = buf + buf_size - 1; \
-			} \
-		} while(0)
 
 	while (*s)
 	{
 		if (*s == ESC_CHAR)
 		{
-			// Got an escape code
 			if (truecolors)
 			{
-				// Player support everything, copy entire escape sequence without parsing
-				// Find the end of the escape sequence (ends with a letter)
 				const char *s_start = s;
-				s++; // Skip ESC
+				s++;
 				if (*s == '[')
 				{
 					s++;
-					// Skip until we find a letter (SGR end marker)
 					while (*s && !isalpha(*s))
 						s++;
 					if (*s)
-						s++; // Skip the final letter
+						s++;
 				}
-				
-				// Ensure we have space for the escape sequence (max ~30 chars for 24-bit color)
-				CHECK_BUFFER_SPACE(s - s_start + 1);
-				
-				// Debug: print what we're copying
-				{
-					char temp[256];
-					int len = s - s_start;
-					if (len < 256) {
-						XMEMCPY(temp, s_start, len);
-						temp[len] = '\0';
-						fprintf(stderr, "DEBUG level_ansi: copying sequence: '%s'\n", temp);
-					}
-				}
-				
-				// Copy the entire escape sequence from source to destination
+
+				ensure_buffer_space((size_t)(s - s_start + 1), &buf, &p, &end, &buf_size);
+
 				while (s_start < s && *s_start && p < end)
 				{
 					append_ch(&p, end, *s_start++);
@@ -617,13 +404,11 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 			}
 			else
 			{
-				// Player doesn't support true colors, find what is the color.
 				ColorState attr = ansi_parse_sequence(&s);
-				
+
 				LevelAnsiContext ctx = {&p, end, &buf_size, &buf};
 				convert_color_to_sequence(&attr, ansi, xterm, level_ansi_check_space, level_ansi_write, &ctx);
-				
-				// Update pointers after potential reallocation
+
 				p = *ctx.p_ptr;
 				end = (char *)ctx.end;
 				buf_size = *ctx.buf_size;
@@ -631,111 +416,74 @@ char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors)
 		}
 		else
 		{
-			CHECK_BUFFER_SPACE(1);
+			ensure_buffer_space(1, &buf, &p, &end, &buf_size);
 			append_ch(&p, end, *s++);
 		}
 	}
-	
-	#undef CHECK_BUFFER_SPACE
-	
+
 	*p = '\0';
-	
-	// Debug
-	fprintf(stderr, "DEBUG level_ansi: output='%s'\n", buf);
-	
 	return buf;
 }
 
 /**
  * @brief Convert ANSI codes based on player capabilities with streaming output
- *
- * This function processes ANSI escape sequences and flushes output when buffer
- * reaches 80% capacity. This allows handling arbitrarily large messages without
- * allocating huge buffers.
- *
- * @param s The input string containing ANSI codes
- * @param ansi Player supports basic ANSI colors (16 colors)
- * @param xterm Player supports xterm colors (256 colors)
- * @param truecolors Player supports 24-bit true colors
- * @param flush_fn Callback function to flush buffer chunks
- * @param ctx Context pointer passed to flush_fn
  */
 void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
-                       void (*flush_fn)(const char *data, size_t len, void *ctx), void *ctx)
+				   void (*flush_fn)(const char *data, size_t len, void *ctx), void *ctx)
 {
-	char buf[8192];  // 8KB buffer
+	char buf[8192];
 	char *p = buf;
 	char *end = buf + sizeof(buf) - 1;
-	const size_t flush_threshold = sizeof(buf) * 80 / 100;  // 80% capacity
-	
+	const size_t flush_threshold = sizeof(buf) * 80 / 100;
+
 	if (!s || !*s)
 		return;
-	
-	// Helper macro to flush buffer when threshold reached
-	#define FLUSH_IF_NEEDED() \
-		do { \
-			size_t used = p - buf; \
-			if (used >= flush_threshold) { \
-				*p = '\0'; \
-				flush_fn(buf, used, ctx); \
-				p = buf; \
-			} \
-		} while(0)
-	
+
 	while (*s)
 	{
 		if (*s == ESC_CHAR)
 		{
-			// Got an escape code
 			if (truecolors)
 			{
-				// Player support everything, copy entire escape sequence without parsing
 				const char *s_start = s;
-				s++; // Skip ESC
+				s++;
 				if (*s == '[')
 				{
 					s++;
-					// Skip until we find a letter (SGR end marker)
 					while (*s && !isalpha(*s))
 						s++;
 					if (*s)
-						s++; // Skip the final letter
+						s++;
 				}
-				
-				// Copy the entire escape sequence from source to destination
+
 				while (s_start < s && *s_start && p < end)
 				{
 					*p++ = *s_start++;
 				}
-				FLUSH_IF_NEEDED();
+				flush_if_needed(&p, buf, flush_threshold, flush_fn, ctx);
 			}
 			else
 			{
-				// Player doesn't support true colors, find what is the color.
 				ColorState attr = ansi_parse_sequence(&s);
-				
+
 				LevelAnsiStreamContext stream_ctx = {buf, &p, end, flush_threshold, flush_fn, ctx};
 				convert_color_to_sequence(&attr, ansi, xterm, level_ansi_stream_check_space, level_ansi_stream_write, &stream_ctx);
-				
-				// Update pointer after writing
+
 				p = *stream_ctx.p_ptr;
 			}
 		}
 		else
 		{
 			*p++ = *s++;
-			FLUSH_IF_NEEDED();
+			flush_if_needed(&p, buf, flush_threshold, flush_fn, ctx);
 		}
 	}
-	
-	// Final flush
+
 	if (p > buf)
 	{
 		*p = '\0';
-		flush_fn(buf, p - buf, ctx);
+		flush_fn(buf, (size_t)(p - buf), ctx);
 	}
-	
-	#undef FLUSH_IF_NEEDED
 }
 
 /**
@@ -1044,108 +792,6 @@ char *ansi_transition_esccode(int ansi_before, int ansi_after, bool no_default_b
 		{
 			buffer[0] = '\0';
 		}
-	}
-
-	return buffer;
-}
-
-/**
- * @brief Build mushcode sequence to transition between ANSI states
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param ansi_before Current ANSI state (packed bits)
- * @param ansi_after Target ANSI state (packed bits)
- * @return char* Mushcode sequence performing the transition (newly allocated)
- */
-char *ansi_transition_mushcode(int ansi_before, int ansi_after)
-{
-	char *buffer = XMALLOC(SBUF_SIZE, "buffer");
-	size_t len = ansi_transition_mushcode_into(ansi_before, ansi_after, buffer, SBUF_SIZE);
-	buffer[len] = '\0';
-	return buffer;
-}
-
-/**
- * @brief Build mushcode letter sequence to transition between ANSI states
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param ansi_before Current ANSI state (packed bits)
- * @param ansi_after Target ANSI state (packed bits)
- * @return char* Mushcode letters performing the transition (newly allocated)
- */
-char *ansi_transition_letters(int ansi_before, int ansi_after)
-{
-	int ansi_bits_set, ansi_bits_clr;
-	char *p;
-	char *buffer;
-	buffer = XMALLOC(SBUF_SIZE, "buffer");
-	*buffer = '\0';
-
-	if (ansi_before != ansi_after)
-	{
-		p = buffer;
-		/*
-		 * If they turn off any highlight bits, or they change from some color
-		 * * to default color, we need to use ansi normal first.
-		 */
-		ansi_bits_set = (~ansi_before) & ansi_after;
-		ansi_bits_clr = ansi_before & (~ansi_after);
-
-		if ((ansi_bits_clr & 0xf00) || /* highlights off */
-			(ansi_bits_set & 0x088) || /* normal to color */
-			(ansi_bits_clr == 0x1000))
-		{ /* explicit normal */
-			*p++ = 'n';
-			ansi_bits_set = (~ansiBits(0)) & ansi_after;
-			ansi_bits_clr = ansiBits(0) & (~ansi_after);
-		}
-
-		/*
-		 * Next reproduce the highlight state
-		 */
-
-		if (ansi_bits_set & 0x100)
-		{
-			*p++ = 'h';
-		}
-
-		if (ansi_bits_set & 0x200)
-		{
-			*p++ = 'u';
-		}
-
-		if (ansi_bits_set & 0x400)
-		{
-			*p++ = 'f';
-		}
-
-		if (ansi_bits_set & 0x800)
-		{
-			*p++ = 'i';
-		}
-
-		/*
-		 * Foreground color
-		 */
-		if ((ansi_bits_set | ansi_bits_clr) & 0x00f)
-		{
-			*p++ = ansiMushCode(ansi_after & 0x00f, false);
-		}
-
-		/*
-		 * Background color
-		 */
-		if ((ansi_bits_set | ansi_bits_clr) & 0x0f0)
-		{
-			*p++ = ansiMushCode((ansi_after & 0x0f0) >> 4, true);
-		}
-
-		/*
-		 * Terminate
-		 */
-		*p = '\0';
 	}
 
 	return buffer;
@@ -1489,277 +1135,4 @@ char *remap_colors(const char *s, int *cmap)
 	} while (*s);
 
 	return (buf);
-}
-/**
- * @brief Convert raw ANSI to mushcode or strip ANSI codes
- *
- * Caller is responsible for freeing the returned buffer with XFREE().
- *
- * @param str String to translate (modified as it is consumed)
- * @param type When 1 converts to mushcode, when 0 strips ANSI
- * @return char* Translated string (newly allocated)
- */
-char *translate_string(char *str, int type)
-{
-	char *buff, *bp;
-	bp = buff = XMALLOC(LBUF_SIZE, "buff");
-
-	if (type)
-	{
-		int ansi_state = ANST_NORMAL;
-		int ansi_state_prev = ANST_NORMAL;
-
-		while (*str)
-		{
-			switch (*str)
-			{
-			case ESC_CHAR:
-				while (*str == ESC_CHAR)
-				{
-					do
-					{
-						int ansi_mask = 0;
-						int ansi_diff = 0;
-						unsigned int param_val = 0;
-						++(str);
-						if (!*(str))
-						{
-							break;
-						}
-						if (*(str) == ANSI_CSI)
-						{
-							++(str);
-							while (*(str) && (*(str) & 0xf0) == 0x30)
-							{
-								if (*(str) < 0x3a)
-								{
-									param_val <<= 1;
-									param_val += (param_val << 2) + (*(str) & 0x0f);
-								}
-								else
-								{
-									if (param_val < I_ANSI_LIM)
-									{
-										ansi_mask |= ansiBitsMask(param_val);
-										ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-									}
-									param_val = 0;
-								}
-								++(str);
-							}
-						}
-						while (*(str) && (*(str) & 0xf0) == 0x20)
-						{
-							++(str);
-						}
-						if (*(str) == ANSI_END)
-						{
-							if (param_val < I_ANSI_LIM)
-							{
-								ansi_mask |= ansiBitsMask(param_val);
-								ansi_diff = ((ansi_diff & ~ansiBitsMask(param_val)) | ansiBits(param_val));
-							}
-							ansi_state = (ansi_state & ~ansi_mask) | ansi_diff;
-							++(str);
-						}
-						else if (*(str))
-						{
-							++(str);
-						}
-					} while (0);
-				}
-
-				char transition[SBUF_SIZE];
-				size_t tlen = ansi_transition_mushcode_into(ansi_state_prev, ansi_state, transition, sizeof transition);
-				transition[tlen] = '\0';
-				XSAFELBSTR(transition, buff, &bp);
-				ansi_state_prev = ansi_state;
-				continue;
-
-			case ' ':
-				if (str[1] == ' ')
-				{
-					XSAFESTRNCAT(buff, &bp, "%b", 2, LBUF_SIZE);
-				}
-				else
-				{
-					XSAFELBCHR(' ', buff, &bp);
-				}
-
-				break;
-
-			case '\\':
-			case '%':
-			case '[':
-			case ']':
-			case '{':
-			case '}':
-			case '(':
-			case ')':
-				XSAFELBCHR('%', buff, &bp);
-				XSAFELBCHR(*str, buff, &bp);
-				break;
-
-			case '\r':
-				break;
-
-			case '\n':
-				XSAFESTRNCAT(buff, &bp, "%r", 2, LBUF_SIZE);
-				break;
-
-			case '\t':
-				XSAFESTRNCAT(buff, &bp, "%t", 2, LBUF_SIZE);
-				break;
-
-			default:
-				XSAFELBCHR(*str, buff, &bp);
-			}
-
-			str++;
-		}
-	}
-	else
-	{
-		while (*str)
-		{
-			switch (*str)
-			{
-			case ESC_CHAR:
-				skip_esccode(&str);
-				continue;
-
-			case '\r':
-				break;
-
-			case '\n':
-			case '\t':
-				XSAFELBCHR(' ', buff, &bp);
-				break;
-
-			default:
-				XSAFELBCHR(*str, buff, &bp);
-			}
-
-			str++;
-		}
-	}
-
-	*bp = '\0';
-	return buff;
-}
-
-/*
- * ---------------------------------------------------------------------------
- * rgb2xterm -- Convert an RGB value to xterm color
- */
-
-/**
- * @brief Convert an RGB value to an xterm color index
- *
- * @param rgb RGB value (0xRRGGBB)
- * @return int xterm color index, or nearest match
- */
-int rgb2xterm(long rgb)
-{
-	int r = (rgb >> 16) & 0xff;
-	int g = (rgb >> 8) & 0xff;
-	int b = rgb & 0xff;
-
-	static const struct
-	{
-		long rgb;
-		int idx;
-	} base16[] = {
-		{0x000000, 0}, {0x800000, 1}, {0x008000, 2}, {0x808000, 3},
-		{0x000080, 4}, {0x800080, 5}, {0x008080, 6}, {0xc0c0c0, 7},
-		{0x808080, 8}, {0xff0000, 9}, {0x00ff00, 10}, {0xffff00, 11},
-		{0x0000ff, 12}, {0xff00ff, 13}, {0x00ffff, 14}, {0xffffff, 15},
-	};
-
-	for (size_t i = 0; i < sizeof(base16) / sizeof(base16[0]); ++i)
-	{
-		if (rgb == base16[i].rgb)
-		{
-			return base16[i].idx;
-		}
-	}
-
-	if (r == g && r == b)
-	{
-		if (rgb <= 0x080808)
-		{
-			return 232;
-		}
-
-		int gray = r;
-		int idx = 232 + (gray - 8 + 5) / 10; /* nearest match */
-		if (idx < 232)
-			idx = 232;
-		if (idx > 255)
-			idx = 255;
-		return idx;
-	}
-
-	int r_lvl = (r + 25) / 51;
-	int g_lvl = (g + 25) / 51;
-	int b_lvl = (b + 25) / 51;
-
-	int xterm = 16 + (36 * r_lvl) + (6 * g_lvl) + b_lvl;
-	if (xterm < 16)
-		xterm = 16;
-	if (xterm > 231)
-		xterm = 231;
-	return xterm;
-}
-
-/**
- * @brief Parse a color string into an xterm color index
- *
- * Accepts hex (#rrggbb), decimal triplets (r g b), 24-bit integer, or
- * direct xterm index.
- *
- * @param str Color string to parse
- * @return int xterm color index, or -1 on error
- */
-int str2xterm(char *str)
-{
-	char *p = str;
-	char *end = NULL;
-
-	if (*p == '#')
-	{
-		p++;
-		long rgb = strtol(p, &end, 16);
-		return (p == end) ? -1 : rgb2xterm(rgb);
-	}
-
-	long first = strtol(p, &end, 10);
-	if (p == end)
-	{
-		return -1;
-	}
-
-	while (*end && !isdigit((unsigned char)*end))
-		end++;
-
-	if (*end == '\0')
-	{
-		if (first < 256)
-			return (int)first;
-		return rgb2xterm(first);
-	}
-
-	long second = strtol(end, &p, 10);
-	if (end == p)
-		return -1;
-	while (*p && !isdigit((unsigned char)*p))
-		p++;
-	if (*p == '\0')
-		return -1;
-	long third = strtol(p, &end, 10);
-	if (p == end)
-		return -1;
-
-	long rgb = ((first & 0xff) << 16) | ((second & 0xff) << 8) | (third & 0xff);
-	return rgb2xterm(rgb);
 }
