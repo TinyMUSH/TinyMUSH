@@ -1042,9 +1042,14 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 			return;
 		}
 
+		// Convert ANSI escape sequences to MUSH codes
+		char *converted_attrtext = ansi_to_mushcode(attrtext);
+
 		could_hear = Hearer(thing);
-		atr_add(thing, attrnum, attrtext, Owner(player), aflags & ~AF_STRUCTURE);
+		atr_add(thing, attrnum, converted_attrtext, Owner(player), aflags & ~AF_STRUCTURE);
 		handle_ears(thing, could_hear, Hearer(thing));
+
+		XFREE(converted_attrtext);
 
 		if (!(key & SET_QUIET) && !Quiet(player) && !Quiet(thing))
 		{

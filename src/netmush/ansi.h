@@ -155,7 +155,7 @@ void ansi_get_color_from_name(ColorState *color, const char *name, bool is_backg
 bool ansi_get_color_from_text(ColorState *color, char *text, bool is_background);
 bool ansi_parse_color_from_string(ColorState *color, const char *color_str, bool is_background);
 ColorStatus to_ansi_escape_sequence(char *buffer, size_t buffer_size, size_t *offset, ColorState *to, ColorType type);
-int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
+bool ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
 bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences);
 ColorState ansi_parse_sequence(const char **ansi_ptr);
 bool ansi_apply_sequence(const char **ptr, ColorState *state);
@@ -166,6 +166,11 @@ char *ansi_parse_x_to_sequence(char **ptr, ColorType type);
 char *color_state_to_mush_code(const ColorState *color);
 char *color_state_to_letters(const ColorState *color);
 char *color_state_to_escape(const ColorState *color, ColorType type);
+char *ansi_states_to_sequence(ColorState *states, int count, ColorType type);
+
+char *ansi_to_mushcode(const char *input);
+
+char *convert_mush_to_ansi(const char *input, ColorType type);
 
 const char *ansi_char_to_sequence(int ch);
 const char *ansi_char_bright_to_sequence(int ch);

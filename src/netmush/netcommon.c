@@ -1729,56 +1729,6 @@ char *trimmed_site(char *name)
 	return buff;
 }
 
-char *convert_mush_to_ansi(char *input, ColorType type)
-{
-	char *output = XMALLOC(MBUF_SIZE, "output");
-	char *out = output;
-	char *p = input;
-	bool has_color = false;
-	while (*p)
-	{
-		if (*p == '%' && tolower(*(p+1)) == 'x')
-		{
-			p += 2;
-			char *seq = ansi_parse_x_to_sequence((char **)&p, type);
-			if (seq)
-			{
-				size_t len = strlen(seq);
-				if (out + len < output + MBUF_SIZE - 1)
-				{
-					strcpy(out, seq);
-					out += len;
-				}
-				XFREE(seq);
-				has_color = true;
-			}
-		}
-		else
-		{
-			if (out < output + MBUF_SIZE - 1)
-			{
-				*out++ = *p++;
-			}
-			else
-			{
-				p++;
-			}
-		}
-	}
-	if (has_color)
-	{
-		const char *reset_seq = "\033[0m";
-		size_t reset_len = strlen(reset_seq);
-		if (out + reset_len < output + MBUF_SIZE - 1)
-		{
-			strcpy(out, reset_seq);
-			out += reset_len;
-		}
-	}
-	*out = '\0';
-	return output;
-}
-
 char *strip_mush_codes(char *input)
 {
 	char *output = XMALLOC(MBUF_SIZE, "output");
@@ -2003,9 +1953,12 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
+					char *doing_str = NULL;
 					ColorType ct = resolve_color_type(e->player, e->player);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (ct == ColorTypeNone ? strip_mush_codes(d->doing) : convert_mush_to_ansi(d->doing, ct)));
-					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str);
+					if(d->doing != NULL) {
+						doing_str = convert_mush_to_ansi(d->doing, ct);
+					}
+					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str != NULL ? doing_str : "");
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
@@ -2016,9 +1969,12 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
+					char *doing_str = NULL;
 					ColorType ct = resolve_color_type(e->player, e->player);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (ct == ColorTypeNone ? strip_mush_codes(d->doing) : convert_mush_to_ansi(d->doing, ct)));
-					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str);
+					if(d->doing != NULL) {
+						doing_str = convert_mush_to_ansi(d->doing, ct);
+					}
+					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str != NULL ? doing_str : "");
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
@@ -2157,37 +2113,74 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 	}
 }
 
-/* ---------------------------------------------------------------------------
- * do_doing: Set the doing string that appears in the WHO report.
- * Idea from R'nice@TinyTIM.
- */
 
+/**
+ * @brief Sanitize a doing string for display in WHO reports.
+ *
+ * This function processes a doing string by converting ANSI escape sequences
+ * to MUSH codes, replacing non-printable characters with spaces, collapsing
+ * multiple consecutive spaces into a single space, and trimming leading and
+ * trailing spaces. This ensures the string is safe and clean for display.
+ *
+ * Idea from R'nice@TinyTIM.
+ *
+ * @param arg The input doing string to sanitize. Can be NULL.
+ * @param name The name tag used for memory allocation with XSTRDUP.
+ * @return A newly allocated sanitized string. The caller is responsible for freeing it.
+ */
 char *sane_doing(char *arg, char *name)
 {
-	char *p, *bp;
+	char *result;
 
-	if (arg != NULL)
-	{
-		for (p = arg; *p; p++)
-		{
-			if ((*p == '\t') || (*p == '\r') || (*p == '\n'))
-			{
-				*p = ' ';
-			}
-			else if (!isprint(*p) && !isspace(*p) && *p != ESC_CHAR)
-			{
-				*p = '?';
-			}
+	if (arg == NULL) {
+		return XSTRDUP("", name);
+	}
+
+	// First, convert ANSI escape sequences to MUSH codes
+	char *mush_str = ansi_to_mushcode(arg);
+
+	// Replace non-printable characters with spaces
+	char *p = mush_str;
+	while (*p) {
+		if (!isprint(*p)) {
+			*p = ' ';
 		}
-
-		bp = XSTRDUP(arg, "bp");
-	}
-	else
-	{
-		return (XSTRDUP("", "name"));
+		p++;
 	}
 
-	return (bp);
+	// Collapse multiple spaces and trim leading/trailing spaces
+	char *cleaned = XMALLOC(MBUF_SIZE, "cleaned");
+	char *out = cleaned;
+	int in_space = 0;
+
+	p = mush_str;
+	// Skip leading spaces
+	while (*p && *p == ' ') p++;
+
+	while (*p) {
+		if (*p == ' ') {
+			if (!in_space) {
+				*out++ = ' ';
+				in_space = 1;
+			}
+		} else {
+			*out++ = *p;
+			in_space = 0;
+		}
+		p++;
+	}
+
+	// Remove trailing space
+	if (out > cleaned && *(out - 1) == ' ') {
+		out--;
+	}
+	*out = '\0';
+
+	XFREE(mush_str);
+	result = XSTRDUP(cleaned, name);
+	XFREE(cleaned);
+
+	return result;
 }
 
 void do_doing(dbref player, dbref cause, int key, char *arg)

@@ -376,7 +376,6 @@ bool ansi_get_color_from_text(ColorState *color, char *text, bool is_background)
             // Try to parse as #RRGGBB
             if (sscanf(token[0] + 1, "%2hhx%2hhx%2hhx", &rgb.r, &rgb.g, &rgb.b) == 3)
             {
-                fprintf(stderr, "DEBUG: parsed #%02x%02x%02x from '%s'\n", rgb.r, rgb.g, rgb.b, token[0]);
                 ansi_get_color_from_rgb(color, rgb, is_background);
                 success = true;
             }
@@ -950,14 +949,14 @@ char *ansi_transition_colorstate(const ColorState from, const ColorState to, Col
  * @param input The input string to parse.
  * @param sequences Pointer to the array of ColorSequence (allocated by the function).
  * @param count Pointer to the number of sequences found.
- * @return 0 on success, -1 on error (memory allocation failure).
+ * @return true on success, false on error (memory allocation failure).
  *
  * @note The caller is responsible for freeing the allocated sequences array.
  */
-int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
+bool ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
 {
     if (!input || !sequences)
-        return -1;
+        return false;
 
     sequences->data = NULL;
     sequences->text = NULL;
@@ -970,7 +969,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
     size_t text_capacity = len + 1;
     char *text_buffer = XMALLOC(text_capacity, "text_buffer");
     if (!text_buffer)
-        return -1;
+        return false;
     size_t text_pos = 0;
 
     for (size_t i = 0; i < len;)
@@ -1033,7 +1032,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
             {
                 char *full = XMALLOC(code_len + 1, "code buffer");
                 if (!full)
-                    return -1;
+                    return false;
                 XMEMCPY(full, input + code_start, code_len);
                 full[code_len] = '\0';
 
@@ -1062,7 +1061,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
                         if (!part)
                         {
                             XFREE(full);
-                            return -1;
+                            return false;
                         }
                         XMEMCPY(part, full, L);
                         part[L] = '\0';
@@ -1129,7 +1128,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
                         if (!part)
                         {
                             XFREE(full);
-                            return -1;
+                            return false;
                         }
                         XMEMCPY(part, full, L);
                         part[L] = '\0';
@@ -1170,7 +1169,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
                                 {
                                     XFREE(part);
                                     XFREE(full);
-                                    return -1;
+                                    return false;
                                 }
                             }
                             sequences->data[sequences->count].position = pos;
@@ -1198,7 +1197,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
                         sequences->data = XREALLOC(sequences->data, capacity * sizeof(ColorSequenceData), "sequences array");
                         if (!sequences->data)
                         {
-                            return -1;
+                            return false;
                         }
                     }
                     sequences->data[sequences->count].position = pos;
@@ -1219,7 +1218,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
                 text_capacity *= 2;
                 text_buffer = XREALLOC(text_buffer, text_capacity, "text buffer");
                 if (!text_buffer)
-                    return -1;
+                    return false;
             }
             text_buffer[text_pos++] = input[i++];
         }
@@ -1227,7 +1226,7 @@ int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
 
     text_buffer[text_pos] = 0;
     sequences->text = text_buffer;
-    return 0;
+    return true;
 }
 
 /**
@@ -1672,6 +1671,11 @@ bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences)
  */
 char *color_state_to_mush_code(const ColorState *color)
 {
+    if (color->reset == ColorStatusReset)
+    {
+        return XSTRDUP("n", "mush code");
+    }
+
     char buffer[256];
     size_t len = 0;
 
@@ -1681,7 +1685,7 @@ char *color_state_to_mush_code(const ColorState *color)
     buffer[len++] = '<';
 
     // Foreground
-    if (color->foreground.is_set)
+    if (color->foreground.is_set == ColorStatusSet)
     {
         if (color->foreground.ansi_index >= 0 && color->foreground.ansi_index < 16)
         {
@@ -1707,7 +1711,7 @@ char *color_state_to_mush_code(const ColorState *color)
     }
 
     // Background
-    if (color->background.is_set)
+    if (color->background.is_set == ColorStatusSet)
     {
         buffer[len++] = '/';
         if (color->background.ansi_index >= 0 && color->background.ansi_index < 16)
@@ -2952,6 +2956,73 @@ int ansi_map_states_colorstate(const char *s, ColorState **states, char **stripp
 }
 
 /**
+ * @brief Generate ANSI escape sequence string from an array of ColorState.
+ * 
+ * Iterates through the array of ColorState, generating transition sequences
+ * for state changes, and appends a final reset to normal.
+ * 
+ * Caller must free the returned string with XFREE().
+ * 
+ * @param states Array of ColorState structures
+ * @param count Number of states in the array
+ * @param type ColorType to use for sequence generation
+ * @return Newly allocated string with ANSI sequences, or NULL on error
+ */
+char *ansi_states_to_sequence(ColorState *states, int count, ColorType type)
+{
+    if (!states || count <= 0)
+        return NULL;
+
+    char *buffer = XMALLOC(LBUF_SIZE, "ansi_states_to_sequence");
+    if (!buffer)
+        return NULL;
+
+    char *bp = buffer;
+    ColorState current = {0}; // Start with default state
+
+    for (int i = 0; i < count; i++)
+    {
+        char *seq = ansi_transition_colorstate(current, states[i], type, false);
+        if (seq)
+        {
+            size_t len = strlen(seq);
+            if (bp + len < buffer + LBUF_SIZE - 1)
+            {
+                XMEMCPY(bp, seq, len);
+                bp += len;
+            }
+            XFREE(seq);
+        }
+        current = states[i];
+    }
+
+    // Append reset to normal using transition function
+    ColorState reset_state = {
+        .foreground = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .background = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .reset = ColorStatusReset,
+        .flash = ColorStatusNone,
+        .highlight = ColorStatusNone,
+        .underline = ColorStatusNone,
+        .inverse = ColorStatusNone,
+    };
+    char *reset_seq = ansi_transition_colorstate(current, reset_state, type, false);
+    if (reset_seq)
+    {
+        size_t len = strlen(reset_seq);
+        if (bp + len < buffer + LBUF_SIZE - 1)
+        {
+            XMEMCPY(bp, reset_seq, len);
+            bp += len;
+        }
+        XFREE(reset_seq);
+    }
+
+    *bp = '\0';
+    return buffer;
+}
+
+/**
  * @brief Parse ANSI escape sequence and return ColorState.
  * 
  * @param ansi_ptr Pointer to string pointer, will be advanced past the parsed sequence
@@ -3510,6 +3581,212 @@ char *remap_colors(const char *s, int *cmap)
     }
 
     return (buf);
+}
+
+/**
+ * @brief Converts a string with ANSI escape sequences to a string with MUSHcode.
+ *
+ * Parses the input string for ANSI sequences, extracts the plain text and color changes,
+ * then reconstructs the string with MUSHcode (%x<code>) inserted at the appropriate positions.
+ *
+ * @param input The input string containing ANSI escape sequences.
+ * @return A newly allocated string with MUSHcode, or NULL on error.
+ */
+char *ansi_to_mushcode(const char *input)
+{
+    ColorSequence sequences;
+
+    if (!input || !*input)
+    {
+        return XSTRDUP("", "empty mushcode");
+    }
+
+    if (!ansi_parse_ansi_to_sequences(input, &sequences))
+    {
+        return NULL;
+    }
+
+    // Allocate output buffer
+    char *output = XMALLOC(LBUF_SIZE, "ansi_to_mushcode");
+    if (!output)
+    {
+        XFREE(sequences.text);
+        XFREE(sequences.data);
+        return NULL;
+    }
+
+    char *outp = output;
+    size_t text_len = strlen(sequences.text);
+    size_t pos = 0;
+
+    for (size_t i = 0; i < sequences.count; i++)
+    {
+        size_t insert_pos = sequences.data[i].position;
+
+        // Copy text from current pos to insert_pos
+        while (pos < insert_pos && pos < text_len)
+        {
+            if (outp < output + LBUF_SIZE - 1)
+            {
+                *outp++ = sequences.text[pos++];
+            }
+            else
+            {
+                // Buffer overflow, truncate
+                break;
+            }
+        }
+
+        // Insert %x<code>
+        char *mush = color_state_to_mush_code(&sequences.data[i].color);
+        if (mush)
+        {
+            size_t mush_len = strlen(mush);
+            if (outp + 2 + mush_len < output + LBUF_SIZE - 1)
+            {
+                *outp++ = '%';
+                *outp++ = 'x';
+                memcpy(outp, mush, mush_len);
+                outp += mush_len;
+            }
+            XFREE(mush);
+        }
+    }
+
+    // Copy remaining text
+    while (pos < text_len)
+    {
+        if (outp < output + LBUF_SIZE - 1)
+        {
+            *outp++ = sequences.text[pos++];
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    *outp = '\0';
+
+    // Clean up
+    XFREE(sequences.text);
+    XFREE(sequences.data);
+
+    return output;
+}
+
+/**
+ * @brief Converts a string with MUSHcode to a string with ANSI escape sequences.
+ *
+ * Parses the input string for embedded MUSHcode sequences (%x<code>), extracts the plain text
+ * and color changes, then reconstructs the string with ANSI escape sequences inserted at the
+ * appropriate positions. Ends with a reset to normal ANSI.
+ *
+ * @param input The input string containing MUSHcode.
+ * @param type The ColorType to use for ANSI sequence generation.
+ * @return A newly allocated string with ANSI sequences, or NULL on error.
+ */
+char *convert_mush_to_ansi(const char *input, ColorType type)
+{
+    ColorSequence seq;
+
+    if (!input || !*input)
+    {
+        return XSTRDUP("", "empty ansi");
+    }
+
+    if (!ansi_parse_embedded_sequences(input, &seq))
+    {
+        return XSTRDUP(input, "convert_mush_to_ansi");
+    }
+
+    char *output = XMALLOC(LBUF_SIZE, "convert_mush_to_ansi");
+    if (!output)
+    {
+        XFREE(seq.text);
+        XFREE(seq.data);
+        return NULL;
+    }
+
+    char *outp = output;
+    ColorState current = {0}; // Start with default state
+    size_t text_len = strlen(seq.text);
+    size_t pos = 0;
+
+    for (size_t i = 0; i < seq.count; i++)
+    {
+        size_t next_pos = seq.data[i].position;
+
+        // Copy text from current pos to next_pos
+        while (pos < next_pos && pos < text_len)
+        {
+            if (outp < output + LBUF_SIZE - 1)
+            {
+                *outp++ = seq.text[pos++];
+            }
+            else
+            {
+                // Buffer overflow
+                break;
+            }
+        }
+
+        // Transition to new color
+        char *trans = ansi_transition_colorstate(current, seq.data[i].color, type, false);
+        if (trans)
+        {
+            size_t len = strlen(trans);
+            if (outp + len < output + LBUF_SIZE - 1)
+            {
+                memcpy(outp, trans, len);
+                outp += len;
+            }
+            XFREE(trans);
+        }
+        current = seq.data[i].color;
+    }
+
+    // Copy remaining text
+    while (pos < text_len)
+    {
+        if (outp < output + LBUF_SIZE - 1)
+        {
+            *outp++ = seq.text[pos++];
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    // Add reset to normal
+    ColorState reset_state = {
+        .foreground = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .background = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .reset = ColorStatusReset,
+        .flash = ColorStatusNone,
+        .highlight = ColorStatusNone,
+        .underline = ColorStatusNone,
+        .inverse = ColorStatusNone
+    };
+    char *reset = ansi_transition_colorstate(current, reset_state, type, false);
+    if (reset)
+    {
+        size_t len = strlen(reset);
+        if (outp + len < output + LBUF_SIZE - 1)
+        {
+            memcpy(outp, reset, len);
+            outp += len;
+        }
+        XFREE(reset);
+    }
+
+    *outp = '\0';
+
+    XFREE(seq.text);
+    XFREE(seq.data);
+
+    return output;
 }
 
 ColorType resolve_color_type(dbref player, dbref cause)
