@@ -62,7 +62,6 @@
 #define XSAFESTRNCAT(b, p, s, n, z) __xsafestrncat(b, p, s, n, z)
 
 #define XSAFECRLF(b, p) __xsafestrncat(b, p, "\r\n", 2, LBUF_SIZE - 1)
-#define XSAFEANSINORMAL(b, p) __xsafestrncat(b, p, ANSI_NORMAL, strlen(ANSI_NORMAL), LBUF_SIZE - 1)
 #define XSAFENOTHING(b, p) __xsafestrncat(b, p, "#-1", 3, LBUF_SIZE - 1)
 #define XSAFENOPERM(b, p) __xsafestrncat(b, p, "#-1 PERMISSION DENIED", 21, LBUF_SIZE - 1)
 #define XSAFENOMATCH(b, p) __xsafestrncat(b, p, "#-1 NO MATCH", 12, LBUF_SIZE - 1)

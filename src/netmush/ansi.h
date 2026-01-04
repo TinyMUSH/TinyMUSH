@@ -155,14 +155,12 @@ void ansi_get_color_from_name(ColorState *color, const char *name, bool is_backg
 bool ansi_get_color_from_text(ColorState *color, char *text, bool is_background);
 bool ansi_parse_color_from_string(ColorState *color, const char *color_str, bool is_background);
 ColorStatus to_ansi_escape_sequence(char *buffer, size_t buffer_size, size_t *offset, ColorState *to, ColorType type);
-ColorState ansi_packed_to_colorstate(int packed);
-int ansi_colorstate_to_packed(ColorState state);
 int ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences);
 bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences);
 ColorState ansi_parse_sequence(const char **ansi_ptr);
 bool ansi_apply_sequence(const char **ptr, ColorState *state);
-bool ansi_apply_sequence_packed(const char **ptr, int *packed_state);
 int ansi_parse_single_x_code(char **input_ptr, ColorState *color_out, bool *current_highlight);
+void xsafe_ansi_normal(char *buff, char **bufc);
 
 char *ansi_parse_x_to_sequence(char **ptr, ColorType type);
 char *color_state_to_mush_code(const ColorState *color);
@@ -174,3 +172,5 @@ const char *ansi_char_bright_to_sequence(int ch);
 int ansi_char_to_num(int ch);
 
 extern ColorEntry colorDefinitions[];
+
+ColorType resolve_color_type(dbref player, dbref cause);

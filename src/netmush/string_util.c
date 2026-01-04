@@ -22,17 +22,21 @@
 #include <ctype.h>
 #include <string.h>
 
-static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state)
+static const ColorState color_none = {0};
+
+/**
+ * @brief Consume an ANSI escape sequence and update ColorState
+ *
+ * @param cursor Pointer to the current position in the string
+ * @param state Pointer to ColorState to update
+ */
+static inline void consume_ansi_sequence_state(char **cursor, ColorState *state)
 {
 	const char *ptr = *cursor;
 
-	if (ansi_apply_sequence_packed(&ptr, packed_state))
+	if (ansi_apply_sequence(&ptr, state))
 	{
 		*cursor = (char *)ptr;
-	}
-	else
-	{
-		++(*cursor);
 	}
 }
 
@@ -431,11 +435,15 @@ char *replace_string(const char *old, const char *new, const char *string)
  * @param dst Pointer to receive the new string (newly allocated)
  * @param from The substring to replace
  * @param to The replacement substring
+ * @param player DBref of the player for color type resolution
+ * @param cause DBref of the cause for color type resolution
  */
-void edit_string(char *src, char **dst, char *from, char *to)
+void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbref cause)
 {
 	char *cp, *p;
-	int ansi_state, to_ansi_set, to_ansi_clr, tlen, flen;
+	ColorState ansi_state = {0};
+	ColorState to_color_state = {0};
+	int tlen, flen;
 	/*
 	 * We may have gotten an ANSI_NORMAL termination to OLD and NEW,
 	 * that the user probably didn't intend to be there. (If the
@@ -463,26 +471,25 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	 * Scan the contents of the TO string. Figure out whether we
 	 * have any embedded ANSI codes.
 	 */
-	ansi_state = ANST_NONE;
+	to_color_state = (ColorState){0};
+	ColorType color_type = resolve_color_type(player, cause);
 
 	do
 	{
-			p = to;
-			while (*p)
+		p = to;
+		while (*p)
+		{
+			if (*p == ESC_CHAR)
 			{
-				if (*p == ESC_CHAR)
-				{
-					consume_ansi_sequence_packed(&p, &ansi_state);
-				}
-				else
-				{
-					++p;
-				}
+				consume_ansi_sequence_state(&p, &to_color_state);
 			}
+			else
+			{
+				++p;
+			}
+		}
 	} while (0);
 
-	to_ansi_set = (~ANST_NONE) & ansi_state;
-	to_ansi_clr = ANST_NONE & (~ansi_state);
 	tlen = p - to;
 	/* Do the substitution.  Idea for prefix/suffix from R'nice@TinyTIM */
 	cp = *dst = XMALLOC(LBUF_SIZE, "edit_string_cp");
@@ -499,7 +506,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*p == ESC_CHAR)
 				{
-					consume_ansi_sequence_packed(&p, &ansi_state);
+					consume_ansi_sequence_state(&p, &ansi_state);
 				}
 				else
 				{
@@ -513,7 +520,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 	else if (!strcmp(from, "$"))
 	{
 		/* Append 'to' to string */
-		ansi_state = ANST_NONE;
+		ansi_state = (ColorState){0};
 
 		do
 		{
@@ -522,7 +529,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*p == ESC_CHAR)
 				{
-					consume_ansi_sequence_packed(&p, &ansi_state);
+					consume_ansi_sequence_state(&p, &ansi_state);
 				}
 				else
 				{
@@ -532,8 +539,19 @@ void edit_string(char *src, char **dst, char *from, char *to)
 		} while (0);
 
 		XSAFESTRNCAT(*dst, &cp, src, p - src, LBUF_SIZE);
-		ansi_state |= to_ansi_set;
-		ansi_state &= ~to_ansi_clr;
+		// Apply to_color_state to ansi_state
+		ansi_state.highlight = to_color_state.highlight;
+		ansi_state.underline = to_color_state.underline;
+		ansi_state.flash = to_color_state.flash;
+		ansi_state.inverse = to_color_state.inverse;
+		if (to_color_state.foreground.is_set)
+		{
+			ansi_state.foreground = to_color_state.foreground;
+		}
+		if (to_color_state.background.is_set)
+		{
+			ansi_state.background = to_color_state.background;
+		}
 		XSAFESTRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 	}
 	else
@@ -548,7 +566,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 		}
 
 		flen = strlen(from);
-		ansi_state = ANST_NONE;
+		ansi_state = (ColorState){0};
 
 		while (*src)
 		{
@@ -559,7 +577,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 			{
 				if (*src == ESC_CHAR)
 				{
-					consume_ansi_sequence_packed(&src, &ansi_state);
+					consume_ansi_sequence_state(&src, &ansi_state);
 				}
 				else
 				{
@@ -580,8 +598,19 @@ void edit_string(char *src, char **dst, char *from, char *to)
 				if (!strncmp(from, src, flen))
 				{
 					/* Apply whatever ANSI transition happens in TO */
-					ansi_state |= to_ansi_set;
-					ansi_state &= ~to_ansi_clr;
+					// Apply to_color_state to ansi_state
+					ansi_state.highlight = to_color_state.highlight;
+					ansi_state.underline = to_color_state.underline;
+					ansi_state.flash = to_color_state.flash;
+					ansi_state.inverse = to_color_state.inverse;
+					if (to_color_state.foreground.is_set)
+					{
+						ansi_state.foreground = to_color_state.foreground;
+					}
+					if (to_color_state.background.is_set)
+					{
+						ansi_state.background = to_color_state.background;
+					}
 					XSAFESTRNCAT(*dst, &cp, to, tlen, LBUF_SIZE);
 					src += flen;
 				}
@@ -598,7 +627,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 					if (*from == ESC_CHAR)
 					{
 						p = src;
-						consume_ansi_sequence_packed(&src, &ansi_state);
+						consume_ansi_sequence_state(&src, &ansi_state);
 						XSAFESTRNCAT(*dst, &cp, p, src - p, LBUF_SIZE);
 					}
 					else
@@ -611,7 +640,7 @@ void edit_string(char *src, char **dst, char *from, char *to)
 		}
 	}
 
-	p = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
+	p = ansi_transition_colorstate(ansi_state, color_none, color_type, false);
 	XSAFELBSTR(p, *dst, &cp);
 	XFREE(p);
 }

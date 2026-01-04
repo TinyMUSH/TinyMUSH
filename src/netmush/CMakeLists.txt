@@ -20,7 +20,7 @@ set(NETMUSH_SOURCES
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
-    string_ansi.c string_util.c timer.c typedefs.h udb_misc.c udb_obj.c 
+    string_util.c timer.c typedefs.h udb_misc.c udb_obj.c 
     udb_ocache.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
     udb_backend.c udb_backend.h
 )

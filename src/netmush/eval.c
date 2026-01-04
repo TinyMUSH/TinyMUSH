@@ -1798,7 +1798,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 	// in the string, and hasn't yet terminated the color with a %xn yet, we'll have to do it for them.
 	if (ansi)
 	{
-		XSAFEANSINORMAL(buff, bufc);
+		xsafe_ansi_normal(buff, bufc);
 	}
 
 	**bufc = '\0';

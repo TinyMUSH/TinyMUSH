@@ -30,6 +30,9 @@
 #include <errno.h>
 #include <limits.h>
 
+// ColorState constant
+static const ColorState color_normal = {0};
+
 /**
  * Restart definitions
  *
@@ -1077,7 +1080,7 @@ void safe_exit_name(dbref it, char *buff, char **bufc)
     char saved = '\0';
     ColorState *states = NULL;
     char *stripped = NULL;
-    ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+    ColorState normal = color_normal;
     ColorType color_type = ColorTypeAnsi;
 
     safe_name(it, buff, bufc);

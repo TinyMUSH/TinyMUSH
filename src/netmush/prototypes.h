@@ -382,12 +382,12 @@ extern void decompile_flags(dbref player, dbref thing, char *thingname);
 extern char *trim_space_sep(char *str, const Delim *sep);
 extern char *next_token(char *str, const Delim *sep);
 extern char *split_token(char **sp, const Delim *sep);
-extern char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr);
+extern char *next_token_colorstate(char *str, const Delim *sep, ColorState *state_ptr);
 extern int countwords(char *str, const Delim *sep);
 extern int list2arr(char ***arr, int maxtok, char *list, const Delim *sep);
 extern void print_separator(const Delim *sep, char *list, char **bufc);
 extern void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep);
-extern int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep);
+extern int list2ansi(ColorState *arr, ColorState *prior_state, int maxlen, char *list, const Delim *sep);
 extern dbref match_thing(dbref player, char *name);
 extern _Bool fn_range_check(const char *fname, int nfargs, int minargs, int maxargs, char *result, char **bufc);
 extern int delim_check(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs, int sep_arg, Delim *sep, int dflags);
@@ -474,7 +474,7 @@ extern void sane_qsort(void *array[], int left, int right, int (*compare)(const 
 extern void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
-extern void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just);
+extern void tables_helper(char *list, ColorState *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just);
 extern void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just);
 extern void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
@@ -712,7 +712,7 @@ extern void fun_wordpos(char *buff, char **bufc, dbref player, dbref caller, dbr
 extern void fun_ansipos(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_repeat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
-extern void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc);
+extern void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc, dbref player, dbref cause);
 extern void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_cat(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
@@ -1219,7 +1219,7 @@ extern void do_mvattr(dbref player, dbref cause, int key, char *what, char *args
 extern int parse_attrib(dbref player, char *str, dbref *thing, int *atr, int ok_structs);
 extern void find_wild_attrs(dbref player, dbref thing, char *str, int check_exclude, int hash_insert, int get_locks, int ok_structs);
 extern int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, int get_locks, int df_star, int ok_structs);
-extern void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to);
+extern void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to, dbref player, dbref cause);
 extern void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nargs);
 extern void do_wipe(dbref player, dbref cause, int key, char *it);
 extern void do_trigger(dbref player, dbref cause, int key, char *object, char *argv[], int nargs);
@@ -1241,8 +1241,7 @@ extern void whisper_pose(dbref player, dbref target, char *message);
 extern void do_pemit_list(dbref player, char *list, const char *message, int do_contents);
 extern void do_pemit(dbref player, dbref cause, int key, char *recipient, char *message);
 
-/* string_ansi.c */
-extern char *level_ansi(const char *s, bool ansi, bool xterm, bool truecolors);
+/* ansi.c (ANSI/string helpers) */
 extern void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors, void (*flush_fn)(const char *, size_t, void *), void *ctx);
 extern char *ansi_strip_ansi(const char *str);
 extern int ansi_strip_ansi_len(const char *s);
@@ -1267,7 +1266,7 @@ extern int string_compare(const char *s1, const char *s2);
 extern int string_prefix(const char *string, const char *prefix);
 extern const char *string_match(const char *src, const char *sub);
 extern char *replace_string(const char *old, const char *new, const char *string);
-extern void edit_string(char *src, char **dst, char *from, char *to);
+extern void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbref cause);
 extern int minmatch(char *str, char *target, int min);
 extern int matches_exit_from_list(char *exit_list, char *pattern);
 extern char *ltos(long num);

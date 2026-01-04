@@ -23,6 +23,8 @@
 #include "externs.h"
 #include "prototypes.h"
 
+static const ColorState color_none = {0};
+
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
@@ -198,43 +200,34 @@ char *split_token(char **sp, const Delim *sep)
 }
 
 /**
- * @brief Parse ANSI escape sequence and update state (with bounds checking).
+ * @brief Point at start of next token, tracking full ColorState (TrueColor/XTerm/ANSI).
  *
- * @param strp Pointer to string position (updated in place)
- * @param ansi_state Current ANSI state (updated in place)
- */
-#define PARSE_ANSI_SEQUENCE(strp, ansi_state)                                                       \
-	do                                                                                              \
-	{                                                                                               \
-		const char *cursor__ = (const char *)(strp);                                                 \
-		if (ansi_apply_sequence_packed(&cursor__, &(ansi_state)))                                   \
-		{                                                                                           \
-			(strp) = (char *)cursor__;                                                              \
-		}                                                                                           \
-		else                                                                                        \
-		{                                                                                           \
-			++(strp);                                                                               \
-		}                                                                                           \
-	} while (0)
-
-/**
- * @brief Point at start of next token, and tell what color it is.
+ * Mirrors next_token_ansi but preserves the complete ColorState instead of packing it
+ * down to 16-color ANSI. This allows callers to retain XTerm and TrueColor fidelity.
  *
  * @param str String with token
  * @param sep Token separator
- * @param ansi_state_ptr Current ansi state
- * @return char* Token
+ * @param state_ptr Current color state (updated on return)
+ * @return char* Pointer to start of next token or NULL if none
  */
-char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
+char *next_token_colorstate(char *str, const Delim *sep, ColorState *state_ptr)
 {
-	int ansi_state = *ansi_state_ptr;
+	ColorState state = *state_ptr;
 	char *p;
 
 	if (sep->len == 1)
 	{
 		while (*str == ESC_CHAR)
 		{
-			PARSE_ANSI_SEQUENCE(str, ansi_state);
+			const char *cursor = str;
+			if (ansi_apply_sequence(&cursor, &state))
+			{
+				str = (char *)cursor;
+			}
+			else
+			{
+				++str;
+			}
 		}
 
 		while (*str && (*str != sep->str[0]))
@@ -243,13 +236,21 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 
 			while (*str == ESC_CHAR)
 			{
-				PARSE_ANSI_SEQUENCE(str, ansi_state);
+				const char *cursor = str;
+				if (ansi_apply_sequence(&cursor, &state))
+				{
+					str = (char *)cursor;
+				}
+				else
+				{
+					++str;
+				}
 			}
 		}
 
 		if (!*str)
 		{
-			*ansi_state_ptr = ansi_state;
+			*state_ptr = state;
 			return NULL;
 		}
 
@@ -265,19 +266,36 @@ char *next_token_ansi(char *str, const Delim *sep, int *ansi_state_ptr)
 	}
 	else
 	{
-		/**
-		 * ansi tracking not supported yet in multichar delims
-		 *
+		/*
+		 * Multi-character delimiter: walk the string updating ColorState until a
+		 * delimiter match is found.
 		 */
-		if ((p = strstr(str, sep->str)) == NULL)
+		while (*str)
 		{
-			return NULL;
+			if (*str == ESC_CHAR)
+			{
+				const char *cursor = str;
+				if (ansi_apply_sequence(&cursor, &state))
+				{
+					str = (char *)cursor;
+					continue;
+				}
+			}
+
+			if (!strncmp(str, sep->str, sep->len))
+			{
+				str += sep->len;
+				*state_ptr = state;
+				return str;
+			}
+
+			++str;
 		}
 
-		str = p + sep->len;
+		return NULL;
 	}
 
-	*ansi_state_ptr = ansi_state;
+	*state_ptr = state;
 	return str;
 }
 
@@ -440,36 +458,37 @@ void arr2list(char **arr, int alen, char *list, char **bufc, const Delim *sep)
 }
 
 /**
- * @brief Find the ANSI states at the beginning and end of each word of a list.
+ * @brief Find the ColorState at the beginning and end of each word of a list.
  *
  * @note Needs one more array slot than list2arr (think fenceposts) but still
  *       takes the same maxlen and returns the same number of words.
  *
- * @param arr Array
- * @param prior_state Ansi State
+ * @param arr Array of ColorState fenceposts (one extra for the trailing state)
+ * @param prior_state Prior ColorState
  * @param maxlen Maximum length of array
  * @param list List to parse
  * @param sep Separator
  * @return int Ansi state
  */
-int list2ansi(int *arr, int *prior_state, int maxlen, char *list, const Delim *sep)
+int list2ansi(ColorState *arr, ColorState *prior_state, int maxlen, char *list, const Delim *sep)
 {
-	int i, ansi_state;
+	int i;
+	ColorState state;
 
 	if (maxlen <= 0)
 	{
 		return 0;
 	}
 
-	ansi_state = arr[0] = *prior_state;
+	state = arr[0] = *prior_state;
 	list = trim_space_sep(list, sep);
 
-	for (i = 1; list && i < maxlen; list = next_token_ansi(list, sep, &ansi_state), ++i)
+	for (i = 1; list && i < maxlen; list = next_token_colorstate(list, sep, &state), ++i)
 	{
-		arr[i - 1] = ansi_state;
+		arr[i - 1] = state;
 	}
 
-	arr[i] = ANST_NONE;
+	arr[i] = color_none;
 	return i - 1;
 }
 

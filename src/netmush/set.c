@@ -77,7 +77,7 @@ dbref match_affected(dbref player, const char *name)
 	}
 }
 
-void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const char *name, const char *newobj)
+void do_chzone(dbref player, dbref cause, int key, const char *name, const char *newobj)
 {
 	dbref thing;
 	dbref zone;
@@ -198,7 +198,7 @@ void do_chzone(dbref player, __attribute__((unused)) dbref cause, int key, const
 	s_Modified(thing);
 }
 
-void do_name(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, const char *name, char *newname)
+void do_name(dbref player, dbref cause, int key, const char *name, char *newname)
 {
 	dbref thing;
 	char *buff, *thingname;
@@ -444,7 +444,7 @@ void set_player_aliases(dbref player, dbref target, char *oldalias, char *list, 
 	}
 }
 
-void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name, char *alias)
+void do_alias(dbref player, dbref cause, int key, char *name, char *alias)
 {
 	dbref thing, aowner;
 	int aflags, alen;
@@ -555,7 +555,7 @@ void do_alias(dbref player, __attribute__((unused)) dbref cause, __attribute__((
  * * do_lock: Set a lock on an object or attribute.
  */
 
-void do_lock(dbref player, __attribute__((unused)) dbref cause, int key, char *name, char *keytext)
+void do_lock(dbref player, dbref cause, int key, char *name, char *keytext)
 {
 	dbref thing, aowner;
 	int atr, aflags;
@@ -653,7 +653,7 @@ void do_lock(dbref player, __attribute__((unused)) dbref cause, int key, char *n
  * * Remove a lock from an object of attribute.
  */
 
-void do_unlock(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
+void do_unlock(dbref player, dbref cause, int key, char *name)
 {
 	dbref thing, aowner;
 	int atr, aflags;
@@ -715,7 +715,7 @@ void do_unlock(dbref player, __attribute__((unused)) dbref cause, int key, char 
  * * do_unlink: Unlink an exit from its destination or remove a dropto.
  */
 
-void do_unlink(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name)
+void do_unlink(dbref player, dbref cause, int key, char *name)
 {
 	dbref exit;
 	init_match(player, name, TYPE_EXIT);
@@ -771,7 +771,7 @@ void do_unlink(dbref player, __attribute__((unused)) dbref cause, __attribute__(
  * do_chown: Change ownership of an object or attribute.
  */
 
-void do_chown(dbref player, __attribute__((unused)) dbref cause, int key, char *name, char *newown)
+void do_chown(dbref player, dbref cause, int key, char *name, char *newown)
 {
 	dbref thing, owner, aowner;
 	int atr, aflags, do_it, cost, quota;
@@ -1064,7 +1064,7 @@ void set_attr_internal(dbref player, dbref thing, int attrnum, char *attrtext, i
 	}
 }
 
-void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *name, char *flag)
+void do_set(dbref player, dbref cause, int key, char *name, char *flag)
 {
 	dbref thing, thing2, aowner;
 	char *p, *buff;
@@ -1252,7 +1252,7 @@ void do_set(dbref player, __attribute__((unused)) dbref cause, int key, char *na
 	flag_set(thing, player, flag, key);
 }
 
-void do_power(dbref player, __attribute__((unused)) dbref cause, int key, char *name, char *flag)
+void do_power(dbref player, dbref cause, int key, char *name, char *flag)
 {
 	dbref thing;
 
@@ -1274,7 +1274,7 @@ void do_power(dbref player, __attribute__((unused)) dbref cause, int key, char *
 	power_set(thing, player, flag, key);
 }
 
-void do_setattr(dbref player, __attribute__((unused)) dbref cause, int attrnum, char *name, char *attrtext)
+void do_setattr(dbref player, dbref cause, int attrnum, char *name, char *attrtext)
 {
 	dbref thing;
 	init_match(player, name, NOTYPE);
@@ -1289,7 +1289,7 @@ void do_setattr(dbref player, __attribute__((unused)) dbref cause, int attrnum, 
 	set_attr_internal(player, thing, attrnum, attrtext, 0, NULL, NULL);
 }
 
-void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char *oldpair, char *newpair[], int nargs)
+void do_cpattr(dbref player, dbref cause, int key, char *oldpair, char *newpair[], int nargs)
 {
 	int i, ca, got = 0;
 	dbref oldthing;
@@ -1355,7 +1355,7 @@ void do_cpattr(dbref player, dbref cause, __attribute__((unused)) int key, char 
 	XFREE(newattrs);
 }
 
-void do_mvattr(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *what, char *args[], int nargs)
+void do_mvattr(dbref player, dbref cause, int key, char *what, char *args[], int nargs)
 {
 	dbref thing, aowner, axowner;
 	ATTR *in_attr, *out_attr;
@@ -1704,15 +1704,15 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
  * edit_string_ansi, do_edit: Modify attributes.
  */
 
-void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to)
+void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to, dbref player, dbref cause)
 {
 	char *s;
-	edit_string(src, dst, from, to);
+	edit_string(src, dst, from, to, player, cause);
 
 	if (mushconf.ansi_colors)
 	{
 		s = XASPRINTF("s", "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL);
-		edit_string(src, returnstr, from, s);
+		edit_string(src, returnstr, from, s, player, cause);
 		XFREE(s);
 	}
 	else
@@ -1722,7 +1722,7 @@ void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char 
 	}
 }
 
-void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *it, char *args[], int nargs)
+void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nargs)
 {
 	dbref thing, aowner;
 	int attr, got_one, aflags, alen, doit;
@@ -1778,7 +1778,7 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 				 * Do the edit and save the result
 				 */
 				got_one = 1;
-				edit_string_ansi(atext, &result, &returnstr, from, to);
+				edit_string_ansi(atext, &result, &returnstr, from, to, player, cause);
 
 				if (ap->check != NULL)
 				{
@@ -1828,7 +1828,7 @@ void do_edit(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 }
 
-void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *it)
+void do_wipe(dbref player, dbref cause, int key, char *it)
 {
 	dbref thing, aowner;
 	int attr, got_one, aflags, alen;
@@ -1883,7 +1883,7 @@ void do_wipe(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 	}
 }
 
-void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char *object, char *argv[], int nargs)
+void do_trigger(dbref player, dbref cause, int key, char *object, char *argv[], int nargs)
 {
 	dbref thing;
 	int attrib;
@@ -1917,7 +1917,7 @@ void do_trigger(dbref player, __attribute__((unused)) dbref cause, int key, char
 	}
 }
 
-void do_use(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *object)
+void do_use(dbref player, dbref cause, int key, char *object)
 {
 	char *df_use, *df_ouse, *temp, *bp;
 	dbref thing, aowner;
@@ -1992,7 +1992,7 @@ void do_use(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
  * * do_setvattr: Set a user-named (or possibly a predefined) attribute.
  */
 
-void do_setvattr(dbref player, dbref cause, __attribute__((unused)) int key, char *arg1, char *arg2)
+void do_setvattr(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
 	char *s;
 	int anum;

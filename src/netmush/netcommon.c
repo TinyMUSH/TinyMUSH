@@ -20,6 +20,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "ansi.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -451,10 +452,233 @@ static void queue_write_callback(const char *data, size_t len, void *context)
 	queue_write(d, data, len);
 }
 
+typedef struct PostprocessStreamContext
+{
+	bool apply_nobleed;
+	bool apply_colormap;
+	int *cmap;
+
+	char seq_buf[128];
+	size_t seq_len;
+
+	char out_buf[8192];
+	char *out_ptr;
+	char *out_end;
+	size_t flush_threshold;
+
+	void (*flush_fn)(const char *data, size_t len, void *ctx);
+	void *flush_ctx;
+} PostprocessStreamContext;
+
+static inline int postprocess_fg_sgr_from_state(const ColorState *state)
+{
+	if (!state || state->foreground.is_set != ColorStatusSet)
+	{
+		return -1;
+	}
+
+	int idx = state->foreground.ansi_index;
+	if (idx >= 0 && idx < 8)
+	{
+		return 30 + idx;
+	}
+
+	if (idx >= 8 && idx < 16)
+	{
+		return 90 + (idx - 8);
+	}
+
+	return -1;
+}
+
+static inline int postprocess_bg_sgr_from_state(const ColorState *state)
+{
+	if (!state || state->background.is_set != ColorStatusSet)
+	{
+		return -1;
+	}
+
+	int idx = state->background.ansi_index;
+	if (idx >= 0 && idx < 8)
+	{
+		return 40 + idx;
+	}
+
+	if (idx >= 8 && idx < 16)
+	{
+		return 100 + (idx - 8);
+	}
+
+	return -1;
+}
+
+static inline void postprocess_apply_sgr_to_state(ColorState *state, int sgr)
+{
+	if (!state)
+	{
+		return;
+	}
+
+	if (sgr >= 30 && sgr <= 37)
+	{
+		int idx = sgr - 30;
+		state->foreground.is_set = ColorStatusSet;
+		state->foreground.ansi_index = idx;
+		state->foreground.xterm_index = idx;
+	}
+	else if (sgr >= 40 && sgr <= 47)
+	{
+		int idx = sgr - 40;
+		state->background.is_set = ColorStatusSet;
+		state->background.ansi_index = idx;
+		state->background.xterm_index = idx;
+	}
+}
+
+static inline void postprocess_flush(PostprocessStreamContext *ctx)
+{
+	size_t used = (size_t)(ctx->out_ptr - ctx->out_buf);
+	if (used > 0)
+	{
+		ctx->flush_fn(ctx->out_buf, used, ctx->flush_ctx);
+		ctx->out_ptr = ctx->out_buf;
+	}
+}
+
+static inline void postprocess_emit_block(PostprocessStreamContext *ctx, const char *data, size_t len)
+{
+	while (len > 0)
+	{
+		size_t space = (size_t)(ctx->out_end - ctx->out_ptr);
+		if (space == 0)
+		{
+			postprocess_flush(ctx);
+			space = (size_t)(ctx->out_end - ctx->out_ptr);
+		}
+
+		size_t copy_len = (len < space) ? len : space;
+		XMEMCPY(ctx->out_ptr, data, copy_len);
+		ctx->out_ptr += copy_len;
+		data += copy_len;
+		len -= copy_len;
+
+		if ((size_t)(ctx->out_ptr - ctx->out_buf) >= ctx->flush_threshold)
+		{
+			postprocess_flush(ctx);
+		}
+	}
+}
+
+static void postprocess_emit_sequence(PostprocessStreamContext *ctx)
+{
+	ctx->seq_buf[ctx->seq_len] = '\0';
+	const char *seq_ptr = ctx->seq_buf;
+	const char *seq_start = seq_ptr;
+	ColorState state = ansi_parse_sequence(&seq_ptr);
+
+	if (seq_ptr == seq_start)
+	{
+		postprocess_emit_block(ctx, ctx->seq_buf, ctx->seq_len);
+		ctx->seq_len = 0;
+		return;
+	}
+
+	ColorState final_state = state;
+
+	if (ctx->apply_nobleed && state.reset == ColorStatusReset)
+	{
+		ColorState white_state = {0};
+		white_state.foreground.is_set = ColorStatusSet;
+		white_state.foreground.ansi_index = 7;
+		white_state.foreground.xterm_index = 7;
+		white_state.foreground.truecolor = (ColorRGB){255, 255, 255};
+
+		white_state.background = state.background;
+		white_state.highlight = state.highlight;
+		white_state.underline = state.underline;
+		white_state.flash = state.flash;
+		white_state.inverse = state.inverse;
+
+		final_state = white_state;
+	}
+
+	if (ctx->apply_colormap)
+	{
+		int n = postprocess_fg_sgr_from_state(&final_state);
+		if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && ctx->cmap[n - I_ANSI_BLACK] != 0)
+		{
+			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - I_ANSI_BLACK]);
+		}
+
+		n = postprocess_bg_sgr_from_state(&final_state);
+		if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && ctx->cmap[n - I_ANSI_BLACK] != 0)
+		{
+			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - I_ANSI_BLACK]);
+		}
+	}
+
+	char seq_out[128];
+	size_t offset = 0;
+	ColorStatus status = to_ansi_escape_sequence(seq_out, sizeof(seq_out), &offset, &final_state, ColorTypeAnsi);
+	if (status == ColorStatusNone || offset == 0)
+	{
+		postprocess_emit_block(ctx, ctx->seq_buf, ctx->seq_len);
+	}
+	else
+	{
+		postprocess_emit_block(ctx, seq_out, offset);
+	}
+
+	ctx->seq_len = 0;
+}
+
+static void postprocess_stream_write(const char *data, size_t len, void *context)
+{
+	PostprocessStreamContext *ctx = (PostprocessStreamContext *)context;
+
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = data[i];
+
+		if (ctx->seq_len > 0 || ch == ESC_CHAR)
+		{
+			if (ctx->seq_len < sizeof(ctx->seq_buf) - 1)
+			{
+				ctx->seq_buf[ctx->seq_len++] = ch;
+			}
+
+			if (ch == 'm')
+			{
+				postprocess_emit_sequence(ctx);
+			}
+			else if (ctx->seq_len >= sizeof(ctx->seq_buf) - 1)
+			{
+				postprocess_emit_block(ctx, ctx->seq_buf, ctx->seq_len);
+				ctx->seq_len = 0;
+			}
+
+			continue;
+		}
+
+		postprocess_emit_block(ctx, &ch, 1);
+	}
+}
+
+static void postprocess_stream_finish(PostprocessStreamContext *ctx)
+{
+	if (ctx->seq_len > 0)
+	{
+		postprocess_emit_block(ctx, ctx->seq_buf, ctx->seq_len);
+		ctx->seq_len = 0;
+	}
+
+	postprocess_flush(ctx);
+}
+
 void queue_string(DESC *d, const char *format, ...)
 {
 	va_list ap;
-	char *buf = NULL, *s = NULL, *msg = XMALLOC(LBUF_SIZE, "msg");
+	char *s = NULL, *msg = XMALLOC(LBUF_SIZE, "msg");
 
 	va_start(ap, format);
 
@@ -485,35 +709,33 @@ void queue_string(DESC *d, const char *format, ...)
 		}
 		else
 		{
-			// Check if we need post-processing (NoBleed or colormap)
-			bool needs_postprocessing = (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player))) || d->colormap;
-			
-			if (needs_postprocessing)
+			bool apply_nobleed = NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player));
+			bool apply_colormap = (d->colormap != NULL);
+			bool needs_postprocessing = apply_nobleed || apply_colormap;
+
+			if (!needs_postprocessing)
 			{
-				// Use buffered version for post-processing
-				buf = level_ansi(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player));
-				
-				if (NoBleed(d->player) && (Ansi(d->player) || Color256(d->player) || Color24Bit(d->player)))
-				{
-					char *buf2 = normal_to_white(buf);
-					XFREE(buf);
-					buf = buf2;
-				}
-				
-				if (d->colormap)
-				{
-					char *buf2 = remap_colors(buf, d->colormap);
-					XFREE(buf);
-					buf = buf2;
-				}
-				
-				queue_write(d, buf, strlen(buf));
-				XFREE(buf);
+				level_ansi_stream(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player), queue_write_callback, d);
 			}
 			else
 			{
-				// Use streaming version for direct output (fast path)
-				level_ansi_stream(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player), queue_write_callback, d);
+				PostprocessStreamContext ctx = {
+					.apply_nobleed = apply_nobleed,
+					.apply_colormap = apply_colormap,
+					.cmap = d->colormap,
+					.seq_len = 0,
+					.out_ptr = NULL,
+					.out_end = NULL,
+					.flush_threshold = 0,
+					.flush_fn = queue_write_callback,
+					.flush_ctx = d};
+
+				ctx.out_ptr = ctx.out_buf;
+				ctx.out_end = ctx.out_buf + sizeof(ctx.out_buf);
+				ctx.flush_threshold = sizeof(ctx.out_buf) * 80 / 100;
+
+				level_ansi_stream(msg, Ansi(d->player), Color256(d->player), Color24Bit(d->player), postprocess_stream_write, &ctx);
+				postprocess_stream_finish(&ctx);
 			}
 		}
 	}

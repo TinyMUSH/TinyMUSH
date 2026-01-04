@@ -21,6 +21,21 @@
 #include <ctype.h>
 #include <string.h>
 
+static const ColorState color_normal = {.foreground = {.is_set = ColorStatusReset}, .background = {.is_set = ColorStatusReset}};
+static const ColorState color_none = {0};
+
+/**
+ * @brief Compare two ColorState structures for equality.
+ *
+ * @param a Pointer to first ColorState
+ * @param b Pointer to second ColorState
+ * @return bool True if equal, false otherwise
+ */
+static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
+{
+	return memcmp(a, b, sizeof(ColorState)) == 0;
+}
+
 /**
  * List management utilities.
  *
@@ -31,7 +46,12 @@
  *
  * @param ptrs List to check
  * @param nitems Number of items
- * @return int List type
+ * @return int List type (NUMERIC_LIST, FLOAT_LIST, DBREF_LIST, or ALPHANUM_LIST)
+ *
+ * @details Analyzes the list items to determine the appropriate sort type.
+ * Starts by assuming numeric, then checks for floats, DBrefs, or falls back
+ * to alphanumeric. DBref detection is based on the first item starting with '#'
+ * followed by digits.
  */
 int autodetect_list(char *ptrs[], int nitems)
 {
@@ -123,7 +143,11 @@ int autodetect_list(char *ptrs[], int nitems)
  * @param type_pos Which argument hold the list type
  * @param ptrs List
  * @param nitems Number of items in the list
- * @return int List type
+ * @return int List type (NUMERIC_LIST, FLOAT_LIST, DBREF_LIST, ALPHANUM_LIST, or NOCASE_LIST)
+ *
+ * @details If type_pos is within bounds, uses the specified type from fargs[type_pos-1]:
+ * 'd' for DBREF_LIST, 'n' for NUMERIC_LIST, 'f' for FLOAT_LIST, 'i' for NOCASE_LIST.
+ * Otherwise, auto-detects based on the list content.
  */
 int get_list_type(char *fargs[], int nfargs, int type_pos, char *ptrs[], int nitems)
 {
@@ -192,7 +216,26 @@ int validate_list_args(const char *func_name, char *buff, char **bufc, dbref pla
 
 /**
  * @brief Validate multiple delimiters for table functions
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player
+ * @param caller DBref of caller
+ * @param cause DBref of cause
+ * @param fargs Function arguments
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments
+ * @param ncargs Number of command arguments
+ * @param list_sep Delimiter for list separation
+ * @param field_sep Delimiter for field separation
+ * @param pad_char Padding character
+ * @param list_pos Position of list delimiter argument
+ * @param field_pos Position of field delimiter argument
+ * @param pad_pos Position of padding character argument
  * @return int 1 if valid, 0 if error
+ *
+ * @details Validates the list separator, field separator, and padding character
+ * for table-related functions like fun_table.
  */
 static int
 validate_table_delims(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
@@ -219,7 +262,23 @@ validate_table_delims(char *buff, char **bufc, dbref player, dbref caller, dbref
 }
 
 /**
- * @brief Generate random list
+ * @brief Generate a list of random integers within an inclusive range.
+ *
+ * Produces @p n_times values between @p r_bot and @p r_top (inclusive),
+ * separated by the optional output delimiter. The count is clamped to
+ * LBUF_SIZE. When @p r_top == @p r_bot, the constant value repeats; when
+ * @p r_top < @p r_bot, the call returns an empty string. A zero or negative
+ * @p n_times also yields an empty result.
+ *
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=lower bound, [1]=upper bound, [2]=count, [3]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -287,63 +346,44 @@ void fun_lrand(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 /**
- * @brief Macro helpers for grouped allocations/deallocations
- */
-#define ALLOC_LBUF_TRIO(buf1, buf2, buf3, tag1, tag2, tag3) \
-	do                                                      \
-	{                                                       \
-		buf1 = XMALLOC(LBUF_SIZE, tag1);                    \
-		buf2 = XMALLOC(LBUF_SIZE, tag2);                    \
-		buf3 = XMALLOC(LBUF_SIZE, tag3);                    \
-	} while (0)
-
-#define FREE_LBUF_TRIO(buf1, buf2, buf3) \
-	do                                   \
-	{                                    \
-		XFREE(buf1);                     \
-		XFREE(buf2);                     \
-		XFREE(buf3);                     \
-	} while (0)
-
-#define ALLOC_LBUF_PAIR(buf1, buf2, tag1, tag2) \
-	do                                          \
-	{                                           \
-		buf1 = XMALLOC(LBUF_SIZE, tag1);        \
-		buf2 = XMALLOC(LBUF_SIZE, tag2);        \
-	} while (0)
-
-#define FREE_LBUF_PAIR(buf1, buf2) \
-	do                             \
-	{                              \
-		XFREE(buf1);               \
-		XFREE(buf2);               \
-	} while (0)
-
-/**
  * @brief Copy delimiter structure (osep = isep)
+ *
+ * @param dest Destination Delim structure
+ * @param src Source Delim structure
+ *
+ * @details Safely copies the delimiter information from src to dest,
+ * handling the variable-length string field.
  */
-#define COPY_DELIM(dest, src) \
-	XMEMCPY(&(dest), &(src), sizeof(Delim) - MAX_DELIM_LEN + 1 + (src).len)
+static inline void copy_delim(Delim *dest, const Delim *src)
+{
+	if (!dest || !src)
+	{
+		return;
+	}
+
+	size_t copy_len = sizeof(Delim) - MAX_DELIM_LEN + 1 + src->len;
+	XMEMCPY(dest, src, copy_len);
+}
 
 /**
- * @brief Parse ANSI escape sequences and update ansi_state
+ * @brief Parse ANSI escape sequences and update full ColorState
  *
  * This function processes ANSI escape sequences (color codes) at the current
  * position in the string, advancing the pointer past the escape sequence and
  * updating the ANSI state accordingly.
  *
  * @param s Pointer to string pointer (will be advanced past ANSI sequences)
- * @param ansi_state Pointer to current ANSI state (will be updated)
+ * @param state Pointer to current ColorState (will be updated)
  *
  * Implementation note: This is a static inline function rather than a macro
  * for type safety and maintainability, while preserving performance.
  */
-static inline void parse_ansi_escapes(char **s, int *ansi_state)
+static inline void parse_ansi_escapes(char **s, ColorState *state)
 {
 	while (**s == ESC_CHAR)
 	{
 		const char *cursor = *s;
-		if (ansi_apply_sequence_packed(&cursor, ansi_state))
+		if (ansi_apply_sequence(&cursor, state))
 		{
 			*s = (char *)cursor;
 		}
@@ -354,11 +394,22 @@ static inline void parse_ansi_escapes(char **s, int *ansi_state)
 	}
 }
 
-static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state)
+/**
+ * @brief Consume a single ANSI escape sequence and update a ColorState.
+ *
+ * Advances the input cursor past a single ANSI escape sequence if one is
+ * present at the current position, updating the provided `ColorState` to
+ * reflect the effect of that sequence. If no valid escape sequence is
+ * recognized, the cursor is advanced by one byte to avoid stalling.
+ *
+ * @param cursor Pointer to the input cursor (will be advanced)
+ * @param state Pointer to the current `ColorState` to update
+ */
+static inline void consume_ansi_sequence_state(char **cursor, ColorState *state)
 {
 	const char *ptr = *cursor;
 
-	if (ansi_apply_sequence_packed(&ptr, packed_state))
+	if (ansi_apply_sequence(&ptr, state))
 	{
 		*cursor = (char *)ptr;
 	}
@@ -369,7 +420,7 @@ static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state
 }
 
 /**
- * @brief Convert a DBref (#db) to it's numerical value (db)
+ * @brief Convert a DBref (#db) to its numerical value (db)
  *
  * @param dbr Text DBref value
  * @return int DBref numerical value
@@ -387,17 +438,21 @@ int dbnum(char *dbr)
 }
 
 /**
- * @brief Returns number of words in a string
+ * @brief Count the words in a list using the specified delimiter.
+ *
+ * Trims leading separators, splits @p fargs[0] on the delimiter (default space
+ * when none provided), and writes the resulting count to @p buff. A missing
+ * argument returns 0 without error output.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -418,17 +473,21 @@ void fun_words(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 /**
- * @brief Returns first word in a string
+ * @brief Return the first word from a list using the given delimiter.
+ *
+ * Trims leading separators, splits @p fargs[0] on the delimiter (default
+ * space if none specified), and copies the first element to @p buff. With no
+ * arguments, returns an empty string without emitting an error.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_first(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -464,23 +523,28 @@ void fun_first(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 /**
- * @brief Returns all but the first word in a string
+ * @brief Return all words except the first, preserving ANSI state.
+ *
+ * Trims leading separators, consumes the first element (tracking ANSI escape
+ * sequences), then outputs any remaining text while restoring the active ANSI
+ * state so colors remain correct. With no arguments, returns an empty string
+ * without error output.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *s, *rest;
 	Delim isep;
-	int ansi_state = ANST_NONE;
+	ColorState ansi_state = color_none;
 
 	/*
 	 * If we are passed an empty arglist return a null string
@@ -497,11 +561,11 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	}
 
 	s = trim_space_sep(fargs[0], &isep); /* leading spaces */
-	rest = next_token_ansi(s, &isep, &ansi_state);
+	rest = next_token_colorstate(s, &isep, &ansi_state);
 
 	if (rest)
 	{
-				s = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
+		s = ansi_transition_colorstate(color_normal, ansi_state, ColorTypeTrueColor, false);
 		XSAFELBSTR(s, buff, bufc);
 		XFREE(s);
 		XSAFELBSTR(rest, buff, bufc);
@@ -509,23 +573,31 @@ void fun_rest(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 }
 
 /**
- * @brief Returns last word in a string
+ * @brief Return the last word from a list while preserving ANSI state.
+ *
+ * Trims leading separators, walks the list using the input delimiter (default
+ * space), and copies the final element to @p buff. For single-character
+ * delimiters, ANSI escape sequences are tracked so the color state active at
+ * the end of the list is reapplied before emitting the last token. For
+ * multi-character delimiters, the function scans from the end of the string to
+ * locate the final separator. With no arguments, returns an empty string
+ * without emitting an error.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *s, *last, *buf;
 	Delim isep;
-	int ansi_state = ANST_NONE;
+	ColorState ansi_state = color_none;
 
 	/**
 	 * If we are passed an empty arglist return a null string
@@ -575,7 +647,7 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 			}
 		} while (*s);
 
-				buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(ansi_state), ColorTypeAnsi, false);
+		buf = ansi_transition_colorstate(color_normal, ansi_state, ColorTypeTrueColor, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		XSAFESTRNCAT(buff, bufc, last, s - last, LBUF_SIZE);
@@ -615,17 +687,23 @@ void fun_last(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 }
 
 /**
- * @brief Match arg2 against each word of arg1, returning index of first match.
+ * @brief Find the 1-based index of the first list element matching a pattern.
+ *
+ * Trims leading separators, splits @p fargs[0] on the delimiter (default
+ * space if none provided), and compares each token to @p fargs[1] using
+ * wildcard matching (`quick_wild`). Returns the index of the first match, or
+ * 0 if no elements match. Argument validation errors are written to @p buff by
+ * the range and delimiter checks.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=pattern, [2]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_match(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -668,17 +746,25 @@ void fun_match(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 /**
- * @brief Returns the index numbers of all words in the list which match pattern
+ * @brief Return the indices of all list elements that match (or don't match) a pattern.
+ *
+ * Trims leading separators, splits @p fargs[0] on the input delimiter (default
+ * space), and tests each token against @p fargs[1] using wildcard matching
+ * (`quick_wild`). The IFELSE_FALSE flag (set by `unmatchall`) inverts the
+ * match test. Matching indices are joined with the output delimiter: if none
+ * is supplied, a space is used (even if the input delimiter differs).
+ * Returns an empty string when no elements qualify. Argument validation errors
+ * are written to @p buff by the range and delimiter checks.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=pattern, [2]=optional input delimiter, [3]=optional output delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -698,7 +784,7 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -751,17 +837,26 @@ void fun_matchall(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 }
 
 /**
- * @brief Extract words from string
+ * @brief Extract a slice of words from a list, with optional output delimiter.
+ *
+ * Splits @p fargs[0] on the input delimiter (default space). Starting at
+ * 1-based position @p fargs[1], copies @p fargs[2] words to @p buff. If
+ * @p fargs[4] is given, it is used as the output delimiter; otherwise the
+ * input delimiter is reused. When input and output delimiters match, the
+ * function copies the substring directly for efficiency; otherwise it rebuilds
+ * the slice token by token. If @p start or @p len is less than 1, or the start
+ * position is past the end of the list, an empty string is returned. Argument
+ * validation errors are written to @p buff by the range and delimiter checks.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=start (1-based), [2]=length, [3]=optional input delimiter, [4]=optional output delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -776,7 +871,7 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (nfargs < 5)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -868,19 +963,26 @@ void fun_extract(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief like extract(), but it works with an arbitrary separator.
+ * @brief Extract a substring between occurrences of a single-character separator.
+ *
+ * Treats @p fargs[1] as a single-character delimiter (default space if empty),
+ * and returns the portion of @p fargs[0] starting at the @p fargs[2]-th field
+ * and ending before the @p fargs[3]-th delimiter. Leading spaces after the
+ * starting delimiter are skipped when the separator is space; trailing spaces
+ * before the ending delimiter are trimmed. If @p start or @p end is less than 1,
+ * or the start position is past the end of the string, returns an empty string.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player Not used
- * @param caller Not used
- * @param cause Not used
- * @param fargs Function's arguments
- * @param nfargs Not used
- * @param cargs Not used
- * @param ncargs Not used
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=string, [1]=separator char (optional), [2]=start field (1-based), [3]=end field (1-based)
+ * @param nfargs Number of function arguments (unused)
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
-void fun_index(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	int start, end;
 	char c, *s, *p;
@@ -980,15 +1082,25 @@ void fun_index(char *buff, char **bufc, dbref player __attribute__((unused)), db
  */
 
 /**
- * @brief Helper functionm for fun_ldelete, fun_replace and fun_insert
+ * @brief Shared worker for ldelete/replace/insert operations on a delimited list.
+ *
+ * Splits @p str into before/target/after chunks using @p sep, then performs one of:
+ * - IF_DELETE: drop the target element and join the rest.
+ * - IF_REPLACE: substitute @p word for the target element.
+ * - IF_INSERT: insert @p word at the target position (allowing append when past end).
+ *
+ * If @p str is empty, only IF_INSERT at position 1 produces output. Positions <1
+ * emit the original string unchanged. If the requested element is beyond the end
+ * (and not an allowed insert-at-end), the original string is returned. Results are
+ * written to @p buff via @p bufc.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param str String to work on
- * @param el Position
- * @param word Target word
- * @param sep String separator
- * @param flag Flags
+ * @param str Input list to modify
+ * @param el 1-based target position
+ * @param word Replacement/insert text (ignored for delete)
+ * @param sep Input/output delimiter
+ * @param flag Operation selector: IF_DELETE, IF_REPLACE, or IF_INSERT
  */
 void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const Delim *sep, int flag)
 {
@@ -1145,17 +1257,23 @@ void do_itemfuns(char *buff, char **bufc, char *str, int el, char *word, const D
 }
 
 /**
- * @brief Delete a word at position X of a list
+ * @brief Remove a single element from a delimited list.
+ *
+ * Splits @p fargs[0] on the delimiter (default space) and drops the element at
+ * 1-based position @p fargs[1]. If @p pos < 1, the original list is returned.
+ * If @p pos is beyond the end, the original list is returned unchanged. An
+ * empty input list yields an empty result. Delimiter validation errors are
+ * written to @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=position (1-based), [2]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_ldelete(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1170,17 +1288,23 @@ void fun_ldelete(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief Replace a word at position X of a list
+ * @brief Replace a single list element at a given position.
+ *
+ * Splits @p fargs[0] on the delimiter (default space) and substitutes
+ * @p fargs[2] for the element at 1-based position @p fargs[1]. If @p pos < 1,
+ * or @p pos is beyond the end of the list, the original list is returned
+ * unchanged. An empty input list yields an empty result. Delimiter validation
+ * errors are written to @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=position (1-based), [2]=replacement text, [3]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_replace(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1195,17 +1319,23 @@ void fun_replace(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief Insert a word at position X of a list
+ * @brief Insert a single element into a delimited list.
+ *
+ * Splits @p fargs[0] on the delimiter (default space) and inserts @p fargs[2]
+ * at 1-based position @p fargs[1]. When @p pos == 1 and the input list is
+ * empty, the new element becomes the list. If @p pos < 1, the original list is
+ * returned unchanged. If @p pos is beyond the end, the element is appended.
+ * Delimiter validation errors are written to @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=position (1-based), [2]=text to insert, [3]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_insert(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1220,17 +1350,27 @@ void fun_insert(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief Replace item in list
+ * @brief Replace multiple positions in a list in one call.
+ *
+ * Parses three lists: the source list @p fargs[0], replacement values
+ * @p fargs[1], and 1-based positions @p fargs[2]. The input delimiter
+ * (default space or @p fargs[3]) splits source and replacement lists;
+ * positions are always split on space. Output is joined with @p fargs[4] if
+ * provided, otherwise the input delimiter is reused. The replacement list and
+ * position list must contain the same number of elements or an error string
+ * is returned. Positions outside the source range are ignored. When no
+ * positions are supplied, the original list is returned unchanged. Delimiter
+ * validation errors are written to @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=source list, [1]=replacement list, [2]=positions list, [3]=optional input delimiter, [4]=optional output delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1252,7 +1392,7 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (nfargs < 5)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -1288,10 +1428,9 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	 * Turn out lists into arrays for ease of manipulation.
 	 *
 	 */
-	ALLOC_LBUF_TRIO(origlist, replist, poslist, "origlist", "replist", "poslist");
-	XSTRCPY(origlist, fargs[0]);
-	XSTRCPY(replist, fargs[1]);
-	XSTRCPY(poslist, fargs[2]);
+	origlist = fargs[0];
+	replist = fargs[1];
+	poslist = fargs[2];
 	norig = list2arr(&orig_p, LBUF_SIZE / 2, origlist, &isep);
 	list2arr(&rep_p, LBUF_SIZE / 2, replist, &isep);
 	npos = list2arr(&pos_p, LBUF_SIZE / 2, poslist, &SPACE_DELIM);
@@ -1316,21 +1455,28 @@ void fun_lreplace(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	XFREE(orig_p);
 	XFREE(rep_p);
 	XFREE(pos_p);
-	FREE_LBUF_TRIO(origlist, replist, poslist);
 }
 
 /**
- * @brief Remove a word from a string
+ * @brief Remove the first occurrence of a word from a delimited list.
+ *
+ * Validates arguments and delimiter (default space). If the target word
+ * contains the delimiter, returns the error string "#-1 CAN ONLY DELETE ONE
+ * ELEMENT". Walks the list token by token, copying all elements to @p buff
+ * except the first one that equals @p fargs[1]; subsequent matches are kept.
+ * If the word is not found, the original list is returned. An empty input list
+ * yields an empty result. Delimiter validation errors are written to @p buff
+ * by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=word to remove, [2]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1382,17 +1528,22 @@ void fun_remove(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief Is a word in a string
+ * @brief Return the 1-based position of a word in a delimited list.
+ *
+ * Validates arguments and delimiter (default space). Trims leading separators
+ * then walks the list token by token. Returns the index of the first element
+ * equal to @p fargs[1], or "0" if the word does not occur. Delimiter
+ * validation errors are written to @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=word to find, [2]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1425,17 +1576,24 @@ void fun_member(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief Reverse the order of words in a list.
+ * @brief Reverse all elements in a delimited list.
+ *
+ * Validates arguments and delimiter (default space). An empty argument list
+ * returns an empty result. Applies a bounds check to avoid overrunning the
+ * output buffer, truncating the input string if needed. Splits the list into
+ * an array with @p fargs[0] and writes elements in reverse order, reusing the
+ * input delimiter between items. Delimiter validation errors are written to
+ * @p buff by the argument check.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list, [1]=optional delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_revwords(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1487,20 +1645,27 @@ void fun_revwords(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 }
 
 /**
- * @brief given two lists and a word, merge the two lists by replacing words
- *        in list1 that are the same as the given word by the corresponding
- *        word in list2 (by position). The lists must have the same number of
- *        words. Compare to MERGE().
+ * @brief Merge two lists by substituting matching elements from a second list.
+ *
+ * Validates arguments and delimiter (default space). Requires that @p fargs[0]
+ * and @p fargs[1] have the same number of elements; otherwise returns
+ * "#-1 NUMBER OF WORDS MUST BE EQUAL". If @p fargs[2] contains more than one
+ * word, returns "#-1 TOO MANY WORDS". Uses @p fargs[2] as the match token: for
+ * each position, if the element from list1 equals that token, the element from
+ * the same position in list2 is emitted; otherwise the original element from
+ * list1 is emitted. Output uses @p fargs[4] when provided, else reuses the
+ * input delimiter. Delimiter validation errors are written to @p buff by the
+ * argument checks.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param player DBref of player (unused)
+ * @param caller DBref of caller (unused)
+ * @param cause DBref of cause (unused)
+ * @param fargs Function arguments: [0]=list1, [1]=list2, [2]=match word, [3]=optional input delimiter, [4]=optional output delimiter
+ * @param nfargs Number of function arguments
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1515,7 +1680,7 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (nfargs < 5)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -1573,11 +1738,15 @@ void fun_splice(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief qsort helper for string comparison (case sensitive)
+ * @brief qsort helper for case-sensitive string comparison.
  *
- * @param s1 First string
- * @param s2 Second String
- * @return int Comparison result
+ * Casts @p s1 and @p s2 to `const char **` and returns the result of
+ * `strcmp(*s1, *s2)`. Suitable for use with `qsort` over an array of `char *`
+ * pointers.
+ *
+ * @param s1 Pointer to first string pointer
+ * @param s2 Pointer to second string pointer
+ * @return int Negative if `*s1` < `*s2`, zero if equal, positive if `*s1` > `*s2`
  */
 int a_comp(const void *s1, const void *s2)
 {
@@ -1585,11 +1754,15 @@ int a_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief qsort helper for string comparison (case insensitive)
+ * @brief qsort helper for case-insensitive string comparison.
  *
- * @param s1 First string
- * @param s2 Second String
- * @return int Comparison result
+ * Casts @p s1 and @p s2 to `const char **` and returns the result of
+ * `strcasecmp(*s1, *s2)`. Suitable for use with `qsort` over an array of
+ * `char *` pointers when ASCII case folding is desired.
+ *
+ * @param s1 Pointer to first string pointer
+ * @param s2 Pointer to second string pointer
+ * @return int Negative if `*s1` < `*s2`, zero if equal, positive if `*s1` > `*s2`
  */
 int c_comp(const void *s1, const void *s2)
 {
@@ -1597,11 +1770,14 @@ int c_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief qsort helper for alphanumerical comparison (case sensitive)
+ * @brief qsort helper for case-sensitive alphanumeric record comparison.
  *
- * @param s1 First list
- * @param s2 Second list
- * @return int Comparison result
+ * Interprets @p s1 and @p s2 as pointers to `A_RECORD` and compares their
+ * `str` fields with `strcmp`. Designed for `qsort` over arrays of `A_RECORD`.
+ *
+ * @param s1 Pointer to first `A_RECORD`
+ * @param s2 Pointer to second `A_RECORD`
+ * @return int Negative if `s1->str` < `s2->str`, zero if equal, positive if `s1->str` > `s2->str`
  */
 int arec_comp(const void *s1, const void *s2)
 {
@@ -1609,11 +1785,15 @@ int arec_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief qsort helper for alphanumerical comparison (case insensitive)
+ * @brief qsort helper for case-insensitive alphanumeric record comparison.
  *
- * @param s1 First list
- * @param s2 Second list
- * @return int Comparison result
+ * Interprets @p s1 and @p s2 as pointers to `A_RECORD` and compares their
+ * `str` fields with `strcasecmp` for ASCII case folding. Designed for `qsort`
+ * over arrays of `A_RECORD`.
+ *
+ * @param s1 Pointer to first `A_RECORD`
+ * @param s2 Pointer to second `A_RECORD`
+ * @return int Negative if `s1->str` < `s2->str`, zero if equal, positive if `s1->str` > `s2->str`
  */
 int crec_comp(const void *s1, const void *s2)
 {
@@ -1621,11 +1801,15 @@ int crec_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief qsort helper for floating point comparison
+ * @brief qsort helper for floating-point record comparison.
  *
- * @param s1 First list
- * @param s2 Second list
- * @return int Comparison result
+ * Interprets @p s1 and @p s2 as pointers to `F_RECORD` and compares their
+ * `data` fields. Returns 1 when the first value is greater, -1 when smaller,
+ * and 0 when equal. Suitable for use with `qsort` over arrays of `F_RECORD`.
+ *
+ * @param s1 Pointer to first `F_RECORD`
+ * @param s2 Pointer to second `F_RECORD`
+ * @return int 1 if `s1->data` > `s2->data`, -1 if less, 0 if equal
  */
 int f_comp(const void *s1, const void *s2)
 {
@@ -1643,11 +1827,16 @@ int f_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief qsort helper for numerical comparison
+ * @brief qsort helper for integer record comparison.
  *
- * @param s1 First list
- * @param s2 Second list
- * @return int Comparison result
+ * Interprets @p s1 and @p s2 as pointers to `I_RECORD` and compares their
+ * `data` fields as integers. Returns 1 when the first value is greater, -1
+ * when smaller, and 0 when equal. Intended for use with `qsort` over arrays
+ * of `I_RECORD`.
+ *
+ * @param s1 Pointer to first `I_RECORD`
+ * @param s2 Pointer to second `I_RECORD`
+ * @return int 1 if `s1->data` > `s2->data`, -1 if less, 0 if equal
  */
 int i_comp(const void *s1, const void *s2)
 {
@@ -1665,13 +1854,22 @@ int i_comp(const void *s1, const void *s2)
 }
 
 /**
- * @brief Sort various type of lists
+ * @brief Sort a list of strings by the requested type and optionally return positions.
  *
- * @param s List
- * @param n Number of arguments
- * @param sort_type Sorty type
- * @param listpos_only Return position in list instead of modified list
- * @return int* Sorted list position
+ * Sorts the array @p s of length @p n using @p sort_type: ALPHANUM_LIST and
+ * NOCASE_LIST apply string comparison (case-sensitive/insensitive), NUMERIC_LIST
+ * parses integers, DBREF_LIST sorts by @c dbnum(), and FLOAT_LIST parses doubles.
+ * When @p listpos_only is zero, @p s is sorted in place. When non-zero, a 1-based
+ * position array is returned indicating each element's original index in sorted
+ * order. For ALPHANUM_LIST and NOCASE_LIST the input array is left untouched when
+ * @p listpos_only is non-zero; other modes still reorder @p s while also returning
+ * positions. Caller must free the returned array (if non-NULL) with @c XFREE.
+ *
+ * @param s Array of list elements to sort (modified unless ALPHANUM/NOCASE with listpos_only set)
+ * @param n Number of elements in @p s
+ * @param sort_type Sort strategy selector (ALPHANUM_LIST, NOCASE_LIST, NUMERIC_LIST, DBREF_LIST, FLOAT_LIST)
+ * @param listpos_only Non-zero to return original positions instead of (or in addition to) an in-place sort
+ * @return int* Position array mapping sorted order to original 1-based indices, or NULL if not requested
  */
 int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 {
@@ -1831,17 +2029,36 @@ int *do_asort(char *s[], int n, int sort_type, int listpos_only)
 }
 
 /**
- * @brief Handle list sorting
+ * @brief Entry point for the `sort()` family of functions.
  *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * Validates the function arguments and delimiters, converts the input list
+ * (from `fargs[0]`) into an array, determines the requested sort type via
+ * `get_list_type()`, and delegates the actual sorting to `do_asort()`.
+ *
+ * Behavior:
+ * - If the caller requested positions (via the function mask `SORT_POS`),
+ *   this function emits a space-separated list of 1-based positions
+ *   corresponding to the sorted order (the positions array is produced by
+ *   `do_asort()` and freed after use).
+ * - Otherwise, it reconstructs the sorted array back into a delimited string
+ *   using the output delimiter (or the input delimiter when unspecified) and
+ *   writes that to the output buffer.
+ *
+ * The function returns early for empty argument lists. Delimiter validation
+ * and error reporting are handled by `validate_list_args()` and
+ * `delim_check()`; any error messages are written into @p buff.
+ *
+ * @param buff Output buffer where results or error strings are written
+ * @param bufc Pointer into @p buff for appending output
+ * @param player DBref of player invoking the function (unused by sorting)
+ * @param caller DBref of the caller (unused by sorting)
+ * @param cause DBref of the cause (unused by sorting)
+ * @param fargs Function arguments: at minimum [0]=list; additional args
+ *              control sort type and delimiters as accepted by
+ *              `get_list_type()` and the surrounding `sort()` API.
+ * @param nfargs Number of function arguments in @p fargs
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1866,7 +2083,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -1920,15 +2137,31 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  */
 
 /**
- * @brief Helper function for sorting using a user-defined function.
+ * @brief Invoke a user-provided comparison expression for sorting.
  *
- * @param s1 Element 1
- * @param s2 Element 2
- * @param cbuff user-defined function for sorting
- * @param thing DBref of thing
- * @param player DBref of player
- * @param cause DBref oc cause
- * @return int Sort result
+ * Evaluates the expression in @p cbuff with @p s1 and @p s2 bound as the
+ * two input parameters. The expression is executed via
+ * `eval_expression_string()` and must yield a numeric result interpreted as
+ * follows: negative if `s1 < s2`, zero if equal, positive if `s1 > s2`.
+ *
+ * Important: this function is designed to be used with the internal
+ * `sane_qsort()` routine (which accepts extra context parameters) and is
+ * NOT compatible with the standard library `qsort()` comparator signature.
+ *
+ * Resource and safety notes:
+ * - The function guards against excessive resource use by checking
+ *   `mushstate.func_invk_ctr`, `mushstate.func_nest_lev` and `Too_Much_CPU()`;
+ *   if limits are exceeded it returns 0 to avoid further evaluation.
+ * - `cbuff` is copied into a temporary buffer before evaluation; no caller
+ *   ownership changes are performed by this function.
+ *
+ * @param s1 Pointer to the first element (passed to the user expression)
+ * @param s2 Pointer to the second element (passed to the user expression)
+ * @param cbuff Null-terminated user comparison expression (copied internally)
+ * @param thing DBref used as evaluation context (e.g. attribute owner)
+ * @param player DBref of the player performing the evaluation
+ * @param cause DBref of the cause of the evaluation
+ * @return int <0 if `s1 < s2`, 0 if equal, >0 if `s1 > s2` as produced by the expression
  */
 int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref player, dbref cause)
 {
@@ -1958,18 +2191,43 @@ int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref playe
 }
 
 /**
- * @brief Andrew Molitor's qsort, which doesn't require transitivity between
- *        comparisons (essential for preventing crashes due to boneheads who
- *        write comparison functions where a > b doesn't mean b < a).
+ * @brief Andrew Molitor's quicksort variant tolerant of non-transitive comparators.
  *
- * @param array Array to sort
- * @param left Left position of array
- * @param right Right position of array
- * @param compare Compare function
- * @param cbuff User-defined compare function
- * @param thing DBref of thing
- * @param player DBref of player
- * @param cause DBref of cause
+ * This routine sorts an array of pointers in-place using a randomized
+ * pivot-based partitioning algorithm that does not require the comparator to
+ * satisfy strict transitivity. It is intended for use when the comparison
+ * function may depend on external context and therefore can produce
+ * comparisons that violate a>b => b<a. The algorithm partitions elements
+ * around a pivot chosen at random, swaps pointers in-place, and recursively
+ * sorts partitions. Tail recursion is converted to iteration to reduce stack
+ * usage.
+ *
+ * Comparator contract:
+ * - The provided @p compare callback must have the signature
+ *   `int compare(const void *a, const void *b, char *cbuff, dbref, dbref, dbref)`
+ *   and should return negative if `a < b`, zero if `a == b`, positive if
+ *   `a > b` (semantics are determined by the caller-provided comparator).
+ * - The additional parameters `cbuff`, `thing`, `player`, and `cause` are
+ *   forwarded to @p compare unchanged and may be used by user-defined
+ *   comparison expressions.
+ *
+ * Notes and limitations:
+ * - Sorting is performed by swapping `void *` pointers; element data is not
+ *   copied. The caller is responsible for pointer validity for the duration
+ *   of the call.
+ * - The routine is not inherently thread-safe; concurrent calls must ensure
+ *   the comparator and context are safe for parallel use.
+ * - Average complexity is O(n log n); worst-case is O(n^2), but randomized
+ *   pivot selection reduces the likelihood of adversarial worst-cases.
+ *
+ * @param array Array of pointers to sort (modified in-place)
+ * @param left Index of the leftmost element to sort (0-based)
+ * @param right Index of the rightmost element to sort (0-based)
+ * @param compare Function pointer to comparator with extended context
+ * @param cbuff User-supplied comparison buffer (forwarded to @p compare)
+ * @param thing DBref passed to @p compare as context
+ * @param player DBref passed to @p compare as context
+ * @param cause DBref passed to @p compare as context
  */
 void sane_qsort(void *array[], int left, int right, int (*compare)(const void *, const void *, char *, dbref, dbref, dbref), char *cbuff, dbref thing, dbref player, dbref cause)
 {
@@ -2047,17 +2305,41 @@ loop:
 }
 
 /**
- * @brief Sort by user-define function
+ * @brief Sort a list using a user-supplied comparison expression.
  *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * Sorts the list provided in @p fargs[1] using a user-defined comparison
+ * expression supplied either as an attribute name in @p fargs[0] or as a
+ * lambda string beginning with "#lambda/". The attribute text (or lambda
+ * body) is retrieved and passed as the comparison buffer to `sane_qsort()`
+ * via the `u_comp()` wrapper. The user expression will be evaluated with the
+ * two elements under comparison bound as the evaluation arguments; it must
+ * return a numeric result interpreted as negative if the first element is
+ * less than the second, zero if equal, and positive if greater.
+ *
+ * Argument validation and delimiter handling are performed via
+ * `validate_list_args()` and `delim_check()`; any error messages are written
+ * into @p buff and the function returns early. The input list is split using
+ * the input delimiter (default space) and the sorted result is written back
+ * to the output buffer joined with the output delimiter (or input delimiter
+ * when the output delimiter is not provided).
+ *
+ * Resource notes:
+ * - The attribute text (or lambda body) is copied into a temporary buffer
+ *   and freed before returning.
+ * - Sorting uses `sane_qsort()` which swaps pointer values in-place; the
+ *   elements pointed to must remain valid during the call.
+ * - The comparator evaluation respects function invocation and nesting
+ *   limits; excessive usage may cause the comparator to return 0.
+ *
+ * @param buff Output buffer where the sorted list or error is written
+ * @param bufc Output buffer cursor for appending
+ * @param player DBref of the player invoking the function
+ * @param caller DBref of the caller (unused)
+ * @param cause DBref of the cause (unused)
+ * @param fargs Function arguments: [0]=attribute name or "#lambda/..." comparator, [1]=list to sort, [2]=optional input delimiter, [3]=optional output delimiter
+ * @param nfargs Number of function arguments in @p fargs
+ * @param cargs Command arguments (unused)
+ * @param ncargs Number of command arguments (unused)
  */
 void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -2080,7 +2362,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -2163,7 +2445,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 
 /**
@@ -2177,8 +2459,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param fp2 Pointer to second float value (for FLOAT_LIST)
  * @return Comparison result: <0, 0, or >0
  */
-static int
-compare_items(const char *s1, const char *s2, int sort_type, int *ip1, int *ip2, double *fp1, double *fp2)
+static int compare_items(const char *s1, const char *s2, int sort_type, int *ip1, int *ip2, double *fp1, double *fp2)
 {
 	if (sort_type == ALPHANUM_LIST)
 	{
@@ -2220,7 +2501,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (nfargs < 5)
 		{
-			COPY_DELIM(osep, isep);
+			copy_delim(&osep, &isep);
 		}
 		else
 		{
@@ -2239,7 +2520,7 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 		if (nfargs < 4)
 		{
-			COPY_DELIM(osep, isep);
+			copy_delim(&osep, &isep);
 		}
 		else
 		{
@@ -2549,11 +2830,11 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				print_separator(&osep, buff, bufc);
 			}
 
-				XSAFELBSTR(ptrs1[i1], buff, bufc);
-				XSTRCPY(oldstr, ptrs1[i1]);
-				i1++;
+			XSAFELBSTR(ptrs1[i1], buff, bufc);
+			XSTRCPY(oldstr, ptrs1[i1]);
+			i1++;
 
-				while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
+			while ((i1 < n1) && !strcmp(ptrs1[i1], oldstr))
 			{
 				i1++;
 			}
@@ -2578,23 +2859,32 @@ void handle_sets(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief Format a list into columns.
+ * @brief Format a list into fixed-width columns, preserving ANSI color state.
+ *
+ * Splits the input list on the supplied delimiter, truncates or pads each
+ * element to the requested width, and emits ANSI transitions so colored text
+ * stays intact across column boundaries.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
  * @param player DBref of player
  * @param caller DBref of caller
  * @param cause DBref of cause
- * @param fargs Function's arguments
+ * @param fargs Function's arguments: [0]=list, [1]=column width, [2]=optional delimiter
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
+ *
+ * @details Each element is padded or truncated to fit the specified width,
+ * and ANSI color states are preserved between elements.
  */
 void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	unsigned int spaces, number, ansinumber, striplen;
+	unsigned int spaces, number, striplen;
 	unsigned int count, i, indent = 0;
-	int isansi = 0, rturn = 1;
+	ColorState ansi_state = color_none;
+	int rturn = 1;
+	size_t remaining;
 	char *p, *q, *buf, *objstring, *cp, *cr = NULL;
 	Delim isep;
 
@@ -2643,17 +2933,12 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	while (cp)
 	{
 		objstring = split_token(&cp, &isep);
-		ansinumber = number;
 		striplen = ansi_strip_ansi_len(objstring);
-
-		if (ansinumber > striplen)
-		{
-			ansinumber = striplen;
-		}
 
 		p = objstring;
 		q = buf;
 		count = 0;
+		ansi_state = color_none;
 
 		while (p && *p)
 		{
@@ -2664,36 +2949,61 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 			if (*p == ESC_CHAR)
 			{
-				/**
-				 * Start of ANSI code. Skip to end.
-				 *
-				 */
-				isansi = 1;
+				char *seq_start = p;
+				char *seq_end;
+				ColorState prev_state = ansi_state;
+				size_t seq_len;
 
-				while (*p && !isalpha(*p))
+				consume_ansi_sequence_state(&p, &ansi_state);
+				seq_end = p;
+				remaining = LBUF_SIZE - 1 - (size_t)(q - buf);
+
+				if (!remaining)
 				{
-					*q++ = *p++;
+					break;
 				}
 
-				if (*p)
+				seq_len = seq_end - seq_start;
+
+				if (seq_len > remaining)
 				{
-					*q++ = *p++;
+					p = seq_start;
+					ansi_state = prev_state;
+					break;
 				}
+
+				XMEMCPY(q, seq_start, seq_len);
+				q += seq_len;
 			}
 			else
 			{
+				if ((size_t)(q - buf) >= LBUF_SIZE - 1)
+				{
+					break;
+				}
+
 				*q++ = *p++;
 				count++;
 			}
 		}
 
-		if (isansi)
+		if (memcmp(&ansi_state, &color_none, sizeof(ColorState)) != 0)
 		{
-			XSAFEANSINORMAL(buf, &q);
+			char *reset_seq = ansi_transition_colorstate(ansi_state, color_none, ColorTypeTrueColor, false);
+			size_t reset_len = strlen(reset_seq);
+			remaining = LBUF_SIZE - 1 - (size_t)(q - buf);
+
+			if (reset_len > remaining)
+			{
+				reset_len = remaining;
+			}
+
+			XMEMCPY(q, reset_seq, reset_len);
+			q += reset_len;
+			XFREE(reset_seq);
 		}
 
 		*q = '\0';
-		isansi = 0;
 		XSAFELBSTR(buf, buff, bufc);
 
 		if (striplen < number)
@@ -2750,23 +3060,27 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 /**
  * @brief Helper function for perform_tables
  *
- * @param list List
- * @param last_state Ansi state
- * @param n_cols Number of columns
- * @param col_widths Columns width
- * @param lead_str Leading String
- * @param trail_str Trailing String
- * @param list_sep List separator
- * @param field_sep Field Separator
- * @param pad_char Padding Char
+ * @param list Input list to format into table
+ * @param last_state Current ANSI color state
+ * @param n_cols Number of columns in the table
+ * @param col_widths Array of column widths
+ * @param lead_str Leading string for each row
+ * @param trail_str Trailing string for each row
+ * @param list_sep Separator between list items
+ * @param field_sep Separator between fields in items
+ * @param pad_char Padding character for alignment
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param just Justify?
+ * @param just Justification flag
+ *
+ * @details Formats the list into a table with specified columns, preserving ANSI colors.
  */
-void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
+void tables_helper(char *list, ColorState *last_state, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
-	int i = 0, nwords = 0, nstates = 0, cpos = 0, wcount = 0, over = 0, ansi_state = 0;
-	int max = 0, nleft = 0, lead_chrs = 0, lens[LBUF_SIZE / 2], states[LBUF_SIZE / 2 + 1];
+	int i = 0, nwords = 0, nstates = 0, cpos = 0, wcount = 0, over = 0;
+	int max = 0, nleft = 0, lead_chrs = 0, lens[LBUF_SIZE / 2];
+	ColorState ansi_state = color_none;
+	ColorState states[LBUF_SIZE / 2 + 1];
 	char *s = NULL, **words = NULL, *buf = NULL;
 	/**
 	 * Split apart the list. We need to find the length of each
@@ -2851,7 +3165,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 			 * If we had a previous state, we have to write it.
 			 *
 			 */
-						buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NONE), ansi_packed_to_colorstate(states[wcount]), ColorTypeAnsi, false);
+			buf = ansi_transition_colorstate(color_none, states[wcount], ColorTypeTrueColor, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 
@@ -2862,7 +3176,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 			if (lens[wcount] <= col_widths[cpos])
 			{
 				over = XSAFELBSTR(words[wcount], buff, bufc);
-								buf = ansi_transition_colorstate(ansi_packed_to_colorstate(states[wcount + 1]), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
+				buf = ansi_transition_colorstate(states[wcount + 1], color_none, ColorTypeTrueColor, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 			}
@@ -2882,7 +3196,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 				{
 					if (*s == ESC_CHAR)
 					{
-						consume_ansi_sequence_packed(&s, &ansi_state);
+						consume_ansi_sequence_state(&s, &ansi_state);
 					}
 					else
 					{
@@ -2892,7 +3206,7 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 				}
 
 				XSAFESTRNCAT(buff, bufc, words[wcount], s - words[wcount], LBUF_SIZE);
-								buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ansi_state), ansi_packed_to_colorstate(ANST_NONE), ColorTypeAnsi, false);
+				buf = ansi_transition_colorstate(ansi_state, color_none, ColorTypeTrueColor, false);
 				XSAFELBSTR(buf, buff, bufc);
 				XFREE(buf);
 			}
@@ -2989,23 +3303,25 @@ void tables_helper(char *list, int *last_state, int n_cols, int col_widths[], ch
 /**
  * @brief Draw a table
  *
- * @param player Not Used
+ * @param player DBref of player (unused)
  * @param list List to draw in table
- * @param n_cols Number of column
- * @param col_widths Column width
- * @param lead_str Leading String
- * @param trail_str Trailing String
- * @param list_sep List Separator
- * @param field_sep Field Separator
- * @param pad_char Padding char
+ * @param n_cols Number of columns
+ * @param col_widths Array of column widths
+ * @param lead_str Leading string for each row
+ * @param trail_str Trailing string for each row
+ * @param list_sep Separator between list items
+ * @param field_sep Separator between fields in items
+ * @param pad_char Padding character
  * @param buff Output buffer
  * @param bufc Output buffer tracker
- * @param just Justify table?
+ * @param just Justification flag for the table
+ *
+ * @details Formats the input list into a multi-column table with specified widths and separators.
  */
-void perform_tables(dbref player __attribute__((unused)), char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
+void perform_tables(dbref player, char *list, int n_cols, int col_widths[], char *lead_str, char *trail_str, const Delim *list_sep, const Delim *field_sep, const Delim *pad_char, char *buff, char **bufc, int just)
 {
 	char *p, *savep, *bb_p;
-	int ansi_state = ANST_NONE;
+	ColorState ansi_state = color_none;
 
 	if (!list || !*list)
 	{
@@ -3046,10 +3362,12 @@ void perform_tables(dbref player __attribute__((unused)), char *list, int n_cols
  * @param player DBref of player
  * @param caller DBref of caller
  * @param cause DBref of cause
- * @param fargs Function's arguments
+ * @param fargs Function's arguments: [0]=list, [1]=column specs, [2]=optional delimiters
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
+ *
+ * @details Parses column specifications and calls perform_tables to format the table.
  */
 void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3133,7 +3451,7 @@ void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3255,7 +3573,7 @@ void fun_table(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3272,7 +3590,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -3476,7 +3794,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3494,7 +3812,7 @@ void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -3702,7 +4020,7 @@ void fun_exclude(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_grab(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3744,7 +4062,7 @@ void fun_grab(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3758,7 +4076,7 @@ void fun_graball(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -3812,7 +4130,7 @@ void swap(char **p, char **q)
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3832,7 +4150,7 @@ void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	if (nfargs < 3)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -3869,7 +4187,7 @@ void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -3888,7 +4206,7 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs < 5)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -3898,7 +4216,8 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	}
 
-	ALLOC_LBUF_PAIR(old_list, new_list, "old_list", "new_list");
+	old_list = XMALLOC(LBUF_SIZE, "old_list");
+	new_list = XMALLOC(LBUF_SIZE, "new_list");
 	XSTRCPY(old_list, fargs[1]);
 	XSTRCPY(new_list, fargs[2]);
 	nptrs_old = list2arr(&ptrs_old, LBUF_SIZE / 2, old_list, &isep);
@@ -3947,7 +4266,8 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		}
 	} while (s);
 
-	FREE_LBUF_PAIR(old_list, new_list);
+	XFREE(old_list);
+	XFREE(new_list);
 	XFREE(ptrs_old);
 	XFREE(ptrs_new);
 }
@@ -3962,7 +4282,7 @@ void fun_ledit(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -4053,7 +4373,7 @@ void fun_itemize(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -4135,7 +4455,7 @@ void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -4161,7 +4481,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{
@@ -4173,7 +4493,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	if (nfargs < 5)
 	{
-		COPY_DELIM(gsep, osep);
+		copy_delim(&gsep, &osep);
 	}
 	else
 	{
@@ -4243,7 +4563,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -4278,7 +4598,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (nfargs < 4)
 	{
-		COPY_DELIM(cmark, omark);
+		copy_delim(&cmark, &omark);
 	}
 	else
 	{
@@ -4295,7 +4615,7 @@ void fun_tokens(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	if (nfargs < 6)
 	{
-		COPY_DELIM(osep, isep);
+		copy_delim(&osep, &isep);
 	}
 	else
 	{

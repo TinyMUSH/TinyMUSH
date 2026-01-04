@@ -21,6 +21,56 @@
 #include <ctype.h>
 #include <string.h>
 
+// ColorState constants
+static const ColorState color_normal = {
+    .foreground = { .is_set = ColorStatusReset },
+    .background = { .is_set = ColorStatusReset }
+};
+static const ColorState color_hilite = {.highlight = ColorStatusSet};
+static const ColorState color_red = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 1, .xterm_index = 196, .truecolor = {255, 0, 0}}};
+static const ColorState color_magenta = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 5, .xterm_index = 201, .truecolor = {255, 0, 255}}};
+static const ColorState color_green = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 2, .xterm_index = 46, .truecolor = {0, 255, 0}}};
+static const ColorState color_yellow = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 3, .xterm_index = 226, .truecolor = {255, 255, 0}}};
+static const ColorState color_cyan = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 6, .xterm_index = 51, .truecolor = {0, 255, 255}}};
+static const ColorState color_blue = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 4, .xterm_index = 21, .truecolor = {0, 0, 255}}};
+
+
+static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
+{
+	return memcmp(a, b, sizeof(ColorState)) == 0;
+}
+
+static void append_color_transition(const ColorState *from, const ColorState *to, ColorType type, char *buff, char **bufc)
+{
+	if (type == ColorTypeNone || colorstate_equal(from, to))
+	{
+		return;
+	}
+
+	char *seq = ansi_transition_colorstate(*from, *to, type, false);
+
+	if (seq)
+	{
+		XSAFELBSTR(seq, buff, bufc);
+		XFREE(seq);
+	}
+}
+
+static ColorState pair_color_states[5] = {
+	color_magenta,
+	color_green,
+	color_yellow,
+	color_cyan,
+	color_blue};
+
+static ColorState pair_rev_color_states[5] = {
+	{.inverse = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 5, .xterm_index = 201, .truecolor = {255, 0, 255}}}, // magenta inverse
+	{.inverse = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 2, .xterm_index = 46, .truecolor = {0, 255, 0}}},	// green inverse
+	{.inverse = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 3, .xterm_index = 226, .truecolor = {255, 255, 0}}}, // yellow inverse
+	{.inverse = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 6, .xterm_index = 51, .truecolor = {0, 255, 255}}},	// cyan inverse
+	{.inverse = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 4, .xterm_index = 21, .truecolor = {0, 0, 255}}}		// blue inverse
+};
+
 int did_attr(dbref player, dbref thing, int what)
 {
 	/*
@@ -276,14 +326,14 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 				if (Can_See(player, thing, can_see_loc))
 				{
 					buff = unparse_object(player, thing, 1);
-				if (!buff)
-				{
-					continue;
-				}
-				if (!buff)
-				{
-					continue;
-				}
+					if (!buff)
+					{
+						continue;
+					}
+					if (!buff)
+					{
+						continue;
+					}
 					html_cp = html_buff;
 
 					if (Html(player) && (mushconf.have_pueblo == 1))
@@ -341,48 +391,18 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 	}
 }
 
-char *pairColor(int color)
-{
-	switch (color)
-	{
-	case 0:
-		return ANSI_MAGENTA;
-	case 1:
-		return ANSI_GREEN;
-	case 2:
-		return ANSI_YELLOW;
-	case 3:
-		return ANSI_CYAN;
-	case 4:
-		return ANSI_BLUE;
-	default:
-		return ANSI_NORMAL;
-	}
-}
-
-char *pairRevColor(int color)
-{
-	switch (color)
-	{
-	case 0:
-		return "m53[\033";
-	case 1:
-		return "m23[\033";
-	case 2:
-		return "m33[\033";
-	case 3:
-		return "m63[\033";
-	case 4:
-		return "m43[\033";
-	default:
-		return ANSI_NORMAL;
-	}
-}
-
-void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, char **bufc)
+void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 {
 	int pos, depth;
 	char *str, *strbuf, *parenlist, *endp;
+	ColorType color_type = resolve_color_type(player, player);
+	ColorState normal = color_normal;
+	ColorState hilite_state = color_hilite;
+	ColorState red_state = color_red;
+	ColorState reverse_normal_state = {.inverse = ColorStatusSet};
+	ColorState reverse_hired_state = {.inverse = ColorStatusSet, .highlight = ColorStatusSet, .foreground = {.is_set = ColorStatusSet, .ansi_index = 1, .xterm_index = 196, .truecolor = {255, 0, 0}}}; // red fg
+
+	// pair_color_states is now statically initialized
 
 	if (!atext || !buff || !bufc)
 	{
@@ -433,9 +453,9 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 					depth--;
 					break;
 				}
-				XSAFELBSTR(pairColor(depth % 5), strbuf, &endp);
+				append_color_transition(&normal, &pair_color_states[depth % 5], color_type, strbuf, &endp);
 				XSAFELBCHR(str[pos], strbuf, &endp);
-				XSAFEANSINORMAL(strbuf, &endp);
+				append_color_transition(&pair_color_states[depth % 5], &normal, color_type, strbuf, &endp);
 			}
 			else
 			{
@@ -457,17 +477,17 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			{
 				if ((parenlist[depth] & 96) == (str[pos] & 96))
 				{
-					XSAFELBSTR(pairColor(depth % 5), strbuf, &endp);
+					append_color_transition(&normal, &pair_color_states[depth % 5], color_type, strbuf, &endp);
 					XSAFELBCHR(str[pos], strbuf, &endp);
-					XSAFEANSINORMAL(strbuf, &endp);
+					append_color_transition(&pair_color_states[depth % 5], &normal, color_type, strbuf, &endp);
 					depth--;
 				}
 				else
 				{
-					XSAFELBSTR(ANSI_HILITE, strbuf, &endp);
-					XSAFELBSTR(ANSI_RED, strbuf, &endp);
+					append_color_transition(&normal, &hilite_state, color_type, strbuf, &endp);
+					append_color_transition(&hilite_state, &red_state, color_type, strbuf, &endp);
 					XSAFELBCHR(str[pos], strbuf, &endp);
-					XSAFEANSINORMAL(strbuf, &endp);
+					append_color_transition(&red_state, &normal, color_type, strbuf, &endp);
 					*endp = '\0';
 					XSAFELBSTR(strbuf, buff, bufc);
 					XSAFELBSTR(str + pos + 1, buff, bufc);
@@ -530,9 +550,9 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			{
 				parenlist[depth] = str[pos];
 			}
-			XSAFELBSTR(ANSI_REVERSE_NORMAL, strbuf, &endp);
+			append_color_transition(&normal, &pair_rev_color_states[depth % 5], color_type, strbuf, &endp);
 			XSAFELBCHR(str[pos], strbuf, &endp);
-			XSAFELBSTR(pairRevColor(depth % 5), strbuf, &endp);
+			append_color_transition(&pair_rev_color_states[depth % 5], &normal, color_type, strbuf, &endp);
 			break;
 
 		case '(':
@@ -546,19 +566,16 @@ void pairs_print(dbref player __attribute__((unused)), char *atext, char *buff, 
 			 */
 			if (depth > 0 && (parenlist[depth] & 96) == (str[pos] & 96))
 			{
-				XSAFELBSTR(ANSI_REVERSE_NORMAL, strbuf, &endp);
+				append_color_transition(&normal, &pair_rev_color_states[depth % 5], color_type, strbuf, &endp);
 				XSAFELBCHR(str[pos], strbuf, &endp);
-				if (depth < LBUF_SIZE)
-				{
-					XSAFELBSTR(pairRevColor(depth % 5), strbuf, &endp);
-				}
+				append_color_transition(&pair_rev_color_states[depth % 5], &normal, color_type, strbuf, &endp);
 				depth--;
 			}
 			else
 			{
-				XSAFELBSTR(ANSI_REVERSE_NORMAL, strbuf, &endp);
+				append_color_transition(&normal, &reverse_hired_state, color_type, strbuf, &endp);
 				XSAFELBCHR(str[pos], strbuf, &endp);
-				XSAFELBSTR(ANSI_REVERSE_HIRED, strbuf, &endp);
+				append_color_transition(&reverse_hired_state, &normal, color_type, strbuf, &endp);
 				str[pos] = '\0';
 				XSAFELBSTR(str, buff, bufc);
 
@@ -856,6 +873,10 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		return;
 	}
 
+	ColorType color_type = resolve_color_type(player, player);
+	ColorState normal_state = color_normal;
+	ColorState hilite_state = color_hilite;
+
 	if (ap->flags & AF_IS_LOCK)
 	{
 		BOOLEXP *bexp = NULL;
@@ -903,22 +924,40 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 		{
 			if (is_special == 0)
 			{
-				XSNPRINTF(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
-				notify(player, s);
+				char *temp_buf = XMALLOC(LBUF_SIZE, "temp_buf");
+				char *tp = temp_buf;
+				append_color_transition(&normal_state, &hilite_state, color_type, temp_buf, &tp);
+				XSAFELBSTR(ap->name, temp_buf, &tp);
+				append_color_transition(&hilite_state, &normal_state, color_type, temp_buf, &tp);
+				XSAFELBSTR(": ", temp_buf, &tp);
+				XSAFELBSTR(text, temp_buf, &tp);
+				*tp = '\0';
+				notify(player, temp_buf);
+				XFREE(temp_buf);
 			}
 			else if (is_special == 1)
 			{
 				buf = XMALLOC(LBUF_SIZE, "buf");
-				XSNPRINTF(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
-				pretty_print(buf, s, text);
+				char *temp_s = XMALLOC(LBUF_SIZE, "temp_s");
+				char *sp = temp_s;
+				append_color_transition(&normal_state, &hilite_state, color_type, temp_s, &sp);
+				XSAFELBSTR(ap->name, temp_s, &sp);
+				append_color_transition(&hilite_state, &normal_state, color_type, temp_s, &sp);
+				XSAFELBSTR(": ", temp_s, &sp);
+				*sp = '\0';
+				pretty_print(buf, temp_s, text);
 				notify(player, buf);
 				XFREE(buf);
+				XFREE(temp_s);
 			}
 			else
 			{
 				buf = XMALLOC(LBUF_SIZE, "buf");
 				bp = buf;
-				XSAFESPRINTF(buf, &bp, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				append_color_transition(&normal_state, &hilite_state, color_type, buf, &bp);
+				XSAFELBSTR(ap->name, buf, &bp);
+				append_color_transition(&hilite_state, &normal_state, color_type, buf, &bp);
+				XSAFELBSTR(": ", buf, &bp);
 				pairs_print(player, text, buf, &bp);
 				*bp = '\0';
 				notify(player, buf);
@@ -1038,31 +1077,37 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 	if (is_special == 1)
 	{
+		char *temp_s = XMALLOC(LBUF_SIZE, "temp_s");
+		char *sp = temp_s;
+		append_color_transition(&normal_state, &hilite_state, color_type, temp_s, &sp);
+		XSAFELBSTR(ap->name, temp_s, &sp);
 		if ((aowner != Owner(thing)) && (aowner != NOTHING))
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+			XSAFELBSTR(" [#", temp_s, &sp);
+			char num[16];
+			XSNPRINTF(num, 16, "%d", aowner);
+			XSAFELBSTR(num, temp_s, &sp);
+			XSAFELBSTR(fbp, temp_s, &sp);
+			XSAFELBSTR("]:", temp_s, &sp);
 		}
 		else if (*fbp)
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+			XSAFELBSTR(" [", temp_s, &sp);
+			XSAFELBSTR(fbp, temp_s, &sp);
+			XSAFELBSTR("]:", temp_s, &sp);
 		}
 		else if (!skip_tag || (ap->number != A_DESC))
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+			XSAFELBSTR(":", temp_s, &sp);
 		}
-		else
-		{
-			s[0] = 0x00;
-			buf = text;
-		}
-
+		append_color_transition(&hilite_state, &normal_state, color_type, temp_s, &sp);
+		XSAFELBSTR(" ", temp_s, &sp);
+		*sp = '\0';
 		buf = XMALLOC(LBUF_SIZE, "buf");
-		if (buf)
-		{
-			pretty_print(buf, s, text);
-			notify(player, buf);
-			XFREE(buf);
-		}
+		pretty_print(buf, temp_s, text);
+		notify(player, buf);
+		XFREE(buf);
+		XFREE(temp_s);
 	}
 	else if (is_special == 2)
 	{
@@ -1073,15 +1118,31 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 
 			if ((aowner != Owner(thing)) && (aowner != NOTHING))
 			{
-				XSAFESPRINTF(buf, &bb_p, "%s%s [#%d%s]:%s ", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL);
+				char temp[16];
+				sprintf(temp, "%d", aowner);
+				append_color_transition(&normal_state, &hilite_state, color_type, buf, &bb_p);
+				XSAFELBSTR(ap->name, buf, &bb_p);
+				XSAFELBSTR(" [#", buf, &bb_p);
+				XSAFELBSTR(temp, buf, &bb_p);
+				XSAFELBSTR(fbp, buf, &bb_p);
+				XSAFELBSTR("]: ", buf, &bb_p);
+				append_color_transition(&hilite_state, &normal_state, color_type, buf, &bb_p);
 			}
 			else if (*fbp)
 			{
-				XSAFESPRINTF(buf, &bb_p, "%s%s [%s]:%s ", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL);
+				append_color_transition(&normal_state, &hilite_state, color_type, buf, &bb_p);
+				XSAFELBSTR(ap->name, buf, &bb_p);
+				XSAFELBSTR(" [", buf, &bb_p);
+				XSAFELBSTR(fbp, buf, &bb_p);
+				XSAFELBSTR("]: ", buf, &bb_p);
+				append_color_transition(&hilite_state, &normal_state, color_type, buf, &bb_p);
 			}
 			else if (!skip_tag || (ap->number != A_DESC))
 			{
-				XSAFESPRINTF(buf, &bb_p, "%s%s:%s ", ANSI_HILITE, ap->name, ANSI_NORMAL);
+				append_color_transition(&normal_state, &hilite_state, color_type, buf, &bb_p);
+				XSAFELBSTR(ap->name, buf, &bb_p);
+				XSAFELBSTR(": ", buf, &bb_p);
+				append_color_transition(&hilite_state, &normal_state, color_type, buf, &bb_p);
 			}
 			else
 			{
@@ -1098,23 +1159,43 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	}
 	else
 	{
+		char *sp = s;
 		if ((aowner != Owner(thing)) && (aowner != NOTHING))
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s [#%d%s]:%s %s", ANSI_HILITE, ap->name, aowner, fbp, ANSI_NORMAL, text);
+			char temp[16];
+			sprintf(temp, "%d", aowner);
+			append_color_transition(&normal_state, &hilite_state, color_type, s, &sp);
+			XSAFELBSTR(ap->name, s, &sp);
+			XSAFELBSTR(" [#", s, &sp);
+			XSAFELBSTR(temp, s, &sp);
+			XSAFELBSTR(fbp, s, &sp);
+			XSAFELBSTR("]: ", s, &sp);
+			append_color_transition(&hilite_state, &normal_state, color_type, s, &sp);
+			XSAFELBSTR(text, s, &sp);
 		}
 		else if (*fbp)
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s [%s]:%s %s", ANSI_HILITE, ap->name, fbp, ANSI_NORMAL, text);
+			append_color_transition(&normal_state, &hilite_state, color_type, s, &sp);
+			XSAFELBSTR(ap->name, s, &sp);
+			XSAFELBSTR(" [", s, &sp);
+			XSAFELBSTR(fbp, s, &sp);
+			XSAFELBSTR("]: ", s, &sp);
+			append_color_transition(&hilite_state, &normal_state, color_type, s, &sp);
+			XSAFELBSTR(text, s, &sp);
 		}
 		else if (!skip_tag || (ap->number != A_DESC))
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s%s:%s %s", ANSI_HILITE, ap->name, ANSI_NORMAL, text);
+			append_color_transition(&normal_state, &hilite_state, color_type, s, &sp);
+			XSAFELBSTR(ap->name, s, &sp);
+			XSAFELBSTR(": ", s, &sp);
+			append_color_transition(&hilite_state, &normal_state, color_type, s, &sp);
+			XSAFELBSTR(text, s, &sp);
 		}
 		else
 		{
-			XSNPRINTF(s, GBUF_SIZE, "%s", text);
+			XSAFELBSTR(text, s, &sp);
 		}
-
+		*sp = '\0';
 		notify(player, s);
 	}
 

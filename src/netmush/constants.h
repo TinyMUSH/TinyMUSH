@@ -1678,9 +1678,6 @@
 #define I_ANSI_NUM 48
 #define I_ANSI_LIM 50
 
-#define ANST_NORMAL 0x0099
-#define ANST_NONE 0x1099
-
 /**
  * @brief UDB Constants
  *

@@ -23,6 +23,13 @@
 #include <ctype.h>
 #include <string.h>
 
+static const ColorState color_normal = {
+    .foreground = { .is_set = ColorStatusReset },
+    .background = { .is_set = ColorStatusReset }
+};
+
+static const ColorState color_none = {0};
+
 /**
  * @brief Is every character in the argument a letter?
  *
@@ -440,33 +447,44 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * string.
  */
 
-static ColorType resolve_color_type(dbref player, dbref cause)
-{
-	dbref target = (cause != NOTHING) ? cause : player;
-
-	if (target != NOTHING && Color24Bit(target))
-	{
-		return ColorTypeTrueColor;
-	}
-
-	if (target != NOTHING && Color256(target))
-	{
-		return ColorTypeXTerm;
-	}
-
-	if (target != NOTHING && Ansi(target))
-	{
-		return ColorTypeAnsi;
-	}
-
-	return ColorTypeNone;
-}
-
+/**
+ * @brief Determine the appropriate color type based on player capabilities.
+ *
+ * Checks the player's color flags to return the highest supported color type:
+ * TrueColor if Color24Bit is set, XTerm if Color256 is set, Ansi if Ansi is set,
+ * otherwise None.
+ *
+ * @param player DBref of the player
+ * @param cause DBref of the cause (used if not NOTHING)
+ * @return ColorType The resolved color type
+ */
+/**
+ * @brief Check if two ColorState structures are equal.
+ *
+ * Compares the memory of two ColorState structs for equality.
+ *
+ * @param a Pointer to first ColorState
+ * @param b Pointer to second ColorState
+ * @return bool True if equal, false otherwise
+ */
 static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
 {
 	return memcmp(a, b, sizeof(ColorState)) == 0;
 }
 
+/**
+ * @brief Append ANSI escape sequence for color transition to buffer.
+ *
+ * Generates and appends the ANSI escape sequence needed to transition from
+ * one color state to another, based on the specified color type. Does nothing
+ * if color type is None or states are equal.
+ *
+ * @param from Pointer to source ColorState
+ * @param to Pointer to target ColorState
+ * @param type ColorType to use for the sequence
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ */
 static void append_color_transition(const ColorState *from, const ColorState *to, ColorType type, char *buff, char **bufc)
 {
 	if (type == ColorTypeNone || colorstate_equal(from, to))
@@ -483,6 +501,23 @@ static void append_color_transition(const ColorState *from, const ColorState *to
 	}
 }
 
+/**
+ * @brief Emit a range of text with appropriate color transitions.
+ *
+ * Outputs the specified range of text to the buffer, inserting ANSI escape
+ * sequences to maintain color state transitions. Handles initial and final
+ * state transitions, and skips color handling if type is None.
+ *
+ * @param text The text string
+ * @param states Array of ColorState for each character
+ * @param start Start index in the text
+ * @param end End index in the text
+ * @param initial_state Initial ColorState
+ * @param final_state Final ColorState
+ * @param type ColorType to use
+ * @param buff Output buffer
+ * @param bufc Output buffer tracker
+ */
 static void emit_colored_range(const char *text, const ColorState *states, int start, int end, ColorState initial_state, ColorState final_state, ColorType type, char *buff, char **bufc)
 {
 	if (start < 0)
@@ -525,11 +560,21 @@ static void emit_colored_range(const char *text, const ColorState *states, int s
 	}
 }
 
-static inline void consume_ansi_sequence_packed(char **cursor, int *packed_state)
+/**
+ * @brief Consume an ANSI escape sequence and update ColorState.
+ *
+ * Parses an ANSI escape sequence at the cursor position and applies it to the
+ * provided ColorState. Advances the cursor past the sequence if successful,
+ * otherwise advances by one character.
+ *
+ * @param cursor Pointer to the current position in the string
+ * @param state Pointer to ColorState to update
+ */
+static inline void consume_ansi_sequence_state(char **cursor, ColorState *state)
 {
 	const char *ptr = *cursor;
 
-	if (ansi_apply_sequence_packed(&ptr, packed_state))
+	if (ansi_apply_sequence(&ptr, state))
 	{
 		*cursor = (char *)ptr;
 	}
@@ -560,7 +605,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	ColorState *needle_states = NULL;
 	char *hay_text = NULL;
 	char *needle_text = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	ColorState zero_state = {0};
 	int match_pos = -1;
@@ -694,7 +739,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	ColorState *needle_states = NULL;
 	char *hay_text = NULL;
 	char *needle_text = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	ColorState zero_state = {0};
 	int match_pos = -1;
@@ -1350,7 +1395,7 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
 	ColorState *states = NULL;
 	char *stripped = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
@@ -1396,7 +1441,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 {
 	ColorState *states = NULL;
 	char *stripped = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
@@ -1557,7 +1602,7 @@ void fun_edit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 {
 	char *tstr = NULL;
 
-	edit_string(fargs[0], &tstr, fargs[1], fargs[2]);
+	edit_string(fargs[0], &tstr, fargs[1], fargs[2], player, cause);
 	XSAFELBSTR(tstr, buff, bufc);
 	XFREE(tstr);
 }
@@ -2217,7 +2262,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 {
 	ColorState *states = NULL;
 	char *stripped = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	int start = (int)strtol(fargs[1], (char **)NULL, 10);
 	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);
@@ -2671,7 +2716,8 @@ void fun_repeat(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *l_fill = NULL, *r_fill = NULL, *bb_p = NULL, *sl = NULL, *el = NULL, *sw = NULL, *ew = NULL, *buf = NULL;
-	int sl_ansi_state = 0, el_ansi_state = 0, sw_ansi_state = 0, ew_ansi_state = 0, sl_pos = 0;
+	ColorState sl_ansi_state = color_normal, el_ansi_state = color_normal, sw_ansi_state = color_normal, ew_ansi_state = color_normal;
+	int sl_pos = 0;
 	int el_pos = 0, sw_pos = 0, ew_pos = 0, width = 0, just = 0, nleft = 0, max = 0, lead_chrs = 0;
 
 	just = Func_Mask(JUST_TYPE);
@@ -2714,9 +2760,11 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	bb_p = *bufc;
 	sl = el = sw = NULL;
 	ew = fargs[0];
-	sl_ansi_state = el_ansi_state = ANST_NORMAL;
-	sw_ansi_state = ew_ansi_state = ANST_NORMAL;
+	sl_ansi_state = el_ansi_state = color_normal;
+	sw_ansi_state = ew_ansi_state = color_normal;
 	sl_pos = el_pos = sw_pos = ew_pos = 0;
+	ColorType color_type = resolve_color_type(player, cause);
+	const ColorState ansi_normal = color_normal;
 
 	while (1)
 	{
@@ -2729,7 +2777,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			{
 			case ESC_CHAR:
 			{
-				consume_ansi_sequence_packed(&sw, &sw_ansi_state);
+				consume_ansi_sequence_state(&sw, &sw_ansi_state);
 				--sw;
 				continue;
 			}
@@ -2804,7 +2852,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 				{
 				case ESC_CHAR:
 				{
-					consume_ansi_sequence_packed(&ew, &ew_ansi_state);
+					consume_ansi_sequence_state(&ew, &ew_ansi_state);
 					--ew;
 					continue;
 				}
@@ -2924,7 +2972,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		/*
 		 * Restore previous ansi state
 		 */
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(sl_ansi_state), ColorTypeAnsi, false);
+		buf = ansi_transition_colorstate(color_normal, sl_ansi_state, color_type, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 		/*
@@ -2934,7 +2982,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		/*
 		 * Back to ansi normal
 		 */
-		buf = ansi_transition_colorstate(ansi_packed_to_colorstate(el_ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
+		buf = ansi_transition_colorstate(el_ansi_state, color_normal, color_type, false);
 		XSAFELBSTR(buf, buff, bufc);
 		XFREE(buf);
 
@@ -3027,17 +3075,20 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
  *   - ANSI states are not supported in the widths, as they are unnecessary.
  */
 
-void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc)
+void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Delim col_sep, Delim row_sep, char *buff, char **bufc, dbref player, dbref cause)
 {
 	char *bb_p = NULL, *l_p = NULL, **xsl = NULL, **xel = NULL, **xsw = NULL, **xew = NULL;
 	char *p = NULL, *sl = NULL, *el = NULL, *sw = NULL, *ew = NULL, *buf = NULL;
-	int *xsl_a = NULL, *xel_a = NULL, *xsw_a = NULL, *xew_a = NULL;
+	ColorState *xsl_a = NULL, *xel_a = NULL, *xsw_a = NULL, *xew_a = NULL;
 	int *xsl_p = NULL, *xel_p = NULL, *xsw_p = NULL, *xew_p = NULL;
 	int *col_widths = NULL, *col_justs = NULL, *col_done = NULL;
-	int i = 0, n = 0, sl_ansi_state = 0, el_ansi_state = 0, sw_ansi_state = 0, ew_ansi_state = 0;
+	int i = 0, n = 0;
+	ColorState sl_ansi_state = {0}, el_ansi_state = {0}, sw_ansi_state = {0}, ew_ansi_state = {0};
 	int sl_pos = 0, el_pos = 0, sw_pos = 0, ew_pos = 0;
 	int width = 0, just = 0, nleft = 0, max = 0, lead_chrs = 0;
 	int n_done = 0, pending_coaright = 0;
+	const ColorState ansi_normal = color_normal;
+	const ColorType color_type = resolve_color_type(player, cause);
 	/*
 	 * Parse the column widths and justifications
 	 */
@@ -3117,10 +3168,10 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	xel = (char **)XCALLOC(n_cols, sizeof(char *), "xel");
 	xsw = (char **)XCALLOC(n_cols, sizeof(char *), "xsw");
 	xew = (char **)XCALLOC(n_cols, sizeof(char *), "xew");
-	xsl_a = (int *)XCALLOC(n_cols, sizeof(int), "xsl_a");
-	xel_a = (int *)XCALLOC(n_cols, sizeof(int), "xel_a");
-	xsw_a = (int *)XCALLOC(n_cols, sizeof(int), "xsw_a");
-	xew_a = (int *)XCALLOC(n_cols, sizeof(int), "xew_a");
+	xsl_a = (ColorState *)XCALLOC(n_cols, sizeof(ColorState), "xsl_a");
+	xel_a = (ColorState *)XCALLOC(n_cols, sizeof(ColorState), "xel_a");
+	xsw_a = (ColorState *)XCALLOC(n_cols, sizeof(ColorState), "xsw_a");
+	xew_a = (ColorState *)XCALLOC(n_cols, sizeof(ColorState), "xew_a");
 	xsl_p = (int *)XCALLOC(n_cols, sizeof(int), "xsl_p");
 	xel_p = (int *)XCALLOC(n_cols, sizeof(int), "xel_p");
 	xsw_p = (int *)XCALLOC(n_cols, sizeof(int), "xsw_p");
@@ -3131,7 +3182,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	for (i = 0; i < n_cols; i++)
 	{
 		xew[i] = data[i];
-		xsl_a[i] = xel_a[i] = xsw_a[i] = xew_a[i] = ANST_NORMAL;
+		xsl_a[i] = xel_a[i] = xsw_a[i] = xew_a[i] = ansi_normal;
 	}
 
 	bb_p = *bufc;
@@ -3239,7 +3290,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					{
 					case ESC_CHAR:
 					{
-						consume_ansi_sequence_packed(&sw, &sw_ansi_state);
+						consume_ansi_sequence_state(&sw, &sw_ansi_state);
 						--sw;
 						continue;
 					}
@@ -3325,8 +3376,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					{
 						xsl[i] = xel[i] = xsw[i] = NULL;
 						xew[i] = data[i];
-						xsl_a[i] = xel_a[i] = ANST_NORMAL;
-						xsw_a[i] = xew_a[i] = ANST_NORMAL;
+						xsl_a[i] = xel_a[i] = ansi_normal;
+						xsw_a[i] = xew_a[i] = ansi_normal;
 						xsl_p[i] = xel_p[i] = xsw_p[i] = xew_p[i] = 0;
 					}
 
@@ -3383,7 +3434,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						{
 						case ESC_CHAR:
 					{
-						consume_ansi_sequence_packed(&ew, &ew_ansi_state);
+						consume_ansi_sequence_state(&ew, &ew_ansi_state);
 						--ew;
 						continue;
 					}
@@ -3496,7 +3547,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Restore previous ansi state
 			 */
-			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(ANST_NORMAL), ansi_packed_to_colorstate(sl_ansi_state), ColorTypeAnsi, false);
+			buf = ansi_transition_colorstate(ansi_normal, sl_ansi_state, color_type, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 			/*
@@ -3506,7 +3557,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 			/*
 			 * Back to ansi normal
 			 */
-			buf = ansi_transition_colorstate(ansi_packed_to_colorstate(el_ansi_state), ansi_packed_to_colorstate(ANST_NORMAL), ColorTypeAnsi, false);
+			buf = ansi_transition_colorstate(el_ansi_state, ansi_normal, color_type, false);
 			XSAFELBSTR(buf, buff, bufc);
 			XFREE(buf);
 
@@ -3572,7 +3623,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				{
 					xsl[i] = xel[i] = xsw[i] = NULL;
 					xew[i] = data[i];
-					xsl_a[i] = xel_a[i] = xsw_a[i] = xew_a[i] = ANST_NORMAL;
+					xsl_a[i] = xel_a[i] = xsw_a[i] = xew_a[i] = ansi_normal;
 					xsl_p[i] = xel_p[i] = xsw_p[i] = xew_p[i] = 0;
 				}
 			}
@@ -3696,7 +3747,7 @@ void fun_align(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 		row_sep.str[0] = '\r';
 	}
 
-	perform_align(n_cols, raw_colstrs, fargs + 1, filler.str[0], col_sep, row_sep, buff, bufc);
+	perform_align(n_cols, raw_colstrs, fargs + 1, filler.str[0], col_sep, row_sep, buff, bufc, player, cause);
 	XFREE(raw_colstrs);
 }
 
@@ -3756,7 +3807,7 @@ void fun_lalign(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		row_sep.str[0] = '\r';
 	}
 
-	perform_align(n_cols, raw_colstrs, data, filler.str[0], col_sep, row_sep, buff, bufc);
+	perform_align(n_cols, raw_colstrs, data, filler.str[0], col_sep, row_sep, buff, bufc, player, cause);
 	XFREE(raw_colstrs);
 	XFREE(data);
 }
@@ -3835,7 +3886,7 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 {
 	ColorState *states = NULL;
 	char *stripped = NULL;
-	ColorState normal = ansi_packed_to_colorstate(ANST_NORMAL);
+	ColorState normal = color_normal;
 	ColorType color_type = resolve_color_type(player, cause);
 	int start = (int)strtol(fargs[1], (char **)NULL, 10);
 	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);

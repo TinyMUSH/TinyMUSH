@@ -1871,6 +1871,35 @@ char *color_state_to_escape(const ColorState *color, ColorType type)
 }
 
 /**
+ * @brief Safely append an ANSI reset using the ColorState pipeline.
+ */
+void xsafe_ansi_normal(char *buff, char **bufc)
+{
+    if (!buff || !bufc || !*bufc)
+    {
+        return;
+    }
+
+    ColorState reset_state = {
+        .foreground = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .background = {ColorStatusReset, 0, 0, {0, 0, 0}},
+        .reset = ColorStatusReset,
+        .flash = ColorStatusNone,
+        .highlight = ColorStatusNone,
+        .underline = ColorStatusNone,
+        .inverse = ColorStatusNone,
+    };
+
+    char seq[32];
+    size_t offset = 0;
+
+    if (to_ansi_escape_sequence(seq, sizeof(seq), &offset, &reset_state, ColorTypeAnsi) != ColorStatusNone)
+    {
+        XSAFESTRNCAT(buff, bufc, seq, offset, LBUF_SIZE);
+    }
+}
+
+/**
  * @brief Parses a %x color code and generates the corresponding ANSI escape sequence.
  *
  * Parses a color code starting from %x, advances the pointer, and generates the ANSI sequence
@@ -2114,139 +2143,6 @@ int mushcode_to_sgr(int ch)
     return 0;
 }
 
-/**
- * @brief Convert packed ANSI state to ColorState structure
- * @param packed Packed ANSI state value
- * @return ColorState structure representing the ANSI state
- */
-ColorState ansi_packed_to_colorstate(int packed)
-{
-    ColorState state = {0};
-
-    /*
-     * Legacy packed layout (string_ansi.c documentation):
-     * 0x2000 bright color flag
-     * 0x1000 no ansi
-     * 0x0800 inverse
-     * 0x0400 flash
-     * 0x0200 underline
-     * 0x0100 highlight
-     * 0x0080 default bg
-     * 0x0070 bg color bits
-     * 0x0008 default fg
-     * 0x0007 fg color bits
-     */
-
-    /* If ANSI is explicitly disabled, leave state unset. */
-    if (packed & 0x1000)
-    {
-        return state;
-    }
-
-    const bool bright = (packed & 0x2000) != 0;
-
-    /* Foreground */
-    const bool fg_default = (packed & 0x0008) != 0;
-    int fg_bits = packed & 0x0007;
-    if (!fg_default)
-    {
-        int idx = fg_bits & 0x7;
-        if (bright && idx < 8)
-        {
-            idx += 8;
-        }
-        ansi_get_color_from_index(&state, idx, false);
-    }
-    else
-    {
-        state.foreground.is_set = ColorStatusReset;
-    }
-
-    /* Background */
-    const bool bg_default = (packed & 0x0080) != 0;
-    int bg_bits = (packed >> 4) & 0x0007;
-    if (!bg_default)
-    {
-        int idx = bg_bits & 0x7;
-        if (bright && idx < 8)
-        {
-            idx += 8;
-        }
-        ansi_get_color_from_index(&state, idx, true);
-    }
-    else
-    {
-        state.background.is_set = ColorStatusReset;
-    }
-
-    /* Attributes */
-    state.highlight = (packed & 0x0100) ? ColorStatusSet : ColorStatusNone;
-    state.underline = (packed & 0x0200) ? ColorStatusSet : ColorStatusNone;
-    state.flash = (packed & 0x0400) ? ColorStatusSet : ColorStatusNone;
-    state.inverse = (packed & 0x0800) ? ColorStatusSet : ColorStatusNone;
-
-    return state;
-}
-
-/**
- * @brief Convert ColorState structure to packed ANSI state
- * @param state ColorState structure to convert
- * @return Packed ANSI state value
- */
-int ansi_colorstate_to_packed(ColorState state)
-{
-    int packed = 0;
-    bool bright = false;
-
-    /* Foreground */
-    if (state.foreground.is_set == ColorStatusSet && state.foreground.ansi_index >= 0 && state.foreground.ansi_index <= 15)
-    {
-        int idx = state.foreground.ansi_index;
-        if (idx >= 8)
-        {
-            bright = true;
-            idx -= 8;
-        }
-        packed |= (idx & 0x7);
-    }
-    else
-    {
-        packed |= 0x0008; /* default fg */
-    }
-
-    /* Background */
-    if (state.background.is_set == ColorStatusSet && state.background.ansi_index >= 0 && state.background.ansi_index <= 15)
-    {
-        int idx = state.background.ansi_index;
-        if (idx >= 8)
-        {
-            bright = true;
-            idx -= 8;
-        }
-        packed |= (idx & 0x7) << 4;
-    }
-    else
-    {
-        packed |= 0x0080; /* default bg */
-    }
-
-    if (bright)
-    {
-        packed |= 0x2000;
-    }
-
-    /* Attributes */
-    if (state.highlight == ColorStatusSet)
-        packed |= 0x0100;
-    if (state.underline == ColorStatusSet)
-        packed |= 0x0200;
-    if (state.flash == ColorStatusSet)
-        packed |= 0x0400;
-    if (state.inverse == ColorStatusSet)
-        packed |= 0x0800;
-
-    return packed;
-}
 
 ColorEntry colorDefinitions[] = {
     {"black", ColorTypeAnsi, 120, 0, 0, {0, 0, 0}, {0.000000000000000, 0.000000000000000, 0.000000000000000}},
@@ -2781,26 +2677,6 @@ bool ansi_apply_sequence(const char **ptr, ColorState *state)
     return true;
 }
 
-bool ansi_apply_sequence_packed(const char **ptr, int *packed_state)
-{
-    if (!ptr || !*ptr || !packed_state)
-    {
-        return false;
-    }
-
-    ColorState state = ansi_packed_to_colorstate(*packed_state);
-    const char *cursor = *ptr;
-
-    if (!ansi_apply_sequence(&cursor, &state))
-    {
-        return false;
-    }
-
-    *packed_state = ansi_colorstate_to_packed(state);
-    *ptr = cursor;
-    return true;
-}
-
 /**
  * @brief Convert ANSI escape sequences to mushcode or strip ANSI codes using the new ANSI API.
  *
@@ -3130,4 +3006,530 @@ ColorState ansi_parse_sequence(const char **ansi_ptr)
     }
     
     return state;
+}
+
+/*
+ * The following functions were moved from string_ansi.c to consolidate ANSI
+ * helpers in a single translation unit.
+ */
+
+static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xterm,
+                                      void (*check_space_fn)(size_t needed, void *ctx),
+                                      void (*write_fn)(const char *data, size_t len, void *ctx),
+                                      void *ctx)
+{
+    if (xterm)
+    {
+        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
+        bool has_bg = (attr->background.is_set == ColorStatusSet);
+
+        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+        {
+            if (check_space_fn)
+                check_space_fn(64, ctx);
+
+            char seq[64];
+            int seq_len = 0;
+
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+
+            if (has_fg)
+            {
+                int xterm_fg;
+                if (attr->foreground.xterm_index >= 0 && attr->foreground.xterm_index <= 255)
+                    xterm_fg = attr->foreground.xterm_index;
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    xterm_fg = closest.xterm_index;
+                }
+
+                seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "38;5;%d", xterm_fg);
+            }
+
+            if (has_bg)
+            {
+                int xterm_bg;
+                if (attr->background.xterm_index >= 0 && attr->background.xterm_index <= 255)
+                    xterm_bg = attr->background.xterm_index;
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    xterm_bg = closest.xterm_index;
+                }
+
+                if (has_fg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "48;5;%d", xterm_bg);
+            }
+
+            if (attr->reset == ColorStatusReset)
+            {
+                if (has_fg || has_bg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+            }
+
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
+
+            write_fn(seq, seq_len, ctx);
+        }
+    }
+    else if (ansi)
+    {
+        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
+        bool has_bg = (attr->background.is_set == ColorStatusSet);
+
+        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+        {
+            if (check_space_fn)
+                check_space_fn(64, ctx);
+
+            char seq[64];
+            int seq_len = 0;
+
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+
+            if (has_fg)
+            {
+                int f;
+                if (attr->foreground.ansi_index >= 0 && attr->foreground.ansi_index <= 15)
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    uint8_t idx = closest.xterm_index & 0xF;
+                    f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
+                }
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeAnsi);
+                    uint8_t a = closest.ansi_index;
+                    f = (a < 8) ? (30 + a) : (90 + (a - 8));
+                }
+                seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", f);
+            }
+
+            if (has_bg)
+            {
+                int b;
+                if (attr->background.ansi_index >= 0 && attr->background.ansi_index <= 15)
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
+                    uint8_t idx = closest.xterm_index & 0xF;
+                    b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
+                }
+                else
+                {
+                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
+                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeAnsi);
+                    uint8_t a = closest.ansi_index;
+                    b = (a < 8) ? (40 + a) : (100 + (a - 8));
+                }
+
+                if (has_fg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", b);
+            }
+
+            if (attr->reset == ColorStatusReset)
+            {
+                if (has_fg || has_bg)
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
+                else
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+            }
+
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
+
+            write_fn(seq, seq_len, ctx);
+        }
+    }
+}
+
+typedef struct LevelAnsiStreamContext
+{
+    char *buf;
+    char **p_ptr;
+    const char *end;
+    size_t flush_threshold;
+    void (*flush_fn)(const char *data, size_t len, void *ctx);
+    void *flush_ctx;
+} LevelAnsiStreamContext;
+
+static inline void flush_if_needed(char **p_ptr, char *buf, size_t flush_threshold,
+                                   void (*flush_fn)(const char *data, size_t len, void *ctx),
+                                   void *ctx)
+{
+    size_t used = (size_t)(*p_ptr - buf);
+    if (used >= flush_threshold)
+    {
+        **p_ptr = '\0';
+        flush_fn(buf, used, ctx);
+        *p_ptr = buf;
+    }
+}
+
+static void level_ansi_stream_write(const char *data, size_t len, void *ctx)
+{
+    LevelAnsiStreamContext *context = (LevelAnsiStreamContext *)ctx;
+    size_t copy_len = (len < (size_t)(context->end - *context->p_ptr)) ? len : (context->end - *context->p_ptr);
+    XMEMCPY(*context->p_ptr, data, copy_len);
+    *context->p_ptr += copy_len;
+
+    size_t used = *context->p_ptr - context->buf;
+    if (used >= context->flush_threshold)
+    {
+        **context->p_ptr = '\0';
+        context->flush_fn(context->buf, used, context->flush_ctx);
+        *context->p_ptr = context->buf;
+    }
+}
+
+static inline void ensure_buffer_space(size_t needed, char **buf, char **p, char **end, size_t *buf_size)
+{
+    size_t used = (size_t)(*p - *buf);
+    if (used + needed >= *buf_size - 1)
+    {
+        *buf_size *= 2;
+        *buf = XREALLOC(*buf, *buf_size, "buf");
+        *p = *buf + used;
+        *end = *buf + *buf_size - 1;
+    }
+}
+
+void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
+               void (*flush_fn)(const char *data, size_t len, void *ctx), void *ctx)
+{
+    char buf[8192];
+    char *p = buf;
+    char *end = buf + sizeof(buf) - 1;
+    const size_t flush_threshold = sizeof(buf) * 80 / 100;
+
+    if (!s || !*s)
+        return;
+
+    while (*s)
+    {
+        if (*s == ESC_CHAR)
+        {
+            if (truecolors)
+            {
+                const char *s_start = s;
+                s++;
+                if (*s == '[')
+                {
+                    s++;
+                    while (*s && !isalpha(*s))
+                        s++;
+                    if (*s)
+                        s++;
+                }
+
+                while (s_start < s && *s_start)
+                {
+                    *p++ = *s_start++;
+                    flush_if_needed(&p, buf, flush_threshold, flush_fn, ctx);
+                }
+            }
+            else
+            {
+                ColorState attr = ansi_parse_sequence(&s);
+
+                LevelAnsiStreamContext stream_ctx = {buf, &p, end, flush_threshold, flush_fn, ctx};
+                convert_color_to_sequence(&attr, ansi, xterm, NULL, level_ansi_stream_write, &stream_ctx);
+
+                p = *stream_ctx.p_ptr;
+            }
+        }
+        else
+        {
+            *p++ = *s++;
+            flush_if_needed(&p, buf, flush_threshold, flush_fn, ctx);
+        }
+    }
+
+    if (p > buf)
+    {
+        *p = '\0';
+        flush_fn(buf, (size_t)(p - buf), ctx);
+    }
+}
+
+char *normal_to_white(const char *raw)
+{
+    char *buf, *p;
+    const char *s = raw;
+    const char *last_pos = s;
+    size_t buf_size = LBUF_SIZE;
+
+    buf = XMALLOC(buf_size, "buf");
+    p = buf;
+
+    if (!s || !*s)
+    {
+        *p = '\0';
+        return buf;
+    }
+
+    while (*s)
+    {
+        if (*s == ESC_CHAR)
+        {
+            size_t text_len = s - last_pos;
+            if (text_len > 0)
+            {
+                ensure_buffer_space(text_len, &buf, &p, &p + buf_size - 1, &buf_size);
+                XMEMCPY(p, last_pos, text_len);
+                p += text_len;
+            }
+
+            const char *seq_start = s;
+            ColorState state = ansi_parse_sequence(&s);
+
+            if (state.reset == ColorStatusReset)
+            {
+                ColorState white_state = {0};
+                white_state.foreground.is_set = ColorStatusSet;
+                white_state.foreground.ansi_index = 7;
+                white_state.foreground.xterm_index = 7;
+                white_state.foreground.truecolor = (ColorRGB){255, 255, 255};
+
+                white_state.background = state.background;
+                white_state.highlight = state.highlight;
+                white_state.underline = state.underline;
+                white_state.flash = state.flash;
+                white_state.inverse = state.inverse;
+
+                char temp_buf[128];
+                size_t offset = 0;
+                to_ansi_escape_sequence(temp_buf, sizeof(temp_buf), &offset, &white_state, ColorTypeAnsi);
+
+                ensure_buffer_space(offset, &buf, &p, &p + buf_size - 1, &buf_size);
+                XMEMCPY(p, temp_buf, offset);
+                p += offset;
+            }
+            else
+            {
+                size_t seq_len = s - seq_start;
+                ensure_buffer_space(seq_len, &buf, &p, &p + buf_size - 1, &buf_size);
+                XMEMCPY(p, seq_start, seq_len);
+                p += seq_len;
+            }
+
+            last_pos = s;
+        }
+        else
+        {
+            s++;
+        }
+    }
+
+    size_t text_len = s - last_pos;
+    if (text_len > 0)
+    {
+        ensure_buffer_space(text_len, &buf, &p, &p + buf_size - 1, &buf_size);
+        XMEMCPY(p, last_pos, text_len);
+        p += text_len;
+    }
+
+    *p = '\0';
+    return buf;
+}
+
+void skip_esccode(char **s)
+{
+    char *p = *s + 1;
+
+    if (!*p)
+    {
+        *s = p;
+        return;
+    }
+
+    if (*p == ANSI_CSI)
+    {
+        while (*++p && (*p & 0xf0) == 0x30)
+            ;
+    }
+
+    while (*p && (*p & 0xf0) == 0x20)
+    {
+        ++p;
+    }
+
+    if (*p)
+    {
+        ++p;
+    }
+
+    *s = p;
+}
+
+static inline int fg_sgr_from_state(const ColorState *state)
+{
+    if (!state || state->foreground.is_set != ColorStatusSet)
+    {
+        return -1;
+    }
+
+    int idx = state->foreground.ansi_index;
+    if (idx >= 0 && idx < 8)
+    {
+        return 30 + idx;
+    }
+
+    if (idx >= 8 && idx < 16)
+    {
+        return 90 + (idx - 8);
+    }
+
+    return -1;
+}
+
+static inline int bg_sgr_from_state(const ColorState *state)
+{
+    if (!state || state->background.is_set != ColorStatusSet)
+    {
+        return -1;
+    }
+
+    int idx = state->background.ansi_index;
+    if (idx >= 0 && idx < 8)
+    {
+        return 40 + idx;
+    }
+
+    if (idx >= 8 && idx < 16)
+    {
+        return 100 + (idx - 8);
+    }
+
+    return -1;
+}
+
+static inline void apply_sgr_to_state(ColorState *state, int sgr)
+{
+    if (!state)
+    {
+        return;
+    }
+
+    if (sgr >= 30 && sgr <= 37)
+    {
+        int idx = sgr - 30;
+        state->foreground.is_set = ColorStatusSet;
+        state->foreground.ansi_index = idx;
+        state->foreground.xterm_index = idx;
+    }
+    else if (sgr >= 40 && sgr <= 47)
+    {
+        int idx = sgr - 40;
+        state->background.is_set = ColorStatusSet;
+        state->background.ansi_index = idx;
+        state->background.xterm_index = idx;
+    }
+}
+
+char *remap_colors(const char *s, int *cmap)
+{
+    char *buf;
+    char *bp;
+    int n;
+    buf = XMALLOC(LBUF_SIZE, "buf");
+
+    if (!s || !*s || !cmap)
+    {
+        if (s)
+        {
+            XSTRNCPY(buf, s, LBUF_SIZE - 1);
+            buf[LBUF_SIZE - 1] = '\0';
+        }
+        else
+        {
+            buf[0] = '\0';
+        }
+
+        return (buf);
+    }
+
+    bp = buf;
+
+    while (*s)
+    {
+        if (*s != ESC_CHAR)
+        {
+            XSAFELBCHR(*s, buf, &bp);
+            ++s;
+            continue;
+        }
+
+        const char *seq_start = s;
+        ColorState state = ansi_parse_sequence(&s);
+
+        if (s == seq_start)
+        {
+            XSAFELBCHR(*s, buf, &bp);
+            ++s;
+            continue;
+        }
+
+        n = fg_sgr_from_state(&state);
+        if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && cmap[n - I_ANSI_BLACK] != 0)
+        {
+            apply_sgr_to_state(&state, cmap[n - I_ANSI_BLACK]);
+        }
+
+        n = bg_sgr_from_state(&state);
+        if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && cmap[n - I_ANSI_BLACK] != 0)
+        {
+            apply_sgr_to_state(&state, cmap[n - I_ANSI_BLACK]);
+        }
+
+        char seq_buf[128];
+        size_t offset = 0;
+        ColorStatus status = to_ansi_escape_sequence(seq_buf, sizeof(seq_buf), &offset, &state, ColorTypeAnsi);
+        if (status == ColorStatusNone || offset == 0)
+        {
+            for (const char *p = seq_start; p < s; ++p)
+            {
+                XSAFELBCHR(*p, buf, &bp);
+            }
+        }
+        else
+        {
+            seq_buf[offset] = '\0';
+            XSAFELBSTR(seq_buf, buf, &bp);
+        }
+    }
+
+    return (buf);
+}
+
+ColorType resolve_color_type(dbref player, dbref cause)
+{
+	dbref target = (cause != NOTHING) ? cause : player;
+
+	if (target != NOTHING && Color24Bit(target))
+	{
+		return ColorTypeTrueColor;
+	}
+
+	if (target != NOTHING && Color256(target))
+	{
+		return ColorTypeXTerm;
+	}
+
+	if (target != NOTHING && Ansi(target))
+	{
+		return ColorTypeAnsi;
+	}
+
+	return ColorTypeNone;
 }
