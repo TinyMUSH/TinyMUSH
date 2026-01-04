@@ -1729,6 +1729,44 @@ char *trimmed_site(char *name)
 	return buff;
 }
 
+char *convert_mush_to_ansi(const char *input, ColorType type)
+{
+	char *output = XMALLOC(MBUF_SIZE, "output");
+	char *out = output;
+	const char *p = input;
+	while (*p)
+	{
+		if (*p == '%' && *(p+1) == 'x')
+		{
+			p += 2;
+			char *seq = ansi_parse_x_to_sequence((char **)&p, type);
+			if (seq)
+			{
+				size_t len = strlen(seq);
+				if (out + len < output + MBUF_SIZE - 1)
+				{
+					strcpy(out, seq);
+					out += len;
+				}
+				XFREE(seq);
+			}
+		}
+		else
+		{
+			if (out < output + MBUF_SIZE - 1)
+			{
+				*out++ = *p++;
+			}
+			else
+			{
+				p++;
+			}
+		}
+	}
+	*out = '\0';
+	return output;
+}
+
 void dump_users(DESC *e, char *match, int key)
 {
 	DESC *d;
@@ -1923,7 +1961,7 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : XSTRDUP(d->doing, "doing")));
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : convert_mush_to_ansi(d->doing, resolve_color_type(e->player, e->player))));
 					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
@@ -1935,7 +1973,7 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : XSTRDUP(d->doing, "doing")));
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : convert_mush_to_ansi(d->doing, resolve_color_type(e->player, e->player))));
 					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
