@@ -1923,24 +1923,20 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : ansi_strip_ansi(d->doing));
-					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str);
+					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
-					XFREE(doing_str);
 				}
 				else
 				{
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : ansi_strip_ansi(d->doing));
-					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str);
+					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
-					XFREE(doing_str);
 				}
 
 				queue_string(e, NULL, buf);
