@@ -1729,14 +1729,15 @@ char *trimmed_site(char *name)
 	return buff;
 }
 
-char *convert_mush_to_ansi(const char *input, ColorType type)
+char *convert_mush_to_ansi(char *input, ColorType type)
 {
 	char *output = XMALLOC(MBUF_SIZE, "output");
 	char *out = output;
-	const char *p = input;
+	char *p = input;
+	bool has_color = false;
 	while (*p)
 	{
-		if (*p == '%' && *(p+1) == 'x')
+		if (*p == '%' && tolower(*(p+1)) == 'x')
 		{
 			p += 2;
 			char *seq = ansi_parse_x_to_sequence((char **)&p, type);
@@ -1749,7 +1750,48 @@ char *convert_mush_to_ansi(const char *input, ColorType type)
 					out += len;
 				}
 				XFREE(seq);
+				has_color = true;
 			}
+		}
+		else
+		{
+			if (out < output + MBUF_SIZE - 1)
+			{
+				*out++ = *p++;
+			}
+			else
+			{
+				p++;
+			}
+		}
+	}
+	if (has_color)
+	{
+		const char *reset_seq = "\033[0m";
+		size_t reset_len = strlen(reset_seq);
+		if (out + reset_len < output + MBUF_SIZE - 1)
+		{
+			strcpy(out, reset_seq);
+			out += reset_len;
+		}
+	}
+	*out = '\0';
+	return output;
+}
+
+char *strip_mush_codes(char *input)
+{
+	char *output = XMALLOC(MBUF_SIZE, "output");
+	char *out = output;
+	char *p = input;
+	while (*p)
+	{
+		if (*p == '%' && tolower(*(p+1)) == 'x')
+		{
+			p += 2;
+			ColorState dummy;
+			bool dummy_highlight;
+			ansi_parse_single_x_code((char **)&p, &dummy, &dummy_highlight);
 		}
 		else
 		{
@@ -1961,7 +2003,8 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : convert_mush_to_ansi(d->doing, resolve_color_type(e->player, e->player))));
+					ColorType ct = resolve_color_type(e->player, e->player);
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (ct == ColorTypeNone ? strip_mush_codes(d->doing) : convert_mush_to_ansi(d->doing, ct)));
 					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
@@ -1973,7 +2016,8 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (resolve_color_type(e->player, e->player) == ColorTypeNone ? ansi_strip_ansi(d->doing) : convert_mush_to_ansi(d->doing, resolve_color_type(e->player, e->player))));
+					ColorType ct = resolve_color_type(e->player, e->player);
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : (ct == ColorTypeNone ? strip_mush_codes(d->doing) : convert_mush_to_ansi(d->doing, ct)));
 					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
