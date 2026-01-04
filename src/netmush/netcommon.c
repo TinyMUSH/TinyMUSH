@@ -2088,16 +2088,13 @@ char *sane_doing(char *arg, char *name)
 			{
 				*p = ' ';
 			}
+			else if (!isprint(*p) && !isspace(*p) && *p != ESC_CHAR)
+			{
+				*p = '?';
+			}
 		}
 
-		if (!mushconf.ansi_colors || !strchr(arg, ESC_CHAR))
-		{
-			bp = XSTRDUP(arg, "bp");
-		}
-		else
-		{
-			bp = XASPRINTF("bp", "%s%s", arg, ANSI_NORMAL);
-		}
+		bp = XSTRDUP(arg, "bp");
 	}
 	else
 	{
