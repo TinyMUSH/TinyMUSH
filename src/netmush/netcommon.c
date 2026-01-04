@@ -1923,20 +1923,24 @@ void dump_users(DESC *e, char *match, int key)
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, (d->doing == NULL ? "" : d->doing));
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : ansi_strip_ansi(d->doing));
+					XSPRINTF(buf, "%-16s%9s %4s%-3s%s\r\n", trn, tf1, tf2, flist, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
+					XFREE(doing_str);
 				}
 				else
 				{
 					char *trn = trimmed_name(d->player);
 					char *tf1 = time_format_1(mushstate.now - d->connected_at);
 					char *tf2 = time_format_2(mushstate.now - d->last_time);
-					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, (d->doing == NULL ? "" : d->doing));
+					char *doing_str = (d->doing == NULL ? XSTRDUP("", "doing") : ansi_strip_ansi(d->doing));
+					XSPRINTF(buf, "%-16s%9s %4s  %s\r\n", trn, tf1, tf2, doing_str);
 					XFREE(tf1);
 					XFREE(tf2);
 					XFREE(trn);
+					XFREE(doing_str);
 				}
 
 				queue_string(e, NULL, buf);
@@ -2002,7 +2006,7 @@ void dump_info(DESC *call_by)
  * do_colormap: Remap ANSI colors in output.
  */
 
-void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *fstr, char *tstr)
+void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 {
 	DESC *d;
 	int from_color, to_color, i, x;
@@ -2076,7 +2080,7 @@ void do_colormap(dbref player, dbref cause __attribute__((unused)), int key __at
  * Idea from R'nice@TinyTIM.
  */
 
-char *sane_doing(char *arg, char *name __attribute__((unused)))
+char *sane_doing(char *arg, char *name)
 {
 	char *p, *bp;
 
@@ -2107,7 +2111,7 @@ char *sane_doing(char *arg, char *name __attribute__((unused)))
 	return (bp);
 }
 
-void do_doing(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
+void do_doing(dbref player, dbref cause, int key, char *arg)
 {
 	DESC *d;
 	int foundany, over;
@@ -2581,7 +2585,7 @@ void logged_out_internal(DESC *d, int key, char *arg)
 	}
 }
 
-void do_command(DESC *d, char *command, int first __attribute__((unused)))
+void do_command(DESC *d, char *command, int first)
 {
 	NAMETAB *cp = NULL;
 	long begin_time = 0L, used_time = 0L;
@@ -2781,7 +2785,7 @@ void do_command(DESC *d, char *command, int first __attribute__((unused)))
 	mushstate.debug_cmd = cmdsave;
 }
 
-void logged_out(dbref player, dbref cause __attribute__((unused)), int key, char *arg)
+void logged_out(dbref player, dbref cause, int key, char *arg)
 {
 	DESC *d, *dlast;
 
@@ -3061,7 +3065,7 @@ void make_ulist(dbref player, char *buff, char **bufc)
  * make_portlist: Make a list of ports for PORTS().
  */
 
-void make_portlist(dbref player __attribute__((unused)), dbref target, char *buff, char **bufc)
+void make_portlist(dbref player, dbref target, char *buff, char **bufc)
 {
 	DESC *d, *dnext;
 	char *s = XMALLOC(MBUF_SIZE, "s");
