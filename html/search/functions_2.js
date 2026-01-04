@@ -55,8 +55,7 @@ var searchData=
   ['connmessages_52',['connMessages',['../bsd_8c.html#adddea5b90f37f8e4d967d609c7463500',1,'bsd.c']]],
   ['connreasons_53',['connReasons',['../bsd_8c.html#af396c975333b684dab35b6802a856f43',1,'bsd.c']]],
   ['convert_5fflags_54',['convert_flags',['../flags_8c.html#adbd784dfc76734416697bcf76b3a61ff',1,'flags.c']]],
-  ['copy_5fesccode_55',['copy_esccode',['../string__ansi_8c.html#ae7386d146453d3709627334d65ffe158',1,'string_ansi.c']]],
-  ['countwords_56',['countwords',['../fnhelper_8c.html#ac071f133fec26286f0be1e92592ee0ab',1,'fnhelper.c']]],
-  ['crec_5fcomp_57',['crec_comp',['../funlist_8c.html#a1b3f1fe5799b3c0ffd500f3846208074',1,'funlist.c']]],
-  ['cvtfun_58',['cvtfun',['../funmath_8c.html#a5f1c5a5d2006b37956b8961c3acbb89e',1,'funmath.c']]]
+  ['countwords_55',['countwords',['../fnhelper_8c.html#ac071f133fec26286f0be1e92592ee0ab',1,'fnhelper.c']]],
+  ['crec_5fcomp_56',['crec_comp',['../funlist_8c.html#a1b3f1fe5799b3c0ffd500f3846208074',1,'funlist.c']]],
+  ['cvtfun_57',['cvtfun',['../funmath_8c.html#a5f1c5a5d2006b37956b8961c3acbb89e',1,'funmath.c']]]
 ];

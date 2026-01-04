@@ -88,15 +88,15 @@ $(function(){ initResizable(false); });
   <div class="headertitle"><div class="title">Skeleton Module - Quick Reference Card</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md495"></a></p>
-<h1><a class="anchor" id="autotoc_md496"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md494"></a></p>
+<h1><a class="anchor" id="autotoc_md495"></a>
 Installation (manual, 2 minutes)</h1>
 <div class="fragment"><div class="line">cp -r src/modules/skeleton src/modules/mymodule</div>
 <div class="line">cd src/modules/mymodule</div>
 <div class="line">mv skeleton.h mymodule.h</div>
 <div class="line">mv skeleton.c mymodule.c</div>
 <div class="line">sed -i &#39;s/skeleton/mymodule/g&#39; mymodule.h mymodule.c CMakeLists.txt</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md497"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md496"></a>
 Essential Files</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -110,7 +110,7 @@ Essential Files</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>README.md</code>   </td><td class="markdownTableBodyNone">Quick start / full guide   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md498"></a>
+<h1><a class="anchor" id="autotoc_md497"></a>
 Module Lifecycle (mod_mymodule_)</h1>
 <div class="fragment"><div class="line"><span class="comment">// REQUIRED: Module initialization</span></div>
 <div class="line"><span class="keywordtype">void</span> mod_mymodule_init(<span class="keywordtype">void</span>)</div>
@@ -135,15 +135,15 @@ Module Lifecycle (mod_mymodule_)</h1>
 <div class="ttc" id="aconstants_8h_html_a1056b6e6b9cb73a581fe3ba3e3ca3548"><div class="ttname"><a href="constants_8h.html#a1056b6e6b9cb73a581fe3ba3e3ca3548">HT_KEYREF</a></div><div class="ttdeci">#define HT_KEYREF</div><div class="ttdef"><b>Definition</b> constants.h:1350</div></div>
 <div class="ttc" id="aconstants_8h_html_a70f52cf948e57d4338de17a52f8e1a0a"><div class="ttname"><a href="constants_8h.html#a70f52cf948e57d4338de17a52f8e1a0a">LOG_ALWAYS</a></div><div class="ttdeci">#define LOG_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:1469</div></div>
 <div class="ttc" id="aconstants_8h_html_afb416e2446a6769c9c843925dd553eef"><div class="ttname"><a href="constants_8h.html#afb416e2446a6769c9c843925dd553eef">HT_STR</a></div><div class="ttdeci">#define HT_STR</div><div class="ttdef"><b>Definition</b> constants.h:1347</div></div>
-<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:221</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md499"></a>
+<div class="ttc" id="amacros_8h_html_adba1624513b5ccddfc8bc0831f9cbf45"><div class="ttname"><a href="macros_8h.html#adba1624513b5ccddfc8bc0831f9cbf45">log_write</a></div><div class="ttdeci">#define log_write(i, p, s, f,...)</div><div class="ttdoc">Log related macros.</div><div class="ttdef"><b>Definition</b> macros.h:220</div></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md498"></a>
 Configuration (netmush.conf)</h1>
 <div class="fragment"><div class="line"># Module must be declared</div>
 <div class="line">module mymodule</div>
 <div class="line"> </div>
 <div class="line"># Configuration parameters</div>
 <div class="line">mymodule_enabled yes</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md500"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md499"></a>
 CONF Table Pattern</h1>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structconfparm.html">CONF</a> mod_mymodule_conftable[] = {</div>
 <div class="line">    {(<span class="keywordtype">char</span> *)<span class="stringliteral">&quot;mymodule_enabled&quot;</span>, <a class="code hl_function" href="conf_8c.html#a3637eed82e0dc8a7aca3d536208a691a">cf_bool</a>, <a class="code hl_define" href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a>, <a class="code hl_define" href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a>,</div>
@@ -154,7 +154,7 @@ CONF Table Pattern</h1>
 <div class="ttc" id="aconstants_8h_html_ac83d7116eca40585f086d0c0c5e02e0c"><div class="ttname"><a href="constants_8h.html#ac83d7116eca40585f086d0c0c5e02e0c">CA_PUBLIC</a></div><div class="ttdeci">#define CA_PUBLIC</div><div class="ttdoc">Command permission flags.</div><div class="ttdef"><b>Definition</b> constants.h:379</div></div>
 <div class="ttc" id="aconstants_8h_html_ae3711c84b4ca88296796e8af4df161e2"><div class="ttname"><a href="constants_8h.html#ae3711c84b4ca88296796e8af4df161e2">CA_GOD</a></div><div class="ttdeci">#define CA_GOD</div><div class="ttdef"><b>Definition</b> constants.h:380</div></div>
 <div class="ttc" id="astructconfparm_html"><div class="ttname"><a href="structconfparm.html">confparm</a></div><div class="ttdef"><b>Definition</b> typedefs.h:775</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md501"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md500"></a>
 Config Types</h2>
 <ul>
 <li><code>cf_bool</code> - Boolean (yes/no)</li>
@@ -162,21 +162,21 @@ Config Types</h2>
 <li><code>cf_string</code> - Text string</li>
 <li><code>cf_const</code> - Read-only constant</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md502"></a>
+<h2><a class="anchor" id="autotoc_md501"></a>
 Permissions</h2>
 <ul>
 <li><code>CA_GOD</code> - Gods only</li>
 <li><code>CA_ADMIN</code> - Admins</li>
 <li><code>CA_PUBLIC</code> - Everyone</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md503"></a>
+<h1><a class="anchor" id="autotoc_md502"></a>
 Naming Conventions</h1>
 <div class="fragment"><div class="line">Global variable:  mod_mymodule_&lt;name&gt;</div>
 <div class="line">Function:         mod_mymodule_&lt;action&gt;()</div>
 <div class="line">Hash table:       mod_mymodule_&lt;type&gt;_htab</div>
 <div class="line">Config:           mod_mymodule_config</div>
 <div class="line">Version:          mod_mymodule_version</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md504"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md503"></a>
 Hash Table Operations</h1>
 <div class="fragment"><div class="line"><span class="comment">// Initialize in mod_mymodule_init()</span></div>
 <div class="line">hashinit(&amp;mod_mymodule_htab, 100);</div>
@@ -218,45 +218,45 @@ Hash Table Operations</h1>
 <p>// Validate args if (nfargs &lt; 1) { XSAFELBSTR("#-1 MISSING ARG", buff, bufc); return; }</p>
 <p>// Do work XSAFESPRINTF(buff, bufc, "nfargs=%d ncargs=%d", nfargs, ncargs); log_write(LOG_ALWAYS, "MOD", "MYMOD", "Function called"); } </p><div class="fragment"><div class="line">## Build &amp; Deploy</div>
 </div><!-- fragment --><p> bash </p>
-<h1><a class="anchor" id="autotoc_md505"></a>
+<h1><a class="anchor" id="autotoc_md504"></a>
 Build</h1>
 <p>cd /home/eddy/source/TinyMUSH rm -rf build &amp;&amp; mkdir build &amp;&amp; cd build cmake .. &amp;&amp; make</p>
-<h1><a class="anchor" id="autotoc_md506"></a>
+<h1><a class="anchor" id="autotoc_md505"></a>
 Result: build/modules/mymodule.so</h1>
-<h1><a class="anchor" id="autotoc_md507"></a>
+<h1><a class="anchor" id="autotoc_md506"></a>
 Enable in config</h1>
 <p>echo "module mymodule" &gt;&gt; game/configs/netmush.conf</p>
-<h1><a class="anchor" id="autotoc_md508"></a>
+<h1><a class="anchor" id="autotoc_md507"></a>
 Restart</h1>
 <p>cd game &amp;&amp; ./netmush -D </p><div class="fragment"><div class="line">## Debug Tips</div>
 </div><!-- fragment --><p> bash </p>
-<h1><a class="anchor" id="autotoc_md509"></a>
+<h1><a class="anchor" id="autotoc_md508"></a>
 Enable debug output</h1>
-<h1><a class="anchor" id="autotoc_md510"></a>
+<h1><a class="anchor" id="autotoc_md509"></a>
 In netmush.conf: mymodule_debug 2</h1>
-<h1><a class="anchor" id="autotoc_md511"></a>
+<h1><a class="anchor" id="autotoc_md510"></a>
 Watch logs</h1>
 <p>tail -f game/logs/netmush.log</p>
-<h1><a class="anchor" id="autotoc_md512"></a>
+<h1><a class="anchor" id="autotoc_md511"></a>
 GDB debugging</h1>
 <p>gdb &ndash;args ./build/src/netmush/netmush -D (gdb) break mod_mymodule_init (gdb) run</p>
-<h1><a class="anchor" id="autotoc_md513"></a>
+<h1><a class="anchor" id="autotoc_md512"></a>
 In-game testing</h1>
 <p>@restart # To reload module </p><dl class="section version"><dt>Version</dt><dd># Check version <div class="fragment"><div class="line">## Verify Installation</div>
 </div><!-- fragment --> bash </dd></dl>
-<h1><a class="anchor" id="autotoc_md514"></a>
+<h1><a class="anchor" id="autotoc_md513"></a>
 Check module loaded</h1>
 <p>ls build/modules/mymodule.so</p>
-<h1><a class="anchor" id="autotoc_md515"></a>
+<h1><a class="anchor" id="autotoc_md514"></a>
 Check in game (if commands registered)</h1>
 <p>@mycommand</p>
-<h1><a class="anchor" id="autotoc_md516"></a>
+<h1><a class="anchor" id="autotoc_md515"></a>
 Check logs</h1>
 <p>grep "initialized" game/logs/netmush.log | tail</p>
-<h1><a class="anchor" id="autotoc_md517"></a>
+<h1><a class="anchor" id="autotoc_md516"></a>
 Check config</h1>
 <p>@config mymodule_* ```</p>
-<h2><a class="anchor" id="autotoc_md518"></a>
+<h2><a class="anchor" id="autotoc_md517"></a>
 Common Mistakes</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -278,7 +278,7 @@ Common Mistakes</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Uninitialized hash table   </td><td class="markdownTableBodyNone">Call <code>hashinit()</code> in init   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md519"></a>
+<h2><a class="anchor" id="autotoc_md518"></a>
 File Size Reference</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -294,7 +294,7 @@ File Size Reference</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Skeleton template   </td><td class="markdownTableBodyNone">~150   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md520"></a>
+<h2><a class="anchor" id="autotoc_md519"></a>
 Next Steps</h2>
 <ol type="1">
 <li><b>Customize</b> - Edit <code>mymodule.h</code> and <code>mymodule.c</code></li>
@@ -303,7 +303,7 @@ Next Steps</h2>
 <li><b>Optimize</b> - Profile and improve performance</li>
 <li><b>Publish</b> - Share with TinyMUSH community</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md521"></a>
+<h2><a class="anchor" id="autotoc_md520"></a>
 Resources</h2>
 <ul>
 <li>📖 Full docs: <code>docs/MODULES_DEVELOPMENT.md</code></li>

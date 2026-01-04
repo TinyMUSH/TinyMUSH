@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['tables_5fhelper_0',['tables_helper',['../funlist_8c.html#a13d2f3430e7204839819a9de70ac6788',1,'funlist.c']]],
+  ['tables_5fhelper_0',['tables_helper',['../funlist_8c.html#ad6e7f7ec7db9654cb135bc77e8f93a19',1,'funlist.c']]],
   ['tcache_5finit_1',['tcache_init',['../eval_8c.html#a0b18175ff6864ef4ebe687994ebe0740',1,'eval.c']]],
   ['test_5fatr_2',['test_atr',['../boolexp_8c.html#a82c787e0e4c1b3dd958c71c8393610ff',1,'boolexp.c']]],
   ['tf_5fclose_3',['tf_close',['../db_8c.html#ac9711a0bcc02328436b1af52b7509eb8',1,'db.c']]],
@@ -16,7 +16,7 @@ var searchData=
   ['tobasex_13',['toBaseX',['../funmath_8c.html#a42e8f0cc3ed47a987ab43a39bc8b2efb',1,'funmath.c']]],
   ['total_5frawmemory_14',['total_rawmemory',['../alloc_8c.html#a61a069393801244ea12e6842c8661650',1,'alloc.c']]],
   ['transform_5fsay_15',['transform_say',['../funobj_8c.html#ae6283b2ec79e202fc1ee8c579bb9b584',1,'funobj.c']]],
-  ['translate_5fstring_16',['translate_string',['../string__ansi_8c.html#a7c959da9b63ab40192131e651ace565b',1,'string_ansi.c']]],
+  ['translate_5fstring_5fansi_16',['translate_string_ansi',['../ansi_8c.html#a7e5d2f2d347f09a618a3e8685120cfb3',1,'ansi.c']]],
   ['trim_5fspace_5fsep_17',['trim_space_sep',['../fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f',1,'fnhelper.c']]],
   ['trim_5fspaces_18',['trim_spaces',['../string__util_8c.html#a7afee6b95bb618b82165e79f6149cd92',1,'string_util.c']]]
 ];

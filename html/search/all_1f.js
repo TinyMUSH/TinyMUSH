@@ -46,7 +46,7 @@ var searchData=
   ['up_20my_20database_43',['How do I back up my database?',['../md_docs_2Historical_2FAQ.html#autotoc_md345',1,'']]],
   ['upcasestr_44',['upcasestr',['../string__util_8c.html#af968a3f1c8e90d1b5d9f0fd6d6cb395a',1,'string_util.c']]],
   ['updated_20in_20the_20future_20center_45',['UPDATED IN THE FUTURE center',['../md_docs_2Historical_2CONVERTING.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2FAQ.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;'],['../md_docs_2Historical_2MODULES.html',1,'&lt;center&gt;WARNING&lt;br&gt;&lt;br&gt;THIS FILE IS OUTDATED AND WILL BE UPDATED IN THE FUTURE&lt;/center&gt;']]],
-  ['updates_46',['Server Security Updates',['../md_SECURITY.html#autotoc_md487',1,'']]],
+  ['updates_46',['Server Security Updates',['../md_SECURITY.html#autotoc_md486',1,'']]],
   ['upgrade_20or_20bugfix_47',['How do I apply a patch upgrade or bugfix?',['../md_docs_2Historical_2FAQ.html#autotoc_md347',1,'']]],
   ['upgrade_5fflags_48',['upgrade_flags',['../db__rw_8c.html#a748779c1770afe9b83673780bf385583',1,'db_rw.c']]],
   ['upgrading_49',['Upgrading',['../md_INSTALL.html#autotoc_md411',1,'']]],
@@ -57,7 +57,7 @@ var searchData=
   ['use_20the_20in_20memory_20database_54',['How do I use the in-memory database?',['../md_docs_2Historical_2FAQ.html#autotoc_md354',1,'']]],
   ['use_5fglobal_5faconn_55',['use_global_aconn',['../structconfdata.html#a49b3d16b2e5cdb6adad4853a81df12dc',1,'confdata']]],
   ['use_5fhostname_56',['use_hostname',['../structconfdata.html#afdc92b90bd7822fe6ac9b333f8e87b9c',1,'confdata']]],
-  ['user_20administrator_20resources_57',['User &amp; Administrator Resources',['../md_README.html#autotoc_md463',1,'']]],
+  ['user_20administrator_20resources_57',['User &amp; Administrator Resources',['../md_README.html#autotoc_md462',1,'']]],
   ['user_5fattribute_58',['user_attribute',['../structuser__attribute.html',1,'']]],
   ['using_20ninja_20faster_20builds_59',['Using Ninja (Faster Builds)',['../md_INSTALL.html#autotoc_md391',1,'']]]
 ];

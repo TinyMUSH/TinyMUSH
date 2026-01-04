@@ -179,8 +179,6 @@ Macros</h2></td></tr>
 <tr class="separator:aa0f36bd899f537fb2d10b5bdd7a8a622"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac11126c9ede8cc4e1411126ec6f1a391" id="r_ac11126c9ede8cc4e1411126ec6f1a391"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac11126c9ede8cc4e1411126ec6f1a391">XSAFECRLF</a>(b,  p)</td></tr>
 <tr class="separator:ac11126c9ede8cc4e1411126ec6f1a391"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f848e78aa0dba55299d330d30aab4cf" id="r_a9f848e78aa0dba55299d330d30aab4cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f848e78aa0dba55299d330d30aab4cf">XSAFEANSINORMAL</a>(b,  p)</td></tr>
-<tr class="separator:a9f848e78aa0dba55299d330d30aab4cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6714102b8ead72f333cbe7f2c1f62686" id="r_a6714102b8ead72f333cbe7f2c1f62686"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6714102b8ead72f333cbe7f2c1f62686">XSAFENOTHING</a>(b,  p)</td></tr>
 <tr class="separator:a6714102b8ead72f333cbe7f2c1f62686"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6518091ea2adf88a1f42d3264ec69e65" id="r_a6518091ea2adf88a1f42d3264ec69e65"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6518091ea2adf88a1f42d3264ec69e65">XSAFENOPERM</a>(b,  p)</td></tr>
@@ -994,7 +992,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a></div>
-<div class="ttc" id="adb_8c_html_afa59f9d74d56d56612477dd8335420f0"><div class="ttname"><a href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a></div><div class="ttdeci">OBJ * db</div><div class="ttdef"><b>Definition</b> db.c:38</div></div>
+<div class="ttc" id="adb_8c_html_afa59f9d74d56d56612477dd8335420f0"><div class="ttname"><a href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a></div><div class="ttdeci">OBJ * db</div><div class="ttdef"><b>Definition</b> db.c:41</div></div>
 <div class="ttc" id="astructobject_html_a7733e6f1fbd45a36ee221de29488dcd7"><div class="ttname"><a href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">object::last_access</a></div><div class="ttdeci">time_t last_access</div><div class="ttdef"><b>Definition</b> typedefs.h:168</div></div>
 </div><!-- fragment -->
 </div>
@@ -1468,7 +1466,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!(((p) == (x)) || isExit(x) || (mushconf.<a class="code hl_variable" href="structconfdata.html#a23c58f69fa82c8a79ddb93163a1a30b9">dark_sleepers</a> &amp;&amp; isPlayer(x) &amp;&amp; !Connected(x) &amp;&amp; !Puppet(x))) &amp;&amp; ((l) ? <a class="code hl_define" href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a>(p, x) : Sees_In_Dark(p, x)) &amp;&amp; ((!Unreal(x) || Check_Known(p, x)) &amp;&amp; (!Unreal(p) || Check_Knows(x, p))))</div>
-<div class="ttc" id="amacros_8h_html_ad87d11259673043b3eac817d49ba8d2d"><div class="ttname"><a href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a></div><div class="ttdeci">#define Sees(p, x)</div><div class="ttdoc">For an object in a room, don't show if all of the following apply: Sleeping players should not be see...</div><div class="ttdef"><b>Definition</b> macros.h:487</div></div>
+<div class="ttc" id="amacros_8h_html_ad87d11259673043b3eac817d49ba8d2d"><div class="ttname"><a href="#ad87d11259673043b3eac817d49ba8d2d">Sees</a></div><div class="ttdeci">#define Sees(p, x)</div><div class="ttdoc">For an object in a room, don't show if all of the following apply: Sleeping players should not be see...</div><div class="ttdef"><b>Definition</b> macros.h:486</div></div>
 <div class="ttc" id="astructconfdata_html_a23c58f69fa82c8a79ddb93163a1a30b9"><div class="ttname"><a href="structconfdata.html#a23c58f69fa82c8a79ddb93163a1a30b9">confdata::dark_sleepers</a></div><div class="ttdeci">int dark_sleepers</div><div class="ttdef"><b>Definition</b> typedefs.h:930</div></div>
 </div><!-- fragment -->
 </div>
@@ -1497,7 +1495,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(!<a class="code hl_define" href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a>(p, x) &amp;&amp; (!(l) || Light(x)) &amp;&amp; ((!Unreal(x) || Check_Known(p, x)) &amp;&amp; (!Unreal(p) || Check_Knows(x, p))))</div>
-<div class="ttc" id="amacros_8h_html_a59479cf48f8ef73d4abf7419e813826b"><div class="ttname"><a href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a></div><div class="ttdeci">#define Darkened(p, x)</div><div class="ttdoc">An object is considered Darkened if: It is set Dark. It does not have a DarkLock set (no HAS_DARKLOCK...</div><div class="ttdef"><b>Definition</b> macros.h:475</div></div>
+<div class="ttc" id="amacros_8h_html_a59479cf48f8ef73d4abf7419e813826b"><div class="ttname"><a href="#a59479cf48f8ef73d4abf7419e813826b">Darkened</a></div><div class="ttdeci">#define Darkened(p, x)</div><div class="ttdoc">An object is considered Darkened if: It is set Dark. It does not have a DarkLock set (no HAS_DARKLOCK...</div><div class="ttdef"><b>Definition</b> macros.h:474</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2131,7 +2129,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f">trim_space_sep</a>((x), &amp;SPACE_DELIM)</div>
-<div class="ttc" id="afnhelper_8c_html_a5a809e71711dc8b32329e666f94d533f"><div class="ttname"><a href="fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f">trim_space_sep</a></div><div class="ttdeci">char * trim_space_sep(char *str, const Delim *sep)</div><div class="ttdoc">Trim off leading and trailing spaces if the separator char is a space.</div><div class="ttdef"><b>Definition</b> fnhelper.c:45</div></div>
+<div class="ttc" id="afnhelper_8c_html_a5a809e71711dc8b32329e666f94d533f"><div class="ttname"><a href="fnhelper_8c.html#a5a809e71711dc8b32329e666f94d533f">trim_space_sep</a></div><div class="ttdeci">char * trim_space_sep(char *str, const Delim *sep)</div><div class="ttdoc">Trim off leading and trailing spaces if the separator char is a space.</div><div class="ttdef"><b>Definition</b> fnhelper.c:47</div></div>
 </div><!-- fragment --><p>Trim spaces. </p>
 
 </div>
@@ -2273,7 +2271,7 @@ Macros</h2></td></tr>
 <div class="ttc" id="aconstants_8h_html_a4033ec224f472d23b46ce2e98f2a8fc4"><div class="ttname"><a href="constants_8h.html#a4033ec224f472d23b46ce2e98f2a8fc4">VE_LOC_XAM</a></div><div class="ttdeci">#define VE_LOC_XAM</div><div class="ttdef"><b>Definition</b> constants.h:1000</div></div>
 <div class="ttc" id="aconstants_8h_html_a5b5463d8ce30b6847624f83e31e1d43e"><div class="ttname"><a href="constants_8h.html#a5b5463d8ce30b6847624f83e31e1d43e">VE_LOC_DARK</a></div><div class="ttdeci">#define VE_LOC_DARK</div><div class="ttdef"><b>Definition</b> constants.h:1001</div></div>
 <div class="ttc" id="aconstants_8h_html_aca3af353b90dcf7d025783af9ea24d46"><div class="ttname"><a href="constants_8h.html#aca3af353b90dcf7d025783af9ea24d46">VE_BASE_DARK</a></div><div class="ttdeci">#define VE_BASE_DARK</div><div class="ttdef"><b>Definition</b> constants.h:1002</div></div>
-<div class="ttc" id="amacros_8h_html_af7278a8d1f533745474c572e695183e3"><div class="ttname"><a href="#af7278a8d1f533745474c572e695183e3">Examinable</a></div><div class="ttdeci">#define Examinable(p, x)</div><div class="ttdoc">Visibility constraints.</div><div class="ttdef"><b>Definition</b> macros.h:463</div></div>
+<div class="ttc" id="amacros_8h_html_af7278a8d1f533745474c572e695183e3"><div class="ttname"><a href="#af7278a8d1f533745474c572e695183e3">Examinable</a></div><div class="ttdeci">#define Examinable(p, x)</div><div class="ttdoc">Visibility constraints.</div><div class="ttdef"><b>Definition</b> macros.h:462</div></div>
 </div><!-- fragment -->
 <p>For exits visible (for lexits(), etc.), this is true if we can examine the exit's location, examine the exit, or the exit is LIGHT. It is also true if neither the location or base or exit is dark. </p>
 
@@ -2523,7 +2521,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((x) == <a class="code hl_define" href="#a184c03f515a6a03f9e9b77b08cd1bce8">GOD</a>)</div>
-<div class="ttc" id="amacros_8h_html_a184c03f515a6a03f9e9b77b08cd1bce8"><div class="ttname"><a href="#a184c03f515a6a03f9e9b77b08cd1bce8">GOD</a></div><div class="ttdeci">#define GOD</div><div class="ttdoc">Flags related macros.</div><div class="ttdef"><b>Definition</b> macros.h:258</div></div>
+<div class="ttc" id="amacros_8h_html_a184c03f515a6a03f9e9b77b08cd1bce8"><div class="ttname"><a href="#a184c03f515a6a03f9e9b77b08cd1bce8">GOD</a></div><div class="ttdeci">#define GOD</div><div class="ttdoc">Flags related macros.</div><div class="ttdef"><b>Definition</b> macros.h:257</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3528,7 +3526,7 @@ Macros</h2></td></tr>
 <div class="ttc" id="aconstants_8h_html_a4865a7e9a5eaea541eeca0725d278ac9"><div class="ttname"><a href="constants_8h.html#a4865a7e9a5eaea541eeca0725d278ac9">CA_LOCATION</a></div><div class="ttdeci">#define CA_LOCATION</div><div class="ttdef"><b>Definition</b> constants.h:418</div></div>
 <div class="ttc" id="aconstants_8h_html_a6068ee067395d4b22afa7da289ed5d3f"><div class="ttname"><a href="constants_8h.html#a6068ee067395d4b22afa7da289ed5d3f">CA_PLAYER</a></div><div class="ttdeci">#define CA_PLAYER</div><div class="ttdef"><b>Definition</b> constants.h:420</div></div>
 <div class="ttc" id="aconstants_8h_html_af6f83b57554c791ba6b55f447e01c8cd"><div class="ttname"><a href="constants_8h.html#af6f83b57554c791ba6b55f447e01c8cd">CA_CONTENTS</a></div><div class="ttdeci">#define CA_CONTENTS</div><div class="ttdef"><b>Definition</b> constants.h:419</div></div>
-<div class="ttc" id="amacros_8h_html_a84c28f3280173bc5457089f1246cbcb7"><div class="ttname"><a href="#a84c28f3280173bc5457089f1246cbcb7">Protect</a></div><div class="ttdeci">#define Protect(f)</div><div class="ttdef"><b>Definition</b> macros.h:248</div></div>
+<div class="ttc" id="amacros_8h_html_a84c28f3280173bc5457089f1246cbcb7"><div class="ttname"><a href="#a84c28f3280173bc5457089f1246cbcb7">Protect</a></div><div class="ttdeci">#define Protect(f)</div><div class="ttdef"><b>Definition</b> macros.h:247</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3568,7 +3566,7 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">((!<a class="code hl_define" href="#af7278a8d1f533745474c572e695183e3">Examinable</a>(p, x) &amp;&amp; (Owner(p) != o)) || ((<a class="code hl_define" href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a>(a, f) &amp; <a class="code hl_define" href="constants_8h.html#a06bde7d693d38f888bc26f6142a36bd2">AF_MDARK</a>) &amp;&amp; !Sees_Hidden_Attrs(p)) || ((<a class="code hl_define" href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a>(a, f) &amp; <a class="code hl_define" href="constants_8h.html#af6c2aa55a0cb486d0ad69e469419d0d4">AF_DARK</a>) &amp;&amp; !God(p)))</div>
 <div class="ttc" id="aconstants_8h_html_a06bde7d693d38f888bc26f6142a36bd2"><div class="ttname"><a href="constants_8h.html#a06bde7d693d38f888bc26f6142a36bd2">AF_MDARK</a></div><div class="ttdeci">#define AF_MDARK</div><div class="ttdef"><b>Definition</b> constants.h:50</div></div>
 <div class="ttc" id="aconstants_8h_html_af6c2aa55a0cb486d0ad69e469419d0d4"><div class="ttname"><a href="constants_8h.html#af6c2aa55a0cb486d0ad69e469419d0d4">AF_DARK</a></div><div class="ttdeci">#define AF_DARK</div><div class="ttdef"><b>Definition</b> constants.h:48</div></div>
-<div class="ttc" id="amacros_8h_html_a6c759018f34f1e60012e739410cab312"><div class="ttname"><a href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a></div><div class="ttdeci">#define AttrFlags(a, f)</div><div class="ttdoc">Attribute visibility and write permissions.</div><div class="ttdef"><b>Definition</b> macros.h:554</div></div>
+<div class="ttc" id="amacros_8h_html_a6c759018f34f1e60012e739410cab312"><div class="ttname"><a href="#a6c759018f34f1e60012e739410cab312">AttrFlags</a></div><div class="ttdeci">#define AttrFlags(a, f)</div><div class="ttdoc">Attribute visibility and write permissions.</div><div class="ttdef"><b>Definition</b> macros.h:553</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3616,7 +3614,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_define" href="#a5a9125b3554caafd40bac9fe4b4ee1a3">IS</a>(i, TYPE_GARBAGE, <a class="code hl_define" href="constants_8h.html#a6300abce54abf88160f8f1cc0887208f">GOING</a>) &amp;&amp; (Location(i) == <a class="code hl_define" href="constants_8h.html#aad4a7ebff687dc5228cc3fd4d25067f2">NOTHING</a>) &amp;&amp; (Contents(i) == <a class="code hl_define" href="constants_8h.html#aad4a7ebff687dc5228cc3fd4d25067f2">NOTHING</a>) &amp;&amp; (Exits(i) == <a class="code hl_define" href="constants_8h.html#aad4a7ebff687dc5228cc3fd4d25067f2">NOTHING</a>) &amp;&amp; (Next(i) == <a class="code hl_define" href="constants_8h.html#aad4a7ebff687dc5228cc3fd4d25067f2">NOTHING</a>) &amp;&amp; (Owner(i) == <a class="code hl_define" href="#a184c03f515a6a03f9e9b77b08cd1bce8">GOD</a>))</div>
-<div class="ttc" id="amacros_8h_html_a5a9125b3554caafd40bac9fe4b4ee1a3"><div class="ttname"><a href="#a5a9125b3554caafd40bac9fe4b4ee1a3">IS</a></div><div class="ttdeci">#define IS(thing, type, flag)</div><div class="ttdef"><b>Definition</b> macros.h:319</div></div>
+<div class="ttc" id="amacros_8h_html_a5a9125b3554caafd40bac9fe4b4ee1a3"><div class="ttname"><a href="#a5a9125b3554caafd40bac9fe4b4ee1a3">IS</a></div><div class="ttdeci">#define IS(thing, type, flag)</div><div class="ttdef"><b>Definition</b> macros.h:318</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4601,7 +4599,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">notify_check(p, p, <a class="code hl_define" href="constants_8h.html#aa3a8005ada88b76cc20209b5661139d9">MSG_PUP_ALWAYS</a> | <a class="code hl_define" href="#a49aeae0a70b01e87c302cc6d93be7825">MSG_ME_ALL</a> | MSG_F_DOWN, NULL, m, ##__VA_ARGS__)</div>
 <div class="ttc" id="aconstants_8h_html_aa3a8005ada88b76cc20209b5661139d9"><div class="ttname"><a href="constants_8h.html#aa3a8005ada88b76cc20209b5661139d9">MSG_PUP_ALWAYS</a></div><div class="ttdeci">#define MSG_PUP_ALWAYS</div><div class="ttdef"><b>Definition</b> constants.h:787</div></div>
-<div class="ttc" id="amacros_8h_html_a49aeae0a70b01e87c302cc6d93be7825"><div class="ttname"><a href="#a49aeae0a70b01e87c302cc6d93be7825">MSG_ME_ALL</a></div><div class="ttdeci">#define MSG_ME_ALL</div><div class="ttdoc">Messages related macros.</div><div class="ttdef"><b>Definition</b> macros.h:213</div></div>
+<div class="ttc" id="amacros_8h_html_a49aeae0a70b01e87c302cc6d93be7825"><div class="ttname"><a href="#a49aeae0a70b01e87c302cc6d93be7825">MSG_ME_ALL</a></div><div class="ttdeci">#define MSG_ME_ALL</div><div class="ttdoc">Messages related macros.</div><div class="ttdef"><b>Definition</b> macros.h:212</div></div>
 </div><!-- fragment --><p>A zillion ways to notify things. </p>
 
 </div>
@@ -5161,7 +5159,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_function" href="db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a>(p, x))</div>
-<div class="ttc" id="adb_8c_html_ac88f57aa95b0fd622fc4a1ec2f64a594"><div class="ttname"><a href="db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a></div><div class="ttdeci">bool check_zone(dbref player, dbref thing)</div><div class="ttdoc">checks back through a zone tree for control</div><div class="ttdef"><b>Definition</b> db.c:3781</div></div>
+<div class="ttc" id="adb_8c_html_ac88f57aa95b0fd622fc4a1ec2f64a594"><div class="ttname"><a href="db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a></div><div class="ttdeci">bool check_zone(dbref player, dbref thing)</div><div class="ttdoc">checks back through a zone tree for control</div><div class="ttdef"><b>Definition</b> db.c:3763</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6122,7 +6120,7 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_define" href="#a750c9742a07088956043790c5d49a889">s_Location</a>(t, n)</div>
-<div class="ttc" id="amacros_8h_html_a750c9742a07088956043790c5d49a889"><div class="ttname"><a href="#a750c9742a07088956043790c5d49a889">s_Location</a></div><div class="ttdeci">#define s_Location(t, n)</div><div class="ttdoc">If we modify something on the db object that needs to be written at dump time, set the object DIRTY.</div><div class="ttdef"><b>Definition</b> macros.h:133</div></div>
+<div class="ttc" id="amacros_8h_html_a750c9742a07088956043790c5d49a889"><div class="ttname"><a href="#a750c9742a07088956043790c5d49a889">s_Location</a></div><div class="ttdeci">#define s_Location(t, n)</div><div class="ttdoc">If we modify something on the db object that needs to be written at dump time, set the object DIRTY.</div><div class="ttdef"><b>Definition</b> macros.h:132</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -8481,30 +8479,6 @@ than", not right shift):</p>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a9f848e78aa0dba55299d330d30aab4cf" name="a9f848e78aa0dba55299d330d30aab4cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f848e78aa0dba55299d330d30aab4cf">&#9670;&#160;</a></span>XSAFEANSINORMAL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define XSAFEANSINORMAL</td>
-          <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>b</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>p</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a3d7676d25de1ebac84446bdc833b9eea">__xsafestrncat</a>(b, p, ANSI_NORMAL, strlen(ANSI_NORMAL), <a class="code hl_define" href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a> - 1)</div>
-<div class="ttc" id="aalloc_8c_html_a3d7676d25de1ebac84446bdc833b9eea"><div class="ttname"><a href="alloc_8c.html#a3d7676d25de1ebac84446bdc833b9eea">__xsafestrncat</a></div><div class="ttdeci">size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)</div><div class="ttdoc">Concatenate two string with at most n character from src and update the position pointer to the end o...</div><div class="ttdef"><b>Definition</b> alloc.c:1461</div></div>
-<div class="ttc" id="aconstants_8h_html_a5f9bfff70bfa4747437d8320ccfa045a"><div class="ttname"><a href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a></div><div class="ttdeci">#define LBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:18</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="abd89c70eb45b35bf283004c4a5a0fcfa" name="abd89c70eb45b35bf283004c4a5a0fcfa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abd89c70eb45b35bf283004c4a5a0fcfa">&#9670;&#160;</a></span>XSAFEBOOL</h2>
 
@@ -8530,6 +8504,7 @@ than", not right shift):</p>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a20c26818e6d772f62fbb5c5a5c8ca23d">__xsafestrcatchr</a>((b), (p), ((n) ? <span class="charliteral">&#39;1&#39;</span> : <span class="charliteral">&#39;0&#39;</span>), <a class="code hl_define" href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a> - 1)</div>
 <div class="ttc" id="aalloc_8c_html_a20c26818e6d772f62fbb5c5a5c8ca23d"><div class="ttname"><a href="alloc_8c.html#a20c26818e6d772f62fbb5c5a5c8ca23d">__xsafestrcatchr</a></div><div class="ttdeci">int __xsafestrcatchr(char *dest, char **destp, char c, size_t size)</div><div class="ttdoc">Copy char 'c' to dest and update the position pointer to the end of the destination buffer.</div><div class="ttdef"><b>Definition</b> alloc.c:1425</div></div>
+<div class="ttc" id="aconstants_8h_html_a5f9bfff70bfa4747437d8320ccfa045a"><div class="ttname"><a href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a></div><div class="ttdeci">#define LBUF_SIZE</div><div class="ttdef"><b>Definition</b> constants.h:18</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -8584,6 +8559,7 @@ than", not right shift):</p>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a3d7676d25de1ebac84446bdc833b9eea">__xsafestrncat</a>(b, p, <span class="stringliteral">&quot;\r\n&quot;</span>, 2, <a class="code hl_define" href="constants_8h.html#a5f9bfff70bfa4747437d8320ccfa045a">LBUF_SIZE</a> - 1)</div>
+<div class="ttc" id="aalloc_8c_html_a3d7676d25de1ebac84446bdc833b9eea"><div class="ttname"><a href="alloc_8c.html#a3d7676d25de1ebac84446bdc833b9eea">__xsafestrncat</a></div><div class="ttdeci">size_t __xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)</div><div class="ttdoc">Concatenate two string with at most n character from src and update the position pointer to the end o...</div><div class="ttdef"><b>Definition</b> alloc.c:1461</div></div>
 </div><!-- fragment -->
 </div>
 </div>
