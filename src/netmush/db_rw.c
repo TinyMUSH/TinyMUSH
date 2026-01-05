@@ -776,6 +776,7 @@ void fix_mux_zones(void)
 			if (astr)
 			{
 				atr_add_raw(i, A_LCONTROL, astr);
+				XFREE(astr);
 			}
 		}
 	}
@@ -800,30 +801,37 @@ void fix_typed_quotas(void)
 	 * new quotas, and then delete the old attributes.
 	 *
 	 */
-	char *qbuf = NULL, *rqbuf = NULL;
+	char *qbuf_raw = NULL, *rqbuf_raw = NULL;
+	const char *qbuf = NULL;
+	const char *rqbuf = NULL;
 	char *s = XMALLOC(LBUF_SIZE, "s");
 
 	for (int i = 0; i < mushstate.db_top; i++)
 	{
 		if (isPlayer(i))
 		{
-			qbuf = atr_get_raw(i, A_QUOTA);
-			rqbuf = atr_get_raw(i, A_RQUOTA);
+			qbuf_raw = atr_get_raw(i, A_QUOTA);
+			rqbuf_raw = atr_get_raw(i, A_RQUOTA);
 
-			if (!qbuf || !*qbuf)
-			{
-				qbuf = (char *)"1";
-			}
-
-			if (!rqbuf || !*rqbuf)
-			{
-				rqbuf = (char *)"0";
-			}
+			qbuf = (qbuf_raw && *qbuf_raw) ? qbuf_raw : "1";
+			rqbuf = (rqbuf_raw && *rqbuf_raw) ? rqbuf_raw : "0";
 
 			XSNPRINTF(s, LBUF_SIZE, "%s %s %s %s %s", qbuf, qbuf, qbuf, qbuf, qbuf);
 			atr_add_raw(i, A_QUOTA, s);
 			XSNPRINTF(s, LBUF_SIZE, "%s %s %s %s %s", rqbuf, rqbuf, rqbuf, rqbuf, rqbuf);
 			atr_add_raw(i, A_RQUOTA, s);
+
+			if (qbuf_raw)
+			{
+				XFREE(qbuf_raw);
+				qbuf_raw = NULL;
+			}
+
+			if (rqbuf_raw)
+			{
+				XFREE(rqbuf_raw);
+				rqbuf_raw = NULL;
+			}
 		}
 	}
 	XFREE(s);
@@ -1765,6 +1773,11 @@ int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)),
 			}
 
 			putstring(f, got);
+
+			if (got)
+			{
+				XFREE(got);
+			}
 		}
 	}
 

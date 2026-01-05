@@ -3622,6 +3622,12 @@ size_t mem_usage(dbref thing)
 			k += strlen(str);
 		}
 
+		if (str)
+		{
+			XFREE(str);
+			str = NULL;
+		}
+
 		attr = atr_num(ca);
 
 		if (attr)

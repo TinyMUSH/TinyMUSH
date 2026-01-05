@@ -1027,6 +1027,7 @@ void destroy_player(dbref victim)
 	if (a_dest)
 	{
 		player = (int)strtol(a_dest, (char **)NULL, 10);
+		XFREE(a_dest);
 
 		if (!Good_owner(player))
 		{

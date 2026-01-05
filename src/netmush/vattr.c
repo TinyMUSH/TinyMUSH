@@ -262,6 +262,10 @@ void do_dbclean(dbref player, dbref cause, int key)
             {
                 str = atr_get_raw(i, ca);
                 atr_add_raw(i, used_table[ca], str);
+                if (str)
+                {
+                    XFREE(str);
+                }
                 atr_clr(i, ca);
                 n_atrt++;
                 got = 1;

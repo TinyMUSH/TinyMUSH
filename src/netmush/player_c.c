@@ -42,6 +42,11 @@ void pcache_reload1(dbref player, PCACHE *pp)
         pp->money = 0;
     }
 
+    if (cp)
+    {
+        XFREE(cp);
+    }
+
     cp = atr_get_raw(player, A_QUEUEMAX);
 
     if (cp && *cp)
@@ -55,6 +60,11 @@ void pcache_reload1(dbref player, PCACHE *pp)
     else
     {
         pp->qmax = -1;
+    }
+
+    if (cp)
+    {
+        XFREE(cp);
     }
 }
 
@@ -252,9 +262,15 @@ int Pennies(dbref obj)
 
     if (cp && *cp)
     {
-        return ((int)strtol(cp, (char **)NULL, 10));
+        int ret = (int)strtol(cp, (char **)NULL, 10);
+        XFREE(cp);
+        return ret;
     }
 
+    if (cp)
+    {
+        XFREE(cp);
+    }
     return 0;
 }
 

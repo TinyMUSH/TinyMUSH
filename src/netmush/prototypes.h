@@ -278,7 +278,7 @@ extern void atr_add_raw(dbref thing, int atr, char *buff);
 extern void atr_add(dbref thing, int atr, char *buff, dbref owner, int flags);
 extern void atr_set_owner(dbref thing, int atr, dbref owner);
 extern void atr_set_flags(dbref thing, int atr, dbref flags);
-extern char *atr_get_raw(dbref thing, int atr);
+extern char *atr_get_raw(dbref thing, int atr); /* caller must XFREE */
 extern char *atr_get_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *alen);
 extern char *atr_get(dbref thing, int atr, dbref *owner, int *flags, int *alen);
 extern _Bool atr_get_info(dbref thing, int atr, dbref *owner, int *flags);

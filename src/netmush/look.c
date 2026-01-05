@@ -1399,6 +1399,11 @@ void show_a_desc(dbref player, dbref loc, const char *msg)
 			raw_notify_newline(player);
 		}
 	}
+
+	if (raw_desc)
+	{
+		XFREE(raw_desc);
+	}
 }
 
 void show_desc(dbref player, dbref loc, int key)
@@ -1440,6 +1445,11 @@ void show_desc(dbref player, dbref loc, int key)
 				{
 					raw_notify_newline(player);
 				}
+			}
+
+			if (raw_desc)
+			{
+				XFREE(raw_desc);
 			}
 		}
 

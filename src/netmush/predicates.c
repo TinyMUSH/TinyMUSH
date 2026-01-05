@@ -1727,7 +1727,13 @@ void do_prog(dbref player, __attribute__((unused)) dbref cause, __attribute__((u
 				notify(player, "Input already pending.");
 				return;
 			}
-			atr_add_raw(doer, A_PROGCMD, atr_get_raw(parent, atr));
+			char *prog_cmd = atr_get_raw(parent, atr);
+
+			if (prog_cmd)
+			{
+				atr_add_raw(doer, A_PROGCMD, prog_cmd);
+				XFREE(prog_cmd);
+			}
 		}
 		else
 		{

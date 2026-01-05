@@ -1971,6 +1971,7 @@ char *al_fetch(dbref thing)
         len = al_size(astr);
         al_extend(&mushstate.mod_alist, &mushstate.mod_size, len, 0);
         XMEMCPY(mushstate.mod_alist, astr, len);
+        XFREE(astr);
     }
     else
     {
@@ -2539,6 +2540,8 @@ void atr_set_flags(dbref thing, int atr, dbref flags)
 /**
  * @brief Get an attribute from the database.
  *
+ * Caller owns the returned buffer and must free it with XFREE().
+ *
  * @param thing DBref of thing
  * @param atr Attribute type
  * @return char*
@@ -2596,6 +2599,10 @@ char *atr_get_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int *
         atr_decode(buff, s, thing, owner, flags, atr, alen);
     }
 
+    if (buff)
+    {
+        XFREE(buff);
+    }
     return s;
 }
 
@@ -2638,6 +2645,7 @@ bool atr_get_info(dbref thing, int atr, dbref *owner, int *flags)
     }
 
     atr_decode(buff, NULL, thing, owner, flags, atr, &alen);
+    XFREE(buff);
     return true;
 }
 
@@ -2670,8 +2678,15 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
 
             if ((lev == 0) || !(*flags & AF_PRIVATE))
             {
+                XFREE(buff);
                 return s;
             }
+        }
+
+        if (buff)
+        {
+            XFREE(buff);
+            buff = NULL;
         }
 
         if ((lev == 0) && Good_obj(Parent(parent)))
@@ -2701,8 +2716,15 @@ char *atr_pget_str(char *s, dbref thing, int atr, dbref *owner, int *flags, int 
 
                     if (!(*flags & AF_PRIVATE))
                     {
+                        XFREE(buff);
                         return s;
                     }
+                }
+
+                if (buff)
+                {
+                    XFREE(buff);
+                    buff = NULL;
                 }
             }
         }
@@ -2759,8 +2781,15 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
 
             if ((lev == 0) || !(*flags & AF_PRIVATE))
             {
+                XFREE(buff);
                 return 1;
             }
+        }
+
+        if (buff)
+        {
+            XFREE(buff);
+            buff = NULL;
         }
 
         if ((lev == 0) && Good_obj(Parent(parent)))
@@ -2790,8 +2819,15 @@ int atr_pget_info(dbref thing, int atr, dbref *owner, int *flags)
 
                     if (!(*flags & AF_PRIVATE))
                     {
+                        XFREE(buff);
                         return 1;
                     }
+                }
+
+                if (buff)
+                {
+                    XFREE(buff);
+                    buff = NULL;
                 }
             }
         }
@@ -2981,6 +3017,7 @@ void atr_pop(void)
 int atr_head(dbref thing, char **attrp)
 {
     char *astr = NULL;
+    bool needs_free = false;
     int alen = 0;
 
     /**
@@ -2994,6 +3031,7 @@ int atr_head(dbref thing, char **attrp)
     else
     {
         astr = atr_get_raw(thing, A_LIST);
+        needs_free = true;
     }
 
     alen = al_size(astr);
@@ -3013,6 +3051,12 @@ int atr_head(dbref thing, char **attrp)
      */
     al_extend(&mushstate.iter_alist.data, &mushstate.iter_alist.len, alen, 0);
     XMEMCPY(mushstate.iter_alist.data, astr, alen);
+
+    if (needs_free && astr)
+    {
+        XFREE(astr);
+    }
+
     *attrp = mushstate.iter_alist.data;
     return atr_next(attrp);
 }
@@ -3790,7 +3834,15 @@ bool check_zone(dbref player, dbref thing)
      * If the zone doesn't have a ControlLock, DON'T allow control.
      *
      */
-    if (atr_get_raw(Zone(thing), A_LCONTROL) && could_doit(player, Zone(thing), A_LCONTROL))
+    char *lcontrol = atr_get_raw(Zone(thing), A_LCONTROL);
+    bool allowed = lcontrol && could_doit(player, Zone(thing), A_LCONTROL);
+
+    if (lcontrol)
+    {
+        XFREE(lcontrol);
+    }
+
+    if (allowed)
     {
         mushstate.zone_nest_num = 0;
         return true;
@@ -3816,7 +3868,15 @@ bool check_zone_for_player(dbref player, dbref thing)
         return false;
     }
 
-    if (atr_get_raw(Zone(thing), A_LCONTROL) && could_doit(player, Zone(thing), A_LCONTROL))
+    char *lcontrol = atr_get_raw(Zone(thing), A_LCONTROL);
+    bool allowed = lcontrol && could_doit(player, Zone(thing), A_LCONTROL);
+
+    if (lcontrol)
+    {
+        XFREE(lcontrol);
+    }
+
+    if (allowed)
     {
         mushstate.zone_nest_num = 0;
         return true;
