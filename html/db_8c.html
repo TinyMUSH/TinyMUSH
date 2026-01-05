@@ -332,6 +332,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>al_store</b> (void)</
 <tr class="memitem:a08d4ba89fe243f2d430abd360a03e85c" id="r_a08d4ba89fe243f2d430abd360a03e85c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a08d4ba89fe243f2d430abd360a03e85c">atr_decode</a> (char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr <a class="el" href="typedefs_8h.html#ad6e0fca9cb4682ac2a9b32277cbe94b6">__attribute__</a>((unused)), int *alen)</td></tr>
 <tr class="memdesc:a08d4ba89fe243f2d430abd360a03e85c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode an attribute string.  <br /></td></tr>
 <tr class="separator:a08d4ba89fe243f2d430abd360a03e85c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d9c4361e9f2e0e08fb7754a61224564" id="r_a2d9c4361e9f2e0e08fb7754a61224564"><td class="memItemLeft" align="right" valign="top"><a id="a2d9c4361e9f2e0e08fb7754a61224564" name="a2d9c4361e9f2e0e08fb7754a61224564"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>db_sync_attributes</b> (void)</td></tr>
+<tr class="separator:a2d9c4361e9f2e0e08fb7754a61224564"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cf45bfae30d317d86da1bd3045027b5" id="r_a1cf45bfae30d317d86da1bd3045027b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1cf45bfae30d317d86da1bd3045027b5">atr_clr</a> (dbref thing, int atr)</td></tr>
 <tr class="memdesc:a1cf45bfae30d317d86da1bd3045027b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear an attribute in the list.  <br /></td></tr>
 <tr class="separator:a1cf45bfae30d317d86da1bd3045027b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1186,6 +1189,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get an attribute from the database. </p>
+<p>Caller owns the returned buffer and must free it with XFREE().</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">thing</td><td>DBref of thing </td></tr>

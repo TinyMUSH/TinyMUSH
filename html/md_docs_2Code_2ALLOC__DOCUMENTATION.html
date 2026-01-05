@@ -137,7 +137,7 @@ Memory Allocation</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Direct call (not recommended):</span></div>
 <div class="line"><span class="keywordtype">char</span> *buffer = <a class="code hl_function" href="alloc_8c.html#a3133f65ceaa1203d553920c83380a8c8">__xmalloc</a>(1024, __FILE__, __LINE__, __func__, <span class="stringliteral">&quot;buffer&quot;</span>);</div>
-<div class="ttc" id="aalloc_8c_html_a3133f65ceaa1203d553920c83380a8c8"><div class="ttname"><a href="alloc_8c.html#a3133f65ceaa1203d553920c83380a8c8">__xmalloc</a></div><div class="ttdeci">void * __xmalloc(size_t size, const char *file, int line, const char *function, const char *var)</div><div class="ttdoc">Tracked version of malloc().</div><div class="ttdef"><b>Definition</b> alloc.c:96</div></div>
+<div class="ttc" id="aalloc_8c_html_a3133f65ceaa1203d553920c83380a8c8"><div class="ttname"><a href="alloc_8c.html#a3133f65ceaa1203d553920c83380a8c8">__xmalloc</a></div><div class="ttdeci">void * __xmalloc(size_t size, const char *file, int line, const char *function, const char *var)</div><div class="ttdoc">Tracked version of malloc().</div><div class="ttdef"><b>Definition</b> alloc.c:115</div></div>
 <div class="ttc" id="amacros_8h_html_a1f2dc397904297d0a9ba598093b19976"><div class="ttname"><a href="macros_8h.html#a1f2dc397904297d0a9ba598093b19976">XMALLOC</a></div><div class="ttdeci">#define XMALLOC(s, v)</div><div class="ttdoc">XMALLOC related macros.</div><div class="ttdef"><b>Definition</b> macros.h:21</div></div>
 </div><!-- fragment --><p><b>Features:</b></p><ul>
 <li>Aligned allocation using C11 <code>aligned_alloc</code>, POSIX <code>posix_memalign</code>, or standard <code>malloc</code></li>
@@ -184,7 +184,7 @@ Memory Deallocation</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// or direct call:</span></div>
 <div class="line"><span class="keywordtype">int</span> overrun = <a class="code hl_function" href="alloc_8c.html#adc770c55d160860dca77d400a7349421">__xfree</a>(buffer);</div>
-<div class="ttc" id="aalloc_8c_html_adc770c55d160860dca77d400a7349421"><div class="ttname"><a href="alloc_8c.html#adc770c55d160860dca77d400a7349421">__xfree</a></div><div class="ttdeci">int __xfree(void *ptr)</div><div class="ttdoc">Tracked version of free().</div><div class="ttdef"><b>Definition</b> alloc.c:329</div></div>
+<div class="ttc" id="aalloc_8c_html_adc770c55d160860dca77d400a7349421"><div class="ttname"><a href="alloc_8c.html#adc770c55d160860dca77d400a7349421">__xfree</a></div><div class="ttdeci">int __xfree(void *ptr)</div><div class="ttdoc">Tracked version of free().</div><div class="ttdef"><b>Definition</b> alloc.c:348</div></div>
 </div><!-- fragment --><p><b>Return Value:</b></p><ul>
 <li><code>0</code>: Buffer was valid and not overrun</li>
 <li><code>1</code>: Buffer was valid but <b>OVERRUN DETECTED</b> (magic number corrupted)</li>
@@ -206,7 +206,7 @@ Memory Inspection</h2>
 <div class="line">    printf(<span class="stringliteral">&quot;Allocated at %s:%d in %s\n&quot;</span>, </div>
 <div class="line">           info-&gt;file, info-&gt;line, info-&gt;function);</div>
 <div class="line">}</div>
-<div class="ttc" id="aalloc_8c_html_a39788016153b54df3b35aefa562b9e6d"><div class="ttname"><a href="alloc_8c.html#a39788016153b54df3b35aefa562b9e6d">__xfind</a></div><div class="ttdeci">MEMTRACK * __xfind(void *ptr)</div><div class="ttdoc">Search the tracking list for a pointer and return it's information.</div><div class="ttdef"><b>Definition</b> alloc.c:262</div></div>
+<div class="ttc" id="aalloc_8c_html_a39788016153b54df3b35aefa562b9e6d"><div class="ttname"><a href="alloc_8c.html#a39788016153b54df3b35aefa562b9e6d">__xfind</a></div><div class="ttdeci">MEMTRACK * __xfind(void *ptr)</div><div class="ttdoc">Search the tracking list for a pointer and return it's information.</div><div class="ttdef"><b>Definition</b> alloc.c:281</div></div>
 </div><!-- fragment --><p><b>Returns:</b> Pointer to MEMTRACK structure, or NULL if not found</p>
 <hr  />
 <h3><a class="anchor" id="autotoc_md84"></a>
@@ -221,7 +221,7 @@ Memory Inspection</h2>
 <div class="line"><span class="keywordflow">if</span> (status == 0) {</div>
 <div class="line">    <span class="comment">// ALERT: Buffer overrun!</span></div>
 <div class="line">}</div>
-<div class="ttc" id="aalloc_8c_html_a6fb3e6eacbda5141d4aa7c2fb0ec048b"><div class="ttname"><a href="alloc_8c.html#a6fb3e6eacbda5141d4aa7c2fb0ec048b">__xcheck</a></div><div class="ttdeci">int __xcheck(void *ptr)</div><div class="ttdoc">Check if a buffer wasn't overrun.</div><div class="ttdef"><b>Definition</b> alloc.c:290</div></div>
+<div class="ttc" id="aalloc_8c_html_a6fb3e6eacbda5141d4aa7c2fb0ec048b"><div class="ttname"><a href="alloc_8c.html#a6fb3e6eacbda5141d4aa7c2fb0ec048b">__xcheck</a></div><div class="ttdeci">int __xcheck(void *ptr)</div><div class="ttdoc">Check if a buffer wasn't overrun.</div><div class="ttdef"><b>Definition</b> alloc.c:309</div></div>
 </div><!-- fragment --><hr  />
 <h1><a class="anchor" id="autotoc_md86"></a>
 String Functions</h1>
@@ -250,7 +250,7 @@ Dynamic String Creation</h2>
 <div class="line">    <span class="comment">// Use msg...</span></div>
 <div class="line">    XFREE(msg);</div>
 <div class="line">}</div>
-<div class="ttc" id="aalloc_8c_html_add0cb4a42b0f665e302370a23949e2ef"><div class="ttname"><a href="alloc_8c.html#add0cb4a42b0f665e302370a23949e2ef">__xavsprintf</a></div><div class="ttdeci">char * __xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)</div><div class="ttdoc">Tracked vsprintf replacement that create a new formatted string buffer.</div><div class="ttdef"><b>Definition</b> alloc.c:462</div></div>
+<div class="ttc" id="aalloc_8c_html_add0cb4a42b0f665e302370a23949e2ef"><div class="ttname"><a href="alloc_8c.html#add0cb4a42b0f665e302370a23949e2ef">__xavsprintf</a></div><div class="ttdeci">char * __xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)</div><div class="ttdoc">Tracked vsprintf replacement that create a new formatted string buffer.</div><div class="ttdef"><b>Definition</b> alloc.c:481</div></div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md92"></a>
 Safe String Operations</h2>
@@ -378,7 +378,7 @@ Safe Buffer Operations</h1>
 <div class="line"><span class="comment">// buffer now contains: &quot;Hello World!&quot;</span></div>
 <div class="line"><span class="comment">// bp points to end position</span></div>
 <div class="line">XFREE(buffer);</div>
-<div class="ttc" id="aalloc_8c_html_adbbf8898a2d02a4dff693747bf9bc058"><div class="ttname"><a href="alloc_8c.html#adbbf8898a2d02a4dff693747bf9bc058">__xsafestrncpy</a></div><div class="ttdeci">size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_t size)</div><div class="ttdoc">Copy a string with at most n character from src and update the position pointer to the end of the des...</div><div class="ttdef"><b>Definition</b> alloc.c:1386</div></div>
+<div class="ttc" id="aalloc_8c_html_adbbf8898a2d02a4dff693747bf9bc058"><div class="ttname"><a href="alloc_8c.html#adbbf8898a2d02a4dff693747bf9bc058">__xsafestrncpy</a></div><div class="ttdeci">size_t __xsafestrncpy(char *dest, char **destp, const char *src, size_t n, size_t size)</div><div class="ttdoc">Copy a string with at most n character from src and update the position pointer to the end of the des...</div><div class="ttdef"><b>Definition</b> alloc.c:1405</div></div>
 </div><!-- fragment --><hr  />
 <h2><a class="anchor" id="autotoc_md116"></a>
 <code>__xsafestrncat(char *dest, char **destp, const char *src, size_t n, size_t size)</code></h2>
@@ -605,7 +605,7 @@ Memory Leak Detection</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a29f3880a920752ac225497297ccbdf4a">list_rawmemory</a>(player);</div>
 <div class="line"><span class="comment">// Check if size grows unexpectedly over time</span></div>
 <div class="line"><span class="comment">// Compare @list raw_memory output periodically</span></div>
-<div class="ttc" id="aalloc_8c_html_a29f3880a920752ac225497297ccbdf4a"><div class="ttname"><a href="alloc_8c.html#a29f3880a920752ac225497297ccbdf4a">list_rawmemory</a></div><div class="ttdeci">void list_rawmemory(dbref player)</div><div class="ttdoc">Show to the player a summary of all allocations.</div><div class="ttdef"><b>Definition</b> alloc.c:1224</div></div>
+<div class="ttc" id="aalloc_8c_html_a29f3880a920752ac225497297ccbdf4a"><div class="ttname"><a href="alloc_8c.html#a29f3880a920752ac225497297ccbdf4a">list_rawmemory</a></div><div class="ttdeci">void list_rawmemory(dbref player)</div><div class="ttdoc">Show to the player a summary of all allocations.</div><div class="ttdef"><b>Definition</b> alloc.c:1243</div></div>
 </div><!-- fragment --><hr  />
 <h1><a class="anchor" id="autotoc_md156"></a>
 API Reference Summary</h1>

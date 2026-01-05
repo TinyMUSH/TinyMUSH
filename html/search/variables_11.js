@@ -42,6 +42,5 @@ var searchData=
   ['suspect_5flist_39',['suspect_list',['../structstatedata.html#a9298d40248ae00b693c4cf2913767330',1,'statedata']]],
   ['sweep_5fdark_40',['sweep_dark',['../structconfdata.html#a2a2e3589ffaf68f59f9e43ec148a5002',1,'confdata']]],
   ['switch_5fdf_5fall_41',['switch_df_all',['../structconfdata.html#a6b8a78403b5feb1d54bfde29837298f2',1,'confdata']]],
-  ['switch_5ftoken_42',['switch_token',['../structstatedata.html#ad36188a720998467e141d0d8aae7fc99',1,'statedata']]],
-  ['sys_5fc_43',['sys_c',['../externs_8h.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c:&#160;udb_ocache.c'],['../udb__ocache_8c.html#a7f82fe1f51b40d8dc0225b87595e9c0c',1,'sys_c:&#160;udb_ocache.c']]]
+  ['switch_5ftoken_42',['switch_token',['../structstatedata.html#ad36188a720998467e141d0d8aae7fc99',1,'statedata']]]
 ];

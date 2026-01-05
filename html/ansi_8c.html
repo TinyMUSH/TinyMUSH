@@ -219,9 +219,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a9cebcc38b9c124e68d8a327fa8490a73" id="r_a9cebcc38b9c124e68d8a327fa8490a73"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9cebcc38b9c124e68d8a327fa8490a73">ansi_transition_colorstate</a> (const <a class="el" href="structColorState.html">ColorState</a> from, const <a class="el" href="structColorState.html">ColorState</a> to, ColorType type, bool no_default_bg)</td></tr>
 <tr class="memdesc:a9cebcc38b9c124e68d8a327fa8490a73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build an ANSI escape sequence to transition between two <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> values.  <br /></td></tr>
 <tr class="separator:a9cebcc38b9c124e68d8a327fa8490a73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad914d89313fd7b6468491ab89e57e0ee" id="r_ad914d89313fd7b6468491ab89e57e0ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad914d89313fd7b6468491ab89e57e0ee">ansi_parse_embedded_sequences</a> (const char *input, <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences)</td></tr>
-<tr class="memdesc:ad914d89313fd7b6468491ab89e57e0ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses embedded ANSI sequences in a string marked with 'x<code>'. </code> <br /></td></tr>
-<tr class="separator:ad914d89313fd7b6468491ab89e57e0ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18b234e1abc49099a86ddf807cd5b71b" id="r_a18b234e1abc49099a86ddf807cd5b71b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18b234e1abc49099a86ddf807cd5b71b">ansi_parse_embedded_sequences</a> (const char *input, <a class="el" href="structColorSequence.html">ColorSequence</a> *sequences)</td></tr>
+<tr class="memdesc:a18b234e1abc49099a86ddf807cd5b71b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses embedded ANSI sequences in a string marked with 'x<code>'. </code> <br /></td></tr>
+<tr class="separator:a18b234e1abc49099a86ddf807cd5b71b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10019119f7dc128e9848f4e04b6ce4f1" id="r_a10019119f7dc128e9848f4e04b6ce4f1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10019119f7dc128e9848f4e04b6ce4f1">ansi_parse_single_x_code</a> (char **input_ptr, <a class="el" href="structColorState.html">ColorState</a> *color_out, bool *current_highlight)</td></tr>
 <tr class="memdesc:a10019119f7dc128e9848f4e04b6ce4f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parses a single x color code from the current position.  <br /></td></tr>
 <tr class="separator:a10019119f7dc128e9848f4e04b6ce4f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -272,6 +272,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>ansi_strip_ansi_len</b
 <tr class="memitem:ade85bc7b6fc3b12db0bd3bc54fbfbf96" id="r_ade85bc7b6fc3b12db0bd3bc54fbfbf96"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade85bc7b6fc3b12db0bd3bc54fbfbf96">ansi_map_states_colorstate</a> (const char *s, <a class="el" href="structColorState.html">ColorState</a> **states, char **stripped)</td></tr>
 <tr class="memdesc:ade85bc7b6fc3b12db0bd3bc54fbfbf96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map ANSI state for every character using modern <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> format.  <br /></td></tr>
 <tr class="separator:ade85bc7b6fc3b12db0bd3bc54fbfbf96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3e1c988affc68882edff6f39c416eb3" id="r_ac3e1c988affc68882edff6f39c416eb3"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3e1c988affc68882edff6f39c416eb3">ansi_states_to_sequence</a> (<a class="el" href="structColorState.html">ColorState</a> *states, int count, ColorType type)</td></tr>
+<tr class="memdesc:ac3e1c988affc68882edff6f39c416eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate ANSI escape sequence string from an array of <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>.  <br /></td></tr>
+<tr class="separator:ac3e1c988affc68882edff6f39c416eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a326bd8e19a69c35941bd1c1a0f395718" id="r_a326bd8e19a69c35941bd1c1a0f395718"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structColorState.html">ColorState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a326bd8e19a69c35941bd1c1a0f395718">ansi_parse_sequence</a> (const char **ansi_ptr)</td></tr>
 <tr class="memdesc:a326bd8e19a69c35941bd1c1a0f395718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse ANSI escape sequence and return <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>.  <br /></td></tr>
 <tr class="separator:a326bd8e19a69c35941bd1c1a0f395718"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -287,12 +290,85 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>skip_esccode</b> (cha
 <tr class="memitem:a860915ab1e4fa7b3525b4ef1e18dd4ea" id="r_a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memItemLeft" align="right" valign="top"><a id="a860915ab1e4fa7b3525b4ef1e18dd4ea" name="a860915ab1e4fa7b3525b4ef1e18dd4ea"></a>
 char *&#160;</td><td class="memItemRight" valign="bottom"><b>remap_colors</b> (const char *s, int *cmap)</td></tr>
 <tr class="separator:a860915ab1e4fa7b3525b4ef1e18dd4ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d3bba00d3d8d7165edc140e28ae3206" id="r_a2d3bba00d3d8d7165edc140e28ae3206"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d3bba00d3d8d7165edc140e28ae3206">ansi_to_mushcode</a> (const char *input)</td></tr>
+<tr class="memdesc:a2d3bba00d3d8d7165edc140e28ae3206"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a string with ANSI escape sequences to a string with MUSHcode.  <br /></td></tr>
+<tr class="separator:a2d3bba00d3d8d7165edc140e28ae3206"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad57dcd168ca9d98d1e4023886713e560" id="r_ad57dcd168ca9d98d1e4023886713e560"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad57dcd168ca9d98d1e4023886713e560">convert_mush_to_ansi</a> (const char *input, ColorType type)</td></tr>
+<tr class="memdesc:ad57dcd168ca9d98d1e4023886713e560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a string with MUSHcode to a string with ANSI escape sequences.  <br /></td></tr>
+<tr class="separator:ad57dcd168ca9d98d1e4023886713e560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee1a252e3041ffa4a64c4d2f808fd41b" id="r_aee1a252e3041ffa4a64c4d2f808fd41b"><td class="memItemLeft" align="right" valign="top"><a id="aee1a252e3041ffa4a64c4d2f808fd41b" name="aee1a252e3041ffa4a64c4d2f808fd41b"></a>
 ColorType&#160;</td><td class="memItemRight" valign="bottom"><b>resolve_color_type</b> (dbref player, dbref cause)</td></tr>
 <tr class="separator:aee1a252e3041ffa4a64c4d2f808fd41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a1c43aeb6bda24e442288c8dcdc29d94c" id="r_a1c43aeb6bda24e442288c8dcdc29d94c"><td class="memItemLeft" align="right" valign="top"><a id="a1c43aeb6bda24e442288c8dcdc29d94c" name="a1c43aeb6bda24e442288c8dcdc29d94c"></a>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_BLACK</b> = 30</td></tr>
+<tr class="memdesc:a1c43aeb6bda24e442288c8dcdc29d94c"><td class="mdescLeft">&#160;</td><td class="mdescRight">ANSI color code constants and definitions. <br /></td></tr>
+<tr class="separator:a1c43aeb6bda24e442288c8dcdc29d94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40c84f34b302cb5daf77495c9083d03d" id="r_a40c84f34b302cb5daf77495c9083d03d"><td class="memItemLeft" align="right" valign="top"><a id="a40c84f34b302cb5daf77495c9083d03d" name="a40c84f34b302cb5daf77495c9083d03d"></a>
+const int&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NUM</b> = 48</td></tr>
+<tr class="separator:a40c84f34b302cb5daf77495c9083d03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a151565e1c10b49704b481556b0941bf3" id="r_a151565e1c10b49704b481556b0941bf3"><td class="memItemLeft" align="right" valign="top"><a id="a151565e1c10b49704b481556b0941bf3" name="a151565e1c10b49704b481556b0941bf3"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_CSI</b> = '['</td></tr>
+<tr class="separator:a151565e1c10b49704b481556b0941bf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a657dd969a689e13d470d4ccbb34c3adf" id="r_a657dd969a689e13d470d4ccbb34c3adf"><td class="memItemLeft" align="right" valign="top"><a id="a657dd969a689e13d470d4ccbb34c3adf" name="a657dd969a689e13d470d4ccbb34c3adf"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_RESET</b> [] = &quot;0&quot;</td></tr>
+<tr class="separator:a657dd969a689e13d470d4ccbb34c3adf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ecd0295f675ff2a460d17b6c3f816af" id="r_a5ecd0295f675ff2a460d17b6c3f816af"><td class="memItemLeft" align="right" valign="top"><a id="a5ecd0295f675ff2a460d17b6c3f816af" name="a5ecd0295f675ff2a460d17b6c3f816af"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_BOLD</b> [] = &quot;1&quot;</td></tr>
+<tr class="separator:a5ecd0295f675ff2a460d17b6c3f816af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d9d73073f8003eea7108b0b8c9578d4" id="r_a9d9d73073f8003eea7108b0b8c9578d4"><td class="memItemLeft" align="right" valign="top"><a id="a9d9d73073f8003eea7108b0b8c9578d4" name="a9d9d73073f8003eea7108b0b8c9578d4"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_UNDERLINE</b> [] = &quot;4&quot;</td></tr>
+<tr class="separator:a9d9d73073f8003eea7108b0b8c9578d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3243ab9179127a03ee2b56b6fa2459be" id="r_a3243ab9179127a03ee2b56b6fa2459be"><td class="memItemLeft" align="right" valign="top"><a id="a3243ab9179127a03ee2b56b6fa2459be" name="a3243ab9179127a03ee2b56b6fa2459be"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_BLINK</b> [] = &quot;5&quot;</td></tr>
+<tr class="separator:a3243ab9179127a03ee2b56b6fa2459be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e4c44be4566c88b571b3e424aea0292" id="r_a4e4c44be4566c88b571b3e424aea0292"><td class="memItemLeft" align="right" valign="top"><a id="a4e4c44be4566c88b571b3e424aea0292" name="a4e4c44be4566c88b571b3e424aea0292"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_REVERSE</b> [] = &quot;7&quot;</td></tr>
+<tr class="separator:a4e4c44be4566c88b571b3e424aea0292"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a16503eeeed9261a95d51dd7699bb3a" id="r_a7a16503eeeed9261a95d51dd7699bb3a"><td class="memItemLeft" align="right" valign="top"><a id="a7a16503eeeed9261a95d51dd7699bb3a" name="a7a16503eeeed9261a95d51dd7699bb3a"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NORMAL_INTENSITY</b> [] = &quot;22&quot;</td></tr>
+<tr class="separator:a7a16503eeeed9261a95d51dd7699bb3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad232cc6eb9a6b241fc63158e7336f401" id="r_ad232cc6eb9a6b241fc63158e7336f401"><td class="memItemLeft" align="right" valign="top"><a id="ad232cc6eb9a6b241fc63158e7336f401" name="ad232cc6eb9a6b241fc63158e7336f401"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NO_UNDERLINE</b> [] = &quot;24&quot;</td></tr>
+<tr class="separator:ad232cc6eb9a6b241fc63158e7336f401"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cacff4dd81785193197c94240a4fbc2" id="r_a6cacff4dd81785193197c94240a4fbc2"><td class="memItemLeft" align="right" valign="top"><a id="a6cacff4dd81785193197c94240a4fbc2" name="a6cacff4dd81785193197c94240a4fbc2"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NO_BLINK</b> [] = &quot;25&quot;</td></tr>
+<tr class="separator:a6cacff4dd81785193197c94240a4fbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c924c5b0bab473f38e5f44ec4e3dd1d" id="r_a3c924c5b0bab473f38e5f44ec4e3dd1d"><td class="memItemLeft" align="right" valign="top"><a id="a3c924c5b0bab473f38e5f44ec4e3dd1d" name="a3c924c5b0bab473f38e5f44ec4e3dd1d"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NO_REVERSE</b> [] = &quot;27&quot;</td></tr>
+<tr class="separator:a3c924c5b0bab473f38e5f44ec4e3dd1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f22d3f3792bd62172292fe9fc248a87" id="r_a9f22d3f3792bd62172292fe9fc248a87"><td class="memItemLeft" align="right" valign="top"><a id="a9f22d3f3792bd62172292fe9fc248a87" name="a9f22d3f3792bd62172292fe9fc248a87"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_FOREGROUND_RESET</b> [] = &quot;39&quot;</td></tr>
+<tr class="separator:a9f22d3f3792bd62172292fe9fc248a87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6de90b307258db7f444ebd8f1aa82b0" id="r_af6de90b307258db7f444ebd8f1aa82b0"><td class="memItemLeft" align="right" valign="top"><a id="af6de90b307258db7f444ebd8f1aa82b0" name="af6de90b307258db7f444ebd8f1aa82b0"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_BACKGROUND_RESET</b> [] = &quot;49&quot;</td></tr>
+<tr class="separator:af6de90b307258db7f444ebd8f1aa82b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05367a555b10afda1419c66ff2b5c2c0" id="r_a05367a555b10afda1419c66ff2b5c2c0"><td class="memItemLeft" align="right" valign="top"><a id="a05367a555b10afda1419c66ff2b5c2c0" name="a05367a555b10afda1419c66ff2b5c2c0"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_END</b> [] = &quot;m&quot;</td></tr>
+<tr class="separator:a05367a555b10afda1419c66ff2b5c2c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a330226a8a739e5cd22a7870960b4b812" id="r_a330226a8a739e5cd22a7870960b4b812"><td class="memItemLeft" align="right" valign="top"><a id="a330226a8a739e5cd22a7870960b4b812" name="a330226a8a739e5cd22a7870960b4b812"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_RESET_SEQUENCE</b> [] = &quot;\033[0m&quot;</td></tr>
+<tr class="separator:a330226a8a739e5cd22a7870960b4b812"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a973535f52d100fd6e4f350abddf3a4c0" id="r_a973535f52d100fd6e4f350abddf3a4c0"><td class="memItemLeft" align="right" valign="top"><a id="a973535f52d100fd6e4f350abddf3a4c0" name="a973535f52d100fd6e4f350abddf3a4c0"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_XTERM_PREFIX_FG</b> [] = &quot;38;5;&quot;</td></tr>
+<tr class="separator:a973535f52d100fd6e4f350abddf3a4c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c3f622fe08f2946f2d3c6272a48f143" id="r_a8c3f622fe08f2946f2d3c6272a48f143"><td class="memItemLeft" align="right" valign="top"><a id="a8c3f622fe08f2946f2d3c6272a48f143" name="a8c3f622fe08f2946f2d3c6272a48f143"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_XTERM_PREFIX_BG</b> [] = &quot;48;5;&quot;</td></tr>
+<tr class="separator:a8c3f622fe08f2946f2d3c6272a48f143"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36248ac8b5940d9d6e762760ee331cd9" id="r_a36248ac8b5940d9d6e762760ee331cd9"><td class="memItemLeft" align="right" valign="top"><a id="a36248ac8b5940d9d6e762760ee331cd9" name="a36248ac8b5940d9d6e762760ee331cd9"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_TRUECOLOR_PREFIX_FG</b> [] = &quot;38;2;&quot;</td></tr>
+<tr class="separator:a36248ac8b5940d9d6e762760ee331cd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dca0377fe53e26d3d5bc59dea332083" id="r_a2dca0377fe53e26d3d5bc59dea332083"><td class="memItemLeft" align="right" valign="top"><a id="a2dca0377fe53e26d3d5bc59dea332083" name="a2dca0377fe53e26d3d5bc59dea332083"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_TRUECOLOR_PREFIX_BG</b> [] = &quot;48;2;&quot;</td></tr>
+<tr class="separator:a2dca0377fe53e26d3d5bc59dea332083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab08b9f22d0d844b296bfdfab1ce0955e" id="r_ab08b9f22d0d844b296bfdfab1ce0955e"><td class="memItemLeft" align="right" valign="top"><a id="ab08b9f22d0d844b296bfdfab1ce0955e" name="ab08b9f22d0d844b296bfdfab1ce0955e"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_NORMAL_SEQ</b> [] = &quot;\033[0m&quot;</td></tr>
+<tr class="separator:ab08b9f22d0d844b296bfdfab1ce0955e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89fbb02f76c9940793a1517f687fe092" id="r_a89fbb02f76c9940793a1517f687fe092"><td class="memItemLeft" align="right" valign="top"><a id="a89fbb02f76c9940793a1517f687fe092" name="a89fbb02f76c9940793a1517f687fe092"></a>
+const char&#160;</td><td class="memItemRight" valign="bottom"><b>C_ANSI_BOLD_SEQ</b> [] = &quot;\033[1m&quot;</td></tr>
+<tr class="separator:a89fbb02f76c9940793a1517f687fe092"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c4d9cb2f14de250c9cf1be3248b50a0" id="r_a2c4d9cb2f14de250c9cf1be3248b50a0"><td class="memItemLeft" align="right" valign="top"><a id="a2c4d9cb2f14de250c9cf1be3248b50a0" name="a2c4d9cb2f14de250c9cf1be3248b50a0"></a>
 <a class="el" href="structColorEntry.html">ColorEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><b>colorDefinitions</b> []</td></tr>
 <tr class="separator:a2c4d9cb2f14de250c9cf1be3248b50a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -704,14 +780,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad914d89313fd7b6468491ab89e57e0ee" name="ad914d89313fd7b6468491ab89e57e0ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad914d89313fd7b6468491ab89e57e0ee">&#9670;&#160;</a></span>ansi_parse_embedded_sequences()</h2>
+<a id="a18b234e1abc49099a86ddf807cd5b71b" name="a18b234e1abc49099a86ddf807cd5b71b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18b234e1abc49099a86ddf807cd5b71b">&#9670;&#160;</a></span>ansi_parse_embedded_sequences()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int ansi_parse_embedded_sequences </td>
+          <td class="memname">bool ansi_parse_embedded_sequences </td>
           <td>(</td>
           <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>input</em></span>, </td>
         </tr>
@@ -733,7 +809,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error (memory allocation failure).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on error (memory allocation failure).</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The caller is responsible for freeing the allocated sequences array. </dd></dl>
 
 </div>
@@ -869,6 +945,45 @@ The input_ptr is only advanced on successful parsing. </dd></dl>
 
 </div>
 </div>
+<a id="ac3e1c988affc68882edff6f39c416eb3" name="ac3e1c988affc68882edff6f39c416eb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3e1c988affc68882edff6f39c416eb3">&#9670;&#160;</a></span>ansi_states_to_sequence()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * ansi_states_to_sequence </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structColorState.html">ColorState</a> *</td>          <td class="paramname"><span class="paramname"><em>states</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>count</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ColorType</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate ANSI escape sequence string from an array of <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>. </p>
+<p>Iterates through the array of <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a>, generating transition sequences for state changes, and appends a final reset to normal.</p>
+<p>Caller must free the returned string with XFREE().</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">states</td><td>Array of <a class="el" href="structColorState.html" title="Complete text formatting state.">ColorState</a> structures </td></tr>
+    <tr><td class="paramname">count</td><td>Number of states in the array </td></tr>
+    <tr><td class="paramname">type</td><td>ColorType to use for sequence generation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Newly allocated string with ANSI sequences, or NULL on error </dd></dl>
+
+</div>
+</div>
 <a id="a0c241ecd2b46058c15b4cd0c1c510258" name="a0c241ecd2b46058c15b4cd0c1c510258"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0c241ecd2b46058c15b4cd0c1c510258">&#9670;&#160;</a></span>ansi_strip_ansi()</h2>
 
@@ -886,6 +1001,34 @@ The input_ptr is only advanced on successful parsing. </dd></dl>
 
 <p>Remove ANSI escape codes using the <a class="el" href="ansi_8c.html" title="ANSI terminal control helpers and telnet negotiation support.">ansi.c</a> parser utilities. </p>
 <p>Caller frees the returned buffer with XFREE(). </p>
+
+</div>
+</div>
+<a id="a2d3bba00d3d8d7165edc140e28ae3206" name="a2d3bba00d3d8d7165edc140e28ae3206"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d3bba00d3d8d7165edc140e28ae3206">&#9670;&#160;</a></span>ansi_to_mushcode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * ansi_to_mushcode </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>input</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a string with ANSI escape sequences to a string with MUSHcode. </p>
+<p>Parses the input string for ANSI sequences, extracts the plain text and color changes, then reconstructs the string with MUSHcode (x<code>) inserted at the appropriate positions.</code></p>
+<p><code></p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input string containing ANSI escape sequences. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with MUSHcode, or NULL on error. </dd></dl>
+<p></code></p>
 
 </div>
 </div>
@@ -1004,6 +1147,39 @@ The input_ptr is only advanced on successful parsing. </dd></dl>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly allocated string with the mushcode, or NULL on error. </dd></dl>
+
+</div>
+</div>
+<a id="ad57dcd168ca9d98d1e4023886713e560" name="ad57dcd168ca9d98d1e4023886713e560"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad57dcd168ca9d98d1e4023886713e560">&#9670;&#160;</a></span>convert_mush_to_ansi()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char * convert_mush_to_ansi </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>input</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ColorType</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a string with MUSHcode to a string with ANSI escape sequences. </p>
+<p>Parses the input string for embedded MUSHcode sequences (x<code>), extracts the plain text and color changes, then reconstructs the string with ANSI escape sequences inserted at the appropriate positions. Ends with a reset to normal ANSI.</code></p>
+<p><code></p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>The input string containing MUSHcode. </td></tr>
+    <tr><td class="paramname">type</td><td>The ColorType to use for ANSI sequence generation. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly allocated string with ANSI sequences, or NULL on error. </dd></dl>
+<p></code></p>
 
 </div>
 </div>
