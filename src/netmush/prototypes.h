@@ -862,6 +862,8 @@ extern void info(int fmt, int flags, int ver);
 extern void usage_dbconvert(void);
 #ifdef USE_GDBM
 extern void usage_dbrecover(void);
+extern void gdbm_panic(const char *mesg);
+extern int dbrecover(int argc, char *argv[]);
 #endif
 extern void usage(char *prog, int which);
 extern void recover_flatfile(char *flat);
@@ -1203,12 +1205,6 @@ extern void mung_quotas(dbref player, int key, int value);
 extern void show_quota(dbref player, dbref victim);
 extern void show_quota_header(dbref player);
 extern void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2);
-
-/* db_gdbm_recover.c */
-#ifdef USE_GDBM
-extern void gdbm_panic(const char *mesg);
-extern int dbrecover(int argc, char *argv[]);
-#endif
 
 /* rob.c */
 extern void do_kill(dbref player, dbref cause, int key, char *what, char *costchar);
