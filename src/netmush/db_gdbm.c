@@ -1,5 +1,5 @@
 /**
- * @file udb_gdbm.c
+ * @file db_gdbm.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief GDBM database backend implementation
  * @version 4.0
@@ -17,7 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "udb_backend.h"
+#include "db_backend.h"
 
 #include <stdbool.h>
 #include <limits.h>
@@ -44,7 +44,7 @@ static void gdbm_setsync(int flag)
 {
     if (gdbm_setopt(gdbm_dbp, GDBM_SYNCMODE, &flag, sizeof(int)) == -1)
     {
-        warning("gdbm_setsync: cannot set GDBM_SYNCMODE to %d on %s. GDBM Error %s", flag, gdbm_dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_setsync: cannot set GDBM_SYNCMODE to %d on %s. GDBM Error %s", flag, gdbm_dbfile, gdbm_strerror(gdbm_errno));
     }
     else
     {
@@ -85,7 +85,7 @@ static int gdbm_init(void)
 
     if ((gdbm_dbp = gdbm_open(tmpfile, mushstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, mushgdbm_error_handler)) == (GDBM_FILE)0)
     {
-        warning("gdbm_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
         XFREE(tmpfile);
         return (1);
     }
@@ -95,7 +95,7 @@ static int gdbm_init(void)
     i = mushstate.standalone ? 400 : 2;
     if (gdbm_setopt(gdbm_dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
     {
-        warning("gdbm_init: cannot set cache size to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_init: cannot set cache size to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -103,7 +103,7 @@ static int gdbm_init(void)
     i = 1;
     if (gdbm_setopt(gdbm_dbp, GDBM_CENTFREE, &i, sizeof(int)) == -1)
     {
-        warning("gdbm_init: cannot set GDBM_CENTFREE to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_init: cannot set GDBM_CENTFREE to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -111,7 +111,7 @@ static int gdbm_init(void)
     i = 1;
     if (gdbm_setopt(gdbm_dbp, GDBM_COALESCEBLKS, &i, sizeof(int)) == -1)
     {
-        warning("gdbm_init: cannot set GDBM_COALESCEBLKS to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_init: cannot set GDBM_COALESCEBLKS to %d on %s. GDBM Error %s", i, gdbm_dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -153,7 +153,7 @@ static bool mushgdbm_close(void)
     {
         if (gdbm_sync(gdbm_dbp) == -1)
         {
-            warning("mushgdbm_close: gdbm_sync error on %s. GDBM Error %s", gdbm_dbfile, gdbm_strerror(gdbm_errno));
+            log_write(LOG_ALWAYS, "DB", "WARN", "mushgdbm_close: gdbm_sync error on %s. GDBM Error %s", gdbm_dbfile, gdbm_strerror(gdbm_errno));
             return false;
         }
         gdbm_close(gdbm_dbp);
@@ -231,7 +231,7 @@ static int gdbm_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 
     if (gdbm_store(gdbm_dbp, key, dat, GDBM_REPLACE))
     {
-        warning("gdbm_put: gdbm_store failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_put: gdbm_store failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }
@@ -275,7 +275,7 @@ static int gdbm_del(UDB_DATA gamekey, unsigned int type)
 
     if (gdbm_delete(gdbm_dbp, key))
     {
-        warning("gdbm_del: gdbm_delete failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "gdbm_del: gdbm_delete failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }

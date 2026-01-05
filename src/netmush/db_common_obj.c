@@ -1,29 +1,22 @@
 
 /**
- * @file udb_obj.c
+ * @file db_common_obj.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief UDBM binary object read/write and traversal helpers
+ * @brief UDB object serialization shared by both backends: load/store bundled attributes and walk them efficiently.
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
- *            You may distribute under the terms the Artistic License,
+ *            You may distribute under the terms of the Artistic License,
  *            as specified in the COPYING file.
  *
- * @note Why not just write the attributes individually to disk? Well, when
- *       you're running on a platform that does synchronous writes with a large
- *       database, thousands of I/O operations tend to be expensive. When you
- *       'coalesce' many attribute writes onto a single object and do only one
- *       I/O operation, you can get an order of magnitude speed difference,
- *       especially on loading/unloading to flatfile. It also has the side
- *       effect of pre-fetching on reads, since you often have sequential
- *       attribute reads off of the same object.
+ * @note Why not just write the attributes individually to disk? When synchronous
+ *       writes are expensive, coalescing many attribute writes into a single
+ *       operation yields a big speedup, especially for flatfile import/export.
+ *       Sequential reads of a bundled object also get an implicit prefetch win.
  *
- *       Wile all of this is extremely true, keep in mind that text was written
- *       over 25 years ago. Even if we didn't optimized our read/write sequence
- *       you woudn't see the difference.
- *
- *       If you really want to see the difference, it's time to get youself into
- *       the retro-computing scene :)
+ *       While this was written decades ago, even an unoptimized sequence would
+ *       likely be acceptable on modern hardware. If you want to feel the pain,
+ *       dust off a retro box and benchmark it yourself.
  */
 
 #include "config.h"

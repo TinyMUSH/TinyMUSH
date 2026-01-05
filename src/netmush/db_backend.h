@@ -1,5 +1,5 @@
 /**
- * @file udb_backend.h
+ * @file db_backend.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Abstract database backend interface for GDBM and LMDB
  * @version 4.0
@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __UDB_BACKEND_H
-#define __UDB_BACKEND_H
+#ifndef __DB_BACKEND_H
+#define __DB_BACKEND_H
 
 #include "typedefs.h"
 #include <stdbool.h>
@@ -63,4 +63,4 @@ UDB_DATA db_get(UDB_DATA gamekey, unsigned int type);
 int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type);
 int db_del(UDB_DATA gamekey, unsigned int type);
 
-#endif /* __UDB_BACKEND_H */
+#endif /* __DB_BACKEND_H */

@@ -1284,12 +1284,7 @@ extern void init_timer(void);
 extern void dispatch(void);
 extern void do_timewarp(dbref player, dbref cause, int key, char *arg);
 
-/* udb_misc.c */
-extern void log_db_err(int obj, int attr, const char *txt);
-extern void warning(const char *p, ...);
-extern void fatal(const char *p, ...);
-
-/* udb_obj.c */
+/* db_common_obj.c */
 extern UDB_OBJECT *unroll_obj(char *data);
 extern char *rollup_obj(UDB_OBJECT *o);
 extern int obj_siz(UDB_OBJECT *o);
@@ -1303,7 +1298,7 @@ extern void pipe_set_attrib(int anum, unsigned int obj, char *value);
 extern void pipe_del_attrib(int anum, unsigned int obj);
 extern void attrib_sync(void);
 
-/* udb_ochunk.c */
+/* db_gdbm_ochunk.c */
 extern void dddb_setsync(int flag);
 extern void dbm_error(const char *msg);
 extern int dddb_optimize(void);

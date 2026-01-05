@@ -1,11 +1,12 @@
 /**
- * @file udb_ochunk.c
+ * @file db_gdbm_ochunk.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Chunked I/O helpers for the UDBM database backend
+ * @brief GDBM-backed chunk store for UDBM: key building, locking, sync/compact,
+ *        and chunk read/write helpers.
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.
- *            You may distribute under the terms the Artistic License,
+ *            You may distribute under the terms of the Artistic License,
  *            as specified in the COPYING file.
  *
  */
@@ -101,7 +102,7 @@ void dddb_setsync(int flag)
 {
     if (gdbm_setopt(dbp, GDBM_SYNCMODE, &flag, sizeof(int)) == -1)
     {
-        warning("dddb_setsync: cannot set GDBM_SYNCMODE to %d on %s. GDBM Error %s", flag, dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "dddb_setsync: cannot set GDBM_SYNCMODE to %d on %s. GDBM Error %s", flag, dbfile, gdbm_strerror(gdbm_errno));
     }
     else
     {
@@ -158,7 +159,7 @@ int dddb_init(void)
 
     if ((dbp = gdbm_open(tmpfile, mushstate.db_block_size, GDBM_WRCREAT | GDBM_SYNC | GDBM_NOLOCK, 0600, dbm_error)) == (GDBM_FILE)0)
     {
-        warning("dddb_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "dddb_init: cannot open %s. GDBM Error %s", tmpfile, gdbm_strerror(gdbm_errno));
         XFREE(tmpfile);
         return (1);
     }
@@ -173,7 +174,7 @@ int dddb_init(void)
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
         {
-            warning("dddb_init: cannot set cache size to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
+            log_write(LOG_ALWAYS, "DB", "WARN", "dddb_init: cannot set cache size to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
             return (1);
         }
     }
@@ -188,7 +189,7 @@ int dddb_init(void)
 
         if (gdbm_setopt(dbp, GDBM_CACHESIZE, &i, sizeof(int)) == -1)
         {
-            warning("dddb_init: cannot set GDBM_CACHESIZE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
+            log_write(LOG_ALWAYS, "DB", "WARN", "dddb_init: cannot set GDBM_CACHESIZE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
             return (1);
         }
     }
@@ -200,7 +201,7 @@ int dddb_init(void)
 
     if (gdbm_setopt(dbp, GDBM_CENTFREE, &i, sizeof(int)) == -1)
     {
-        warning("dddb_init: cannot set GDBM_CENTFREE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "dddb_init: cannot set GDBM_CENTFREE to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -211,7 +212,7 @@ int dddb_init(void)
 
     if (gdbm_setopt(dbp, GDBM_COALESCEBLKS, &i, sizeof(int)) == -1)
     {
-        warning("dddb_init: cannot set GDBM_COALESCEBLKS to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "dddb_init: cannot set GDBM_COALESCEBLKS to %d on %s. GDBM Error %s", i, dbfile, gdbm_strerror(gdbm_errno));
         return (1);
     }
 
@@ -264,12 +265,12 @@ bool dddb_close(void)
     {
         if (gdbm_sync(dbp) == -1)
         {
-            warning("dddb_close: gdbm_sync error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
+            log_write(LOG_ALWAYS, "DB", "WARN", "dddb_close: gdbm_sync error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
             return false;
         }
         if (gdbm_close(dbp) == -1)
         {
-            warning("dddb_close: gdbm_close error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
+            log_write(LOG_ALWAYS, "DB", "WARN", "dddb_close: gdbm_close error on %s. GDBM Error %s", dbfile, gdbm_strerror(gdbm_errno));
             return false;
         }
         dbp = (GDBM_FILE)0;
@@ -322,7 +323,7 @@ int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 
     if (gdbm_store(dbp, key, dat, GDBM_REPLACE))
     {
-        warning("db_put: gdbm_store failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "db_put: gdbm_store failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }
@@ -366,7 +367,7 @@ int db_del(UDB_DATA gamekey, unsigned int type)
      */
     if (gdbm_delete(dbp, key))
     {
-        warning("db_del: gdbm_delete failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
+        log_write(LOG_ALWAYS, "DB", "WARN", "db_del: gdbm_delete failed. GDBM Error %s", gdbm_strerror(gdbm_errno));
         XFREE(key.dptr);
         return (1);
     }

@@ -1,5 +1,5 @@
 /**
- * @file udb_backend.c
+ * @file db_backend.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Database backend dispatcher - delegates operations to GDBM or LMDB
  * @version 4.0
@@ -17,7 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "udb_backend.h"
+#include "db_backend.h"
 
 #include <stdbool.h>
 #include <sys/file.h>

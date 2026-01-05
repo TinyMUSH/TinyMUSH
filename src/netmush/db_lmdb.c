@@ -1,5 +1,5 @@
 /**
- * @file udb_lmdb.c
+ * @file db_lmdb.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief LMDB database backend implementation
  * @version 4.0
@@ -17,7 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "udb_backend.h"
+#include "db_backend.h"
 
 #include <stdbool.h>
 #include <limits.h>
@@ -55,7 +55,7 @@ static void lmdb_setsync(int flag)
     /* Get current flags */
     rc = mdb_env_get_flags(lmdb_env, &env_flags);
     if (rc != 0) {
-        warning("lmdb_setsync: cannot get env flags: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_setsync: cannot get env flags: %s", mdb_strerror(rc));
         return;
     }
     
@@ -69,7 +69,7 @@ static void lmdb_setsync(int flag)
     /* Note: mdb_env_set_flags can only change certain flags after open */
     rc = mdb_env_set_flags(lmdb_env, MDB_NOSYNC, flag == 0);
     if (rc != 0) {
-        warning("lmdb_setsync: cannot set sync mode: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_setsync: cannot set sync mode: %s", mdb_strerror(rc));
     } else {
         log_write(LOG_ALWAYS, "DB", "INFO", "LMDB: set sync mode to %s on %s.", 
                   flag ? "sync" : "async", lmdb_dbfile);
@@ -92,7 +92,7 @@ static int lmdb_grow_mapsize(size_t minimum)
     rc = mdb_env_info(lmdb_env, &info);
     if (rc != 0)
     {
-        warning("lmdb_grow_mapsize: mdb_env_info failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_grow_mapsize: mdb_env_info failed: %s", mdb_strerror(rc));
         return 1;
     }
 
@@ -127,7 +127,7 @@ static int lmdb_grow_mapsize(size_t minimum)
     rc = mdb_env_set_mapsize(lmdb_env, target);
     if (rc != 0)
     {
-        warning("lmdb_grow_mapsize: mdb_env_set_mapsize failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_grow_mapsize: mdb_env_set_mapsize failed: %s", mdb_strerror(rc));
         return 1;
     }
 
@@ -168,7 +168,7 @@ static int lmdb_init(void)
     /* Create directory if it doesn't exist */
     if (stat(tmpdir, &st) != 0) {
         if (mkdir(tmpdir, 0700) != 0) {
-            warning("lmdb_init: cannot create directory %s", tmpdir);
+            log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: cannot create directory %s", tmpdir);
             XFREE(tmpfile);
             XFREE(tmpdir);
             return (1);
@@ -180,7 +180,7 @@ static int lmdb_init(void)
     /* Create LMDB environment */
     rc = mdb_env_create(&lmdb_env);
     if (rc != 0) {
-        warning("lmdb_init: mdb_env_create failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_env_create failed: %s", mdb_strerror(rc));
         XFREE(tmpfile);
         XFREE(tmpdir);
         return (1);
@@ -189,7 +189,7 @@ static int lmdb_init(void)
     /* Set map size (1 GB default, can grow) */
     rc = mdb_env_set_mapsize(lmdb_env, LMDB_DEFAULT_MAPSIZE);
     if (rc != 0) {
-        warning("lmdb_init: mdb_env_set_mapsize failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_env_set_mapsize failed: %s", mdb_strerror(rc));
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
         XFREE(tmpfile);
@@ -202,7 +202,7 @@ static int lmdb_init(void)
     /* Set max databases (we only use 1, but allow expansion) */
     rc = mdb_env_set_maxdbs(lmdb_env, 1);
     if (rc != 0) {
-        warning("lmdb_init: mdb_env_set_maxdbs failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_env_set_maxdbs failed: %s", mdb_strerror(rc));
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
         XFREE(tmpfile);
@@ -218,7 +218,7 @@ static int lmdb_init(void)
     
     rc = mdb_env_open(lmdb_env, tmpdir, env_flags, 0600);
     if (rc != 0) {
-        warning("lmdb_init: mdb_env_open failed on %s: %s", tmpdir, mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_env_open failed on %s: %s", tmpdir, mdb_strerror(rc));
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
         XFREE(tmpfile);
@@ -230,13 +230,13 @@ static int lmdb_init(void)
     if (rc == 0) {
         lmdb_mapsize = (size_t)info.me_mapsize;
     } else {
-        warning("lmdb_init: mdb_env_info failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_env_info failed: %s", mdb_strerror(rc));
     }
 
     /* Open main database */
     rc = mdb_txn_begin(lmdb_env, NULL, 0, &txn);
     if (rc != 0) {
-        warning("lmdb_init: mdb_txn_begin failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_txn_begin failed: %s", mdb_strerror(rc));
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
         XFREE(tmpfile);
@@ -246,7 +246,7 @@ static int lmdb_init(void)
 
     rc = mdb_dbi_open(txn, NULL, MDB_CREATE, &lmdb_dbi);
     if (rc != 0) {
-        warning("lmdb_init: mdb_dbi_open failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_dbi_open failed: %s", mdb_strerror(rc));
         mdb_txn_abort(txn);
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
@@ -257,7 +257,7 @@ static int lmdb_init(void)
 
     rc = mdb_txn_commit(txn);
     if (rc != 0) {
-        warning("lmdb_init: mdb_txn_commit failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_init: mdb_txn_commit failed: %s", mdb_strerror(rc));
         mdb_env_close(lmdb_env);
         lmdb_env = NULL;
         XFREE(tmpfile);
@@ -343,7 +343,7 @@ static UDB_DATA lmdb_get(UDB_DATA gamekey, unsigned int type)
     /* Start read-only transaction */
     rc = mdb_txn_begin(lmdb_env, NULL, MDB_RDONLY, &txn);
     if (rc != 0) {
-        warning("lmdb_get: mdb_txn_begin failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_get: mdb_txn_begin failed: %s", mdb_strerror(rc));
         XFREE(keybuf);
         return gamedata;
     }
@@ -356,7 +356,7 @@ static UDB_DATA lmdb_get(UDB_DATA gamekey, unsigned int type)
         XMEMCPY(gamedata.dptr, data.mv_data, data.mv_size);
         gamedata.dsize = (int)data.mv_size;
     } else if (rc != MDB_NOTFOUND) {
-        warning("lmdb_get: mdb_get failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_get: mdb_get failed: %s", mdb_strerror(rc));
     }
 
     mdb_txn_abort(txn);  /* Read-only, so abort is fine */
@@ -396,7 +396,7 @@ static int lmdb_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 retry_put:
     rc = mdb_txn_begin(lmdb_env, NULL, 0, &txn);
     if (rc != 0) {
-        warning("lmdb_put: mdb_txn_begin failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_put: mdb_txn_begin failed: %s", mdb_strerror(rc));
         XFREE(keybuf);
         return (1);
     }
@@ -414,7 +414,7 @@ retry_put:
     }
 
     if (rc != 0) {
-        warning("lmdb_put: mdb_put failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_put: mdb_put failed: %s", mdb_strerror(rc));
         mdb_txn_abort(txn);
         XFREE(keybuf);
         return (1);
@@ -431,7 +431,7 @@ retry_put:
     }
 
     if (rc != 0) {
-        warning("lmdb_put: mdb_txn_commit failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_put: mdb_txn_commit failed: %s", mdb_strerror(rc));
         XFREE(keybuf);
         return (1);
     }
@@ -470,7 +470,7 @@ static int lmdb_del(UDB_DATA gamekey, unsigned int type)
     /* Start write transaction */
     rc = mdb_txn_begin(lmdb_env, NULL, 0, &txn);
     if (rc != 0) {
-        warning("lmdb_del: mdb_txn_begin failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_del: mdb_txn_begin failed: %s", mdb_strerror(rc));
         XFREE(keybuf);
         return (1);
     }
@@ -478,7 +478,7 @@ static int lmdb_del(UDB_DATA gamekey, unsigned int type)
     /* Delete record */
     rc = mdb_del(txn, lmdb_dbi, &key, NULL);
     if (rc != 0 && rc != MDB_NOTFOUND) {
-        warning("lmdb_del: mdb_del failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_del: mdb_del failed: %s", mdb_strerror(rc));
         mdb_txn_abort(txn);
         XFREE(keybuf);
         return (1);
@@ -487,7 +487,7 @@ static int lmdb_del(UDB_DATA gamekey, unsigned int type)
     /* Commit transaction */
     rc = mdb_txn_commit(txn);
     if (rc != 0) {
-        warning("lmdb_del: mdb_txn_commit failed: %s", mdb_strerror(rc));
+        log_write(LOG_ALWAYS, "DB", "WARN", "lmdb_del: mdb_txn_commit failed: %s", mdb_strerror(rc));
         XFREE(keybuf);
         return (1);
     }

@@ -20,20 +20,20 @@ set(NETMUSH_SOURCES
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
-    string_util.c timer.c typedefs.h udb_misc.c udb_obj.c 
+    string_util.c timer.c typedefs.h db_common_obj.c 
     unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-    udb_backend.c udb_backend.h
+    db_backend.c db_backend.h
 )
 
 # Add backend-specific source files
 if(USE_LMDB)
-    list(APPEND NETMUSH_SOURCES udb_lmdb.c)
+    list(APPEND NETMUSH_SOURCES db_lmdb.c)
     add_compile_definitions(USE_LMDB)
     message(STATUS "Database backend: LMDB")
 endif()
 
 if(USE_GDBM)
-    list(APPEND NETMUSH_SOURCES udb_gdbm.c recover.c)
+    list(APPEND NETMUSH_SOURCES db_gdbm_ochunk.c db_gdbm.c recover.c)
     add_compile_definitions(USE_GDBM)
     message(STATUS "Database backend: GDBM")
 endif()
