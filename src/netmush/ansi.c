@@ -1628,7 +1628,7 @@ bool ansi_parse_ansi_to_sequences(const char *input, ColorSequence *sequences)
 
     while (i < input_len)
     {
-        if (input[i] == '\033' && i + 1 < input_len && input[i + 1] == '[')
+        if (input[i] == C_ANSI_ESC && i + 1 < input_len && input[i + 1] == C_ANSI_CSI)
         {
             // Find the end of the sequence
             size_t start = i;
@@ -2049,13 +2049,13 @@ const char *ansi_char_to_sequence(int ch)
             if (colorDefinitions[i].ansi_index >= 30 && colorDefinitions[i].ansi_index <= 37)
             {
                 // Foreground color
-                snprintf(buffer, sizeof(buffer), "\033[%dm", 30 + colorDefinitions[i].ansi_index);
+                snprintf(buffer, sizeof(buffer), "%c%c%dm", C_ANSI_ESC, C_ANSI_CSI, 30 + colorDefinitions[i].ansi_index);
                 return buffer;
             }
             else if (colorDefinitions[i].ansi_index >= 40 && colorDefinitions[i].ansi_index <= 47)
             {
                 // Background color
-                snprintf(buffer, sizeof(buffer), "\033[%dm", 40 + (colorDefinitions[i].ansi_index - 8));
+                snprintf(buffer, sizeof(buffer), "%c%c%dm", C_ANSI_ESC, C_ANSI_CSI, 40 + (colorDefinitions[i].ansi_index - 8));
                 return buffer;
             }
         }
@@ -2081,7 +2081,7 @@ const char *ansi_char_bright_to_sequence(int ch)
             if (colorDefinitions[i].ansi_index >= 0 && colorDefinitions[i].ansi_index <= 7)
             {
                 // Bright foreground color (90-97)
-                snprintf(buffer, sizeof(buffer), "\033[%dm", 90 + colorDefinitions[i].ansi_index);
+                snprintf(buffer, sizeof(buffer), "%c%c%dm", C_ANSI_ESC, C_ANSI_CSI, 90 + colorDefinitions[i].ansi_index);
                 return buffer;
             }
         }
@@ -3039,7 +3039,7 @@ ColorState ansi_parse_sequence(const char **ansi_ptr)
 {
     ColorState state = {0};
     
-    if (!ansi_ptr || !*ansi_ptr || **ansi_ptr != '\033')
+    if (!ansi_ptr || !*ansi_ptr || **ansi_ptr != C_ANSI_ESC)
         return state;
     
     const char *start = *ansi_ptr;
