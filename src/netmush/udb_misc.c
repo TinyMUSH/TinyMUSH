@@ -63,11 +63,11 @@ void warning(const char *p, ...)
 	char *buffer = NULL;
 	int size = 0;
 	const char *str = NULL;
+	int first = 1;
 
 	va_start(ap, p);
 
 	/* Calculate total size needed for concatenation */
-	size = 0;
 	str = p;
 	va_list ap_copy;
 	va_copy(ap_copy, ap);
@@ -103,11 +103,28 @@ void warning(const char *p, ...)
 	{
 		if (str == (const char *)-1)
 		{
-			strcat(buffer, safe_strerror(errno));
+			const char *err = safe_strerror(errno);
+			if (first)
+			{
+				strcpy(buffer, err);
+				first = 0;
+			}
+			else
+			{
+				strcat(buffer, err);
+			}
 		}
 		else
 		{
-			strcat(buffer, str);
+			if (first)
+			{
+				strcpy(buffer, str);
+				first = 0;
+			}
+			else
+			{
+				strcat(buffer, str);
+			}
 		}
 		str = va_arg(ap, const char *);
 	}
@@ -131,11 +148,11 @@ void fatal(const char *p, ...)
 	char *buffer = NULL;
 	int size = 0;
 	const char *str = NULL;
+	int first = 1;
 
 	va_start(ap, p);
 
 	/* Calculate total size needed for concatenation */
-	size = 0;
 	str = p;
 	va_list ap_copy;
 	va_copy(ap_copy, ap);
@@ -171,11 +188,28 @@ void fatal(const char *p, ...)
 	{
 		if (str == (const char *)-1)
 		{
-			strcat(buffer, safe_strerror(errno));
+			const char *err = safe_strerror(errno);
+			if (first)
+			{
+				strcpy(buffer, err);
+				first = 0;
+			}
+			else
+			{
+				strcat(buffer, err);
+			}
 		}
 		else
 		{
-			strcat(buffer, str);
+			if (first)
+			{
+				strcpy(buffer, str);
+				first = 0;
+			}
+			else
+			{
+				strcat(buffer, str);
+			}
 		}
 		str = va_arg(ap, const char *);
 	}
