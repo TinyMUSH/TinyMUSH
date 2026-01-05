@@ -89,7 +89,7 @@ void warning(const char *p, ...)
 	va_end(ap_copy);
 
 	/* Allocate buffer and concatenate strings */
-	buffer = (char *)calloc(size + 1, sizeof(char));
+	buffer = calloc(size + 1, 1);
 	if (buffer == NULL)
 	{
 		/* Fallback if allocation fails */
@@ -144,12 +144,8 @@ void fatal(const char *p, ...)
 	{
 		if (str == (const char *)-1)
 		{
-			char errbuf[256];
-			if (strerror_r(errno, errbuf, sizeof(errbuf)) != 0)
-			{
-				snprintf(errbuf, sizeof(errbuf), "Unknown error %d", errno);
-			}
-			size += strlen(errbuf);
+			const char *err = safe_strerror(errno);
+			size += strlen(err);
 		}
 		else
 		{
@@ -161,7 +157,7 @@ void fatal(const char *p, ...)
 	va_end(ap_copy);
 
 	/* Allocate buffer and concatenate strings */
-	buffer = (char *)calloc(size + 1, sizeof(char));
+	buffer = calloc(size + 1, 1);
 	if (buffer == NULL)
 	{
 		/* Fallback if allocation fails - use minimal logging and exit */
@@ -175,12 +171,7 @@ void fatal(const char *p, ...)
 	{
 		if (str == (const char *)-1)
 		{
-			char errbuf[256];
-			if (strerror_r(errno, errbuf, sizeof(errbuf)) != 0)
-			{
-				snprintf(errbuf, sizeof(errbuf), "Unknown error %d", errno);
-			}
-			strcat(buffer, errbuf);
+			strcat(buffer, safe_strerror(errno));
 		}
 		else
 		{
