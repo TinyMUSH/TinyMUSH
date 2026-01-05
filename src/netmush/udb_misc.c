@@ -8,8 +8,6 @@
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  *
- * @todo Convert to standard logging functions
- *
  */
 
 #include "config.h"
@@ -62,26 +60,73 @@ void log_db_err(int obj, int attr, const char *txt)
 void warning(const char *p, ...)
 {
 	va_list ap;
+	char *buffer = NULL;
+	char *bufptr = NULL;
+	int size = 0;
+	const char *str = NULL;
+
 	va_start(ap, p);
 
-	while (1)
+	/* Calculate total size needed for concatenation */
+	str = p;
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+
+	while (str != (const char *)0)
 	{
-		if (p == (const char *)0)
+		if (str == (const char *)-1)
 		{
-			break;
+			const char *err = safe_strerror(errno);
+			size += strlen(err);
 		}
-
-		if (p == (const char *)-1)
+		else
 		{
-			p = (const char *)safe_strerror(errno);
+			size += strlen(str);
 		}
-
-		log_write_raw(1, "%s", p);
-		p = va_arg(ap, const char *);
+		str = va_arg(ap_copy, const char *);
 	}
 
+	va_end(ap_copy);
+
+	/* Allocate buffer and concatenate strings */
+	buffer = malloc(size + 1);
+	if (buffer == NULL)
+	{
+		/* Fallback if allocation fails */
+		log_write(LOG_ALWAYS, "UDB", "ERROR", "Memory allocation failed in warning()");
+		va_end(ap);
+		return;
+	}
+
+	bufptr = buffer;
+	str = p;
+	while (str != (const char *)0)
+	{
+		const char *src;
+		size_t len;
+
+		if (str == (const char *)-1)
+		{
+			src = safe_strerror(errno);
+		}
+		else
+		{
+			src = str;
+		}
+
+		len = strlen(src);
+		memcpy(bufptr, src, len);
+		bufptr += len;
+
+		str = va_arg(ap, const char *);
+	}
+	*bufptr = '\0';
+
 	va_end(ap);
-	log_write_raw(1, "\n");
+
+	/* Use standard logging */
+	log_write(LOG_ALWAYS, "UDB", "WARN", "%s", buffer);
+	free(buffer);
 }
 
 /*
@@ -93,30 +138,72 @@ void warning(const char *p, ...)
 void fatal(const char *p, ...)
 {
 	va_list ap;
+	char *buffer = NULL;
+	char *bufptr = NULL;
+	int size = 0;
+	const char *str = NULL;
+
 	va_start(ap, p);
 
-	while (1)
+	/* Calculate total size needed for concatenation */
+	str = p;
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+
+	while (str != (const char *)0)
 	{
-		if (p == (const char *)0)
+		if (str == (const char *)-1)
 		{
-			break;
+			const char *err = safe_strerror(errno);
+			size += strlen(err);
 		}
-
-		if (p == (const char *)-1)
+		else
 		{
-			static char errbuf[256];
-			if (strerror_r(errno, errbuf, sizeof(errbuf)) != 0)
-			{
-				snprintf(errbuf, sizeof(errbuf), "Unknown error %d", errno);
-			}
-			p = errbuf;
+			size += strlen(str);
 		}
-
-		log_write_raw(1, "%s", p);
-		p = va_arg(ap, const char *);
+		str = va_arg(ap_copy, const char *);
 	}
 
+	va_end(ap_copy);
+
+	/* Allocate buffer and concatenate strings */
+	buffer = malloc(size + 1);
+	if (buffer == NULL)
+	{
+		/* Fallback if allocation fails - use minimal logging and exit */
+		log_write(LOG_ALWAYS, "UDB", "FATAL", "Memory allocation failed in fatal(), exiting");
+		va_end(ap);
+		exit(EXIT_FAILURE);
+	}
+
+	bufptr = buffer;
+	str = p;
+	while (str != (const char *)0)
+	{
+		const char *src;
+		size_t len;
+
+		if (str == (const char *)-1)
+		{
+			src = safe_strerror(errno);
+		}
+		else
+		{
+			src = str;
+		}
+
+		len = strlen(src);
+		memcpy(bufptr, src, len);
+		bufptr += len;
+
+		str = va_arg(ap, const char *);
+	}
+	*bufptr = '\0';
+
 	va_end(ap);
-	log_write_raw(1, "\n");
+
+	/* Use standard logging */
+	log_write(LOG_ALWAYS, "UDB", "FATAL", "%s", buffer);
+	free(buffer);
 	exit(EXIT_FAILURE);
 }
