@@ -34,7 +34,7 @@ if(USE_LMDB)
 endif()
 
 if(USE_GDBM)
-    list(APPEND NETMUSH_SOURCES db_storage_gdbm.c)
+    list(APPEND NETMUSH_SOURCES db_backend_gdbm.c)
     add_compile_definitions(USE_GDBM)
     message(STATUS "Database backend: GDBM")
 endif()

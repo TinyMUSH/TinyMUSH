@@ -1,5 +1,5 @@
 /**
- * @file db_storage_gdbm.c
+ * @file db_backend_gdbm.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief GDBM database backend implementation and recovery tools
  * @version 4.0
