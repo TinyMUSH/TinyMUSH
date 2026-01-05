@@ -1,5 +1,5 @@
 /**
- * @file db_storage_lmdb.c
+ * @file db_backend_lmdb.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief LMDB database backend implementation
  * @version 4.0

@@ -28,7 +28,7 @@ set(NETMUSH_SOURCES
 
 # Add backend-specific source files
 if(USE_LMDB)
-    list(APPEND NETMUSH_SOURCES db_storage_lmdb.c)
+    list(APPEND NETMUSH_SOURCES db_backend_lmdb.c)
     add_compile_definitions(USE_LMDB)
     message(STATUS "Database backend: LMDB")
 endif()
