@@ -2950,18 +2950,8 @@ void list_textfiles(dbref player)
  */
 void list_db_stats(dbref player)
 {
-	notify(player, "DB Cache Stats              Writes                    Reads");
-	notify(player, "--------------------------- ------------------------- -------------------------");
-	raw_notify(player, "Calls                       %-25d %-25d", cs_writes, cs_reads);
-	raw_notify(player, "Cache Hits                  %-25d %-25d", cs_whits, cs_rhits);
-	raw_notify(player, "I/O                         %-25d %-25d", cs_dbwrites, cs_dbreads);
-	raw_notify(player, "Failed                                                %-25d", cs_fails);
-	raw_notify(player, "Hit ratio                   %-3.0f%%                      %-3.0f%%", (cs_writes ? (float)cs_whits / cs_writes * 100 : 0.0), (cs_reads ? (float)cs_rhits / cs_reads * 100 : 0.0));
-	raw_notify(player, "Deletes                     %d", cs_dels);
-	raw_notify(player, "Checks                      %d", cs_checks);
-	raw_notify(player, "Syncs                       %d", cs_syncs);
-	notify(player, "-------------------------------------------------------------------------------");
-	raw_notify(player, "Cache size: %d bytes. Cache time: %d seconds.", cs_size, (int)(time(NULL) - cs_ltime));
+	notify(player, "Database cache layer removed; backend is accessed directly.");
+	notify(player, "No cache statistics are available in this build.");
 }
 
 /**
@@ -3017,15 +3007,13 @@ void print_memory(dbref player, const char *item, size_t size)
  */
 void list_memory(dbref player)
 {
-	double total = 0, each = 0, each2 = 0;
+	double total = 0, each = 0;
 	int i = 0, j = 0;
 	CMDENT *cmd = NULL;
 	ADDENT *add = NULL;
 	NAMETAB *name = NULL;
 	ATTR *attr = NULL;
 	UFUN *ufunc = NULL;
-	UDB_CACHE *cp = NULL;
-	UDB_CHAIN *sp = NULL;
 	HASHENT *htab = NULL;
 	OBJSTACK *stack = NULL;
 	OBJGRID *grid = NULL;
@@ -3051,29 +3039,6 @@ void list_memory(dbref player)
 	each = sizeof(CONFDATA) + sizeof(STATEDATA);
 	print_memory(player, "mushconf/mushstate", each);
 	total += each;
-	/**
-	 * Calculate size of cache
-	 *
-	 */
-	each = cs_size;
-	print_memory(player, "Cache data", each);
-	total += each;
-	each = sizeof(UDB_CHAIN) * mushconf.cache_width;
-
-	for (i = 0; i < mushconf.cache_width; i++)
-	{
-		sp = &sys_c[i];
-
-		for (cp = sp->head; cp != NULL; cp = cp->nxt)
-		{
-			each += sizeof(UDB_CACHE);
-			each2 += cp->keylen;
-		}
-	}
-
-	print_memory(player, "Cache keys", each2);
-	print_memory(player, "Cache overhead", each);
-	total += each + each2;
 	/**
 	 * Calculate size of object pipelines
 	 *
@@ -3663,7 +3628,7 @@ void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attr
 		break;
 
 	case LIST_CACHEOBJS:
-		list_cached_objs(player);
+		notify(player, "Object cache removed: backend is accessed directly.");
 		break;
 
 	case LIST_TEXTFILES:
@@ -3683,7 +3648,7 @@ void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attr
 		break;
 
 	case LIST_CACHEATTRS:
-		list_cached_attrs(player);
+		notify(player, "Attribute cache removed: backend is accessed directly.");
 		break;
 
 	case LIST_RAWMEM:

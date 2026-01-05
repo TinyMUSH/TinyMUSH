@@ -23,6 +23,8 @@
 #include <limits.h>
 #include <lmdb.h>
 #include <sys/stat.h>
+#include <stdint.h>
+#include <stddef.h>
 
 /* LMDB-specific state */
 static char *lmdb_dbfile = DEFAULT_DBMCHUNKFILE;
@@ -30,8 +32,11 @@ static int lmdb_db_initted = 0;
 static MDB_env *lmdb_env = NULL;
 static MDB_dbi lmdb_dbi = 0;
 
-/* LMDB default map size: 1 GB, expandable */
+/* LMDB map sizing (default 1 GB, grows as needed up to 16 GB) */
 #define LMDB_DEFAULT_MAPSIZE (1UL * 1024UL * 1024UL * 1024UL)
+#define LMDB_MAX_MAPSIZE (16UL * 1024UL * 1024UL * 1024UL)
+#define LMDB_MAP_GROWTH_FACTOR 2UL
+static size_t lmdb_mapsize = LMDB_DEFAULT_MAPSIZE;
 
 static void lmdb_setsync(int flag)
 {
@@ -66,6 +71,66 @@ static void lmdb_setsync(int flag)
     }
 }
 
+/* Grow the LMDB mapsize to accommodate additional writes */
+static int lmdb_grow_mapsize(size_t minimum)
+{
+    MDB_envinfo info;
+    size_t current;
+    size_t target;
+    int rc;
+
+    if (!lmdb_env)
+    {
+        return 1;
+    }
+
+    rc = mdb_env_info(lmdb_env, &info);
+    if (rc != 0)
+    {
+        warning("lmdb_grow_mapsize: mdb_env_info failed: %s", mdb_strerror(rc));
+        return 1;
+    }
+
+    current = (size_t)info.me_mapsize;
+    target = current;
+
+    if (target < LMDB_DEFAULT_MAPSIZE)
+    {
+        target = LMDB_DEFAULT_MAPSIZE;
+    }
+
+    if (minimum > target)
+    {
+        target = minimum;
+    }
+
+    while (target < minimum && target <= (LMDB_MAX_MAPSIZE / LMDB_MAP_GROWTH_FACTOR))
+    {
+        target *= LMDB_MAP_GROWTH_FACTOR;
+    }
+
+    if (target > LMDB_MAX_MAPSIZE)
+    {
+        target = LMDB_MAX_MAPSIZE;
+    }
+
+    if (target <= current)
+    {
+        return 1;
+    }
+
+    rc = mdb_env_set_mapsize(lmdb_env, target);
+    if (rc != 0)
+    {
+        warning("lmdb_grow_mapsize: mdb_env_set_mapsize failed: %s", mdb_strerror(rc));
+        return 1;
+    }
+
+    lmdb_mapsize = target;
+    log_write(LOG_ALWAYS, "DB", "INFO", "LMDB: grew map to %zu bytes", target);
+    return 0;
+}
+
 static int lmdb_optimize(void)
 {
     /* LMDB doesn't require manual optimization like GDBM */
@@ -80,6 +145,7 @@ static int lmdb_init(void)
     char *tmpdir;
     int rc;
     MDB_txn *txn = NULL;
+    MDB_envinfo info;
     struct stat st;
 
     if (!mushstate.standalone)
@@ -126,6 +192,8 @@ static int lmdb_init(void)
         return (1);
     }
 
+    lmdb_mapsize = LMDB_DEFAULT_MAPSIZE;
+
     /* Set max databases (we only use 1, but allow expansion) */
     rc = mdb_env_set_maxdbs(lmdb_env, 1);
     if (rc != 0) {
@@ -151,6 +219,13 @@ static int lmdb_init(void)
         XFREE(tmpfile);
         XFREE(tmpdir);
         return (1);
+    }
+
+    rc = mdb_env_info(lmdb_env, &info);
+    if (rc == 0) {
+        lmdb_mapsize = (size_t)info.me_mapsize;
+    } else {
+        warning("lmdb_init: mdb_env_info failed: %s", mdb_strerror(rc));
     }
 
     /* Open main database */
@@ -225,6 +300,7 @@ static bool lmdb_close(void)
     }
 
     lmdb_db_initted = 0;
+    lmdb_mapsize = LMDB_DEFAULT_MAPSIZE;
     return true;
 }
 
@@ -312,7 +388,7 @@ static int lmdb_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
     data.mv_data = gamedata.dptr;
     data.mv_size = gamedata.dsize;
 
-    /* Start write transaction */
+retry_put:
     rc = mdb_txn_begin(lmdb_env, NULL, 0, &txn);
     if (rc != 0) {
         warning("lmdb_put: mdb_txn_begin failed: %s", mdb_strerror(rc));
@@ -320,8 +396,18 @@ static int lmdb_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
         return (1);
     }
 
-    /* Store data (MDB_NOOVERWRITE = 0 means replace) */
     rc = mdb_put(txn, lmdb_dbi, &key, &data, 0);
+    if (rc == MDB_MAP_FULL) {
+        mdb_txn_abort(txn);
+
+        if (lmdb_grow_mapsize(lmdb_mapsize * LMDB_MAP_GROWTH_FACTOR) == 0) {
+            goto retry_put;
+        }
+
+        XFREE(keybuf);
+        return (1);
+    }
+
     if (rc != 0) {
         warning("lmdb_put: mdb_put failed: %s", mdb_strerror(rc));
         mdb_txn_abort(txn);
@@ -329,8 +415,16 @@ static int lmdb_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
         return (1);
     }
 
-    /* Commit transaction */
     rc = mdb_txn_commit(txn);
+    if (rc == MDB_MAP_FULL) {
+        if (lmdb_grow_mapsize(lmdb_mapsize * LMDB_MAP_GROWTH_FACTOR) == 0) {
+            goto retry_put;
+        }
+
+        XFREE(keybuf);
+        return (1);
+    }
+
     if (rc != 0) {
         warning("lmdb_put: mdb_txn_commit failed: %s", mdb_strerror(rc));
         XFREE(keybuf);

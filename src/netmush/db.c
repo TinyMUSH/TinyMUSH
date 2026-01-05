@@ -2296,6 +2296,91 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
     }
 }
 
+static void notify_module_attr_put(UDB_DATA key)
+{
+    for (MODULE *mp = mushstate.modules_list; mp != NULL; mp = mp->next)
+    {
+        if (mp->cache_put_notify)
+        {
+            mp->cache_put_notify(key, DBTYPE_ATTRIBUTE);
+        }
+    }
+}
+
+static void notify_module_attr_del(UDB_DATA key)
+{
+    for (MODULE *mp = mushstate.modules_list; mp != NULL; mp = mp->next)
+    {
+        if (mp->cache_del_notify)
+        {
+            mp->cache_del_notify(key, DBTYPE_ATTRIBUTE);
+        }
+    }
+}
+
+static void db_attribute_delete(UDB_ANAME *okey)
+{
+    UDB_DATA key = {okey, sizeof(UDB_ANAME)};
+
+    notify_module_attr_del(key);
+
+    if (mushstate.standalone)
+    {
+        pipe_del_attrib(okey->attrnum, okey->object);
+        return;
+    }
+
+    db_lock();
+    pipe_del_attrib(okey->attrnum, okey->object);
+    attrib_sync();
+    db_unlock();
+}
+
+static void db_attribute_store(UDB_ANAME *okey, char *value)
+{
+    UDB_DATA key = {okey, sizeof(UDB_ANAME)};
+
+    notify_module_attr_put(key);
+
+    if (mushstate.standalone)
+    {
+        pipe_set_attrib(okey->attrnum, okey->object, value);
+        XFREE(value);
+        return;
+    }
+
+    db_lock();
+    pipe_set_attrib(okey->attrnum, okey->object, value);
+    attrib_sync();
+    db_unlock();
+
+    XFREE(value);
+}
+
+static char *db_attribute_fetch(UDB_ANAME *okey)
+{
+    return pipe_get_attrib(okey->attrnum, okey->object);
+}
+
+int db_sync_attributes(void)
+{
+    if (mushstate.standalone || mushstate.restarting)
+    {
+        dddb_setsync(0);
+    }
+
+    db_lock();
+    attrib_sync();
+    db_unlock();
+
+    if (mushstate.standalone || mushstate.restarting)
+    {
+        dddb_setsync(1);
+    }
+
+    return 0;
+}
+
 /**
  * @brief clear an attribute in the list.
  *
@@ -2305,16 +2390,13 @@ void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags,
 void atr_clr(dbref thing, int atr)
 {
     UDB_ANAME okey;
-    UDB_DATA key;
 
     /**
      * Delete the entry from cache
      *
      */
     makekey(thing, atr, &okey);
-    key.dptr = &okey;
-    key.dsize = sizeof(UDB_ANAME);
-    cache_del(key, DBTYPE_ATTRIBUTE);
+    db_attribute_delete(&okey);
     al_delete(thing, atr);
 
     if (!mushstate.standalone && !mushstate.loading_db)
@@ -2383,7 +2465,6 @@ void atr_add_raw(dbref thing, int atr, char *buff)
 {
     char *a = NULL;
     UDB_ANAME okey;
-    UDB_DATA key, data;
 
     makekey(thing, atr, &okey);
 
@@ -2393,9 +2474,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
          * Delete the entry from cache
          *
          */
-        key.dptr = &okey;
-        key.dsize = sizeof(UDB_ANAME);
-        cache_del(key, DBTYPE_ATTRIBUTE);
+        db_attribute_delete(&okey);
         al_delete(thing, atr);
         return;
     }
@@ -2410,11 +2489,7 @@ void atr_add_raw(dbref thing, int atr, char *buff)
      * Store the value in cache
      *
      */
-    key.dptr = &okey;
-    key.dsize = sizeof(UDB_ANAME);
-    data.dptr = a;
-    data.dsize = strlen(a) + 1;
-    cache_put(key, data, DBTYPE_ATTRIBUTE);
+    db_attribute_store(&okey, a);
     al_add(thing, atr);
 
     if (!mushstate.standalone && !mushstate.loading_db)
@@ -2548,7 +2623,6 @@ void atr_set_flags(dbref thing, int atr, dbref flags)
  */
 char *atr_get_raw(dbref thing, int atr)
 {
-    UDB_DATA key, data;
     UDB_ANAME okey;
 
     if (Typeof(thing) == TYPE_GARBAGE)
@@ -2566,10 +2640,7 @@ char *atr_get_raw(dbref thing, int atr)
      * Fetch the entry from cache and return it
      *
      */
-    key.dptr = &okey;
-    key.dsize = sizeof(UDB_ANAME);
-    data = cache_get(key, DBTYPE_ATTRIBUTE);
-    return data.dptr;
+    return db_attribute_fetch(&okey);
 }
 
 /**
@@ -3778,7 +3849,6 @@ int init_database(char *dbfile)
          */
     }
 
-    cache_init(mushconf.cache_width);
     dddb_setfile(dbfile);
     dddb_init();
     

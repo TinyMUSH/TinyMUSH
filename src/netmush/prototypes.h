@@ -1303,20 +1303,6 @@ extern void pipe_set_attrib(int anum, unsigned int obj, char *value);
 extern void pipe_del_attrib(int anum, unsigned int obj);
 extern void attrib_sync(void);
 
-/* udb_ocache.c */
-extern int cachehash(void *keydata, int keylen, unsigned int type);
-extern void cache_repl(UDB_CACHE *cp, void *new, int len, unsigned int type, unsigned int flags);
-extern int cache_init(int width);
-extern void cache_reset(void);
-extern void list_cached_objs(dbref player);
-extern void list_cached_attrs(dbref player);
-extern UDB_DATA cache_get(UDB_DATA key, unsigned int type);
-extern int cache_put(UDB_DATA key, UDB_DATA data, unsigned int type);
-extern UDB_CACHE *get_free_entry(int atrsize);
-extern int cache_write(UDB_CACHE *cp);
-extern int cache_sync(void);
-extern void cache_del(UDB_DATA key, unsigned int type);
-
 /* udb_ochunk.c */
 extern void dddb_setsync(int flag);
 extern void dbm_error(const char *msg);
@@ -1329,6 +1315,7 @@ extern int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type);
 extern int db_del(UDB_DATA gamekey, unsigned int type);
 extern void db_lock(void);
 extern void db_unlock(void);
+extern int db_sync_attributes(void);
 
 /* unparse.c */
 extern char *unparse_object_quiet(dbref loc);

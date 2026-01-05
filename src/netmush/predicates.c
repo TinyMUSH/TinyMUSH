@@ -1894,7 +1894,7 @@ void do_restart(dbref player, __attribute__((unused)) dbref cause, __attribute__
 	al_store(); /* Persist any in-memory attribute list before restart */
 	dump_database_internal(DUMP_DB_RESTART);
 
-	cache_sync();
+	db_sync_attributes();
 	dddb_close();
 
 	logfile_close();

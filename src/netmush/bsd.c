@@ -1478,7 +1478,7 @@ void sighandler(int sig)
 			 */
 			al_store(); /* Persist any in-memory attribute list before crash dump */
 			dump_database_internal(DUMP_DB_CRASH);
-			cache_sync();
+			db_sync_attributes();
 			dddb_close();
 
 			/**

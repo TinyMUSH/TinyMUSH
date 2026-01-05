@@ -21,7 +21,7 @@ set(NETMUSH_SOURCES
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
     string_util.c timer.c typedefs.h udb_misc.c udb_obj.c 
-    udb_ocache.c unparse.c vattr.c version.c walkdb.c wild.c wiz.c
+    unparse.c vattr.c version.c walkdb.c wild.c wiz.c
     udb_backend.c udb_backend.h
 )
 
@@ -72,18 +72,7 @@ endif()
 target_link_libraries(netmush PRIVATE ${NETMUSH_LIBRARIES})
 install(TARGETS netmush DESTINATION ${CMAKE_INSTALL_PREFIX}/)
 
-# Database converter utility (requires both GDBM and LMDB). Build only if both are available.
-find_library(GDBM_LIBRARY_DBCONVERT gdbm)
-if(USE_LMDB)
-    find_library(LMDB_LIBRARY_DBCONVERT lmdb)
-endif()
-
-if(GDBM_LIBRARY_DBCONVERT AND LMDB_LIBRARY_DBCONVERT)
-    add_executable(dbconvert dbconvert.c)
-    target_link_libraries(dbconvert PRIVATE ${GDBM_LIBRARY_DBCONVERT} ${LMDB_LIBRARY_DBCONVERT})
-    install(TARGETS dbconvert DESTINATION ${CMAKE_INSTALL_PREFIX}/)
-else()
-    message(STATUS "dbconvert skipped (requires both GDBM and LMDB libraries)")
-endif()
+# Database converter utility (requires both backends); disabled when builds are mutually exclusive.
+message(STATUS "dbconvert skipped (LMDB/GDBM builds are mutually exclusive)")
 
 ## Removed temporary vt100 test and benchmark executables

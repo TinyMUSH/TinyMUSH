@@ -23,26 +23,17 @@
 #include <sys/file.h>
 #include <unistd.h>
 
-/* Current active backend */
-db_backend_t *current_backend = NULL;
+/* Current active backend (chosen at compile time) */
+#if defined(USE_LMDB) && !defined(USE_GDBM)
+db_backend_t *current_backend = &lmdb_backend;
+#elif defined(USE_GDBM) && !defined(USE_LMDB)
+db_backend_t *current_backend = &gdbm_backend;
+#else
+#error "Exactly one database backend must be enabled (USE_LMDB xor USE_GDBM)"
+#endif
 
 /* File lock structure for GDBM backend */
 static struct flock fl;
-
-/* Select default backend if none chosen yet */
-static void ensure_backend_selected(void)
-{
-    if (current_backend) {
-        return;
-    }
-#ifdef USE_LMDB
-    current_backend = &lmdb_backend;
-#elif defined(USE_GDBM)
-    current_backend = &gdbm_backend;
-#else
-#error "No database backend configured (USE_LMDB or USE_GDBM required)"
-#endif
-}
 
 /**
  * @brief Configure sync mode
@@ -50,7 +41,6 @@ static void ensure_backend_selected(void)
  */
 void dddb_setsync(int flag)
 {
-    ensure_backend_selected();
     if (current_backend && current_backend->setsync) {
         current_backend->setsync(flag);
     }
@@ -62,7 +52,6 @@ void dddb_setsync(int flag)
  */
 int dddb_optimize(void)
 {
-    ensure_backend_selected();
     if (current_backend && current_backend->optimize) {
         return current_backend->optimize();
     }
@@ -75,8 +64,6 @@ int dddb_optimize(void)
  */
 int dddb_init(void)
 {
-    ensure_backend_selected();
-    
     if (current_backend && current_backend->init) {
         return current_backend->init();
     }
@@ -90,7 +77,6 @@ int dddb_init(void)
  */
 int dddb_setfile(char *fil)
 {
-    ensure_backend_selected();
     if (current_backend && current_backend->setfile) {
         return current_backend->setfile(fil);
     }

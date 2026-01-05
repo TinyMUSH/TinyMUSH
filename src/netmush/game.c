@@ -1746,7 +1746,7 @@ int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __att
 	s = XASPRINTF("s", "%s/%s.FLAT", mushconf.bakhome, mushconf.db_file);
 	log_write(LOG_ALWAYS, "DMP", "DUMP", "Writing db: %s", s);
 	pcache_sync();
-	cache_sync();
+	db_sync_attributes();
 	fp = tf_fopen(s, O_WRONLY | O_CREAT | O_TRUNC);
 
 	if (fp != NULL)
@@ -2498,7 +2498,7 @@ void dump_database(void)
 	log_write(LOG_DBSAVES, "DMP", "DUMP", "Dumping: %s.#%d#", mushconf.db_file, mushstate.epoch);
 	al_store(); /* Persist any in-memory attribute list before sync */
 	pcache_sync();
-	cache_sync();
+	db_sync_attributes();
 	dump_database_internal(DUMP_DB_NORMAL);
 	log_write(LOG_DBSAVES, "DMP", "DONE", "Dump complete: %s.#%d#", mushconf.db_file, mushstate.epoch);
 	mushstate.dumping = 0;
@@ -2533,7 +2533,7 @@ void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
 
 	if (!(key & DUMP_FLATFILE))
 	{
-		cache_sync();
+		db_sync_attributes();
 
 		if ((key & DUMP_OPTIMIZE) || (mushconf.dbopt_interval && (mushstate.epoch % mushconf.dbopt_interval == 0)))
 		{
@@ -3220,7 +3220,7 @@ void recover_flatfile(char *flat)
 	 */
 	call_all_modules_nocache("db_write");
 	db_unlock();
-	cache_sync();
+	db_sync_attributes();
 	dddb_close();
 }
 
@@ -3497,7 +3497,7 @@ int dbconvert(int argc, char *argv[])
 	}
 
 	db_unlock();
-	cache_sync();
+	db_sync_attributes();
 	dddb_close();
 	exit(EXIT_SUCCESS);
 }
@@ -3808,7 +3808,7 @@ int dbconvert(int argc, char *argv[])
 	}
 
 	db_unlock();
-	cache_sync();
+	db_sync_attributes();
 	dddb_close();
 	exit(EXIT_SUCCESS);
 }
@@ -4388,16 +4388,7 @@ int main(int argc, char *argv[])
 	 */
 	mushstate.initializing = 0;
 
-	/*
-	 * Clear all reference flags in the cache-- what happens when the
-	 * game loads is NOT representative of normal cache behavior :)
-	 * Neither is creating a new db, but in that case the objects exist
-	 * only in the cache...
-	 */
-	if (!mindb)
-	{
-		cache_reset();
-	}
+	/* Cache layer removed; nothing to reset here. */
 
 	/*
 	 * This must happen after startups are run, in order to get a really
@@ -4482,7 +4473,7 @@ int main(int argc, char *argv[])
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");
 	close_sockets(0, (char *)"Going down - Bye");
 	dump_database();
-	cache_sync();
+	db_sync_attributes();
 	dddb_close();
 
 	if (fileexist(mushconf.log_file))

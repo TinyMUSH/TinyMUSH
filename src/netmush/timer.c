@@ -563,7 +563,7 @@ void dispatch(void)
         mushstate.check_counter = mushconf.check_interval + mushstate.now;
         mushstate.debug_cmd = (char *)"< dbck >";
         do_dbck(NOTHING, NOTHING, 0);
-        cache_sync();
+        db_sync_attributes();
         pcache_trim();
     }
 
