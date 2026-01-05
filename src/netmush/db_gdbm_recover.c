@@ -1,5 +1,5 @@
 /**
- * @file recover.c
+ * @file db_gdbm_recover.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Tool to traverse a corrupted GDBM database, locate tagged blocks, and rebuild a consistent database
  * @version 4.0

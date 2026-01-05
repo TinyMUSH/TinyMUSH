@@ -1,5 +1,5 @@
 /**
- * @file db_backend.h
+ * @file db_storage.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Abstract database backend interface for GDBM and LMDB
  * @version 4.0
@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef __DB_BACKEND_H
-#define __DB_BACKEND_H
+#ifndef __DB_STORAGE_H
+#define __DB_STORAGE_H
 
 #include "typedefs.h"
 #include <stdbool.h>

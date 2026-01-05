@@ -224,7 +224,7 @@ extern _Bool destroyable(dbref victim);
 extern _Bool can_destroy_player(dbref player, dbref victim);
 extern void do_destroy(dbref player, dbref cause, int key, char *what);
 
-/* db.c */
+/* db_runtime.c */
 extern void tf_xclose(FILE *fd);
 extern int tf_fiddle(int tfd);
 extern int tf_xopen(char *fname, int mode);
@@ -311,7 +311,7 @@ extern _Bool check_zone_for_player(dbref player, dbref thing);
 extern void dump_restart_db(void);
 extern void load_restart_db(void);
 
-/* db_rw.c */
+/* db_flatfile.c */
 extern BOOLEXP *getboolexp1(FILE *f);
 extern BOOLEXP *getboolexp(FILE *f);
 extern int unscramble_attrnum(int attrnum);
@@ -1186,7 +1186,7 @@ extern void show_quota(dbref player, dbref victim);
 extern void show_quota_header(dbref player);
 extern void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2);
 
-/* recover.c */
+/* db_gdbm_recover.c */
 #ifdef USE_GDBM
 extern void gdbm_panic(const char *mesg);
 extern int dbrecover(int argc, char *argv[]);
@@ -1298,9 +1298,8 @@ extern void pipe_set_attrib(int anum, unsigned int obj, char *value);
 extern void pipe_del_attrib(int anum, unsigned int obj);
 extern void attrib_sync(void);
 
-/* db_gdbm_ochunk.c */
+/* db_storage.c */
 extern void dddb_setsync(int flag);
-extern void dbm_error(const char *msg);
 extern int dddb_optimize(void);
 extern int dddb_init(void);
 extern int dddb_setfile(char *fil);

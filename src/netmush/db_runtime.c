@@ -1,7 +1,7 @@
 /**
- * @file db.c
+ * @file db_runtime.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Core database object utilities and attribute access/manipulation helpers
+ * @brief Runtime database management: object table, attributes, file helpers
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

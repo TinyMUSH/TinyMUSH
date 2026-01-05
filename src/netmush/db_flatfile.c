@@ -1,7 +1,7 @@
 /**
- * @file db_rw.c
+ * @file db_flatfile.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
- * @brief Flatfile persistence layer for reading/writing the game database
+ * @brief Flatfile persistence: reading/writing database dumps and format conversion
  * @version 4.0
  *
  * @copyright Copyright (C) 1989-2025 TinyMUSH development team.

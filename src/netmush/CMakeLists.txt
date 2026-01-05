@@ -15,14 +15,14 @@ endif()
 # Base source files
 set(NETMUSH_SOURCES
     alloc.c ansi.c ansi.h api.c boolexp.c bsd.c command.c conf.c constants.h 
-    cque.c create.c db.c db_rw.c eval.c externs.h file_c.c flags.c fnhelper.c 
+    cque.c create.c db_runtime.c db_flatfile.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
     string_util.c timer.c typedefs.h db_common_obj.c 
     unparse.c vattr.c version.c walkdb.c wild.c wiz.c
-    db_backend.c db_backend.h
+    db_storage.c db_storage.h
 )
 
 # Add backend-specific source files
@@ -33,7 +33,7 @@ if(USE_LMDB)
 endif()
 
 if(USE_GDBM)
-    list(APPEND NETMUSH_SOURCES db_gdbm_ochunk.c db_gdbm.c recover.c)
+    list(APPEND NETMUSH_SOURCES db_gdbm.c db_gdbm_recover.c)
     add_compile_definitions(USE_GDBM)
     message(STATUS "Database backend: GDBM")
 endif()

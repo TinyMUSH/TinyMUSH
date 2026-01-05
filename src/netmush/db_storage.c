@@ -1,5 +1,5 @@
 /**
- * @file db_backend.c
+ * @file db_storage.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Database backend dispatcher - delegates operations to GDBM or LMDB
  * @version 4.0
