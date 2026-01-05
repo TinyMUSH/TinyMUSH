@@ -61,9 +61,9 @@ void warning(const char *p, ...)
 {
 	va_list ap;
 	char *buffer = NULL;
+	char *bufptr = NULL;
 	int size = 0;
 	const char *str = NULL;
-	int first = 1;
 
 	va_start(ap, p);
 
@@ -89,7 +89,7 @@ void warning(const char *p, ...)
 	va_end(ap_copy);
 
 	/* Allocate buffer and concatenate strings */
-	buffer = calloc(size + 1, 1);
+	buffer = malloc(size + 1);
 	if (buffer == NULL)
 	{
 		/* Fallback if allocation fails */
@@ -98,36 +98,29 @@ void warning(const char *p, ...)
 		return;
 	}
 
+	bufptr = buffer;
 	str = p;
 	while (str != (const char *)0)
 	{
+		const char *src;
+		size_t len;
+
 		if (str == (const char *)-1)
 		{
-			const char *err = safe_strerror(errno);
-			if (first)
-			{
-				strcpy(buffer, err);
-				first = 0;
-			}
-			else
-			{
-				strcat(buffer, err);
-			}
+			src = safe_strerror(errno);
 		}
 		else
 		{
-			if (first)
-			{
-				strcpy(buffer, str);
-				first = 0;
-			}
-			else
-			{
-				strcat(buffer, str);
-			}
+			src = str;
 		}
+
+		len = strlen(src);
+		memcpy(bufptr, src, len);
+		bufptr += len;
+
 		str = va_arg(ap, const char *);
 	}
+	*bufptr = '\0';
 
 	va_end(ap);
 
@@ -146,9 +139,9 @@ void fatal(const char *p, ...)
 {
 	va_list ap;
 	char *buffer = NULL;
+	char *bufptr = NULL;
 	int size = 0;
 	const char *str = NULL;
-	int first = 1;
 
 	va_start(ap, p);
 
@@ -174,7 +167,7 @@ void fatal(const char *p, ...)
 	va_end(ap_copy);
 
 	/* Allocate buffer and concatenate strings */
-	buffer = calloc(size + 1, 1);
+	buffer = malloc(size + 1);
 	if (buffer == NULL)
 	{
 		/* Fallback if allocation fails - use minimal logging and exit */
@@ -183,36 +176,29 @@ void fatal(const char *p, ...)
 		exit(EXIT_FAILURE);
 	}
 
+	bufptr = buffer;
 	str = p;
 	while (str != (const char *)0)
 	{
+		const char *src;
+		size_t len;
+
 		if (str == (const char *)-1)
 		{
-			const char *err = safe_strerror(errno);
-			if (first)
-			{
-				strcpy(buffer, err);
-				first = 0;
-			}
-			else
-			{
-				strcat(buffer, err);
-			}
+			src = safe_strerror(errno);
 		}
 		else
 		{
-			if (first)
-			{
-				strcpy(buffer, str);
-				first = 0;
-			}
-			else
-			{
-				strcat(buffer, str);
-			}
+			src = str;
 		}
+
+		len = strlen(src);
+		memcpy(bufptr, src, len);
+		bufptr += len;
+
 		str = va_arg(ap, const char *);
 	}
+	*bufptr = '\0';
 
 	va_end(ap);
 
