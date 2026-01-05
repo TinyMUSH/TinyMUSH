@@ -33,7 +33,7 @@ if(USE_LMDB)
 endif()
 
 if(USE_GDBM)
-    list(APPEND NETMUSH_SOURCES udb_gdbm.c udb_gdbm_frontend.c recover.c)
+    list(APPEND NETMUSH_SOURCES udb_gdbm.c recover.c)
     add_compile_definitions(USE_GDBM)
     message(STATUS "Database backend: GDBM")
 endif()
