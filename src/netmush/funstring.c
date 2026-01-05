@@ -24,9 +24,8 @@
 #include <string.h>
 
 static const ColorState color_normal = {
-    .foreground = { .is_set = ColorStatusReset },
-    .background = { .is_set = ColorStatusReset }
-};
+	.foreground = {.is_set = ColorStatusReset},
+	.background = {.is_set = ColorStatusReset}};
 
 static const ColorState color_none = {0};
 
@@ -251,7 +250,7 @@ void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 		 */
 		while (*tp && *tp != isep.str[0])
 		{
-			if (*tp == ESC_CHAR)
+			if (*tp == C_ANSI_ESC)
 			{
 				char *esc_start = tp;
 				skip_esccode(&tp);
@@ -376,7 +375,7 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 			while (*q != '\0')
 			{
-				if (*q == ESC_CHAR)
+				if (*q == C_ANSI_ESC)
 				{
 					skip_esccode(&q);
 					endchar = q;
@@ -419,7 +418,7 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 		while (q <= ep)
 		{
-			if (*q == ESC_CHAR)
+			if (*q == C_ANSI_ESC)
 			{
 				skip_esccode(&q);
 				endchar = q;
@@ -756,7 +755,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	}
 
 	haystack = fargs[0]; /*!< haystack */
-	needle = fargs[1];		 /*!< needle */
+	needle = fargs[1];	 /*!< needle */
 
 	if (haystack == NULL)
 	{
@@ -882,7 +881,7 @@ void fun_lcstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	while (*ap)
 	{
-		if (*ap == ESC_CHAR)
+		if (*ap == C_ANSI_ESC)
 		{
 			skip_esccode(&ap);
 		}
@@ -915,7 +914,7 @@ void fun_ucstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 
 	while (*ap)
 	{
-		if (*ap == ESC_CHAR)
+		if (*ap == C_ANSI_ESC)
 		{
 			skip_esccode(&ap);
 		}
@@ -946,7 +945,7 @@ void fun_capstr(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 
 	XSAFELBSTR(fargs[0], buff, bufc);
 
-	while (*ap == ESC_CHAR)
+	while (*ap == C_ANSI_ESC)
 	{
 		skip_esccode(&ap);
 	}
@@ -1696,7 +1695,7 @@ void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		switch (*s)
 		{
-		case ESC_CHAR:
+		case C_ANSI_ESC:
 			escape_start = s;
 			skip_esccode(&s);
 			for (char *seq = escape_start; seq < s; ++seq)
@@ -1757,8 +1756,8 @@ void fun_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	{
 		switch (*s)
 		{
-		case ESC_CHAR:
-			escape_start  = s;
+		case C_ANSI_ESC:
+			escape_start = s;
 			skip_esccode(&s);
 			for (char *seq = escape_start; seq < s; ++seq)
 			{
@@ -1814,7 +1813,7 @@ void fun_esc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	{
 		switch (*s)
 		{
-		case ESC_CHAR:
+		case C_ANSI_ESC:
 			escape_start = s;
 			skip_esccode(&s);
 			for (char *seq = escape_start; seq < s; ++seq)
@@ -2026,7 +2025,7 @@ void crunch_code(char *code)
 		{
 			*out++ = *in++;
 		}
-		else if (*in == ESC_CHAR)
+		else if (*in == C_ANSI_ESC)
 		{
 			skip_esccode(&in);
 		}
@@ -2085,7 +2084,7 @@ void crypt_code(char *buff, char **bufc, char *code, char *text, int type)
 				q = code;
 			}
 		}
-		else if (*p == ESC_CHAR)
+		else if (*p == C_ANSI_ESC)
 		{
 			skip_esccode(&p);
 		}
@@ -2161,12 +2160,12 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 		// Output the scrambled character
 		XSAFELBCHR(stripped[j], buff, bufc);
-		
+
 		// Swap color states and characters
 		ColorState temp_state = color_states[j];
 		color_states[j] = color_states[i];
 		color_states[i] = temp_state;
-		
+
 		char temp_char = stripped[j];
 		stripped[j] = stripped[i];
 		stripped[i] = temp_char;
@@ -2478,12 +2477,12 @@ void fun_diffpos(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 
 	for (i = 0, s1 = fargs[0], s2 = fargs[1]; *s1 && *s2; i++, s1++, s2++)
 	{
-		while (*s1 == ESC_CHAR)
+		while (*s1 == C_ANSI_ESC)
 		{
 			skip_esccode(&s1);
 		}
 
-		while (*s2 == ESC_CHAR)
+		while (*s2 == C_ANSI_ESC)
 		{
 			skip_esccode(&s2);
 		}
@@ -2775,7 +2774,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 		{
 			switch (*sw)
 			{
-			case ESC_CHAR:
+			case C_ANSI_ESC:
 			{
 				consume_ansi_sequence_state(&sw, &sw_ansi_state);
 				--sw;
@@ -2785,8 +2784,8 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			case '\t':
 			case '\r':
 				*sw = ' ';
-				//[[fallthrough]];
-				__attribute__((fallthrough));
+				++sw_pos;
+				continue;
 			case ' ':
 				++sw_pos;
 				continue;
@@ -2850,7 +2849,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 			{
 				switch (*ew)
 				{
-				case ESC_CHAR:
+				case C_ANSI_ESC:
 				{
 					consume_ansi_sequence_state(&ew, &ew_ansi_state);
 					--ew;
@@ -2860,10 +2859,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 				case '\r':
 				case '\t':
 					*ew = ' ';
-
-					/*
-					 * FALLTHRU
-					 */
+					break;
 				case ' ':
 				case '\n':
 					break;
@@ -3288,7 +3284,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 				{
 					switch (*sw)
 					{
-					case ESC_CHAR:
+					case C_ANSI_ESC:
 					{
 						consume_ansi_sequence_state(&sw, &sw_ansi_state);
 						--sw;
@@ -3298,8 +3294,8 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					case '\t':
 					case '\r':
 						*sw = ' ';
-						//[[fallthrough]];
-						__attribute__((fallthrough));
+						++sw_pos;
+						continue;
 					case ' ':
 						++sw_pos;
 						continue;
@@ -3432,20 +3428,17 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 					{
 						switch (*ew)
 						{
-						case ESC_CHAR:
-					{
-						consume_ansi_sequence_state(&ew, &ew_ansi_state);
-						--ew;
-						continue;
-					}
+						case C_ANSI_ESC:
+						{
+							consume_ansi_sequence_state(&ew, &ew_ansi_state);
+							--ew;
+							continue;
+						}
 
 						case '\r':
 						case '\t':
 							*ew = ' ';
-
-							/*
-							 * FALLTHRU
-							 */
+							break;
 						case ' ':
 						case '\n':
 							break;
@@ -3456,8 +3449,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 						default:
 
 							/*
-							 * Break up long
-							 * words
+							 * Break up long words
 							 */
 							if (ew_pos - sw_pos == width)
 							{
@@ -3954,7 +3946,7 @@ void fun_art(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 
 	while (*s && (isspace(*s) || iscntrl(*s)))
 	{
-		if (*s == ESC_CHAR)
+		if (*s == C_ANSI_ESC)
 		{
 			skip_esccode(&s);
 		}

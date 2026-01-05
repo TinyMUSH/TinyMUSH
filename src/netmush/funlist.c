@@ -380,7 +380,7 @@ static inline void copy_delim(Delim *dest, const Delim *src)
  */
 static inline void parse_ansi_escapes(char **s, ColorState *state)
 {
-	while (**s == ESC_CHAR)
+	while (**s == C_ANSI_ESC)
 	{
 		const char *cursor = *s;
 		if (ansi_apply_sequence(&cursor, state))
@@ -2947,7 +2947,7 @@ void fun_columns(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 				break;
 			}
 
-			if (*p == ESC_CHAR)
+			if (*p == C_ANSI_ESC)
 			{
 				char *seq_start = p;
 				char *seq_end;
@@ -3194,7 +3194,7 @@ void tables_helper(char *list, ColorState *last_state, int n_cols, int col_width
 
 				for (s = words[wcount], i = 0; *s && (i < col_widths[cpos]);)
 				{
-					if (*s == ESC_CHAR)
+					if (*s == C_ANSI_ESC)
 					{
 						consume_ansi_sequence_state(&s, &ansi_state);
 					}

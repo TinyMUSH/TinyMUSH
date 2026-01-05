@@ -26,25 +26,32 @@
 #include <strings.h>
 #include <errno.h>
 
+// ANSI color constants
+const int C_ANSI_BLACK = 30;
+const int C_ANSI_NUM = 48;
+
 // ANSI constants for escape sequences
-static const char C_ANSI_ESC[] = "\033[";
-static const char C_ANSI_RESET[] = "0";
-static const char C_ANSI_BOLD[] = "1";
-static const char C_ANSI_UNDERLINE[] = "4";
-static const char C_ANSI_BLINK[] = "5";
-static const char C_ANSI_REVERSE[] = "7";
-static const char C_ANSI_NORMAL_INTENSITY[] = "22";
-static const char C_ANSI_NO_UNDERLINE[] = "24";
-static const char C_ANSI_NO_BLINK[] = "25";
-static const char C_ANSI_NO_REVERSE[] = "27";
-static const char C_ANSI_FOREGROUND_RESET[] = "39";
-static const char C_ANSI_BACKGROUND_RESET[] = "49";
-static const char C_ANSI_END[] = "m";
-static const char C_ANSI_RESET_SEQUENCE[] = "\033[0m";
-static const char C_ANSI_XTERM_PREFIX_FG[] = "38;5;";
-static const char C_ANSI_XTERM_PREFIX_BG[] = "48;5;";
-static const char C_ANSI_TRUECOLOR_PREFIX_FG[] = "38;2;";
-static const char C_ANSI_TRUECOLOR_PREFIX_BG[] = "48;2;";
+const char C_ANSI_CSI = '[';
+const char C_ANSI_RESET[] = "0";
+const char C_ANSI_BOLD[] = "1";
+const char C_ANSI_UNDERLINE[] = "4";
+const char C_ANSI_BLINK[] = "5";
+const char C_ANSI_REVERSE[] = "7";
+const char C_ANSI_NORMAL_INTENSITY[] = "22";
+const char C_ANSI_NO_UNDERLINE[] = "24";
+const char C_ANSI_NO_BLINK[] = "25";
+const char C_ANSI_NO_REVERSE[] = "27";
+const char C_ANSI_FOREGROUND_RESET[] = "39";
+const char C_ANSI_BACKGROUND_RESET[] = "49";
+const char C_ANSI_END[] = "m";
+const char C_ANSI_RESET_SEQUENCE[] = "\033[0m";
+const char C_ANSI_XTERM_PREFIX_FG[] = "38;5;";
+const char C_ANSI_XTERM_PREFIX_BG[] = "48;5;";
+const char C_ANSI_TRUECOLOR_PREFIX_FG[] = "38;2;";
+const char C_ANSI_TRUECOLOR_PREFIX_BG[] = "48;2;";
+
+const char C_ANSI_NORMAL_SEQ[] = "\033[0m";
+const char C_ANSI_BOLD_SEQ[] = "\033[1m";
 
 /**
  * @brief Converts an RGB color to CIELAB color space.
@@ -839,7 +846,7 @@ ColorStatus to_ansi_escape_sequence(char *buffer, size_t buffer_size, size_t *of
 
         if (has_bg || has_fg || has_attr)
         {
-            *offset += XSPRINTF(buffer + *offset, "%s", C_ANSI_ESC);
+            *offset += XSPRINTF(buffer + *offset, "%c%c", C_ANSI_ESC, C_ANSI_CSI);
             append_attribute(buffer, buffer_size, offset, to->reset, to->reset == ColorStatusReset ? C_ANSI_RESET : NULL);
             append_attribute(buffer, buffer_size, offset, to->highlight, to->highlight == ColorStatusReset ? C_ANSI_NORMAL_INTENSITY : C_ANSI_BOLD);
             append_attribute(buffer, buffer_size, offset, to->underline, to->underline == ColorStatusReset ? C_ANSI_NO_UNDERLINE : C_ANSI_UNDERLINE);
@@ -2627,13 +2634,13 @@ static void append_mush_from_state(const ColorState *state, char *buff, char **b
 
 static bool parse_and_apply_ansi_sequence(const char **ptr, ColorState *state)
 {
-    if (!ptr || !*ptr || **ptr != ESC_CHAR)
+    if (!ptr || !*ptr || **ptr != C_ANSI_ESC)
         return false;
 
     const char *p = *ptr;
 
     /* Expect ESC [ ... m */
-    if (*p != ESC_CHAR || *(p + 1) != '[')
+    if (*p != C_ANSI_ESC || *(p + 1) != '[')
         return false;
 
     p += 2; /* Skip ESC [ */
@@ -2709,7 +2716,7 @@ char *translate_string_ansi(const char *str, int type)
 
         while (*p)
         {
-            if (*p == ESC_CHAR && *(p + 1) == '[')
+            if (*p == C_ANSI_ESC && *(p + 1) == '[')
             {
                 const char *cursor = p;
                 ColorState next = current;
@@ -2777,7 +2784,7 @@ char *translate_string_ansi(const char *str, int type)
 
         while (*p)
         {
-            if (*p == ESC_CHAR && *(p + 1) == '[')
+            if (*p == C_ANSI_ESC && *(p + 1) == '[')
             {
                 /* Skip ANSI sequence */
                 const char *cursor = p;
@@ -2834,7 +2841,7 @@ char *ansi_strip_ansi(const char *str)
 
     while (*p)
     {
-        if (*p == ESC_CHAR && *(p + 1) == '[')
+        if (*p == C_ANSI_ESC && *(p + 1) == '[')
         {
             const char *cursor = p;
             if (parse_and_apply_ansi_sequence(&cursor, &discard))
@@ -2867,7 +2874,7 @@ int ansi_strip_ansi_len(const char *str)
 
     while (*p)
     {
-        if (*p == ESC_CHAR && *(p + 1) == '[')
+        if (*p == C_ANSI_ESC && *(p + 1) == '[')
         {
             const char *cursor = p;
             if (parse_and_apply_ansi_sequence(&cursor, &discard))
@@ -2922,7 +2929,7 @@ int ansi_map_states_colorstate(const char *s, ColorState **states, char **stripp
     p = s;
     while (*p && n < map_cap && n < strip_cap)
     {
-        if (*p == ESC_CHAR)
+        if (*p == C_ANSI_ESC)
         {
             // Parse ANSI sequence and update current_state
             parse_and_apply_ansi_sequence(&p, &current_state);
@@ -2938,7 +2945,7 @@ int ansi_map_states_colorstate(const char *s, ColorState **states, char **stripp
     // Skip any trailing ANSI sequences
     while (*p)
     {
-        if (*p == ESC_CHAR)
+        if (*p == C_ANSI_ESC)
         {
             parse_and_apply_ansi_sequence(&p, &current_state);
         }
@@ -3102,7 +3109,7 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
             char seq[64];
             int seq_len = 0;
 
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", C_ANSI_ESC);
 
             if (has_fg)
             {
@@ -3163,7 +3170,7 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
             char seq[64];
             int seq_len = 0;
 
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", ESC_CHAR);
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", C_ANSI_ESC);
 
             if (has_fg)
             {
@@ -3288,7 +3295,7 @@ void level_ansi_stream(const char *s, bool ansi, bool xterm, bool truecolors,
 
     while (*s)
     {
-        if (*s == ESC_CHAR)
+        if (*s == C_ANSI_ESC)
         {
             if (truecolors)
             {
@@ -3351,7 +3358,7 @@ char *normal_to_white(const char *raw)
 
     while (*s)
     {
-        if (*s == ESC_CHAR)
+        if (*s == C_ANSI_ESC)
         {
             size_t text_len = s - last_pos;
             if (text_len > 0)
@@ -3424,7 +3431,7 @@ void skip_esccode(char **s)
         return;
     }
 
-    if (*p == ANSI_CSI)
+    if (*p == C_ANSI_CSI)
     {
         while (*++p && (*p & 0xf0) == 0x30)
             ;
@@ -3534,7 +3541,7 @@ char *remap_colors(const char *s, int *cmap)
 
     while (*s)
     {
-        if (*s != ESC_CHAR)
+        if (*s != C_ANSI_ESC)
         {
             XSAFELBCHR(*s, buf, &bp);
             ++s;
@@ -3552,15 +3559,15 @@ char *remap_colors(const char *s, int *cmap)
         }
 
         n = fg_sgr_from_state(&state);
-        if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && cmap[n - I_ANSI_BLACK] != 0)
+        if (n >= C_ANSI_BLACK && n < C_ANSI_NUM && cmap[n - C_ANSI_BLACK] != 0)
         {
-            apply_sgr_to_state(&state, cmap[n - I_ANSI_BLACK]);
+            apply_sgr_to_state(&state, cmap[n - C_ANSI_BLACK]);
         }
 
         n = bg_sgr_from_state(&state);
-        if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && cmap[n - I_ANSI_BLACK] != 0)
+        if (n >= C_ANSI_BLACK && n < C_ANSI_NUM && cmap[n - C_ANSI_BLACK] != 0)
         {
-            apply_sgr_to_state(&state, cmap[n - I_ANSI_BLACK]);
+            apply_sgr_to_state(&state, cmap[n - C_ANSI_BLACK]);
         }
 
         char seq_buf[128];
@@ -3810,3 +3817,4 @@ ColorType resolve_color_type(dbref player, dbref cause)
 
 	return ColorTypeNone;
 }
+

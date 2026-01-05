@@ -3520,7 +3520,7 @@ void putstring(FILE *f, const char *s)
             fprintf(f, "\\t");
             break;
 
-        case ESC_CHAR:
+        case C_ANSI_ESC:
             fprintf(f, "\\e");
             break;
         case '\\':
@@ -3636,7 +3636,7 @@ char *getstring(FILE *f, bool new_strings)
                     break;
 
                 case 'e':
-                    c = ESC_CHAR;
+                    c = C_ANSI_ESC;
                     break;
                 }
             }

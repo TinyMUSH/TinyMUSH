@@ -445,24 +445,24 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 	ColorState to_color_state = {0};
 	int tlen, flen;
 	/*
-	 * We may have gotten an ANSI_NORMAL termination to OLD and NEW,
+	 * We may have gotten an C_ANSI_NORMAL_SEQ termination to OLD and NEW,
 	 * that the user probably didn't intend to be there. (If the
 	 * user really did want it there, he simply has to put a double
-	 * ANSI_NORMAL in; this is non-intuitive but without it we can't
+	 * C_ANSI_NORMAL_SEQ in; this is non-intuitive but without it we can't
 	 * let users swap one ANSI code for another using this.)  Thus,
-	 * we chop off the terminating ANSI_NORMAL on both, if there is
+	 * we chop off the terminating C_ANSI_NORMAL_SEQ on both, if there is
 	 * one.
 	 */
 	p = from + strlen(from) - 4;
 
-	if (p >= from && !strcmp(p, ANSI_NORMAL))
+	if (p >= from && !strcmp(p, C_ANSI_NORMAL_SEQ))
 	{
 		*p = '\0';
 	}
 
 	p = to + strlen(to) - 4;
 
-	if (p >= to && !strcmp(p, ANSI_NORMAL))
+	if (p >= to && !strcmp(p, C_ANSI_NORMAL_SEQ))
 	{
 		*p = '\0';
 	}
@@ -479,7 +479,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 		p = to;
 		while (*p)
 		{
-			if (*p == ESC_CHAR)
+			if (*p == C_ANSI_ESC)
 			{
 				consume_ansi_sequence_state(&p, &to_color_state);
 			}
@@ -504,7 +504,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 			p = src;
 			while (*p)
 			{
-				if (*p == ESC_CHAR)
+				if (*p == C_ANSI_ESC)
 				{
 					consume_ansi_sequence_state(&p, &ansi_state);
 				}
@@ -527,7 +527,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 			p = src;
 			while (*p)
 			{
-				if (*p == ESC_CHAR)
+				if (*p == C_ANSI_ESC)
 				{
 					consume_ansi_sequence_state(&p, &ansi_state);
 				}
@@ -575,7 +575,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 
 			while (*src && (*src != *from))
 			{
-				if (*src == ESC_CHAR)
+				if (*src == C_ANSI_ESC)
 				{
 					consume_ansi_sequence_state(&src, &ansi_state);
 				}
@@ -624,7 +624,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 					 * ANSI code. Otherwise we just copy
 					 * the character.
 					 */
-					if (*from == ESC_CHAR)
+					if (*from == C_ANSI_ESC)
 					{
 						p = src;
 						consume_ansi_sequence_state(&src, &ansi_state);

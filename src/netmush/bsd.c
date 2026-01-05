@@ -1150,6 +1150,19 @@ int process_input(DESC *d)
 			{
 				option = (unsigned char)q[2];
 				
+				/* Log client telnet negotiation */
+				{
+					const char *cmd_name = NULL;
+					switch (cmd) {
+						case 0xFD: cmd_name = "DO"; break;
+						case 0xFE: cmd_name = "DONT"; break;
+						case 0xFB: cmd_name = "WILL"; break;
+						case 0xFC: cmd_name = "WONT"; break;
+						default: cmd_name = "UNKNOWN"; break;
+					}
+					log_write(LOG_NET, "NET", "TELNEG", "[%d] Client sent %s %d (0x%02X)", d->descriptor, cmd_name, option, option);
+				}
+				
 				/* 
 				 * Respond to prevent client hang
 				 * Accept options we advertised (SUPPRESS_GO_AHEAD, ECHO)
@@ -1162,12 +1175,26 @@ int process_input(DESC *d)
 						/* Accept: send WILL (already sent in welcome, but confirm) */
 						/* No response needed - we already sent WILL */
 					}
+					else if (option == 0x00)  /* BINARY - we advertised this */
+					{
+						/* Accept: no response needed - we already sent WILL */
+					}
+					else if (option == 0x22)  /* LINEMODE - accept this */
+					{
+						/* Accept: send WILL */
+						response[0] = 0xFF;  /* IAC */
+						response[1] = 0xFB;  /* WILL */
+						response[2] = option;
+						log_write(LOG_NET, "NET", "TELNEG", "[%d] Server sent WILL %d (0x%02X)", d->descriptor, option, option);
+						queue_write(d, (char *)response, 3);
+					}
 					else
 					{
 						/* Refuse: send WONT */
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFC;  /* WONT */
 						response[2] = option;
+						log_write(LOG_NET, "NET", "TELNEG", "[%d] Server sent WONT %d (0x%02X)", d->descriptor, option, option);
 						queue_write(d, (char *)response, 3);
 					}
 				}
@@ -1179,6 +1206,7 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFD;  /* DO */
 						response[2] = option;
+						log_write(LOG_NET, "NET", "TELNEG", "[%d] Server sent DO %d (0x%02X)", d->descriptor, option, option);
 						queue_write(d, (char *)response, 3);
 					}
 					else
@@ -1187,6 +1215,7 @@ int process_input(DESC *d)
 						response[0] = 0xFF;  /* IAC */
 						response[1] = 0xFE;  /* DONT */
 						response[2] = option;
+						log_write(LOG_NET, "NET", "TELNEG", "[%d] Server sent DONT %d (0x%02X)", d->descriptor, option, option);
 						queue_write(d, (char *)response, 3);
 					}
 				}

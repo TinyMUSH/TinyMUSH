@@ -240,7 +240,7 @@ static int ok_channel_string(char *str, int maxlen, int ok_spaces, int ok_ansi)
     for (p = str; *p; p++)
     {
         if ((!ok_spaces && isspace(*p)) ||
-            (!ok_ansi && (*p == ESC_CHAR)))
+            (!ok_ansi && (*p == C_ANSI_ESC)))
         {
             return 0;
         }
@@ -257,10 +257,10 @@ static char *munge_comtitle(char *title)
 
     *tbuf = 0x00;
 
-    if (strchr(title, ESC_CHAR))
+    if (strchr(title, C_ANSI_ESC))
     {
-        XSAFESTRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(ANSI_NORMAL) + 1));
-        XSAFEMBSTR(ANSI_NORMAL, tbuf, &tp);
+        XSAFESTRCAT(tbuf, &tp, title, MBUF_SIZE - (strlen(C_ANSI_NORMAL_SEQ) + 1));
+        XSAFEMBSTR(C_ANSI_NORMAL_SEQ, tbuf, &tp);
     }
     else
     {

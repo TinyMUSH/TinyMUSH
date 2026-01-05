@@ -86,7 +86,7 @@ char *next_token(char *str, const Delim *sep)
 
 	if (sep->len == 1)
 	{
-		while (*str == ESC_CHAR)
+		while (*str == C_ANSI_ESC)
 		{
 			skip_esccode(&str);
 		}
@@ -95,7 +95,7 @@ char *next_token(char *str, const Delim *sep)
 		{
 			++str;
 
-			while (*str == ESC_CHAR)
+			while (*str == C_ANSI_ESC)
 			{
 				skip_esccode(&str);
 			}
@@ -150,7 +150,7 @@ char *split_token(char **sp, const Delim *sep)
 
 	if (sep->len == 1)
 	{
-		while (*str == ESC_CHAR)
+		while (*str == C_ANSI_ESC)
 		{
 			skip_esccode(&str);
 		}
@@ -159,7 +159,7 @@ char *split_token(char **sp, const Delim *sep)
 		{
 			++str;
 
-			while (*str == ESC_CHAR)
+			while (*str == C_ANSI_ESC)
 			{
 				skip_esccode(&str);
 			}
@@ -217,7 +217,7 @@ char *next_token_colorstate(char *str, const Delim *sep, ColorState *state_ptr)
 
 	if (sep->len == 1)
 	{
-		while (*str == ESC_CHAR)
+		while (*str == C_ANSI_ESC)
 		{
 			const char *cursor = str;
 			if (ansi_apply_sequence(&cursor, &state))
@@ -234,7 +234,7 @@ char *next_token_colorstate(char *str, const Delim *sep, ColorState *state_ptr)
 		{
 			++str;
 
-			while (*str == ESC_CHAR)
+			while (*str == C_ANSI_ESC)
 			{
 				const char *cursor = str;
 				if (ansi_apply_sequence(&cursor, &state))
@@ -272,7 +272,7 @@ char *next_token_colorstate(char *str, const Delim *sep, ColorState *state_ptr)
 		 */
 		while (*str)
 		{
-			if (*str == ESC_CHAR)
+			if (*str == C_ANSI_ESC)
 			{
 				const char *cursor = str;
 				if (ansi_apply_sequence(&cursor, &state))

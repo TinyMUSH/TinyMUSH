@@ -605,15 +605,15 @@ static void postprocess_emit_sequence(PostprocessStreamContext *ctx)
 	if (ctx->apply_colormap)
 	{
 		int n = postprocess_fg_sgr_from_state(&final_state);
-		if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && ctx->cmap[n - I_ANSI_BLACK] != 0)
+		if (n >= C_ANSI_BLACK && n < C_ANSI_NUM && ctx->cmap[n - C_ANSI_BLACK] != 0)
 		{
-			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - I_ANSI_BLACK]);
+			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - C_ANSI_BLACK]);
 		}
 
 		n = postprocess_bg_sgr_from_state(&final_state);
-		if (n >= I_ANSI_BLACK && n < I_ANSI_NUM && ctx->cmap[n - I_ANSI_BLACK] != 0)
+		if (n >= C_ANSI_BLACK && n < C_ANSI_NUM && ctx->cmap[n - C_ANSI_BLACK] != 0)
 		{
-			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - I_ANSI_BLACK]);
+			postprocess_apply_sgr_to_state(&final_state, ctx->cmap[n - C_ANSI_BLACK]);
 		}
 	}
 
@@ -640,7 +640,7 @@ static void postprocess_stream_write(const char *data, size_t len, void *context
 	{
 		char ch = data[i];
 
-		if (ctx->seq_len > 0 || ch == ESC_CHAR)
+		if (ctx->seq_len > 0 || ch == C_ANSI_ESC)
 		{
 			if (ctx->seq_len < sizeof(ctx->seq_buf) - 1)
 			{
@@ -885,35 +885,10 @@ void desc_delhash(DESC *d)
 
 void welcome_user(DESC *d)
 {
-	/*
-	 * Send TELNET options to inform client about server capabilities
-	 * This helps clients like TinyFugue properly handle ANSI codes without
-	 * requiring manual emulation mode changes.
-	 * 
-	 * Standard MUD telnet negotiation sequence:
-	 * - WILL SUPPRESS_GO_AHEAD: Server won't send GA after each line
-	 * - WONT ECHO: Client handles local echo (standard MUD behavior)
-	 * 
-	 * This combination triggers automatic ANSI mode in TinyFugue and similar clients.
-	 */
-	unsigned char telnet_opts[3];
-	
-	/* Send WILL SUPPRESS_GO_AHEAD (option 3) */
-	telnet_opts[0] = 0xFF;  /* IAC */
-	telnet_opts[1] = 0xFB;  /* WILL */
-	telnet_opts[2] = 0x03;  /* SUPPRESS_GO_AHEAD */
-	queue_write(d, (char *)telnet_opts, 3);
-	
-	/* Send WONT ECHO (option 1) - client does local echo (MUD standard) */
-	telnet_opts[0] = 0xFF;  /* IAC */
-	telnet_opts[1] = 0xFC;  /* WONT */
-	telnet_opts[2] = 0x01;  /* ECHO */
-	queue_write(d, (char *)telnet_opts, 3);
-	
+
 	if (mushconf.have_pueblo == 1)
 	{
-		queue_rawstring(d, NULL, mushconf.pueblo_version);
-		queue_rawstring(d, NULL, "\r\n\r\n");
+		queue_rawstring(d, "%s\r\n\r\n", mushconf.pueblo_version);
 	}
 
 	if (d->host_info & H_REGISTRATION)
@@ -1297,7 +1272,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 	{
 		if (mushconf.ansi_colors)
 		{
-			raw_notify(player, "\r\n%sMOTD:%s %s\r\n", ANSI_HILITE, ANSI_NORMAL, mushconf.motd_msg);
+			raw_notify(player, "\r\n%sMOTD:%s %s\r\n", C_ANSI_BOLD_SEQ, C_ANSI_NORMAL_SEQ, mushconf.motd_msg);
 		}
 		else
 		{
@@ -1311,7 +1286,7 @@ void announce_connect(dbref player, DESC *d, const char *reason)
 		{
 			if (mushconf.ansi_colors)
 			{
-				raw_notify(player, "\r\n%sWIZMOTD:%s %s\r\n", ANSI_HILITE, ANSI_NORMAL, mushconf.wizmotd_msg);
+				raw_notify(player, "\r\n%sWIZMOTD:%s %s\r\n", C_ANSI_BOLD_SEQ, C_ANSI_NORMAL_SEQ, mushconf.wizmotd_msg);
 			}
 			else
 			{
@@ -2051,13 +2026,13 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 	from_color = mushcode_to_sgr((unsigned char)*fstr);
 	to_color = mushcode_to_sgr((unsigned char)*tstr);
 
-	if ((from_color < I_ANSI_BLACK) || (from_color >= I_ANSI_NUM))
+	if ((from_color < C_ANSI_BLACK) || (from_color >= C_ANSI_NUM))
 	{
 		notify(player, "That's not a valid color to change.");
 		return;
 	}
 
-	if ((to_color < I_ANSI_BLACK) || (to_color >= I_ANSI_NUM))
+	if ((to_color < C_ANSI_BLACK) || (to_color >= C_ANSI_NUM))
 	{
 		notify(player, "That's not a valid color to remap to.");
 		return;
@@ -2069,13 +2044,13 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 		{
 			if (from_color == to_color)
 			{
-				d->colormap[from_color - I_ANSI_BLACK] = 0;
+				d->colormap[from_color - C_ANSI_BLACK] = 0;
 				/*
 				 * If no changes, clear colormap
 				 */
 				x = 0;
 
-				for (i = 0; i < I_ANSI_NUM - I_ANSI_BLACK; i++)
+				for (i = 0; i < C_ANSI_NUM - C_ANSI_BLACK; i++)
 					if (d->colormap[i] != 0)
 					{
 						x++;
@@ -2093,7 +2068,7 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 			}
 			else
 			{
-				d->colormap[from_color - I_ANSI_BLACK] = to_color;
+				d->colormap[from_color - C_ANSI_BLACK] = to_color;
 				notify(player, "Color remapped.");
 			}
 		}
@@ -2105,8 +2080,8 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
 			}
 			else
 			{
-				d->colormap = (int *)XCALLOC(I_ANSI_NUM - I_ANSI_BLACK, sizeof(int), "d->colormap");
-				d->colormap[from_color - I_ANSI_BLACK] = to_color;
+				d->colormap = (int *)XCALLOC(C_ANSI_NUM - C_ANSI_BLACK, sizeof(int), "d->colormap");
+				d->colormap[from_color - C_ANSI_BLACK] = to_color;
 				notify(player, "Color remapped.");
 			}
 		}

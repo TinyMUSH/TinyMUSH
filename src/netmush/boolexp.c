@@ -1008,7 +1008,7 @@ BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal)
 		 */
 		for (p = (char *)buf; *p; p++)
 		{
-			if ((*p == '\t') || (*p == '\r') || (*p == '\n') || (*p == ESC_CHAR))
+			if ((*p == '\t') || (*p == '\r') || (*p == '\n') || (*p == C_ANSI_ESC))
 			{
 				return (TRUE_BOOLEXP);
 			}

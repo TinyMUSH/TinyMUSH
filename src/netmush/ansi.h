@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
+
 /**
  * @brief Enumeration of supported color output types.
  *
@@ -145,6 +147,40 @@ typedef struct ColorSequence
     ColorSequenceData *data;   /**< Array of color change data */
 } ColorSequence;
 
+/**
+ * @brief ANSI color code constants and definitions.
+ */
+
+
+extern const int C_ANSI_BLACK;
+extern const int C_ANSI_NUM;
+
+#define C_ANSI_ESC '\033'
+//#define C_ANSI_CSI '['
+extern const char C_ANSI_CSI;
+extern const char C_ANSI_RESET[];
+extern const char C_ANSI_BOLD[];
+extern const char C_ANSI_UNDERLINE[];
+extern const char C_ANSI_BLINK[];
+extern const char C_ANSI_REVERSE[];
+extern const char C_ANSI_NORMAL_INTENSITY[];
+extern const char C_ANSI_NO_UNDERLINE[];
+extern const char C_ANSI_NO_BLINK[];
+extern const char C_ANSI_NO_REVERSE[];
+extern const char C_ANSI_FOREGROUND_RESET[];
+extern const char C_ANSI_BACKGROUND_RESET[];
+extern const char C_ANSI_END[];
+extern const char C_ANSI_RESET_SEQUENCE[];
+extern const char C_ANSI_XTERM_PREFIX_FG[];
+extern const char C_ANSI_XTERM_PREFIX_BG[];
+extern const char C_ANSI_TRUECOLOR_PREFIX_FG[];
+extern const char C_ANSI_TRUECOLOR_PREFIX_BG[];
+
+extern const char C_ANSI_NORMAL_SEQ[];
+extern const char C_ANSI_BOLD_SEQ[];
+
+extern ColorEntry colorDefinitions[];
+
 // Function declarations
 ColorCIELab ansi_rgb_to_cielab(ColorRGB color);
 double ansi_ciede2000(ColorCIELab lab1, ColorCIELab lab2);
@@ -161,21 +197,14 @@ ColorState ansi_parse_sequence(const char **ansi_ptr);
 bool ansi_apply_sequence(const char **ptr, ColorState *state);
 int ansi_parse_single_x_code(char **input_ptr, ColorState *color_out, bool *current_highlight);
 void xsafe_ansi_normal(char *buff, char **bufc);
-
 char *ansi_parse_x_to_sequence(char **ptr, ColorType type);
 char *color_state_to_mush_code(const ColorState *color);
 char *color_state_to_letters(const ColorState *color);
 char *color_state_to_escape(const ColorState *color, ColorType type);
 char *ansi_states_to_sequence(ColorState *states, int count, ColorType type);
-
 char *ansi_to_mushcode(const char *input);
-
 char *convert_mush_to_ansi(const char *input, ColorType type);
-
 const char *ansi_char_to_sequence(int ch);
 const char *ansi_char_bright_to_sequence(int ch);
 int ansi_char_to_num(int ch);
-
-extern ColorEntry colorDefinitions[];
-
 ColorType resolve_color_type(dbref player, dbref cause);

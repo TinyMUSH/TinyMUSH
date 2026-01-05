@@ -318,10 +318,10 @@ char *parse_to(char **dstr, char delim, int eval)
 				first = false;
 				break;
 
-			case ESC_CHAR:
+			case C_ANSI_ESC:
 				copy_char(&cstr, &zstr);
 
-				if (*cstr == ANSI_CSI)
+				if (*cstr == C_ANSI_CSI)
 				{
 					do
 					{
@@ -1771,7 +1771,7 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 			break;
 
-		case ESC_CHAR:
+		case C_ANSI_ESC:
 		{
 			char *escape_start = *dstr;
 			skip_esccode(dstr);

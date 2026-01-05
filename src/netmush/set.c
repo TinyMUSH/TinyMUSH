@@ -1706,26 +1706,8 @@ int parse_attrib_wild(dbref player, char *str, dbref *thing, int check_parents, 
 
 /*
  * ---------------------------------------------------------------------------
- * edit_string_ansi, do_edit: Modify attributes.
+ * do_edit: Modify attributes.
  */
-
-void edit_string_ansi(char *src, char **dst, char **returnstr, char *from, char *to, dbref player, dbref cause)
-{
-	char *s;
-	edit_string(src, dst, from, to, player, cause);
-
-	if (mushconf.ansi_colors)
-	{
-		s = XASPRINTF("s", "%s%s%s%s", ANSI_HILITE, to, ANSI_NORMAL, ANSI_NORMAL);
-		edit_string(src, returnstr, from, s, player, cause);
-		XFREE(s);
-	}
-	else
-	{
-		*returnstr = XMALLOC(LBUF_SIZE, "returnstr");
-		XSTRCPY(*returnstr, *dst);
-	}
-}
 
 void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nargs)
 {
@@ -1783,7 +1765,7 @@ void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nar
 				 * Do the edit and save the result
 				 */
 				got_one = 1;
-				edit_string_ansi(atext, &result, &returnstr, from, to, player, cause);
+				edit_string(atext, &result, from, to, player, cause);
 
 				if (ap->check != NULL)
 				{
@@ -1800,12 +1782,11 @@ void do_edit(dbref player, dbref cause, int key, char *it, char *args[], int nar
 
 					if (!Quiet(player))
 					{
-						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Set - %s: %s", ap->name, returnstr);
+						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Set - %s: %s", ap->name, result);
 					}
 				}
 
 				XFREE(result);
-				XFREE(returnstr);
 			}
 			else
 			{

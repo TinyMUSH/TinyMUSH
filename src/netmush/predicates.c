@@ -1043,7 +1043,7 @@ void do_addcommand(dbref player, __attribute__((unused)) dbref cause, int key, c
 
 	for (s = name; *s; s++)
 	{
-		if (isspace(*s) || (*s == ESC_CHAR))
+		if (isspace(*s) || (*s == C_ANSI_ESC))
 		{
 			notify(player, "That is not a valid command name.");
 			return;
