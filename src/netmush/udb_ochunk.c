@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include <limits.h>
+#include <string.h>
 #include <gdbm.h>
 #include <sys/file.h>
 #include <unistd.h>
@@ -29,6 +30,72 @@ int db_initted = 0;
 GDBM_FILE dbp = (GDBM_FILE)0;
 
 struct flock fl;
+
+static int build_key(UDB_DATA gamekey, unsigned int type, datum *key)
+{
+    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    {
+        return -1;
+    }
+
+    size_t keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
+
+    if (keylen > INT_MAX)
+    {
+        return 1;
+    }
+
+    char *s = (char *)XMALLOC(keylen, "key.dptr");
+
+    if (!s)
+    {
+        return 1;
+    }
+
+    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
+    XMEMCPY((void *)(s + gamekey.dsize), (void *)&type, sizeof(unsigned int));
+
+    key->dptr = s;
+    key->dsize = (int)keylen;
+    return 0;
+}
+
+void db_lock(void)
+{
+    /* Attempt to lock the DBM file. Block until the lock is cleared, then set it. */
+    if (mushstate.dbm_fd == -1)
+    {
+        return;
+    }
+
+    fl.l_type = F_WRLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    fl.l_pid = getpid();
+
+    if (fcntl(mushstate.dbm_fd, F_SETLKW, &fl) == -1)
+    {
+        log_perror("DMP", "LOCK", NULL, "fcntl()");
+        return;
+    }
+}
+
+void db_unlock(void)
+{
+    if (mushstate.dbm_fd == -1)
+    {
+        return;
+    }
+
+    fl.l_type = F_UNLCK;
+
+    if (fcntl(mushstate.dbm_fd, F_SETLK, &fl) == -1)
+    {
+        log_perror("DMP", "LOCK", NULL, "fcntl()");
+        return;
+    }
+}
 
 void dddb_setsync(int flag)
 {
@@ -64,7 +131,8 @@ int dddb_optimize(void)
     rc = gdbm_reorganize(dbp);
 
     /* Assurer la persistance sur disque avant de libérer le verrou */
-    if (rc == 0) {
+    if (rc == 0)
+    {
         (void)gdbm_sync(dbp);
     }
 
@@ -79,7 +147,6 @@ int dddb_init(void)
 
     if (!mushstate.standalone)
     {
-
         tmpfile = XASPRINTF("tmpfile", "%s/%s", mushconf.dbhome, dbfile);
     }
     else
@@ -218,36 +285,17 @@ bool dddb_close(void)
 
 UDB_DATA db_get(UDB_DATA gamekey, unsigned int type)
 {
-    UDB_DATA gamedata;
+    UDB_DATA gamedata = {0};
     datum dat;
-    datum key;
-    char *s;
-    size_t keylen;
+    datum key = {0};
 
-    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    int rc = build_key(gamekey, type, &key);
+
+    if (rc != 0)
     {
-        gamedata.dptr = NULL;
-        gamedata.dsize = 0;
         return gamedata;
     }
 
-    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
-
-    if (keylen > INT_MAX)
-    {
-        gamedata.dptr = NULL;
-        gamedata.dsize = 0;
-        return gamedata;
-    }
-
-    /*
-     * Construct a key (GDBM likes first 4 bytes to be unique)
-     */
-    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
-    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
-    s += gamekey.dsize;
-    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = (int)keylen;
     dat = gdbm_fetch(dbp, key);
     gamedata.dptr = dat.dptr;
     gamedata.dsize = dat.dsize;
@@ -260,33 +308,15 @@ UDB_DATA db_get(UDB_DATA gamekey, unsigned int type)
 int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 {
     datum dat;
-    datum key;
-    char *s;
-    size_t keylen;
+    datum key = {0};
 
-    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    int rc = build_key(gamekey, type, &key);
+
+    if (rc != 0)
     {
         return (1);
     }
 
-    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
-
-    if (keylen > INT_MAX)
-    {
-        return (1);
-    }
-
-    /*
-     * Construct a key (GDBM likes first 4 bytes to be unique)
-     */
-    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
-    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
-    s += gamekey.dsize;
-    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = (int)keylen;
-    /*
-     * make table entry
-     */
     dat.dptr = gamedata.dptr;
     dat.dsize = gamedata.dsize;
 
@@ -306,30 +336,20 @@ int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type)
 int db_del(UDB_DATA gamekey, unsigned int type)
 {
     datum dat;
-    datum key;
-    char *s;
-    size_t keylen;
+    datum key = {0};
 
-    if (!db_initted || !gamekey.dptr || gamekey.dsize < 0)
+    int rc = build_key(gamekey, type, &key);
+
+    if (rc == -1)
     {
         return (-1);
     }
 
-    keylen = (size_t)gamekey.dsize + sizeof(unsigned int);
-
-    if (keylen > INT_MAX)
+    if (rc == 1)
     {
         return (1);
     }
 
-    /*
-     * Construct a key (GDBM likes first 4 bytes to be unique)
-     */
-    s = key.dptr = (char *)XMALLOC(keylen, "key.dptr");
-    XMEMCPY((void *)s, gamekey.dptr, gamekey.dsize);
-    s += gamekey.dsize;
-    XMEMCPY((void *)s, (void *)&type, sizeof(unsigned int));
-    key.dsize = (int)keylen;
     dat = gdbm_fetch(dbp, key);
 
     /* not there? */
@@ -353,44 +373,4 @@ int db_del(UDB_DATA gamekey, unsigned int type)
 
     XFREE(key.dptr);
     return (0);
-}
-
-void db_lock(void)
-{
-    /*
-     * Attempt to lock the DBM file. Block until the lock is cleared,
-     * then set it.
-     */
-    if (mushstate.dbm_fd == -1)
-    {
-        return;
-    }
-
-    fl.l_type = F_WRLCK;
-    fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-    fl.l_pid = getpid();
-
-    if (fcntl(mushstate.dbm_fd, F_SETLKW, &fl) == -1)
-    {
-        log_perror("DMP", "LOCK", NULL, "fcntl()");
-        return;
-    }
-}
-
-void db_unlock(void)
-{
-    if (mushstate.dbm_fd == -1)
-    {
-        return;
-    }
-
-    fl.l_type = F_UNLCK;
-
-    if (fcntl(mushstate.dbm_fd, F_SETLK, &fl) == -1)
-    {
-        log_perror("DMP", "LOCK", NULL, "fcntl()");
-        return;
-    }
 }

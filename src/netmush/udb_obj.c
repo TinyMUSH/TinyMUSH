@@ -295,27 +295,31 @@ void objfree(UDB_OBJECT *o)
 
 /* Routines to manipulate attributes within the object structure */
 
-char *obj_get_attrib(int anam, UDB_OBJECT *obj)
+static int find_attrib_slot(int anam, UDB_OBJECT *obj, int *insertion_point)
 {
-    int lo, mid, hi;
-    UDB_ATTRIB *a;
-    /*
-     * Binary search for the attribute
-     */
-    lo = 0;
-    hi = obj->at_count - 1;
-    a = obj->atrs;
+    if (!obj || obj->at_count <= 0 || !obj->atrs)
+    {
+        if (insertion_point)
+        {
+            *insertion_point = 0;
+        }
+        return -1;
+    }
+
+    int lo = 0;
+    int hi = obj->at_count - 1;
+    UDB_ATTRIB *a = obj->atrs;
 
     while (lo <= hi)
     {
-        mid = ((hi - lo) >> 1) + lo;
+        int mid = ((hi - lo) >> 1) + lo;
 
         if (a[mid].attrnum == anam)
         {
-            return (char *)a[mid].data;
-            break;
+            return mid;
         }
-        else if (a[mid].attrnum > anam)
+
+        if (a[mid].attrnum > anam)
         {
             hi = mid - 1;
         }
@@ -325,12 +329,28 @@ char *obj_get_attrib(int anam, UDB_OBJECT *obj)
         }
     }
 
-    return (NULL);
+    if (insertion_point)
+    {
+        *insertion_point = lo;
+    }
+
+    return -1;
+}
+
+char *obj_get_attrib(int anam, UDB_OBJECT *obj)
+{
+    if (!obj->atrs || obj->at_count <= 0)
+    {
+        return NULL;
+    }
+
+    int idx = find_attrib_slot(anam, obj, NULL);
+    return (idx >= 0) ? (char *)obj->atrs[idx].data : NULL;
 }
 
 void obj_set_attrib(int anam, UDB_OBJECT *obj, char *value)
 {
-    int hi, lo, mid;
+    int insert_at = 0;
     UDB_ATTRIB *a;
 
     /*
@@ -348,60 +368,33 @@ void obj_set_attrib(int anam, UDB_OBJECT *obj, char *value)
         a[0].size = strlen(value) + 1;
         return;
     }
+    int idx = find_attrib_slot(anam, obj, &insert_at);
 
-    /*
-     * Binary search for the attribute.
-     */
-    lo = 0;
-    hi = obj->at_count - 1;
-    a = obj->atrs;
-
-    while (lo <= hi)
+    if (idx >= 0)
     {
-        mid = ((hi - lo) >> 1) + lo;
-
-        if (a[mid].attrnum == anam)
-        {
-            XFREE(a[mid].data);
-            a[mid].data = (char *)value;
-            a[mid].size = strlen(value) + 1;
-            return;
-        }
-        else if (a[mid].attrnum > anam)
-        {
-            hi = mid - 1;
-        }
-        else
-        {
-            lo = mid + 1;
-        }
+        a = obj->atrs;
+        XFREE(a[idx].data);
+        a[idx].data = (char *)value;
+        a[idx].size = strlen(value) + 1;
+        return;
     }
 
-    /*
-     * If we got here, we didn't find it, so lo = hi + 1, and the
-     * * attribute should be inserted between them.
-     */
     a = (UDB_ATTRIB *)XREALLOC(obj->atrs, (obj->at_count + 1) * sizeof(UDB_ATTRIB), "a");
 
-    /*
-     * Move the stuff upwards one slot.
-     */
+    if (insert_at < obj->at_count)
+    {
+        XMEMMOVE((void *)(a + insert_at + 1), (void *)(a + insert_at), (obj->at_count - insert_at) * sizeof(UDB_ATTRIB));
+    }
 
-    if (lo < obj->at_count)
-        XMEMMOVE((void *)(a + lo + 1), (void *)(a + lo), (obj->at_count - lo) * sizeof(UDB_ATTRIB));
-
-    a[lo].data = value;
-    a[lo].attrnum = anam;
-    a[lo].size = strlen(value) + 1;
+    a[insert_at].data = value;
+    a[insert_at].attrnum = anam;
+    a[insert_at].size = strlen(value) + 1;
     obj->at_count++;
     obj->atrs = a;
 }
 
 void obj_del_attrib(int anam, UDB_OBJECT *obj)
 {
-    int hi, lo, mid;
-    UDB_ATTRIB *a;
-
     if (!obj->at_count || !obj->atrs)
     {
         return;
@@ -412,41 +405,26 @@ void obj_del_attrib(int anam, UDB_OBJECT *obj)
         abort();
     }
 
-    /*
-     * Binary search for the attribute.
-     */
-    lo = 0;
-    hi = obj->at_count - 1;
-    a = obj->atrs;
+    int idx = find_attrib_slot(anam, obj, NULL);
 
-    while (lo <= hi)
+    if (idx < 0)
     {
-        mid = ((hi - lo) >> 1) + lo;
+        return;
+    }
 
-        if (a[mid].attrnum == anam)
-        {
-            XFREE(a[mid].data);
-            obj->at_count--;
+    UDB_ATTRIB *a = obj->atrs;
+    XFREE(a[idx].data);
+    obj->at_count--;
 
-            if (mid != obj->at_count)
-                XMEMCPY((void *)(a + mid), (void *)(a + mid + 1), (obj->at_count - mid) * sizeof(UDB_ATTRIB));
+    if (idx != obj->at_count)
+    {
+        XMEMCPY((void *)(a + idx), (void *)(a + idx + 1), (obj->at_count - idx) * sizeof(UDB_ATTRIB));
+    }
 
-            if (obj->at_count == 0)
-            {
-                XFREE(obj->atrs);
-                obj->atrs = NULL;
-            }
-
-            return;
-        }
-        else if (a[mid].attrnum > anam)
-        {
-            hi = mid - 1;
-        }
-        else
-        {
-            lo = mid + 1;
-        }
+    if (obj->at_count == 0)
+    {
+        XFREE(obj->atrs);
+        obj->atrs = NULL;
     }
 }
 
