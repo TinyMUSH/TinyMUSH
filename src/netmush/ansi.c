@@ -1927,15 +1927,6 @@ char *ansi_parse_x_to_sequence(char **ptr, ColorType type)
 
     // No need to check for %x prefix since caller already did that
     // *ptr should point to the character after %x
-
-    {
-        FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-        if (debug_file) {
-            fprintf(debug_file, "DEBUG: ansi_parse_x_to_sequence called with ptr='%s'\n", *ptr);
-            fclose(debug_file);
-        }
-    }
-
     ColorState color = {0};
     bool parsed = false;
 
@@ -1958,34 +1949,13 @@ char *ansi_parse_x_to_sequence(char **ptr, ColorType type)
             if (code) {
                 XMEMCPY(code, start, len);
                 code[len] = '\0';
-                {
-                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-                    if (debug_file) {
-                        fprintf(debug_file, "DEBUG: parsing color code: '%s'\n", code);
-                        fclose(debug_file);
-                    }
-                }
                 parsed = ansi_parse_color_from_string(&color, code, false);
-                {
-                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-                    if (debug_file) {
-                        fprintf(debug_file, "DEBUG: ansi_parse_color_from_string returned %d\n", parsed);
-                        fclose(debug_file);
-                    }
-                }
                 XFREE(code);
             }
             (*ptr)++; // Skip >
         }
         else
         {
-            {
-                FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-                if (debug_file) {
-                    fprintf(debug_file, "DEBUG: no closing > found, ptr at: '%s'\n", *ptr);
-                    fclose(debug_file);
-                }
-            }
             *ptr = start; // Reset on error
         }
     }
@@ -2005,24 +1975,10 @@ char *ansi_parse_x_to_sequence(char **ptr, ColorType type)
         size_t offset = 0;
         if (to_ansi_escape_sequence(buffer, sizeof(buffer), &offset, &color, type) == ColorStatusSet)
         {
-            {
-                FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-                if (debug_file) {
-                    fprintf(debug_file, "DEBUG: offset = %zu, buffer starts with: '%.*s'\n", offset, (int)offset > 10 ? 10 : (int)offset, buffer);
-                    fclose(debug_file);
-                }
-            }
             char *result = XMALLOC(offset + 1, "sequence");
             if (result) {
                 XMEMCPY(result, buffer, offset);
                 result[offset] = '\0';
-                {
-                    FILE *debug_file = fopen("/tmp/debug_eval.log", "a");
-                    if (debug_file) {
-                        fprintf(debug_file, "DEBUG: generated sequence length: %zu, first 5 chars: %02x %02x %02x %02x %02x\n", strlen(result), (unsigned char)result[0], (unsigned char)result[1], (unsigned char)result[2], (unsigned char)result[3], (unsigned char)result[4]);
-                        fclose(debug_file);
-                    }
-                }
             }
             return result;
         }
