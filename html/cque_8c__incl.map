@@ -1,6 +1,6 @@
 <map id="src/netmush/cque.c" name="src/netmush/cque.c">
 <area shape="rect" id="Node000001" title="Command queue scheduling, throttling, and execution utilities." alt="" coords="494,5,630,31"/>
-<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="494,28,314,47,86,81,85,76,313,42,494,23"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="494,33,202,82,199,82,198,77,202,76,493,28"/>

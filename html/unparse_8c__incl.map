@@ -1,6 +1,6 @@
 <map id="src/netmush/unparse.c" name="src/netmush/unparse.c">
 <area shape="rect" id="Node000001" title="Render locks and boolean expressions to printable strings for output and decompile." alt="" coords="320,5,473,31"/>
-<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="98,79,164,105"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="98,79,164,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="352,34,179,80,178,75,351,29"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="188,79,276,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="370,34,275,75,273,70,367,29"/>

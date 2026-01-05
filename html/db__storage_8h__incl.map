@@ -1,0 +1,18 @@
+<map id="src/netmush/db_storage.h" name="src/netmush/db_storage.h">
+<area shape="rect" id="Node000001" title="Abstract database backend interface for GDBM and LMDB." alt="" coords="46,5,217,31"/>
+<area shape="rect" id="Node000002" href="$typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="179,79,260,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,29,194,67,191,71,145,34"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,153,79,178"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="126,33,60,141,55,138,122,30"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="102,153,166,178"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="207,107,161,145,158,141,203,103"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="190,153,249,178"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="222,105,222,137,217,137,217,105"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="190,108,87,149,85,144,188,103"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="272,153,329,178"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="235,103,277,140,274,144,231,107"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="352,153,433,178"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="250,103,350,144,348,149,248,108"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="457,153,542,178"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="261,101,443,147,442,152,259,106"/>
+</map>

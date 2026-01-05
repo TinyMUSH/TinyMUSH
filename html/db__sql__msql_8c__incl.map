@@ -1,6 +1,6 @@
 <map id="src/modules/db_sql/db_sql_msql.c" name="src/modules/db_sql/db_sql_msql.c">
 <area shape="rect" id="Node000001" title="mSQL backend driver for the SQL abstraction layer" alt="" coords="119,5,253,46"/>
-<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,94,71,120"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,71,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,49,75,89,73,84,148,44"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="95,94,168,120"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,48,151,83,146,79,170,45"/>

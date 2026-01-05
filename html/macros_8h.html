@@ -708,7 +708,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:a8f7c9c0c683f5c0e88b3fc953e9948d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">We can set it if: The (master) attribute is not internal or a lock AND we're God OR we meet the following criteria: - The object is not God. - The attribute on the object is not locked. - The object is not set Constant. - We control the object, and the attribute and master attribute do not have the Wizard or God flags, OR We are a Wizard and the attribute and master attribute do not have the God flags.  <br /></td></tr>
 <tr class="separator:a8f7c9c0c683f5c0e88b3fc953e9948d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69e1ff5f1ff1c0f33952edf592e1f90f" id="r_a69e1ff5f1ff1c0f33952edf592e1f90f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69e1ff5f1ff1c0f33952edf592e1f90f">Write_attr</a>(p,  x,  a,  f)</td></tr>
-<tr class="memdesc:a69e1ff5f1ff1c0f33952edf592e1f90f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a69e1ff5f1ff1c0f33952edf592e1f90f" title="Write_attr() is only used by atr_cpy(), and thus is not subject to the effects of the Constant flag.">Write_attr()</a> is only used by <a class="el" href="db_8c.html#a18b4d2e1a3ec53f7c6a4a2d55a7ae3db" title="Copy all attributes from one object to another. Takes the player argument to ensure that only attribu...">atr_cpy()</a>, and thus is not subject to the effects of the Constant flag.  <br /></td></tr>
+<tr class="memdesc:a69e1ff5f1ff1c0f33952edf592e1f90f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a69e1ff5f1ff1c0f33952edf592e1f90f" title="Write_attr() is only used by atr_cpy(), and thus is not subject to the effects of the Constant flag.">Write_attr()</a> is only used by <a class="el" href="db__attributes_8c.html#a18b4d2e1a3ec53f7c6a4a2d55a7ae3db" title="Copy all attributes from one object to another. Takes the player argument to ensure that only attribu...">atr_cpy()</a>, and thus is not subject to the effects of the Constant flag.  <br /></td></tr>
 <tr class="separator:a69e1ff5f1ff1c0f33952edf592e1f90f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1871eef9959cab7877e0e20638f691e5" id="r_a1871eef9959cab7877e0e20638f691e5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1871eef9959cab7877e0e20638f691e5">Lock_attr</a>(p,  x,  a,  o)</td></tr>
 <tr class="memdesc:a1871eef9959cab7877e0e20638f691e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">We can lock/unlock it if: we're God OR we meet the following criteria: - The (master) attribute is not internal or a lock AND - The object is not God. - The object is not set Constant. - The master attribute does not have the Wizard or God flags, OR We are a Wizard and the master attribute does not have the God flag. - We are a Wizard OR we own the attribute.  <br /></td></tr>
@@ -991,8 +991,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a></div>
-<div class="ttc" id="adb_8c_html_afa59f9d74d56d56612477dd8335420f0"><div class="ttname"><a href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a></div><div class="ttdeci">OBJ * db</div><div class="ttdef"><b>Definition</b> db.c:41</div></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a></div>
+<div class="ttc" id="adb__flatfile_8c_html_a81abf5d67af4cc116d290a1d21c750d4"><div class="ttname"><a href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a></div><div class="ttdeci">struct object * db</div><div class="ttdef"><b>Definition</b> db_objects.c:39</div></div>
 <div class="ttc" id="astructobject_html_a7733e6f1fbd45a36ee221de29488dcd7"><div class="ttname"><a href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">object::last_access</a></div><div class="ttdeci">time_t last_access</div><div class="ttdef"><b>Definition</b> typedefs.h:168</div></div>
 </div><!-- fragment -->
 </div>
@@ -1889,7 +1889,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aa3f6687be8834ee8605e1ff58a0c506f">contents</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aa3f6687be8834ee8605e1ff58a0c506f">contents</a></div>
 <div class="ttc" id="astructobject_html_aa3f6687be8834ee8605e1ff58a0c506f"><div class="ttname"><a href="structobject.html#aa3f6687be8834ee8605e1ff58a0c506f">object::contents</a></div><div class="ttdeci">dbref contents</div><div class="ttdef"><b>Definition</b> typedefs.h:149</div></div>
 </div><!-- fragment -->
 </div>
@@ -1990,7 +1990,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a></div>
 <div class="ttc" id="astructobject_html_a185b87853fe2262deaf93292fb5a8b03"><div class="ttname"><a href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">object::create_time</a></div><div class="ttdeci">time_t create_time</div><div class="ttdef"><b>Definition</b> typedefs.h:167</div></div>
 </div><!-- fragment -->
 </div>
@@ -2109,7 +2109,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a></div>
 <div class="ttc" id="astructobject_html_af193a2c91befe720b73ecde5810aecbe"><div class="ttname"><a href="structobject.html#af193a2c91befe720b73ecde5810aecbe">object::location</a></div><div class="ttdeci">dbref location</div><div class="ttdef"><b>Definition</b> typedefs.h:146</div></div>
 </div><!-- fragment -->
 </div>
@@ -2291,7 +2291,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655">exits</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655">exits</a></div>
 <div class="ttc" id="astructobject_html_ab84ae4bf7b5b90d0a77fb55624f5d655"><div class="ttname"><a href="structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655">object::exits</a></div><div class="ttdeci">dbref exits</div><div class="ttdef"><b>Definition</b> typedefs.h:151</div></div>
 </div><!-- fragment -->
 </div>
@@ -2366,7 +2366,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a31c6622e5aa167e7888229bc9fccca49">flags</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a31c6622e5aa167e7888229bc9fccca49">flags</a></div>
 <div class="ttc" id="astructobject_html_a31c6622e5aa167e7888229bc9fccca49"><div class="ttname"><a href="structobject.html#a31c6622e5aa167e7888229bc9fccca49">object::flags</a></div><div class="ttdeci">FLAG flags</div><div class="ttdef"><b>Definition</b> typedefs.h:162</div></div>
 </div><!-- fragment -->
 </div>
@@ -2385,7 +2385,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a92653f929086acb2fcb643d1e586f19f">flags2</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a92653f929086acb2fcb643d1e586f19f">flags2</a></div>
 <div class="ttc" id="astructobject_html_a92653f929086acb2fcb643d1e586f19f"><div class="ttname"><a href="structobject.html#a92653f929086acb2fcb643d1e586f19f">object::flags2</a></div><div class="ttdeci">FLAG flags2</div><div class="ttdef"><b>Definition</b> typedefs.h:163</div></div>
 </div><!-- fragment -->
 </div>
@@ -2404,7 +2404,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a></div>
 <div class="ttc" id="astructobject_html_a88cd7dbadba2cb0442e602af4203d096"><div class="ttname"><a href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">object::flags3</a></div><div class="ttdeci">FLAG flags3</div><div class="ttdef"><b>Definition</b> typedefs.h:164</div></div>
 </div><!-- fragment -->
 </div>
@@ -3410,7 +3410,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a></div>
 <div class="ttc" id="astructobject_html_a219e71d30599d2d2fb4c91de0c62c1cc"><div class="ttname"><a href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">object::link</a></div><div class="ttdeci">dbref link</div><div class="ttdef"><b>Definition</b> typedefs.h:156</div></div>
 </div><!-- fragment -->
 </div>
@@ -3503,7 +3503,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aaa345ffe4290a2291e961de7869e0645">instance_count</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aaa345ffe4290a2291e961de7869e0645">instance_count</a></div>
 <div class="ttc" id="astructobject_html_aaa345ffe4290a2291e961de7869e0645"><div class="ttname"><a href="structobject.html#aaa345ffe4290a2291e961de7869e0645">object::instance_count</a></div><div class="ttdeci">int instance_count</div><div class="ttdef"><b>Definition</b> typedefs.h:179</div></div>
 </div><!-- fragment -->
 </div>
@@ -3837,7 +3837,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3980,7 +3980,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4165,7 +4165,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a></div>
 <div class="ttc" id="astructobject_html_a0d6184c0875ccb81e16a833a25cf1033"><div class="ttname"><a href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">object::last_mod</a></div><div class="ttdeci">time_t last_mod</div><div class="ttdef"><b>Definition</b> typedefs.h:169</div></div>
 </div><!-- fragment -->
 </div>
@@ -4244,7 +4244,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ad7236619381ae73a01447b00723b9bd2">name_length</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ad7236619381ae73a01447b00723b9bd2">name_length</a></div>
 <div class="ttc" id="astructobject_html_ad7236619381ae73a01447b00723b9bd2"><div class="ttname"><a href="structobject.html#ad7236619381ae73a01447b00723b9bd2">object::name_length</a></div><div class="ttdeci">int name_length</div><div class="ttdef"><b>Definition</b> typedefs.h:175</div></div>
 </div><!-- fragment -->
 </div>
@@ -4287,7 +4287,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d">next</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d">next</a></div>
 <div class="ttc" id="astructobject_html_a93e5c745d1ff0e0b3a7f8840f133559d"><div class="ttname"><a href="structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d">object::next</a></div><div class="ttdeci">dbref next</div><div class="ttdef"><b>Definition</b> typedefs.h:153</div></div>
 </div><!-- fragment -->
 </div>
@@ -5158,8 +5158,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_function" href="db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a>(p, x))</div>
-<div class="ttc" id="adb_8c_html_ac88f57aa95b0fd622fc4a1ec2f64a594"><div class="ttname"><a href="db_8c.html#ac88f57aa95b0fd622fc4a1ec2f64a594">check_zone</a></div><div class="ttdeci">bool check_zone(dbref player, dbref thing)</div><div class="ttdoc">checks back through a zone tree for control</div><div class="ttdef"><b>Definition</b> db.c:3877</div></div>
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_function" href="db__objects_8c.html#af007774bdda3cc1dd86c318d67def3fd">check_zone</a>(p, x))</div>
+<div class="ttc" id="adb__objects_8c_html_af007774bdda3cc1dd86c318d67def3fd"><div class="ttname"><a href="db__objects_8c.html#af007774bdda3cc1dd86c318d67def3fd">check_zone</a></div><div class="ttdeci">bool check_zone(dbref player, dbref thing)</div><div class="ttdoc">checks back through a zone tree for control</div><div class="ttdef"><b>Definition</b> db_objects.c:1308</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5292,7 +5292,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#abec30fb1788baf2f1660d5630fe08642">owner</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#abec30fb1788baf2f1660d5630fe08642">owner</a></div>
 <div class="ttc" id="astructobject_html_abec30fb1788baf2f1660d5630fe08642"><div class="ttname"><a href="structobject.html#abec30fb1788baf2f1660d5630fe08642">object::owner</a></div><div class="ttdeci">dbref owner</div><div class="ttdef"><b>Definition</b> typedefs.h:159</div></div>
 </div><!-- fragment -->
 </div>
@@ -5330,7 +5330,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a1f08f13cf631f1f157ea71faa7c520a3">parent</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a1f08f13cf631f1f157ea71faa7c520a3">parent</a></div>
 <div class="ttc" id="astructobject_html_a1f08f13cf631f1f157ea71faa7c520a3"><div class="ttname"><a href="structobject.html#a1f08f13cf631f1f157ea71faa7c520a3">object::parent</a></div><div class="ttdeci">dbref parent</div><div class="ttdef"><b>Definition</b> typedefs.h:158</div></div>
 </div><!-- fragment -->
 </div>
@@ -5501,7 +5501,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a82537c22d6bcaa84dc3300838b801ebf">powers</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a82537c22d6bcaa84dc3300838b801ebf">powers</a></div>
 <div class="ttc" id="astructobject_html_a82537c22d6bcaa84dc3300838b801ebf"><div class="ttname"><a href="structobject.html#a82537c22d6bcaa84dc3300838b801ebf">object::powers</a></div><div class="ttdeci">POWER powers</div><div class="ttdef"><b>Definition</b> typedefs.h:165</div></div>
 </div><!-- fragment -->
 </div>
@@ -5520,7 +5520,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a6121772bbe22ca2c995039f65f130220">powers2</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a6121772bbe22ca2c995039f65f130220">powers2</a></div>
 <div class="ttc" id="astructobject_html_a6121772bbe22ca2c995039f65f130220"><div class="ttname"><a href="structobject.html#a6121772bbe22ca2c995039f65f130220">object::powers2</a></div><div class="ttdeci">POWER powers2</div><div class="ttdef"><b>Definition</b> typedefs.h:166</div></div>
 </div><!-- fragment -->
 </div>
@@ -5752,8 +5752,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 <div class="ttc" id="aconstants_8h_html_ab78f34451c5c2be60321d0fa2fc0daac"><div class="ttname"><a href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div><div class="ttdeci">#define DIRTY</div><div class="ttdef"><b>Definition</b> constants.h:962</div></div>
 <div class="ttc" id="astructstatedata_html_ac7ce05696823ea31fa4dec5b665637da"><div class="ttname"><a href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">statedata::now</a></div><div class="ttdeci">time_t now</div><div class="ttdef"><b>Definition</b> typedefs.h:1145</div></div>
 </div><!-- fragment -->
@@ -5777,8 +5777,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a7733e6f1fbd45a36ee221de29488dcd7">last_access</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -5978,7 +5978,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> = <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> &amp; ~DIRTY</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> = <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> &amp; ~DIRTY</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6036,8 +6036,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aa3f6687be8834ee8605e1ff58a0c506f">contents</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aa3f6687be8834ee8605e1ff58a0c506f">contents</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6073,8 +6073,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6096,8 +6096,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a185b87853fe2262deaf93292fb5a8b03">create_time</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6142,8 +6142,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655">exits</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ab84ae4bf7b5b90d0a77fb55624f5d655">exits</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6183,8 +6183,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a31c6622e5aa167e7888229bc9fccca49">flags</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a31c6622e5aa167e7888229bc9fccca49">flags</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6206,8 +6206,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a92653f929086acb2fcb643d1e586f19f">flags2</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a92653f929086acb2fcb643d1e586f19f">flags2</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6229,8 +6229,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6400,7 +6400,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aaa345ffe4290a2291e961de7869e0645">instance_count</a> = n;</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aaa345ffe4290a2291e961de7869e0645">instance_count</a> = n;</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6422,8 +6422,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a219e71d30599d2d2fb4c91de0c62c1cc">link</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6445,8 +6445,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#af193a2c91befe720b73ecde5810aecbe">location</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 <p>If we modify something on the db object that needs to be written at dump time, set the object DIRTY. </p>
 
@@ -6484,8 +6484,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a> = mushstate.<a class="code hl_variable" href="structstatedata.html#ac7ce05696823ea31fa4dec5b665637da">now</a>; \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6507,8 +6507,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a0d6184c0875ccb81e16a833a25cf1033">last_mod</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6530,7 +6530,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ad7236619381ae73a01447b00723b9bd2">name_length</a> = (n)</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ad7236619381ae73a01447b00723b9bd2">name_length</a> = (n)</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6552,8 +6552,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d">next</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a93e5c745d1ff0e0b3a7f8840f133559d">next</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6593,8 +6593,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#abec30fb1788baf2f1660d5630fe08642">owner</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#abec30fb1788baf2f1660d5630fe08642">owner</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6616,8 +6616,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a1f08f13cf631f1f157ea71faa7c520a3">parent</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a1f08f13cf631f1f157ea71faa7c520a3">parent</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6639,8 +6639,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a82537c22d6bcaa84dc3300838b801ebf">powers</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a82537c22d6bcaa84dc3300838b801ebf">powers</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6662,8 +6662,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a6121772bbe22ca2c995039f65f130220">powers2</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a6121772bbe22ca2c995039f65f130220">powers2</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -6797,7 +6797,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aa8794f142d3682bd9cbc27278049f14c">stack_count</a> = n;</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aa8794f142d3682bd9cbc27278049f14c">stack_count</a> = n;</div>
 <div class="ttc" id="astructobject_html_aa8794f142d3682bd9cbc27278049f14c"><div class="ttname"><a href="structobject.html#aa8794f142d3682bd9cbc27278049f14c">object::stack_count</a></div><div class="ttdeci">int stack_count</div><div class="ttdef"><b>Definition</b> typedefs.h:176</div></div>
 </div><!-- fragment -->
 </div>
@@ -6858,7 +6858,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ae82bae3d3f4ed86285749df4548ed116">struct_count</a> = n;</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ae82bae3d3f4ed86285749df4548ed116">struct_count</a> = n;</div>
 <div class="ttc" id="astructobject_html_ae82bae3d3f4ed86285749df4548ed116"><div class="ttname"><a href="structobject.html#ae82bae3d3f4ed86285749df4548ed116">object::struct_count</a></div><div class="ttdeci">int struct_count</div><div class="ttdef"><b>Definition</b> typedefs.h:178</div></div>
 </div><!-- fragment -->
 </div>
@@ -6956,7 +6956,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a98fa36bb08efbacfdaeb373105d5b346">vars_count</a> = n;</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a98fa36bb08efbacfdaeb373105d5b346">vars_count</a> = n;</div>
 <div class="ttc" id="astructobject_html_a98fa36bb08efbacfdaeb373105d5b346"><div class="ttname"><a href="structobject.html#a98fa36bb08efbacfdaeb373105d5b346">object::vars_count</a></div><div class="ttdeci">int vars_count</div><div class="ttdef"><b>Definition</b> typedefs.h:177</div></div>
 </div><!-- fragment -->
 </div>
@@ -6998,8 +6998,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aec066020a6368887cc86ecbf1193c460">zone</a> = (n); \</div>
-<div class="line">    <a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aec066020a6368887cc86ecbf1193c460">zone</a> = (n); \</div>
+<div class="line">    <a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a88cd7dbadba2cb0442e602af4203d096">flags3</a> |= <a class="code hl_define" href="constants_8h.html#ab78f34451c5c2be60321d0fa2fc0daac">DIRTY</a></div>
 <div class="ttc" id="astructobject_html_aec066020a6368887cc86ecbf1193c460"><div class="ttname"><a href="structobject.html#aec066020a6368887cc86ecbf1193c460">object::zone</a></div><div class="ttdeci">dbref zone</div><div class="ttdef"><b>Definition</b> typedefs.h:161</div></div>
 </div><!-- fragment -->
 </div>
@@ -7391,7 +7391,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aa8794f142d3682bd9cbc27278049f14c">stack_count</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aa8794f142d3682bd9cbc27278049f14c">stack_count</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7501,7 +7501,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ae82bae3d3f4ed86285749df4548ed116">struct_count</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ae82bae3d3f4ed86285749df4548ed116">struct_count</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -7612,7 +7612,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#ad175e0c7f43ec275662f257ec0e31325">cpu_time_used</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#ad175e0c7f43ec275662f257ec0e31325">cpu_time_used</a></div>
 <div class="ttc" id="astructobject_html_ad175e0c7f43ec275662f257ec0e31325"><div class="ttname"><a href="structobject.html#ad175e0c7f43ec275662f257ec0e31325">object::cpu_time_used</a></div><div class="ttdeci">struct timeval cpu_time_used</div><div class="ttdef"><b>Definition</b> typedefs.h:180</div></div>
 </div><!-- fragment -->
 </div>
@@ -7838,7 +7838,7 @@ than", not right shift):</p>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#a98fa36bb08efbacfdaeb373105d5b346">vars_count</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#a98fa36bb08efbacfdaeb373105d5b346">vars_count</a></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -8051,7 +8051,7 @@ than", not right shift):</p>
 <b>Value:</b><div class="fragment"><div class="line">(!((a)-&gt;flags &amp; (<a class="code hl_define" href="constants_8h.html#a095e0b85ca44dd9438badbe6e82347df">AF_INTERNAL</a> | <a class="code hl_define" href="constants_8h.html#a4ef22647a1c18cd81a3b0e71a0bad543">AF_NOCLONE</a>)) &amp;&amp; (God(p) || (!God(x) &amp;&amp; !(f &amp; <a class="code hl_define" href="constants_8h.html#a14faf9258ebebc1cc60dab15cb320fa0">AF_LOCK</a>) &amp;&amp; ((Controls(p, x) &amp;&amp; !((a)-&gt;flags &amp; (<a class="code hl_define" href="constants_8h.html#a9f0100bf8754070cb4370b52587fb88c">AF_WIZARD</a> | <a class="code hl_define" href="constants_8h.html#a8cf5fa560ba23d118ac77e1ea60c541c">AF_GOD</a>)) &amp;&amp; !((f) &amp; (<a class="code hl_define" href="constants_8h.html#a9f0100bf8754070cb4370b52587fb88c">AF_WIZARD</a> | <a class="code hl_define" href="constants_8h.html#a8cf5fa560ba23d118ac77e1ea60c541c">AF_GOD</a>))) || (Sets_Wiz_Attrs(p) &amp;&amp; !((a)-&gt;flags &amp; <a class="code hl_define" href="constants_8h.html#a8cf5fa560ba23d118ac77e1ea60c541c">AF_GOD</a>))))))</div>
 <div class="ttc" id="aconstants_8h_html_a4ef22647a1c18cd81a3b0e71a0bad543"><div class="ttname"><a href="constants_8h.html#a4ef22647a1c18cd81a3b0e71a0bad543">AF_NOCLONE</a></div><div class="ttdeci">#define AF_NOCLONE</div><div class="ttdef"><b>Definition</b> constants.h:63</div></div>
 </div><!-- fragment -->
-<p><a class="el" href="#a69e1ff5f1ff1c0f33952edf592e1f90f" title="Write_attr() is only used by atr_cpy(), and thus is not subject to the effects of the Constant flag.">Write_attr()</a> is only used by <a class="el" href="db_8c.html#a18b4d2e1a3ec53f7c6a4a2d55a7ae3db" title="Copy all attributes from one object to another. Takes the player argument to ensure that only attribu...">atr_cpy()</a>, and thus is not subject to the effects of the Constant flag. </p>
+<p><a class="el" href="#a69e1ff5f1ff1c0f33952edf592e1f90f" title="Write_attr() is only used by atr_cpy(), and thus is not subject to the effects of the Constant flag.">Write_attr()</a> is only used by <a class="el" href="db__attributes_8c.html#a18b4d2e1a3ec53f7c6a4a2d55a7ae3db" title="Copy all attributes from one object to another. Takes the player argument to ensure that only attribu...">atr_cpy()</a>, and thus is not subject to the effects of the Constant flag. </p>
 
 </div>
 </div>
@@ -9268,7 +9268,7 @@ than", not right shift):</p>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db_8c.html#afa59f9d74d56d56612477dd8335420f0">db</a>[t].<a class="code hl_variable" href="structobject.html#aec066020a6368887cc86ecbf1193c460">zone</a></div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_variable" href="db__flatfile_8c.html#a81abf5d67af4cc116d290a1d21c750d4">db</a>[t].<a class="code hl_variable" href="structobject.html#aec066020a6368887cc86ecbf1193c460">zone</a></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -30,7 +30,7 @@ var searchData=
   ['list_5frawmemory_27',['list_rawmemory',['../alloc_8c.html#a29f3880a920752ac225497297ccbdf4a',1,'alloc.c']]],
   ['list_5ftextfiles_28',['list_textfiles',['../command_8c.html#a7738fae756acb374e7944f825d3bd7a7',1,'command.c']]],
   ['list_5fvattrs_29',['list_vattrs',['../command_8c.html#ad7d03fe57eede4f2aef5cf3fbc281cfd',1,'command.c']]],
-  ['load_5frestart_5fdb_30',['load_restart_db',['../db_8c.html#a856858ada02cdcecf30d7d18165115f6',1,'db.c']]],
+  ['load_5frestart_5fdb_30',['load_restart_db',['../db__objects_8c.html#a856858ada02cdcecf30d7d18165115f6',1,'db_objects.c']]],
   ['log_5fsignal_31',['log_signal',['../bsd_8c.html#acfc6af4e2eaaa3ac531c955fa923516d',1,'bsd.c']]],
   ['look_5fcontents_32',['look_contents',['../look_8c.html#a09b73dd2051681f4b83f4ef4191c3f3a',1,'look.c']]],
   ['ltos_33',['ltos',['../string__util_8c.html#acdeb4d27d73ff8b89cbf09ed57d2944e',1,'string_util.c']]]

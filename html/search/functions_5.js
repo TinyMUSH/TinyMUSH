@@ -21,8 +21,8 @@ var searchData=
   ['fh_5fwiz_18',['fh_wiz',['../flags_8c.html#ab6f189f4d084da1bd8c15866f565034e',1,'flags.c']]],
   ['fh_5fwizroy_19',['fh_wizroy',['../flags_8c.html#a4cbe3cf252b0036f55c8296b5d03e7de',1,'flags.c']]],
   ['find_5fflag_20',['find_flag',['../flags_8c.html#a2da0e87220d0b5f244f2db0515fac86d',1,'flags.c']]],
-  ['fix_5fmux_5fzones_21',['fix_mux_zones',['../db__rw_8c.html#ade1ae8d0c7cc371aca3d3242ae307397',1,'db_rw.c']]],
-  ['fix_5ftyped_5fquotas_22',['fix_typed_quotas',['../db__rw_8c.html#a0a1ef48c56451022d41a399c71360210',1,'db_rw.c']]],
+  ['fix_5fmux_5fzones_21',['fix_mux_zones',['../db__flatfile_8c.html#ade1ae8d0c7cc371aca3d3242ae307397',1,'db_flatfile.c']]],
+  ['fix_5ftyped_5fquotas_22',['fix_typed_quotas',['../db__flatfile_8c.html#a0a1ef48c56451022d41a399c71360210',1,'db_flatfile.c']]],
   ['flag_5fdescription_23',['flag_description',['../flags_8c.html#a7826bc6114d012e3118e398af5a27bef',1,'flags.c']]],
   ['flag_5fset_24',['flag_set',['../flags_8c.html#a3a33c10a18abf2194e984dc59027e6d4',1,'flags.c']]],
   ['fn_5frange_5fcheck_25',['fn_range_check',['../fnhelper_8c.html#a8f6e0778d5815457ec440b3bd74f7a58',1,'fnhelper.c']]],
@@ -253,10 +253,10 @@ var searchData=
   ['fun_5fzfun_250',['fun_zfun',['../funobj_8c.html#a0b3ed53013340a3ec79974593340e760',1,'funobj.c']]],
   ['fun_5fzone_251',['fun_zone',['../funobj_8c.html#addc067ed35f058732e2f4d23afddd9b1',1,'funobj.c']]],
   ['fval_252',['fval',['../funmath_8c.html#af7d1af835fc751ad74f72fc8688888dd',1,'funmath.c']]],
-  ['fwdlist_5fck_253',['fwdlist_ck',['../db_8c.html#ae6f82fb7c71b41f881f158b15fba1509',1,'fwdlist_ck(int, dbref, dbref, int, char *):&#160;db.c'],['../db_8c.html#ad37c2ad127d1b0de7f2fc3e2c201d25a',1,'fwdlist_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext):&#160;db.c']]],
-  ['fwdlist_5fclr_254',['fwdlist_clr',['../db_8c.html#abc104022fb98e35e206c4358979bf1be',1,'db.c']]],
-  ['fwdlist_5fget_255',['fwdlist_get',['../db_8c.html#a132d43a41dcb4f457ba6c9c377eb8ecd',1,'db.c']]],
-  ['fwdlist_5fload_256',['fwdlist_load',['../db_8c.html#aabe422cf34f4c2bd10a307aea08e7942',1,'db.c']]],
-  ['fwdlist_5frewrite_257',['fwdlist_rewrite',['../db_8c.html#ac8868a7abe4cab6ec5dd989a47f54d75',1,'db.c']]],
-  ['fwdlist_5fset_258',['fwdlist_set',['../db_8c.html#a93f4d9b9d97d42c8ad8b29f61328b220',1,'db.c']]]
+  ['fwdlist_5fck_253',['fwdlist_ck',['../db__fwdlist_8c.html#ae6f82fb7c71b41f881f158b15fba1509',1,'fwdlist_ck(int, dbref, dbref, int, char *):&#160;db_fwdlist.c'],['../db__fwdlist_8c.html#ad37c2ad127d1b0de7f2fc3e2c201d25a',1,'fwdlist_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext):&#160;db_fwdlist.c']]],
+  ['fwdlist_5fclr_254',['fwdlist_clr',['../db__fwdlist_8c.html#abc104022fb98e35e206c4358979bf1be',1,'db_fwdlist.c']]],
+  ['fwdlist_5fget_255',['fwdlist_get',['../db__fwdlist_8c.html#a132d43a41dcb4f457ba6c9c377eb8ecd',1,'db_fwdlist.c']]],
+  ['fwdlist_5fload_256',['fwdlist_load',['../db__fwdlist_8c.html#aabe422cf34f4c2bd10a307aea08e7942',1,'db_fwdlist.c']]],
+  ['fwdlist_5frewrite_257',['fwdlist_rewrite',['../db__fwdlist_8c.html#ac8868a7abe4cab6ec5dd989a47f54d75',1,'db_fwdlist.c']]],
+  ['fwdlist_5fset_258',['fwdlist_set',['../db__fwdlist_8c.html#a93f4d9b9d97d42c8ad8b29f61328b220',1,'db_fwdlist.c']]]
 ];

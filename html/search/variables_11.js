@@ -17,7 +17,7 @@ var searchData=
   ['sigactions_5fnametab_14',['sigactions_nametab',['../externs_8h.html#a9494b2b3aa7b6cd292263bfb14fbc52e',1,'sigactions_nametab:&#160;nametabs.c'],['../nametabs_8c.html#a9494b2b3aa7b6cd292263bfb14fbc52e',1,'sigactions_nametab:&#160;nametabs.c']]],
   ['site_5fchars_15',['site_chars',['../structconfdata.html#a0ce8dea021fc6b4d88c2fee0f35ad5fc',1,'confdata']]],
   ['site_5ffile_16',['site_file',['../structconfdata.html#aae9b90a99df1d29301b736b459a33043',1,'confdata']]],
-  ['sock_17',['sock',['../bsd_8c.html#a5903d0b282fc5eae503de618f896b5e1',1,'sock:&#160;bsd.c'],['../db_8c.html#a5903d0b282fc5eae503de618f896b5e1',1,'sock:&#160;bsd.c']]],
+  ['sock_17',['sock',['../bsd_8c.html#a5903d0b282fc5eae503de618f896b5e1',1,'sock:&#160;bsd.c'],['../externs_8h.html#a5903d0b282fc5eae503de618f896b5e1',1,'sock:&#160;bsd.c']]],
   ['space_5fcompress_18',['space_compress',['../structconfdata.html#a1bac5a99b698f1d5b6fc8903e1ea544d',1,'confdata']]],
   ['stack_5fcount_19',['stack_count',['../structobject.html#aa8794f142d3682bd9cbc27278049f14c',1,'object']]],
   ['stack_5flim_20',['stack_lim',['../structconfdata.html#a7861ece57e7a331af2246dcdd40291fd',1,'confdata']]],

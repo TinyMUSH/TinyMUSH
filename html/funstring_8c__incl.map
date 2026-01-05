@@ -1,6 +1,6 @@
 <map id="src/netmush/funstring.c" name="src/netmush/funstring.c">
 <area shape="rect" id="Node000001" title="String manipulation built&#45;ins: search/replace, case handling, formatting." alt="" coords="299,5,456,31"/>
-<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="29,79,94,105"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="29,79,94,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="321,34,110,81,109,76,319,29"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="119,79,207,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="342,34,215,76,213,71,340,29"/>

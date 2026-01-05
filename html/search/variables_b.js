@@ -20,7 +20,7 @@ var searchData=
   ['max_5fplayer_5faliases_17',['max_player_aliases',['../structconfdata.html#abd6a2de2db257b210ab0f8b29bd3e8ed',1,'confdata']]],
   ['max_5fplayers_18',['max_players',['../structconfdata.html#a64b49d585e0c32ef2ca995e12d1c20a3',1,'confdata']]],
   ['max_5fqpid_19',['max_qpid',['../structconfdata.html#a254f3a8378db217465b3105f74f82606',1,'confdata']]],
-  ['maxd_20',['maxd',['../bsd_8c.html#a17f460c66afc95b921d5b5656d9be0b5',1,'maxd:&#160;bsd.c'],['../db_8c.html#a17f460c66afc95b921d5b5656d9be0b5',1,'maxd:&#160;bsd.c']]],
+  ['maxd_20',['maxd',['../bsd_8c.html#a17f460c66afc95b921d5b5656d9be0b5',1,'maxd:&#160;bsd.c'],['../externs_8h.html#a17f460c66afc95b921d5b5656d9be0b5',1,'maxd:&#160;bsd.c']]],
   ['min_5fsize_21',['min_size',['../structstatedata.html#a6a549fe214fa2a8da3013a31975dab08',1,'statedata']]],
   ['minlen_22',['minlen',['../structname__table.html#a9d0c806d87781379dd3b21b7bfeefc18',1,'name_table']]],
   ['minor_23',['minor',['../structversioninfo.html#a8a8acd07c4c57e54efad6daf7e173b47',1,'versioninfo']]],

@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['s_5fname_0',['s_Name',['../db_8c.html#a78ca7ee8a642ada79f8d8ef49be33f87',1,'db.c']]],
-  ['s_5fpass_1',['s_Pass',['../db_8c.html#a15e8f6c514d404a36365dd4dc51b24d4',1,'db.c']]],
-  ['safe_5fexit_5fname_2',['safe_exit_name',['../db_8c.html#a965f26a4e0de5c48f6007f93ead099be',1,'db.c']]],
+  ['s_5fname_0',['s_Name',['../db__objects_8c.html#a78ca7ee8a642ada79f8d8ef49be33f87',1,'db_objects.c']]],
+  ['s_5fpass_1',['s_Pass',['../db__objects_8c.html#a15e8f6c514d404a36365dd4dc51b24d4',1,'db_objects.c']]],
+  ['safe_5fexit_5fname_2',['safe_exit_name',['../db__objects_8c.html#a965f26a4e0de5c48f6007f93ead099be',1,'db_objects.c']]],
   ['safe_5fgettimeofday_3',['safe_gettimeofday',['../string__util_8c.html#a024552f4a78374dc5be679d168cc98a7',1,'string_util.c']]],
-  ['safe_5fname_4',['safe_name',['../db_8c.html#a8325075d7baa2cff5159cf1f6a7db075',1,'db.c']]],
+  ['safe_5fname_4',['safe_name',['../db__objects_8c.html#a8325075d7baa2cff5159cf1f6a7db075',1,'db_objects.c']]],
   ['safe_5fstrerror_5',['safe_strerror',['../string__util_8c.html#a9d2f17cc77b140dfe9b1573d963cfeb5',1,'string_util.c']]],
   ['sane_5fdoing_6',['sane_doing',['../netcommon_8c.html#acf36dc03cb99ad9722170d4ae3b6fee4',1,'netcommon.c']]],
   ['sane_5finet_5faddr_7',['sane_inet_addr',['../conf_8c.html#adad360a9cec42e0191855db3094277b2',1,'conf.c']]],

@@ -97,11 +97,8 @@ Directory dependency graph for netmush:</div>
 <div class="dyncontent">
 <div class="center"><img src="dir_d49c5bdcdc946239a893bf2d58085e26_dep.png" border="0" usemap="#adir__d49c5bdcdc946239a893bf2d58085e26__dep" alt="src/netmush"/></div>
 <map name="adir__d49c5bdcdc946239a893bf2d58085e26__dep" id="adir__d49c5bdcdc946239a893bf2d58085e26__dep">
-<area shape="rect" href="dir_d49c5bdcdc946239a893bf2d58085e26.html" title="netmush" alt="" coords="30,52,102,78"/>
-<area shape="rect" href="dir_ffa1afd5a6b1102248cca3fb92b5d472.html" title="_codeql_build_dir" alt="" coords="5,126,127,152"/>
-<area shape="poly" href="dir_000010_000000.html" alt="" coords="69,78,69,110,63,110,63,78"/>
-<area shape="rect" href="dir_000010_000000.html" title="58" alt="" coords="67,100,81,115"/>
-<area shape="rect" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="19,16,113,89"/>
+<area shape="rect" href="dir_d49c5bdcdc946239a893bf2d58085e26.html" title="netmush" alt="" coords="27,52,98,78"/>
+<area shape="rect" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="16,16,109,89"/>
 </map>
 </div>
 <table class="memberdecls">
@@ -139,14 +136,38 @@ Files</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="create_8c.html">create.c</a></td></tr>
 <tr class="memdesc:create_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object creation commands and initial setup of rooms, exits, things, and players. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db_8c.html">db.c</a></td></tr>
-<tr class="memdesc:db_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core database object utilities and attribute access/manipulation helpers. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__attributes_8c.html">db_attributes.c</a></td></tr>
+<tr class="memdesc:db__attributes_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute management system. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__rw_8c.html">db_rw.c</a></td></tr>
-<tr class="memdesc:db__rw_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flatfile persistence layer for reading/writing the game database. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__backend__gdbm_8c.html">db_backend_gdbm.c</a></td></tr>
+<tr class="memdesc:db__backend__gdbm_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">GDBM database backend implementation and recovery tools. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dbconvert_8c.html">dbconvert.c</a></td></tr>
-<tr class="memdesc:dbconvert_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database converter between GDBM and LMDB formats. <br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__backend__lmdb_8c.html">db_backend_lmdb.c</a></td></tr>
+<tr class="memdesc:db__backend__lmdb_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">LMDB database backend implementation. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__filehelpers_8c.html">db_filehelpers.c</a></td></tr>
+<tr class="memdesc:db__filehelpers_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">File and pipe manipulation helpers for database I/O. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__flatfile_8c.html">db_flatfile.c</a></td></tr>
+<tr class="memdesc:db__flatfile_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flatfile persistence: reading/writing database dumps and format conversion. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__fwdlist_8c.html">db_fwdlist.c</a></td></tr>
+<tr class="memdesc:db__fwdlist_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forward list management for AUDIBLE attribute propagation. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__objects_8c.html">db_objects.c</a></td></tr>
+<tr class="memdesc:db__objects_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core object management: database growth, names, initialization. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__propdir_8c.html">db_propdir.c</a></td></tr>
+<tr class="memdesc:db__propdir_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property directory management for multi-parent inheritance. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__serialization_8c.html">db_serialization.c</a></td></tr>
+<tr class="memdesc:db__serialization_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">UDB object serialization shared by both backends: load/store bundled attributes and walk them efficiently. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__storage_8c.html">db_storage.c</a></td></tr>
+<tr class="memdesc:db__storage_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database backend dispatcher - delegates operations to GDBM or LMDB. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="db__storage_8h_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="db__storage_8h.html">db_storage.h</a></td></tr>
+<tr class="memdesc:db__storage_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstract database backend interface for GDBM and LMDB. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="eval_8c.html">eval.c</a></td></tr>
 <tr class="memdesc:eval_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expression parsing, evaluation, and command/function argument processing. <br /></td></tr>
@@ -243,9 +264,6 @@ Files</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="quota_8c.html">quota.c</a></td></tr>
 <tr class="memdesc:quota_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Quota tracking and commands that enforce building/resource limits. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="recover_8c.html">recover.c</a></td></tr>
-<tr class="memdesc:recover_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tool to traverse a corrupted GDBM database, locate tagged blocks, and rebuild a consistent database. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rob_8c.html">rob.c</a></td></tr>
 <tr class="memdesc:rob_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Economy and combat commands: give/take currency, kill/rob interactions. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,27 +281,6 @@ Files</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="typedefs_8h_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="typedefs_8h.html">typedefs.h</a></td></tr>
 <tr class="memdesc:typedefs_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core typedefs for dbrefs, flags, buffers, and engine data structures. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__backend_8c.html">udb_backend.c</a></td></tr>
-<tr class="memdesc:udb__backend_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database backend dispatcher - delegates operations to GDBM or LMDB. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="udb__backend_8h_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__backend_8h.html">udb_backend.h</a></td></tr>
-<tr class="memdesc:udb__backend_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstract database backend interface for GDBM and LMDB. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__gdbm_8c.html">udb_gdbm.c</a></td></tr>
-<tr class="memdesc:udb__gdbm_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">GDBM database backend implementation. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__lmdb_8c.html">udb_lmdb.c</a></td></tr>
-<tr class="memdesc:udb__lmdb_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">LMDB database backend implementation. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__misc_8c.html">udb_misc.c</a></td></tr>
-<tr class="memdesc:udb__misc_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Support routines for the UDBM backend: error handling and maintenance helpers. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__obj_8c.html">udb_obj.c</a></td></tr>
-<tr class="memdesc:udb__obj_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">UDBM binary object read/write and traversal helpers. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="udb__ochunk_8c.html">udb_ochunk.c</a></td></tr>
-<tr class="memdesc:udb__ochunk_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Chunked I/O helpers for the UDBM database backend. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><span class="icondoc"></span>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unparse_8c.html">unparse.c</a></td></tr>
 <tr class="memdesc:unparse_8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render locks and boolean expressions to printable strings for output and decompile. <br /></td></tr>

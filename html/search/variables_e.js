@@ -52,6 +52,6 @@ var searchData=
   ['pub_5fflags_49',['pub_flags',['../structconfdata.html#ae557ac2320872af7ebc3e08ef7e26779',1,'confdata']]],
   ['pueblo_5fmsg_50',['pueblo_msg',['../structconfdata.html#a24f2436215c4a3f7fdc3fd2a323b76fa',1,'confdata']]],
   ['pueblo_5fversion_51',['pueblo_version',['../structconfdata.html#aa356a768475aefdeb06d1bc5582d9b05',1,'confdata']]],
-  ['purenames_52',['purenames',['../db_8c.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c'],['../externs_8h.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db.c']]],
+  ['purenames_52',['purenames',['../db__objects_8c.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db_objects.c'],['../externs_8h.html#af49f75cf1acfe79b210355eed9e32b12',1,'purenames:&#160;db_objects.c']]],
   ['put_53',['put',['../structdb__backend.html#aa138dc5c185e73ece8a12edf607be7c9',1,'db_backend']]]
 ];

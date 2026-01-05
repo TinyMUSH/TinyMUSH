@@ -202,7 +202,7 @@ Attributes lost on server dump (Resolved)</h2>
 <ul>
 <li><b>Status:</b> Fixed (December 22, 2025)</li>
 <li><b>Scope:</b> Attribute persistence before dumps in <code><a class="el" href="game_8c.html" title="Server startup/shutdown, main loop orchestration, and core engine glue.">src/netmush/game.c</a></code></li>
-<li><b>Impact:</b> Added <code><a class="el" href="db_8c.html#a7926ca58d55efd00cde49964ba1fcde6" title="Write modified attribute list.">al_store()</a></code> before all database dumps to persist in-memory attribute lists, preventing loss of attribute changes.</li>
+<li><b>Impact:</b> Added <code><a class="el" href="db__attributes_8c.html#a7926ca58d55efd00cde49964ba1fcde6" title="Write modified attribute list.">al_store()</a></code> before all database dumps to persist in-memory attribute lists, preventing loss of attribute changes.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md436"></a>
 stack-safe writes in <code>fun_write()</code> (Resolved)</h2>

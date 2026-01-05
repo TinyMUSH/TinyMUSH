@@ -1,7 +1,4 @@
 <map id="src/netmush" name="src/netmush">
-<area shape="rect" id="node1" href="dir_d49c5bdcdc946239a893bf2d58085e26.html" title="netmush" alt="" coords="30,52,102,78"/>
-<area shape="rect" id="node2" href="dir_ffa1afd5a6b1102248cca3fb92b5d472.html" title="_codeql_build_dir" alt="" coords="5,126,127,152"/>
-<area shape="poly" id="edge1" href="dir_000010_000000.html" alt="" coords="69,78,69,110,63,110,63,78"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000010_000000.html" title="58" alt="" coords="67,100,81,115"/>
-<area shape="rect" id="clust1" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="19,16,113,89"/>
+<area shape="rect" id="node1" href="dir_d49c5bdcdc946239a893bf2d58085e26.html" title="netmush" alt="" coords="27,52,98,78"/>
+<area shape="rect" id="clust1" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html" title="src" alt="" coords="16,16,109,89"/>
 </map>

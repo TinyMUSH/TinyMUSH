@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['t_5ffd_0',['t_fd',['../db_8c.html#a684d3e4c52154c744337346edf069a1d',1,'db.c']]],
-  ['t_5fis_5fpipe_1',['t_is_pipe',['../db_8c.html#a16ac81d40461b8f613f81160429909eb',1,'db.c']]],
+  ['t_5ffd_0',['t_fd',['../db__filehelpers_8c.html#a684d3e4c52154c744337346edf069a1d',1,'db_filehelpers.c']]],
+  ['t_5fis_5fpipe_1',['t_is_pipe',['../db__filehelpers_8c.html#a16ac81d40461b8f613f81160429909eb',1,'db_filehelpers.c']]],
   ['tail_2',['tail',['../structobjlist__stack.html#a72dab3ef9c4385be8bbd4c7139bbd663',1,'objlist_stack']]],
   ['terse_5fcontents_3',['terse_contents',['../structconfdata.html#ae9a2ef781d5c5406b23e2cfaabb8590b',1,'confdata']]],
   ['terse_5fexits_4',['terse_exits',['../structconfdata.html#aa30928ec1f152663b7d7c10f633cab0b',1,'confdata']]],
