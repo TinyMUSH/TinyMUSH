@@ -1,6 +1,6 @@
 
 /**
- * @file db_common_obj.c
+ * @file db_serialization.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief UDB object serialization shared by both backends: load/store bundled attributes and walk them efficiently.
  * @version 4.0

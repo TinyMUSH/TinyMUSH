@@ -224,7 +224,7 @@ extern _Bool destroyable(dbref victim);
 extern _Bool can_destroy_player(dbref player, dbref victim);
 extern void do_destroy(dbref player, dbref cause, int key, char *what);
 
-/* db_runtime.c */
+/* db_filehelpers.c */
 extern void tf_xclose(FILE *fd);
 extern int tf_fiddle(int tfd);
 extern int tf_xopen(char *fname, int mode);
@@ -235,18 +235,24 @@ extern void tf_close(int fdes);
 extern FILE *tf_fopen(char *fname, int mode);
 extern void tf_fclose(FILE *fd);
 extern FILE *tf_popen(char *fname, int mode);
+
+/* db_fwdlist.c */
 extern void fwdlist_set(dbref thing, FWDLIST *ifp);
 extern void fwdlist_clr(dbref thing);
 extern int fwdlist_load(FWDLIST *fp, dbref player, char *atext);
 extern int fwdlist_rewrite(FWDLIST *fp, char *atext);
 extern int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext);
 extern FWDLIST *fwdlist_get(dbref thing);
+
+/* db_propdir.c */
 extern void propdir_set(dbref thing, PROPDIR *ifp);
 extern void propdir_clr(dbref thing);
 extern int propdir_load(PROPDIR *fp, dbref player, char *atext);
 extern int propdir_rewrite(PROPDIR *fp, char *atext);
 extern int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext);
 extern PROPDIR *propdir_get(dbref thing);
+
+/* db_objects.c */
 extern void safe_name(dbref thing, char *outbuf, char **bufc);
 extern char *Name(dbref thing);
 extern char *PureName(dbref thing);
@@ -255,6 +261,26 @@ extern void safe_exit_name(dbref it, char *buff, char **bufc);
 extern void s_Pass(dbref thing, const char *s);
 extern void do_attribute(dbref player, dbref cause, int key, char *aname, char *value);
 extern void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2);
+extern void initialize_objects(dbref first, dbref last);
+extern void db_grow(dbref newtop);
+extern void db_free(void);
+extern void db_make_minimal(void);
+extern dbref parse_dbref_only(const char *s);
+extern dbref parse_objid(const char *s, const char *p);
+extern dbref parse_dbref(const char *s);
+extern void putstring(FILE *f, const char *s);
+extern void putref(FILE *f, int d);
+extern void putlong(FILE *f, long l);
+extern char *getstring(FILE *f, _Bool new_strings);
+extern dbref getref(FILE *f);
+extern long getlong(FILE *f);
+extern int init_database(char *dbfile);
+extern _Bool check_zone(dbref player, dbref thing);
+extern _Bool check_zone_for_player(dbref player, dbref thing);
+extern void dump_restart_db(void);
+extern void load_restart_db(void);
+
+/* db_attributes.c */
 extern void init_attrtab(void);
 extern ATTR *atr_str(char *s);
 extern void anum_extend(int newtop);
@@ -292,15 +318,7 @@ extern int atr_next(char **attrp);
 extern void atr_push(void);
 extern void atr_pop(void);
 extern int atr_head(dbref thing, char **attrp);
-extern void initialize_objects(dbref first, dbref last);
-extern void db_grow(dbref newtop);
-extern void db_free(void);
-extern void db_make_minimal(void);
-extern dbref parse_dbref_only(const char *s);
-extern dbref parse_objid(const char *s, const char *p);
-extern dbref parse_dbref(const char *s);
-extern void putstring(FILE *f, const char *s);
-extern void putref(FILE *f, int d);
+extern int db_sync_attributes(void);
 extern void putlong(FILE *f, long l);
 extern char *getstring(FILE *f, _Bool new_strings);
 extern dbref getref(FILE *f);
@@ -1284,7 +1302,7 @@ extern void init_timer(void);
 extern void dispatch(void);
 extern void do_timewarp(dbref player, dbref cause, int key, char *arg);
 
-/* db_common_obj.c */
+/* db_serialization.c */
 extern UDB_OBJECT *unroll_obj(char *data);
 extern char *rollup_obj(UDB_OBJECT *o);
 extern int obj_siz(UDB_OBJECT *o);

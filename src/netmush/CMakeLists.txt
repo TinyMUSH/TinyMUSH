@@ -15,12 +15,13 @@ endif()
 # Base source files
 set(NETMUSH_SOURCES
     alloc.c ansi.c ansi.h api.c boolexp.c bsd.c command.c conf.c constants.h 
-    cque.c create.c db_runtime.c db_flatfile.c eval.c externs.h file_c.c flags.c fnhelper.c 
+    cque.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
+    db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
-    string_util.c timer.c typedefs.h db_common_obj.c 
+    string_util.c timer.c typedefs.h 
     unparse.c vattr.c version.c walkdb.c wild.c wiz.c
     db_storage.c db_storage.h
 )

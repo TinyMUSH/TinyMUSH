@@ -26,6 +26,9 @@ extern OBJXFUNCS xfunctions;
 extern FUN flist[];
 
 extern DESC *descriptor_list;
+extern int sock;
+extern int maxd;
+extern int ndescriptors;
 
 extern CONFDATA mushconf;
 extern STATEDATA mushstate;
