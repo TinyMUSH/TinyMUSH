@@ -27,13 +27,13 @@ set(NETMUSH_SOURCES
 
 # Add backend-specific source files
 if(USE_LMDB)
-    list(APPEND NETMUSH_SOURCES udb_lmdb.c)
+    list(APPEND NETMUSH_SOURCES udb_lmdb.c udb_lmdb_frontend.c)
     add_compile_definitions(USE_LMDB)
     message(STATUS "Database backend: LMDB")
 endif()
 
 if(USE_GDBM)
-    list(APPEND NETMUSH_SOURCES udb_gdbm.c recover.c)
+    list(APPEND NETMUSH_SOURCES udb_gdbm.c udb_gdbm_frontend.c recover.c)
     add_compile_definitions(USE_GDBM)
     message(STATUS "Database backend: GDBM")
 endif()
