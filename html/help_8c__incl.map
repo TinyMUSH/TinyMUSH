@@ -1,6 +1,6 @@
 <map id="src/netmush/help.c" name="src/netmush/help.c">
 <area shape="rect" id="Node000001" title="Help, news, and +help retrieval and display commands." alt="" coords="535,5,666,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="98,79,164,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="98,79,164,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="535,29,377,49,179,81,179,76,376,44,534,24"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="188,79,276,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="538,34,292,82,291,76,537,29"/>

@@ -1,6 +1,6 @@
 <map id="src/netmush/string_util.c" name="src/netmush/string_util.c">
 <area shape="rect" id="Node000001" title="Core string utilities: safe buffer operations, munging, and helper routines." alt="" coords="391,5,520,46"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,71,120"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,94,71,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="391,40,255,63,86,96,85,91,254,58,390,35"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,94,184,120"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="391,46,199,93,198,88,390,41"/>

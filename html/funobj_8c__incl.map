@@ -1,6 +1,6 @@
 <map id="src/netmush/funobj.c" name="src/netmush/funobj.c">
 <area shape="rect" id="Node000001" title="Object&#45;focused built&#45;ins: dbref resolution, attributes, containment, and locks." alt="" coords="384,5,526,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="384,32,250,52,87,81,86,76,249,46,383,26"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="402,34,199,80,198,75,401,29"/>

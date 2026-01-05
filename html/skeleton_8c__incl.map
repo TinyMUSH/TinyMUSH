@@ -1,6 +1,6 @@
 <map id="src/modules/skeleton/skeleton.c" name="src/modules/skeleton/skeleton.c">
 <area shape="rect" id="Node000001" title="Skeleton module &#45; complete template for new modules." alt="" coords="466,5,612,46"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="121,94,186,120"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="121,94,186,120"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="466,43,202,96,201,91,465,38"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="211,94,299,120"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="469,49,314,92,313,87,467,44"/>

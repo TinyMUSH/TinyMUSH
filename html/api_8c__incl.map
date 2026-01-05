@@ -1,6 +1,6 @@
 <map id="src/netmush/api.c" name="src/netmush/api.c">
 <area shape="rect" id="Node000001" title="Module&#45;facing API hooks for commands, functions, and game integration." alt="" coords="310,5,434,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="21,79,86,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="21,79,86,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="315,34,102,81,101,76,314,29"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="111,79,199,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="336,34,207,76,206,71,335,29"/>

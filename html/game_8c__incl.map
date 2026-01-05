@@ -1,6 +1,6 @@
 <map id="src/netmush/game.c" name="src/netmush/game.c">
 <area shape="rect" id="Node000001" title="Server startup/shutdown, main loop orchestration, and core engine glue." alt="" coords="853,5,993,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="21,79,86,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="21,79,86,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="853,23,717,27,532,36,320,54,102,82,101,76,319,49,532,31,717,22,853,18"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="111,79,199,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="853,26,574,45,397,61,218,82,215,82,215,77,217,76,396,56,574,39,852,20"/>

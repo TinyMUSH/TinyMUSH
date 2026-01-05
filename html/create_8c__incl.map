@@ -1,6 +1,6 @@
 <map id="src/netmush/create.c" name="src/netmush/create.c">
 <area shape="rect" id="Node000001" title="Object creation commands and initial setup of rooms, exits, things, and players." alt="" coords="322,5,466,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="325,34,86,81,85,76,324,29"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="352,34,198,77,197,72,350,29"/>

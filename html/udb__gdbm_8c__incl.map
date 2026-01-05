@@ -1,6 +1,6 @@
 <map id="src/netmush/udb_gdbm.c" name="src/netmush/udb_gdbm.c">
 <area shape="rect" id="Node000001" title="GDBM database backend implementation." alt="" coords="481,5,648,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="481,29,304,49,86,81,86,76,303,43,480,24"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="489,34,202,82,199,82,198,77,202,76,488,29"/>

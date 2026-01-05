@@ -1,6 +1,6 @@
 <map id="src/netmush/db.c" name="src/netmush/db.c">
 <area shape="rect" id="Node000001" title="Core database object utilities and attribute access/manipulation helpers." alt="" coords="652,5,773,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="652,25,408,42,250,58,86,82,85,76,249,53,408,36,651,19"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="652,28,452,49,202,82,200,82,199,77,202,76,451,44,651,23"/>

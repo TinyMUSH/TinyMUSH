@@ -1,6 +1,6 @@
 <map id="src/netmush/conf.c" name="src/netmush/conf.c">
 <area shape="rect" id="Node000001" title="Configuration parsing, defaults, and runtime reload support." alt="" coords="626,5,759,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,71,105"/>
+<area shape="rect" id="Node000002" href="$config_8h.html" title="Configuration options set by configure script." alt="" coords="5,79,71,105"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="626,25,391,43,241,59,86,82,85,76,240,54,391,37,626,20"/>
 <area shape="rect" id="Node000003" href="$constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,79,184,105"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="627,29,436,50,202,82,200,82,199,77,202,76,435,45,626,24"/>
