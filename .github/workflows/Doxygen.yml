@@ -40,6 +40,9 @@ jobs:
         run: |
           ver="${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
           sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER         = ${ver}|" .github/Doxyfile
+      
+      - name: Ensure build/docs directory exists
+        run: mkdir -p build/docs
 
       - name: Build documentation
         run: doxygen .github/Doxyfile
