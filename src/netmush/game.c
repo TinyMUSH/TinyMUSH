@@ -2750,7 +2750,7 @@ int Hearer(dbref thing)
 		for (s = buff + 1; *s && (*s != ':'); s++)
 			;
 
-		if (s)
+		if (*s == ':')
 		{
 			XFREE(buff);
 			atr_pop();
