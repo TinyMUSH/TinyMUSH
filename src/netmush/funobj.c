@@ -4144,10 +4144,7 @@ void transform_say(dbref speaker, char *sname, char *str, int key, char *say_str
 
 	XFREE(result);
 
-	if (trans_str)
-	{
-		XFREE(trans_str);
-	}
+	XFREE(trans_str);
 
 	if (empty_str)
 	{
