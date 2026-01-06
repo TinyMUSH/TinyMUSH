@@ -286,7 +286,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 			}
 			else
 			{
-				log_write(LOG_BUGS, "BUG", "LOCK", "%s in %s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type);
+				log_write(LOG_BUGS, "BUG", "LOCK", "%s: Lock had bad indirection (%c, type %d)", pname, INDIR_TOKEN, b->sub1->type);
 			}
 			XFREE(pname);
 
