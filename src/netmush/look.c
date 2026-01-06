@@ -2663,7 +2663,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 				for (s = buff + 1; *s && (*s != ':'); s++)
 					;
 
-				if (s)
+				if (*s == ':')
 				{
 					canhear = 1;
 					break;
