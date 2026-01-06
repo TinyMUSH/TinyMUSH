@@ -1691,7 +1691,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 		else
 		{
-			log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, command);
+			log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, command);
 		}
 
 		XFREE(pname);

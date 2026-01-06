@@ -5116,7 +5116,7 @@ void fun_gridmake(char *buff, char **bufc, dbref player, dbref caller, dbref cau
     if (status < 0)
     {
         pname = log_getname(player);
-        log_write(LOG_BUGS, "GRD", "MAKE", "%s Failure");
+        log_write(LOG_BUGS, "GRD", "MAKE", "%s Failure", pname);
         XFREE(pname);
         grid_free(player, ogp);
         XSAFELBSTR("#-1 FAILURE", buff, bufc);

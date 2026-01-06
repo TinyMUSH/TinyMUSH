@@ -563,7 +563,7 @@ void do_fixdb(dbref player, dbref cause __attribute__((unused)), int key, char *
 
             tname = log_getname(thing);
             buf = ansi_strip_ansi(arg2);
-            log_write(LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", buf);
+            log_write(LOG_SECURITY, "SEC", "CNAME", "%s renamed to %s", tname, buf);
             XFREE(buf);
             XFREE(tname);
 
