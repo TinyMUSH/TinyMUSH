@@ -22,12 +22,15 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <dlfcn.h>
+#include <errno.h>
 #include <getopt.h>
 #include <gdbm.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/file.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 /* GDBM-specific state */
