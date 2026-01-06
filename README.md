@@ -3,6 +3,7 @@
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml)|
 |[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml)|
+|[![CodeQL Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/codeql.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/security/code-scanning)|
 
 - [TinyMUSH 4](#tinymush-4)
   - [Introduction](#introduction)
