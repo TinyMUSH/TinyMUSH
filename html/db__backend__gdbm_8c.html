@@ -107,53 +107,62 @@ $(function(){ initResizable(false); });
 <code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;dlfcn.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;getopt.h&gt;</code><br />
 <code>#include &lt;gdbm.h&gt;</code><br />
 <code>#include &lt;libgen.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;sys/file.h&gt;</code><br />
+<code>#include &lt;sys/stat.h&gt;</code><br />
 <code>#include &lt;unistd.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for db_backend_gdbm.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="db__backend__gdbm_8c__incl.png" border="0" usemap="#asrc_2netmush_2db__backend__gdbm_8c" alt=""/></div>
 <map name="asrc_2netmush_2db__backend__gdbm_8c" id="asrc_2netmush_2db__backend__gdbm_8c">
-<area shape="rect" title="GDBM database backend implementation and recovery tools." alt="" coords="637,5,804,46"/>
+<area shape="rect" title="GDBM database backend implementation and recovery tools." alt="" coords="753,5,920,46"/>
 <area shape="rect" title=" " alt="" coords="5,94,71,120"/>
-<area shape="poly" title=" " alt="" coords="637,35,394,55,242,73,86,97,85,91,241,68,393,50,636,29"/>
+<area shape="poly" title=" " alt="" coords="753,33,462,51,276,70,86,97,86,91,276,65,461,46,752,27"/>
 <area shape="rect" href="constants_8h.html" title="Global numeric and string constants for flags, limits, and parser tokens." alt="" coords="95,94,184,120"/>
-<area shape="poly" title=" " alt="" coords="637,39,438,63,202,97,200,97,199,92,202,91,438,58,636,34"/>
+<area shape="poly" title=" " alt="" coords="753,36,506,60,202,97,200,97,199,92,202,91,505,54,752,31"/>
 <area shape="rect" href="typedefs_8h.html" title="Core typedefs for dbrefs, flags, buffers, and engine data structures." alt="" coords="510,168,590,193"/>
-<area shape="poly" title=" " alt="" coords="700,49,577,159,573,155,697,45"/>
+<area shape="poly" title=" " alt="" coords="775,49,720,70,665,96,617,128,577,159,573,155,614,123,662,92,718,65,773,44"/>
 <area shape="rect" title=" " alt="" coords="332,241,392,267"/>
-<area shape="poly" title=" " alt="" coords="637,31,543,35,442,46,353,65,320,79,299,96,290,111,287,128,289,146,296,164,317,199,341,228,337,232,312,202,291,166,284,147,282,128,285,109,295,92,318,75,351,60,441,41,543,30,637,25"/>
+<area shape="poly" title=" " alt="" coords="753,34,625,43,482,56,361,74,320,84,299,96,289,111,287,128,289,145,295,164,317,199,341,229,337,232,312,202,291,166,284,147,281,128,284,109,295,92,318,80,360,69,482,51,625,37,753,29"/>
 <area shape="rect" title=" " alt="" coords="235,241,308,267"/>
-<area shape="poly" title=" " alt="" coords="637,30,539,35,433,45,383,54,339,65,305,79,281,96,271,110,264,126,259,161,261,196,266,226,261,227,255,197,253,161,259,124,267,107,277,92,302,74,338,60,382,49,432,40,539,29,636,25"/>
+<area shape="poly" title=" " alt="" coords="753,34,621,42,473,56,346,74,304,84,281,96,271,110,264,126,258,161,260,196,266,226,261,227,255,196,253,160,259,124,266,107,278,92,302,79,345,68,472,50,621,37,753,29"/>
 <area shape="rect" href="macros_8h.html" title="Engine&#45;wide macros for memory tracking, flag checks, logging, and utilities." alt="" coords="429,94,503,120"/>
-<area shape="poly" title=" " alt="" coords="658,49,519,92,517,87,656,44"/>
+<area shape="poly" title=" " alt="" coords="753,47,519,96,518,91,752,41"/>
 <area shape="rect" href="externs_8h.html" title="Shared extern declarations and globals used across the game engine." alt="" coords="527,94,600,120"/>
-<area shape="poly" title=" " alt="" coords="683,49,602,89,600,84,680,44"/>
+<area shape="poly" title=" " alt="" coords="769,49,616,93,614,88,768,44"/>
 <area shape="rect" href="prototypes_8h_source.html" title=" " alt="" coords="675,94,766,120"/>
-<area shape="poly" title=" " alt="" coords="723,46,723,78,718,78,718,46"/>
+<area shape="poly" title=" " alt="" coords="809,49,752,87,750,83,806,44"/>
 <area shape="rect" title=" " alt="" coords="806,168,868,193"/>
-<area shape="poly" title=" " alt="" coords="740,45,780,92,823,153,819,157,776,96,736,48"/>
+<area shape="poly" title=" " alt="" coords="836,47,832,81,831,120,835,152,830,153,826,120,827,80,831,46"/>
 <area shape="rect" href="db__storage_8h.html" title="Abstract database backend interface for GDBM and LMDB." alt="" coords="309,94,404,120"/>
-<area shape="poly" title=" " alt="" coords="637,48,420,95,419,89,636,43"/>
+<area shape="poly" title=" " alt="" coords="753,42,420,96,419,91,752,37"/>
 <area shape="rect" title=" " alt="" coords="840,94,902,120"/>
-<area shape="poly" title=" " alt="" coords="760,44,836,84,834,89,757,49"/>
+<area shape="poly" title=" " alt="" coords="848,45,862,78,857,81,843,47"/>
 <area shape="rect" title=" " alt="" coords="927,94,986,120"/>
-<area shape="poly" title=" " alt="" coords="780,44,913,88,911,93,779,49"/>
-<area shape="rect" title=" " alt="" coords="1011,94,1078,120"/>
-<area shape="poly" title=" " alt="" coords="803,44,996,91,995,96,801,49"/>
-<area shape="rect" title=" " alt="" coords="1102,94,1166,120"/>
-<area shape="poly" title=" " alt="" coords="805,38,934,60,1088,91,1087,96,933,65,804,43"/>
-<area shape="rect" title=" " alt="" coords="1189,94,1255,120"/>
-<area shape="poly" title=" " alt="" coords="805,34,972,56,1175,91,1174,96,971,61,804,39"/>
-<area shape="rect" title=" " alt="" coords="1278,94,1350,120"/>
-<area shape="poly" title=" " alt="" coords="805,32,1010,53,1135,70,1264,91,1263,96,1135,75,1010,59,805,37"/>
-<area shape="rect" title=" " alt="" coords="1374,94,1440,120"/>
-<area shape="poly" title=" " alt="" coords="805,29,1050,50,1203,67,1359,91,1359,96,1202,73,1049,55,805,35"/>
+<area shape="poly" title=" " alt="" coords="868,44,927,83,924,88,865,49"/>
+<area shape="rect" title=" " alt="" coords="1010,94,1071,120"/>
+<area shape="poly" title=" " alt="" coords="889,44,997,86,995,91,887,49"/>
+<area shape="rect" title=" " alt="" coords="1095,94,1162,120"/>
+<area shape="poly" title=" " alt="" coords="910,44,1080,90,1079,95,909,49"/>
+<area shape="rect" title=" " alt="" coords="1186,94,1250,120"/>
+<area shape="poly" title=" " alt="" coords="921,40,1172,91,1170,96,920,45"/>
+<area shape="rect" title=" " alt="" coords="1273,94,1339,120"/>
+<area shape="poly" title=" " alt="" coords="921,35,1074,58,1259,91,1258,96,1073,63,920,40"/>
+<area shape="rect" title=" " alt="" coords="1362,94,1426,120"/>
+<area shape="poly" title=" " alt="" coords="921,32,1113,53,1229,70,1348,91,1347,96,1228,75,1112,59,920,37"/>
+<area shape="rect" title=" " alt="" coords="1450,94,1522,120"/>
+<area shape="poly" title=" " alt="" coords="921,30,1149,52,1290,69,1435,91,1435,96,1290,74,1149,57,921,36"/>
+<area shape="rect" title=" " alt="" coords="1546,94,1623,120"/>
+<area shape="poly" title=" " alt="" coords="921,29,1189,49,1358,67,1531,91,1530,96,1357,73,1188,55,921,34"/>
+<area shape="rect" title=" " alt="" coords="1648,94,1714,120"/>
+<area shape="poly" title=" " alt="" coords="921,27,1055,33,1230,45,1429,63,1632,91,1632,96,1428,69,1230,50,1055,38,920,32"/>
 <area shape="rect" title=" " alt="" coords="112,168,167,193"/>
 <area shape="poly" title=" " alt="" coords="142,120,142,152,137,152,137,120"/>
 <area shape="rect" title=" " alt="" coords="508,241,571,267"/>
