@@ -71,6 +71,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="TinyMUSH regression test runner")
     parser.add_argument("--config", "-c", default=DEFAULT_CONFIG, help="Path to the test config file")
     parser.add_argument("--allow-disconnect", action="store_true", help="Run commands that may close the session")
+    parser.add_argument("--auto-shutdown", action="store_true", help="Automatically issue a @shutdown command when the test suite concludes")
     parser.add_argument("--delay", "-d", type=float, default=0.2, help="Delay between commands in seconds (default: 0.2)")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed output for debugging")
     return parser.parse_args()
@@ -223,7 +224,10 @@ def main() -> None:
 
     # Graceful logout if possible
     try:
-        tn.write(b"QUIT\n")
+        if args.auto_shutdown:
+            tn.write(b"@shutdown\n")
+        else:
+            tn.write(b"QUIT\n")
     except Exception:
         pass
     tn.close()
