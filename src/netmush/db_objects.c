@@ -1072,7 +1072,6 @@ void putstring(FILE *f, const char *s)
         case '\\':
         case '"':
             fprintf(f, "\\%c", *s);
-            putc('\\', f);
             break;
         default:
             putc(*s, f);
