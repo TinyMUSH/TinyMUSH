@@ -12,5 +12,6 @@ var searchData=
   ['contents_9',['Table of Contents',['../md_docs_2Historical_2ChangeLog_8History.html',1,'']]],
   ['contributing_20to_20tinymush_10',['Contributing to TinyMUSH',['../md_CONTRIBUTING.html',1,'']]],
   ['copying_11',['COPYING',['../md_COPYING.html',1,'']]],
-  ['credits_12',['TinyMUSH 4.0 Credits',['../md_AUTHORS.html',1,'']]]
+  ['credits_12',['TinyMUSH 4.0 Credits',['../md_AUTHORS.html',1,'']]],
+  ['custom_20attribute_20restoration_20fix_13',['Manual Test for Custom Attribute Restoration Fix',['../md_TEST__CUSTOM__ATTR__FIX.html',1,'']]]
 ];
