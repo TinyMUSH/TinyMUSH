@@ -476,7 +476,7 @@ bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key)
 }
 
 /**
- * @attention If the parser returns TRUE_BOOLEXP, you lose TRUE_BOOLEXP cannot be typed in by the user; use @unlock instead
+ * @attention If the parser returns TRUE_BOOLEXP, you lose TRUE_BOOLEXP cannot be typed in by the user; use \@unlock instead
  *
  */
 
@@ -494,11 +494,12 @@ void skip_whitespace(char **pBuf)
 }
 
 /**
- * @brief Test attriutes
+ * @brief Test attributes
  *
- * @param s				Attribute to test
- * @param parse_player	DBref of player triggering the test
- * @return BOOLEXP*		Boolean expression with the result of the test
+ * @param s					Attribute to test
+ * @param parse_player		DBref of player triggering the test
+ * @param parsing_internal	Whether parsing is being done internally
+ * @return BOOLEXP*			Boolean expression with the result of the test
  */
 BOOLEXP *test_atr(char *s, dbref parse_player, bool parsing_internal)
 {

@@ -954,8 +954,7 @@ char *ansi_transition_colorstate(const ColorState from, const ColorState to, Col
  * and decoded ColorState.
  *
  * @param input The input string to parse.
- * @param sequences Pointer to the array of ColorSequence (allocated by the function).
- * @param count Pointer to the number of sequences found.
+ * @param sequences Pointer to the ColorSequence structure to populate (allocated by the function).
  * @return true on success, false on error (memory allocation failure).
  *
  * @note The caller is responsible for freeing the allocated sequences array.
@@ -1244,9 +1243,9 @@ bool ansi_parse_embedded_sequences(const char *input, ColorSequence *sequences)
  * the consumed characters.
  *
  * Supported formats:
- * - Bracketed: %x<color>, %x<color/bgcolor>, %x+<color>
+ * - Bracketed: %x&lt;color&gt;, %x&lt;color/bgcolor&gt;, %x+&lt;color&gt;
  * - Non-bracketed: %xr, %xh, %xn, etc.
- * - Combined: %x<red>/<blue>
+ * - Combined: %x&lt;red&gt;/&lt;blue&gt;
  *
  * @param input_ptr Pointer to pointer to current position (after "%x"). Updated on success.
  * @param color_out Output ColorState structure. Must be initialized by caller.
@@ -3550,7 +3549,7 @@ char *remap_colors(const char *s, int *cmap)
  * @brief Converts a string with ANSI escape sequences to a string with MUSHcode.
  *
  * Parses the input string for ANSI sequences, extracts the plain text and color changes,
- * then reconstructs the string with MUSHcode (%x<code>) inserted at the appropriate positions.
+ * then reconstructs the string with MUSHcode (`%x<code>`) inserted at the appropriate positions.
  *
  * @param input The input string containing ANSI escape sequences.
  * @return A newly allocated string with MUSHcode, or NULL on error.
@@ -3600,7 +3599,7 @@ char *ansi_to_mushcode(const char *input)
             }
         }
 
-        // Insert %x<code>
+        // Insert `%x<code>`
         char *mush = color_state_to_mush_code(&sequences.data[i].color);
         if (mush)
         {
@@ -3641,7 +3640,7 @@ char *ansi_to_mushcode(const char *input)
 /**
  * @brief Converts a string with MUSHcode to a string with ANSI escape sequences.
  *
- * Parses the input string for embedded MUSHcode sequences (%x<code>), extracts the plain text
+ * Parses the input string for embedded MUSHcode sequences (`%x<code>`), extracts the plain text
  * and color changes, then reconstructs the string with ANSI escape sequences inserted at the
  * appropriate positions. Ends with a reset to normal ANSI.
  *
