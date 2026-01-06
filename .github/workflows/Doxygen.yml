@@ -1,48 +1,67 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Doxygen
 
-# Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
     paths:
       - 'src/**'
+      - 'docs/**'
+      - 'README.md'
       - '.github/Doxyfile'
       - '.github/workflows/Doxygen.yml'
   pull_request:
     branches: [ master ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - 'README.md'
+      - '.github/Doxyfile'
+      - '.github/workflows/Doxygen.yml'
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  Doxygen:
-    permissions:
-      contents: write
-    # The type of runner that the job will run on
+  docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup
-        run: mkdir ./html
+      - name: Install Doxygen and Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
 
-      - name: Doxygen
-        uses: mattnotmitt/doxygen-action@v1
+      - name: Set project version
+        run: |
+          ver="${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
+          sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER         = ${ver}|" .github/Doxyfile
+
+      - name: Build documentation
+        run: doxygen .github/Doxyfile
+
+      - name: Upload docs artifact (PRs)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
         with:
-          working-directory: .
-          doxyfile-path: .github/Doxyfile
-      
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+          name: doxygen-html
+          path: build/docs/doxygen/html
+
+      - name: Configure Pages
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./code_docs
-          publish_branch: gh-pages
+          path: build/docs/doxygen/html
+
+      - name: Deploy to Pages
+        if: ${{ github.event_name == 'push' }}
+        id: deployment
+        uses: actions/deploy-pages@v4
