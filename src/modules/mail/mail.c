@@ -1513,7 +1513,7 @@ void do_mail_stats(dbref player, char *name, int full)
      * find player
      */
 
-    if ((*name == '\0') || !name)
+    if (!name || (*name == '\0'))
     {
         if Wizard (player)
             target = AMBIGUOUS;
@@ -2929,9 +2929,9 @@ static int sign(int x)
 
 void do_malias_switch(dbref player, char *a1, char *a2)
 {
-    if ((!a2 || !*a2) && !(!a1 || !*a1))
+    if ((!a2 || !*a2) && a1 && *a1)
         do_malias_list(player, a1);
-    else if ((!*a1 || !a1) && (!*a2 || !a2))
+    else if ((!a1 || !*a1) && (!a2 || !*a2))
         do_malias_list_all(player);
     else
         do_malias_create(player, a1, a2);

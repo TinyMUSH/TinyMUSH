@@ -1747,12 +1747,12 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
 										 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
-										 cp ? cp : "<NULL>", cp ? (int)strlen(cp) : 0);
+										 cp, (int)strlen(cp));
 					   log_write(LOG_ALWAYS, "TRIG", "CMDLINE", "[DEBUG process_cmdline] RAW cp='%s' (len=%d) (player=#%d, cause=#%d)",
-								 cp ? cp : "<NULL>", cp ? (int)strlen(cp) : 0, player, cause);
+								 cp, (int)strlen(cp), player, cause);
 					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
 									 "[DEBUG process_cmdline] about to call process_command: '%s'",
-									 cp ? cp : "<NULL>");
+									 cp);
 				       numpipes = 0;
 				       while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
 				       {
