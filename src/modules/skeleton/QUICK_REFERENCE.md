@@ -232,8 +232,8 @@ gdb --args ./build/src/netmush/netmush -D
 (gdb) run
 
 # In-game testing
-@restart  # To reload module
-@version  # Check version
+\@restart  # To reload module
+\@version  # Check version
 ```
 
 ## Verify Installation
@@ -243,13 +243,13 @@ gdb --args ./build/src/netmush/netmush -D
 ls build/modules/mymodule.so
 
 # Check in game (if commands registered)
-@mycommand
+\@mycommand
 
 # Check logs
 grep "initialized" game/logs/netmush.log | tail
 
 # Check config
-@config mymodule_*
+\@config mymodule_*
 ```
 
 ## Common Mistakes

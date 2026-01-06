@@ -275,15 +275,15 @@
  * Halted(X)            - Is X halted (not allowed to run commands)?
  * Suspect(X)           - Is X someone the wizzes should keep an eye on
  * Slave(X)             - Should X be prevented from db-changing commands
- * Safe(X,P)            - Does P need the /OVERRIDE switch to @destroy X?
+ * Safe(X,P)            - Does P need the /OVERRIDE switch to \@destroy X?
  * Monitor(X)           - Should we check for ^xxx:xxx listens on player?
  * Terse(X)             - Should we only show the room name on a look?
  * Myopic(X)            - Should things as if we were nonowner/nonwiz
  * Audible(X)           - Should X forward messages?
- * Findroom(X)          - Can players in room X be found via @whereis?
- * Unfindroom(X)        - Is @whereis blocked for players in room X?
- * Findable(X)          - Can @whereis find X
- * Unfindable(X)        - Is @whereis blocked for X
+ * Findroom(X)          - Can players in room X be found via \@whereis?
+ * Unfindroom(X)        - Is \@whereis blocked for players in room X?
+ * Findable(X)          - Can \@whereis find X
+ * Unfindable(X)        - Is \@whereis blocked for X
  * No_robots(X)         - Does X disallow robot players from using
  * Has_location(X)      - Is X something with a location (ie plyr or obj)
  * Has_home(X)          - Is X something with a home (ie plyr or obj)

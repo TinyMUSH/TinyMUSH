@@ -4,14 +4,14 @@ TinyMUSH 4.0 provides a module system that allows developers to extend server fu
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Module Architecture](#module-architecture)
-- [Building a Module](#building-a-module)
-- [Module Structure](#module-structure)
-- [Module Initialization](#module-initialization)
-- [Configuration Management](#configuration-management)
-- [Example Modules](#example-modules)
-- [Best Practices](#best-practices)
+- [Overview](\#overview)
+- [Module Architecture](\#module-architecture)
+- [Building a Module](\#building-a-module)
+- [Module Structure](\#module-structure)
+- [Module Initialization](\#module-initialization)
+- [Configuration Management](\#configuration-management)
+- [Example Modules](\#example-modules)
+- [Best Practices](\#best-practices)
 
 ## Overview
 

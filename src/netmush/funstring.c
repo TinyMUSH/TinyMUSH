@@ -446,16 +446,16 @@ void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * string.
  */
 
-/**
- * @brief Determine the appropriate color type based on player capabilities.
+/*
+ * Determine the appropriate color type based on player capabilities.
  *
  * Checks the player's color flags to return the highest supported color type:
  * TrueColor if Color24Bit is set, XTerm if Color256 is set, Ansi if Ansi is set,
  * otherwise None.
  *
- * @param player DBref of the player
- * @param cause DBref of the cause (used if not NOTHING)
- * @return ColorType The resolved color type
+ * player: DBref of the player
+ * cause: DBref of the cause (used if not NOTHING)
+ * return: ColorType The resolved color type
  */
 /**
  * @brief Check if two ColorState structures are equal.
@@ -1902,11 +1902,13 @@ void fun_stripchars(char *buff, char **bufc, dbref player, dbref caller, dbref c
 /**
  * @brief Highlight a string using ANSI terminal effects.
  *
+ * @code
  * +colorname
- * #RRGGBB <#RRGGBB>
+ * #RRGGBB  <#RRGGBB>
  * <RR GG BB>
  * XTERN
  * Old Style
+ * @endcode
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker

@@ -2097,7 +2097,7 @@ void do_colormap(dbref player, dbref cause, int key, char *fstr, char *tstr)
  * multiple consecutive spaces into a single space, and trimming leading and
  * trailing spaces. This ensures the string is safe and clean for display.
  *
- * Idea from R'nice@TinyTIM.
+ * Idea from R'nice\@TinyTIM.
  *
  * @param arg The input doing string to sanitize. Can be NULL.
  * @param name The name tag used for memory allocation with XSTRDUP.

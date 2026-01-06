@@ -49,7 +49,7 @@
 #define AF_WIZARD 0x00000004    /*!< only wizards can change it */
 #define AF_MDARK 0x00000008     /*!< Only wizards can see it. Dark to mortals */
 #define AF_INTERNAL 0x00000010  /*!< Don't show even to #1 */
-#define AF_NOCMD 0x00000020     /*!< Don't create a @ command for it */
+#define AF_NOCMD 0x00000020     /*!< Don't create a \@ command for it */
 #define AF_LOCK 0x00000040      /*!< Attribute is locked */
 #define AF_DELETED 0x00000080   /*!< Attribute should be ignored */
 #define AF_NOPROG 0x00000100    /*!< Don't process $-commands from this attr */
@@ -130,7 +130,7 @@
 #define A_OUSE 46         /*!< Others use message */
 #define A_SEMAPHORE 47    /*!< Semaphore control info */
 #define A_TIMEOUT 48      /*!< Per-user disconnect timeout */
-#define A_QUOTA 49        /*!< Absolute quota (to speed up @quota) */
+#define A_QUOTA 49        /*!< Absolute quota (to speed up \@quota) */
 #define A_LEAVE 50        /*!< Invoker leave message */
 #define A_OLEAVE 51       /*!< Others leave message in src */
 #define A_ALEAVE 52       /*!< Leave action list */
@@ -166,8 +166,8 @@
 #define A_ATPORT 82       /*!< Teleport action list */
 #define A_FREE83 83       /*!< Unused, Formerly A_PRIVS: Individual permissions */
 #define A_LOGINDATA 84    /*!< Recent login information */
-#define A_LTPORT 85       /*!< Teleport lock (can others @tel to me?) */
-#define A_LDROP 86        /*!< Drop lock (can I be dropped or @tel'ed) */
+#define A_LTPORT 85       /*!< Teleport lock (can others \@tel to me?) */
+#define A_LDROP 86        /*!< Drop lock (can I be dropped or \@tel'ed) */
 #define A_LRECEIVE 87     /*!< Receive lock (who may give me things?) */
 #define A_LASTSITE 88     /*!< Last site logged in from, in cleartext */
 #define A_INPREFIX 89     /*!< Prefix on incoming messages into objects */
@@ -177,9 +177,9 @@
 #define A_LLINK 93        /*!< Who may link to here */
 #define A_LTELOUT 94      /*!< Who may teleport out from here */
 #define A_FORWARDLIST 95  /*!< Recipients of AUDIBLE output */
-#define A_MAILFOLDERS 96  /*!< @mail folders */
+#define A_MAILFOLDERS 96  /*!< \@mail folders */
 #define A_LUSER 97        /*!< Spare lock not referenced by server */
-#define A_LPARENT 98      /*!< Who may @parent to me if PARENT_OK set */
+#define A_LPARENT 98      /*!< Who may \@parent to me if PARENT_OK set */
 #define A_LCONTROL 99     /*!< Who controls me if CONTROL_OK set */
 #define A_VA 100          /*!< VA-Z attribute */
 #define A_VB 101          /*!< VA-Z attribute */
@@ -289,9 +289,9 @@
 #define A_MAILTO 205      /*!< Who is the mail to? */
 #define A_MAILMSG 206     /*!< The mail message itself */
 #define A_MAILSUB 207     /*!< The mail subject */
-#define A_MAILCURF 208    /*!< The current @mail folder */
+#define A_MAILCURF 208    /*!< The current \@mail folder */
 #define A_LSPEECH 209     /*!< Speechlocks */
-#define A_PROGCMD 210     /*!< Command for execution by @prog */
+#define A_PROGCMD 210     /*!< Command for execution by \@prog */
 #define A_MAILFLAGS 211   /*!< Flags for extended mail */
 #define A_DESTROYER 212   /*!< Who is destroying this object? */
 #define A_NEWOBJS 213     /*!< New object array */
@@ -302,7 +302,7 @@
 #define A_LASTIP 218      /*!< Last IP address logged in from */
 #define A_LDARK 219       /*!< DarkLock */
 #define A_VRML_URL 220    /*!< URL of the VRML scene for this object */
-#define A_HTDESC 221      /*!< HTML @desc */
+#define A_HTDESC 221      /*!< HTML \@desc */
 #define A_NAME_FMT 222    /*!< Player-specified name format */
 #define A_LKNOWN 223      /*!< Who is this player seen by? (presence) */
 #define A_LHEARD 224      /*!< Who is this player heard by? (speech) */
@@ -364,12 +364,12 @@
 #define CS_CMDARG 0x00100       /*!< Pass in given command args */
 #define CS_STRIP 0x00200        /*!< Strip braces even when not interpreting */
 #define CS_STRIP_AROUND 0x00400 /*!< Strip braces around entire string only */
-#define CS_ADDED 0x00800        /*!< Command has been added by @addcommand */
+#define CS_ADDED 0x00800        /*!< Command has been added by \@addcommand */
 #define CS_LEADIN 0x01000       /*!< Command is a single-letter lead-in */
 #define CS_PRESERVE 0x02000     /*!< For hooks, preserve global registers */
 #define CS_NOSQUISH 0x04000     /*!< Do not space-compress */
 #define CS_FUNCTION 0x08000     /*!< Can call with command() */
-#define CS_ACTOR 0x10000        /*!< @addcommand executed by player, not obj */
+#define CS_ACTOR 0x10000        /*!< \@addcommand executed by player, not obj */
 #define CS_PRIVATE 0x20000      /*!< For hooks, use private global registers */
 
 /**
@@ -413,7 +413,7 @@
 #define CA_GBL_INTERP 0x01000000 /*!< Requires the global INTERP flag */
 #define CA_DISABLED 0x02000000   /*!< Command completely disabled */
 #define CA_STATIC 0x04000000     /*!< Cannot be changed at runtime */
-#define CA_NO_DECOMP 0x08000000  /*!< Don't include in @decompile */
+#define CA_NO_DECOMP 0x08000000  /*!< Don't include in \@decompile */
 
 #define CA_LOCATION 0x10000000 /*!< Invoker must have location */
 #define CA_CONTENTS 0x20000000 /*!< Invoker must have contents */
@@ -498,12 +498,12 @@
 #define BOOLEXP_EVAL 9
 
 /**
- * @briefBoolexp decompile formats
+ * @brief Boolexp decompile formats
  *
  */
 #define F_EXAMINE 1   /** Normal */
 #define F_QUIET 2     /** Binary for db dumps */
-#define F_DECOMPILE 3 /** @decompile output */
+#define F_DECOMPILE 3 /** \@decompile output */
 #define F_FUNCTION 4  /** [lock()] output */
 
 /**
@@ -573,10 +573,10 @@
 #define DEST_ALL 2              /*!< owner */
 #define DEST_OVERRIDE 4         /*!< override Safe() */
 #define DEST_INSTANT 8          /*!< instantly destroy */
-#define DIG_TELEPORT 1          /*!< teleport to room after @digging */
+#define DIG_TELEPORT 1          /*!< teleport to room after \@digging */
 #define DOLIST_SPACE 0          /*!< expect spaces as delimiter */
 #define DOLIST_DELIMIT 1        /*!< expect custom delimiter */
-#define DOLIST_NOTIFY 2         /*!< queue a '@notify me' at the end */
+#define DOLIST_NOTIFY 2         /*!< queue a '\@notify me' at the end */
 #define DOLIST_NOW 4            /*!< Run commands immediately, no queueing */
 #define DOING_MESSAGE 0         /*!< Set my DOING message */
 #define DOING_HEADER 1          /*!< Set the DOING header */
@@ -587,8 +587,8 @@
 #define DUMP_TEXT 2             /*!< Dump text (gdbm) file */
 #define DUMP_FLATFILE 8         /*!< Dump to flatfile */
 #define DUMP_OPTIMIZE 16        /*!< Optimized dump */
-#define ENDCMD_BREAK 0          /*!< @break - end action list on true */
-#define ENDCMD_ASSERT 1         /*!< @assert - end action list on false */
+#define ENDCMD_BREAK 0          /*!< \@break - end action list on true */
+#define ENDCMD_ASSERT 1         /*!< \@assert - end action list on false */
 #define EXAM_DEFAULT 0          /*!< Default */
 #define EXAM_BRIEF 1            /*!< Don't show attributes */
 #define EXAM_LONG 2             /*!< Nonowner sees public attrs too */
@@ -659,8 +659,8 @@
 #define PEMIT_FPOSE 6           /*!< force controlled obj to pose */
 #define PEMIT_FPOSE_NS 7        /*!< force controlled obj to pose w/o space */
 #define PEMIT_CONTENTS 8        /*!< Send to contents (additive) */
-#define PEMIT_HERE 16           /*!< Send to location (@femit, additive) */
-#define PEMIT_ROOM 32           /*!< Send to containing rm (@femit, additive) */
+#define PEMIT_HERE 16           /*!< Send to location (\@femit, additive) */
+#define PEMIT_ROOM 32           /*!< Send to containing rm (\@femit, additive) */
 #define PEMIT_LIST 64           /*!< Send to a list */
 #define PEMIT_SPEECH 128        /*!< Explicitly tag this as speech */
 #define PEMIT_HTML 256          /*!< HTML escape, and no newline */
@@ -713,7 +713,7 @@
 #define SWEEP_ME 1              /*!< Check my inventory */
 #define SWEEP_HERE 2            /*!< Check my location */
 #define SWEEP_COMMANDS 4        /*!< Check for $-commands */
-#define SWEEP_LISTEN 8          /*!< Check for @listen-ers */
+#define SWEEP_LISTEN 8          /*!< Check for \@listen-ers */
 #define SWEEP_PLAYER 16         /*!< Check for players and puppets */
 #define SWEEP_CONNECT 32        /*!< Search for connected players/puppets */
 #define SWEEP_EXITS 64          /*!< Search the exits for audible flags */
@@ -732,7 +732,7 @@
 #define TWARP_IDLE 8            /*!< Warp the idle check interval */
 #define TWARP_EMPTY 16          /*!< Not used - Available */
 #define TWARP_EVENTS 32         /*!< Warp the events checking interval */
-#define VERB_NOW 1              /*!< Run @afoo immediately, no queueing */
+#define VERB_NOW 1              /*!< Run \@afoo immediately, no queueing */
 #define VERB_MOVE 2             /*!< Treat like movement message */
 #define VERB_SPEECH 4           /*!< Treat like speech message */
 #define VERB_PRESENT 8          /*!< Treat like presence message */
@@ -786,7 +786,7 @@
  */
 #define MSG_PUP_ALWAYS 0x00001  /*!< Always forward msg to puppet own */
 #define MSG_INV 0x00002         /*!< Forward msg to contents */
-#define MSG_INV_L 0x00004       /*!< ... only if msg passes my @listen */
+#define MSG_INV_L 0x00004       /*!< ... only if msg passes my \@listen */
 #define MSG_INV_EXITS 0x00008   /*!< Forward through my audible exits */
 #define MSG_NBR 0x00010         /*!< Forward msg to neighbors */
 #define MSG_NBR_A 0x00020       /*!< ... only if I am audible */
@@ -798,7 +798,7 @@
 #define MSG_ME 0x00800          /*!< Send to me */
 #define MSG_S_INSIDE 0x01000    /*!< Originator is inside target */
 #define MSG_S_OUTSIDE 0x02000   /*!< Originator is outside target */
-#define MSG_HTML 0x04000        /*!< Don't send \r\n */
+#define MSG_HTML 0x04000        /*!< Don't send \\r\\n */
 #define MSG_SPEECH 0x08000      /*!< This message is speech. */
 #define MSG_MOVE 0x10000        /*!< This message is movement. */
 #define MSG_PRESENCE 0x20000    /*!< This message is related to presence. */
@@ -890,9 +890,9 @@
 #define WIZARD 0x00000010      /*!< gets automatic control */
 #define LINK_OK 0x00000020     /*!< anybody can link to this room */
 #define DARK 0x00000040        /*!< Don't show contents or presence */
-#define JUMP_OK 0x00000080     /*!< Others may @tel here */
+#define JUMP_OK 0x00000080     /*!< Others may \@tel here */
 #define STICKY 0x00000100      /*!< Object goes home when dropped */
-#define DESTROY_OK 0x00000200  /*!< Others may @destroy */
+#define DESTROY_OK 0x00000200  /*!< Others may \@destroy */
 #define HAVEN 0x00000400       /*!< No killing here, or no pages */
 #define QUIET 0x00000800       /*!< Prevent 'feelgood' messages */
 #define HALT 0x00001000        /*!< object cannot perform actions */
@@ -901,7 +901,7 @@
 #define MONITOR 0x00008000     /*!< Process ^x:action listens on obj? */
 #define MYOPIC 0x00010000      /*!< See things as nonowner/nonwizard */
 #define PUPPET 0x00020000      /*!< Relays ALL messages to owner */
-#define CHOWN_OK 0x00040000    /*!< Object may be @chowned freely */
+#define CHOWN_OK 0x00040000    /*!< Object may be \@chowned freely */
 #define ENTER_OK 0x00080000    /*!< Object may be ENTERed */
 #define VISUAL 0x00100000      /*!< Everyone can see properties */
 #define IMMORTAL 0x00200000    /*!< Object can't be killed */
@@ -911,7 +911,7 @@
 #define INHERIT 0x02000000     /*!< Gets owner's privs. (i.e. Wiz) */
 #define NOSPOOF 0x04000000     /*!< Report originator of all actions. */
 #define ROBOT 0x08000000       /*!< Player is a ROBOT */
-#define SAFE 0x10000000        /*!< Need /override to @destroy */
+#define SAFE 0x10000000        /*!< Need /override to \@destroy */
 #define ROYALTY 0x20000000     /*!< Sees like a wiz, but ca't modify */
 #define HEARTHRU 0x40000000    /*!< Can hear out of this obj or exit */
 #define TERSE 0x80000000       /*!< Only show room name on look */
@@ -920,10 +920,10 @@
  *
  */
 #define KEY 0x00000001         /*!< No puppets */
-#define ABODE 0x00000002       /*!< May @set home here */
+#define ABODE 0x00000002       /*!< May \@set home here */
 #define FLOATING 0x00000004    /*!< -- Legacy -- */
 #define UNFINDABLE 0x00000008  /*!< Can't loc() from afar */
-#define PARENT_OK 0x00000010   /*!< Others may @parent to me */
+#define PARENT_OK 0x00000010   /*!< Others may \@parent to me */
 #define LIGHT 0x00000020       /*!< Visible in dark places */
 #define HAS_LISTEN 0x00000040  /*!< Internal: LISTEN attr set */
 #define HAS_FWDLIST 0x00000080 /*!< Internal: FORWARDLIST attr set */
@@ -955,14 +955,14 @@
  * Third word of flags
  *
  */
-#define REDIR_OK 0x00000001      /*!< Can be victim of @redirect */
-#define HAS_REDIRECT 0x00000002  /*!< Victim of @redirect */
+#define REDIR_OK 0x00000001      /*!< Can be victim of \@redirect */
+#define HAS_REDIRECT 0x00000002  /*!< Victim of \@redirect */
 #define ORPHAN 0x00000004        /*!< Don't check parent chain for $cmd */
 #define HAS_DARKLOCK 0x00000008  /*!< Has a DarkLock */
 #define DIRTY 0x00000010         /*!< Temporary flag: object is dirty */
 #define NODEFAULT 0x00000020     /*!< Not subject to attr defaults */
 #define PRESENCE 0x00000040      /*!< Check presence-related locks */
-#define HAS_SPEECHMOD 0x00000080 /*!< Check @speechmod attr */
+#define HAS_SPEECHMOD 0x00000080 /*!< Check \@speechmod attr */
 #define HAS_PROPDIR 0X00000100   /*!< Internal: has Propdir attr */
 #define COLOR256 0x00000200      /*!< Player support XTERM 256 colors */
 #define COLOR24BIT 0x00000400    /*!< Player support XTERM 24 bit colors */
@@ -1267,7 +1267,7 @@
 #define ARG_DELIMITER '='
 /**
  * These chars get replaced by the current item from a list in commands and
- * functions that do iterative replacement, such as @apply_marked, dolist,
+ * functions that do iterative replacement, such as \@apply_marked, dolist,
  * the eval= operator for \@search, and iter().
  *
  */
@@ -1363,7 +1363,7 @@
 
 #define R_QUIT 5       /*!< User quit */
 #define R_TIMEOUT 6    /*!< Inactivity timeout */
-#define R_BOOT 7       /*!< Victim of @boot, @toad, or @destroy */
+#define R_BOOT 7       /*!< Victim of \@boot, \@toad, or \@destroy */
 #define R_SOCKDIED 8   /*!< Other end of socket closed it */
 #define R_GOING_DOWN 9 /*!< Game is going down */
 #define R_BADLOGIN 10  /*!< Too many failed login attempts */
@@ -1409,7 +1409,7 @@
 
 #define MAT_NO_EXITS 1     /*!< Don't check for exits */
 #define MAT_EXIT_PARENTS 2 /*!< Check for exits in parents */
-#define MAT_NUMERIC 4      /*!< Check for un-#ified dbrefs */
+#define MAT_NUMERIC 4      /*!< Check for un-\#ified dbrefs */
 #define MAT_HOME 8         /*!< Check for 'home' */
 
 /**
@@ -1463,7 +1463,7 @@
 #define LOG_KBCOMMANDS 0x00010000  /*!< Log keyboard commands */
 #define LOG_SUSPECTCMDS 0x00020000 /*!< Log SUSPECT player keyboard cmds */
 #define LOG_TIMEUSE 0x00040000     /*!< Log CPU time usage */
-#define LOG_LOCAL 0x00080000       /*!< Log user stuff via @log */
+#define LOG_LOCAL 0x00080000       /*!< Log user stuff via \@log */
 #define LOG_MALLOC 0x00100000      /*!< Log malloc requests */
 #define LOG_FORCE 0x04000000       /*!< Ignore mushstate.logging */
 #define LOG_ALWAYS 0x80000000      /*!< Always log it */
@@ -1492,10 +1492,10 @@
  *
  */
 #define POW_CHG_QUOTAS 0x00000001  /*!< May change and see quotas */
-#define POW_CHOWN_ANY 0x00000002   /*!< Can @chown anything or to anyone */
-#define POW_ANNOUNCE 0x00000004    /*!< May use @wall */
-#define POW_BOOT 0x00000008        /*!< May use @boot */
-#define POW_HALT 0x00000010        /*!< May @halt on other's objects */
+#define POW_CHOWN_ANY 0x00000002   /*!< Can \@chown anything or to anyone */
+#define POW_ANNOUNCE 0x00000004    /*!< May use \@wall */
+#define POW_BOOT 0x00000008        /*!< May use \@boot */
+#define POW_HALT 0x00000010        /*!< May \@halt on other's objects */
 #define POW_CONTROL_ALL 0x00000020 /*!< I control everything */
 #define POW_WIZARD_WHO 0x00000040  /*!< See extra WHO information */
 #define POW_EXAM_ALL 0x00000080    /*!< I can examine everything */
@@ -1504,9 +1504,9 @@
 #define POW_FREE_QUOTA 0x00000400  /*!< I have infinite quota */
 #define POW_HIDE 0x00000800        /*!< Can set themselves DARK */
 #define POW_IDLE 0x00001000        /*!< No idle limit */
-#define POW_SEARCH 0x00002000      /*!< Can @search anyone */
+#define POW_SEARCH 0x00002000      /*!< Can \@search anyone */
 #define POW_LONGFINGERS 0x00004000 /*!< Can get/whisper/etc from a distance */
-#define POW_PROG 0x00008000        /*!< Can use the @prog command */
+#define POW_PROG 0x00008000        /*!< Can use the \@prog command */
 #define POW_MDARK_ATTR 0x00010000  /*!< Can read AF_MDARK attrs */
 #define POW_WIZ_ATTR 0x00020000    /*!< Can write AF_WIZARD attrs */
 #define POW_FREE_ATTR 0x00040000   /*!< Not used - Available */
@@ -1518,7 +1518,7 @@
 #define POW_NO_DESTROY 0x01000000  /*!< Cannot be destroyed */
 #define POW_GUEST 0x02000000       /*!< Player is a guest */
 #define POW_PASS_LOCKS 0x04000000  /*!< Player can pass any lock */
-#define POW_STAT_ANY 0x08000000    /*!< Can @stat anyone */
+#define POW_STAT_ANY 0x08000000    /*!< Can \@stat anyone */
 #define POW_STEAL 0x10000000       /*!< Can give negative money */
 #define POW_TEL_ANYWHR 0x20000000  /*!< Teleport anywhere */
 #define POW_TEL_UNRST 0x40000000   /*!< Teleport anything */

@@ -210,10 +210,10 @@ BOOLEXP *getboolexp1(FILE *f)
 		b->thing = 0;
 		/**
 		 * This is either an attribute, eval, or constant lock.
-		 * Constant locks are of the form <num>, while attribute and
-		 * eval locks are of the form <anam-or-anum>:<string> or
-		 * <aname-or-anum>/<string> respectively. The characters
-		 * <nl>, |, and & terminate the string.
+		 * Constant locks are of the form &lt;num&gt;, while attribute and
+		 * eval locks are of the form &lt;anam-or-anum&gt;:&lt;string&gt; or
+		 * &lt;aname-or-anum&gt;/&lt;string&gt; respectively. The characters
+		 * &lt;nl&gt;, |, and &amp; terminate the string.
 		 *
 		 */
 		if (isdigit(c))
@@ -793,8 +793,8 @@ void fix_typed_quotas(void)
 	 * If we have a pre-2.2 or MUX database, only the QUOTA and RQUOTA
 	 * attributes  exist. For simplicity's sake, we assume that players will
 	 * have the  same quotas for all types, equal to the current value. This
-	 * is  going to produce incorrect values for RQUOTA; this is easily fixed
-	 * by a @quota/fix done from within-game.
+	* is  going to produce incorrect values for RQUOTA; this is easily fixed
+	* by a \@quota/fix done from within-game.
 	 *
 	 * If we have a early beta 2.2 release, we have quotas which are spread
 	 * out over ten attributes. We're going to have to grab those, make the

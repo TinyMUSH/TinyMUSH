@@ -50,6 +50,8 @@ char *unparse_object_quiet(dbref loc)
  * @param b Boolean expression tree to render
  * @param outer_type Parent node type to control parentheses insertion
  * @param format Output format selector (quiet/examine/decompile/function)
+ * @param boolexp_buf Output buffer for the rendered string
+ * @param buftop Output buffer cursor pointer
  */
 void unparse_boolexp1(dbref player, BOOLEXP *b, char outer_type, int format, char *boolexp_buf, char **buftop)
 {

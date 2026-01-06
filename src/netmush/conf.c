@@ -2026,12 +2026,13 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
 }
 
 /**
- * @brief Add an helpfile
+ * @brief Add a helpfile
  *
- * @param player        Dbref of player
- * @param confcmd       Command
+ * @param vp            Unused
  * @param str           Filename
- * @param is_raw        Raw textfile?
+ * @param extra         Unused
+ * @param player        Dbref of player
+ * @param cmd           Command
  * @return CF_Result
  */
 CF_Result cf_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
@@ -2042,10 +2043,11 @@ CF_Result cf_helpfile(int *vp __attribute__((unused)), char *str, long extra __a
 /**
  * @brief Add a raw helpfile
  *
- * @param player        Dbref of player
- * @param confcmd       Command
+ * @param vp            Unused
  * @param str           Filename
- * @param is_raw        Raw textfile?
+ * @param extra         Unused
+ * @param player        Dbref of player
+ * @param cmd           Command
  * @return CF_Result
  */
 CF_Result cf_raw_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)

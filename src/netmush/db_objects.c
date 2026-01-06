@@ -406,7 +406,7 @@ void do_attribute(dbref player, dbref cause __attribute__((unused)), int key, ch
 
     case ATTRIB_INFO:
         /**
-         * Print info, like @list user_attr does
+         * Print info, like \@list user_attr does
          *
          */
         if (!(va->flags & AF_DELETED))
@@ -970,7 +970,7 @@ dbref parse_objid(const char *s, const char *p)
     }
 
     /**
-     * ObjID takes the format <dbref>:<timestamp as long int>
+     * ObjID takes the format &lt;dbref&gt;:&lt;timestamp as long int&gt;
      * If we match the dbref but its creation time doesn't match the
      * timestamp, we don't have a match.
      */

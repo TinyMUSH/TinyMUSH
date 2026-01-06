@@ -172,7 +172,7 @@ void *dnsResolver(void *args)
 void check_dnsResolver_status(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key)
 {
 	/**
-	 * @todo Just a placeholder for now. Call by @startslave
+	 * @todo Just a placeholder for now. Call by \@startslave
 	 * that should also be rename to something better suiting
 	 * once i sort out what this should do.
 	 *
@@ -666,7 +666,7 @@ char *connReasons(int reason)
 /**
  * @brief (Dis)connect reasons that get fed to A_A(DIS)CONNECT via announce_connattr
  *
- * @param message reason ID
+ * @param reason reason ID
  * @return char* reason message
  */
 char *connMessages(int reason)
@@ -750,7 +750,7 @@ void shutdownsock(DESC *d, int reason)
 		}
 		/**
 		 * If requested, write an accounting record of the form:
-		 * Plyr# Flags Cmds ConnTime Loc Money [Site] <DiscRsn> Name
+		 * Plyr# Flags Cmds ConnTime Loc Money [Site] \<DiscRsn\> Name
 		 *
 		 */
 		now = mushstate.now - d->connected_at;

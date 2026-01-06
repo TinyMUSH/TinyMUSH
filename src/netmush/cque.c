@@ -1663,7 +1663,7 @@ void do_second(void)
 	 * move contents of low priority queue onto end of normal one this
 	 * helps to keep objects from getting out of control since its
 	 * affects on other objects happen only after one second  this should
-	 * allow @halt to be type before getting blown away  by scrolling text
+	* allow \@halt to be type before getting blown away  by scrolling text
 	 *
 	 */
 	if ((mushconf.control_flags & CF_DEQUEUE) == 0)

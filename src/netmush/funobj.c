@@ -2262,7 +2262,7 @@ void fun_v(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 	}
 
 	/**
-	 * Not an attribute, process as %<arg>
+	 * Not an attribute, process as %&lt;arg&gt;
 	 *
 	 */
 	char sbuf[SBUF_SIZE];
@@ -2407,7 +2407,7 @@ void do_ufun(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 	}
 
 	/**
-	 * First arg: <obj>/<attr> or <attr> or #lambda/<code>
+	 * First arg: &lt;obj&gt;/&lt;attr&gt; or &lt;attr&gt; or \#lambda/&lt;code&gt;
 	 *
 	 */
 	if (string_prefix(fargs[0], "#lambda/"))
@@ -2583,7 +2583,7 @@ void fun_objcall(char *buff, char **bufc, dbref player, dbref caller __attribute
 	}
 
 	/**
-	 * First arg: <obj>/<attr> or <attr> or #lambda/<code>
+	 * First arg: &lt;obj&gt;/&lt;attr&gt; or &lt;attr&gt; or \#lambda/&lt;code&gt;
 	 *
 	 */
 	if (string_prefix(fargs[1], "#lambda/"))
@@ -3698,8 +3698,8 @@ size_t mem_usage_attr(dbref player, char *str)
  *
  *          If an attribute wildcard pattern is specified, this returns the
  *          number of bytes of memory consumed by attribute text for those
- *          attributes on <object>. To just get a count of the number of bytes
- *          used by all attribute text on an object, use 'objmem(<object> / *)'.
+ *          attributes on &lt;object&gt;. To just get a count of the number of bytes
+ *          used by all attribute text on an object, use 'objmem(&lt;object&gt; / *)'.
  *          You must be able to read an attribute in order to check its size.
  *
  * @param buff Output buffer
@@ -4213,8 +4213,8 @@ void fun_speak(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	}
 
 	/**
-	 * We have three possible cases for the speaker: <thing string>&<name
-	 * string> &<name string> (speaker defaults to player) <thing string>
+	 * We have three possible cases for the speaker: &lt;thing string&gt;&amp;&lt;name
+	 * string&gt; &amp;&lt;name string&gt; (speaker defaults to player) &lt;thing string&gt;
 	 * (name string defaults to name of thing)
 	 *
 	 */

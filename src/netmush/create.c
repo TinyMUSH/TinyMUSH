@@ -1275,7 +1275,7 @@ void do_destroy(dbref player, dbref cause __attribute__((unused)), int key, char
     }
 
     /**
-     * We can use @destroy/instant to immediately blow up an object that
+     * We can use \@destroy/instant to immediately blow up an object that
      * was already queued for destruction -- that object is unmodified
      * except for being Going.
      *

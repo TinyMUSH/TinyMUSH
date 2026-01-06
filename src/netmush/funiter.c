@@ -24,11 +24,11 @@
 /**
  * @brief Load attribute text for iteration functions.
  *
- * Handles both #lambda/ and regular obj/attr syntax.
+ * Handles both \#lambda/ and regular obj/attr syntax.
  * Returns 0 on success, 1 on error (caller should return).
  *
  * @param player Player performing the lookup
- * @param farg Attribute argument (#lambda/... or obj/attr)
+ * @param farg Attribute argument (\#lambda/... or obj/attr)
  * @param thing Output: object dbref
  * @param ap Output: attribute pointer
  * @param atext Output: allocated attribute text
@@ -658,7 +658,7 @@ void fun_fold(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
     }
 
     /**
-     * Two possibilities for the first arg: <obj>/<attr> and <attr>.
+     * Two possibilities for the first arg: &lt;obj&gt;/&lt;attr&gt; and &lt;attr&gt;.
      *
      */
     if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
@@ -786,7 +786,7 @@ void handle_filter(char *buff, char **bufc, dbref player, dbref caller, dbref ca
     }
 
     /**
-     * Two possibilities for the first arg: <obj>/<attr> and <attr>.
+     * Two possibilities for the first arg: &lt;obj&gt;/&lt;attr&gt; and &lt;attr&gt;.
      *
      */
     if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
@@ -901,7 +901,7 @@ void fun_map(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
     }
 
     /**
-     * Two possibilities for the second arg: <obj>/<attr> and <attr>.
+     * Two possibilities for the second arg: &lt;obj&gt;/&lt;attr&gt; and &lt;attr&gt;.
      *
      */
     if (load_iter_attrib(player, fargs[0], &thing, &ap, &atext, &aowner, &aflags, &alen))
@@ -1461,7 +1461,7 @@ void fun_while(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
     }
 
     /**
-     * Our first and second args can be <obj>/<attr> or just <attr>. Use
+     * Our first and second args can be &lt;obj&gt;/&lt;attr&gt; or just &lt;attr&gt;. Use
      * them if we can access them, otherwise return an empty string.
      *
      */

@@ -1069,16 +1069,16 @@ void fun_index(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 /*
  * ---------------------------------------------------------------------------
  * ldelete: Remove a word from a string by place
- * ldelete(<list>,<position>[,<separator>])
+ * ldelete(&lt;list&gt;,&lt;position&gt;[,&lt;separator&gt;])
  *
  * insert: insert a word into a string by place
- * insert(<list>,<position>,<new item> [,<separator>])
+ * insert(&lt;list&gt;,&lt;position&gt;,&lt;new item&gt; [,&lt;separator&gt;])
  *
  * replace: replace a word into a string by place
- * replace(<list>,<position>,<new item>[,<separator>])
+ * replace(&lt;list&gt;,&lt;position&gt;,&lt;new item&gt;[,&lt;separator&gt;])
  *
  * lreplace: replace multiple words into a string by places
- * lreplace(<list>,<replacement words>,<positions>[,<isep>,<osep>])
+ * lreplace(&lt;list&gt;,&lt;replacement words&gt;,&lt;positions&gt;[,&lt;isep&gt;,&lt;osep&gt;])
  */
 
 /**
@@ -2161,7 +2161,7 @@ void handle_sort(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  * @param thing DBref used as evaluation context (e.g. attribute owner)
  * @param player DBref of the player performing the evaluation
  * @param cause DBref of the cause of the evaluation
- * @return int <0 if `s1 < s2`, 0 if equal, >0 if `s1 > s2` as produced by the expression
+ * @return int &lt;0 if `s1 &lt; s2`, 0 if equal, &gt;0 if `s1 &gt; s2` as produced by the expression
  */
 int u_comp(const void *s1, const void *s2, char *cbuff, dbref thing, dbref player, dbref cause)
 {
@@ -2428,8 +2428,8 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	XFREE(ptrs);
 }
 
-/**
- * @brief Set management: SETUNION, SETDIFF, SETINTER. Also LUNION,
+/*
+ * Set management: SETUNION, SETDIFF, SETINTER. Also LUNION,
  * LDIFF, LINTER: Same thing, but takes a sort type like sort() does. There's
  * an unavoidable PennMUSH conflict, as setunion() and friends have a 4th-arg
  * output delimiter in TM3, but the 4th arg is used for the sort type in
@@ -2437,15 +2437,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * would be confusing, since the last two args are, by convention,
  * delimiters. So we add new funcs.
  *
- * @param buff Output buffer
- * @param bufc Output buffer tracker
- * @param player DBref of player
- * @param caller DBref of caller
- * @param cause DBref of cause
- * @param fargs Function's arguments
- * @param nfargs Number of function's arguments
- * @param cargs Command's arguments
- * @param ncargs Number of command's arguments
+ * Parameters: buff, bufc, player, caller, cause, fargs, nfargs, cargs, ncargs
  */
 
 /**
@@ -2457,7 +2449,7 @@ void fun_sortby(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param ip2 Pointer to second integer value (for INT_LIST)
  * @param fp1 Pointer to first float value (for FLOAT_LIST)
  * @param fp2 Pointer to second float value (for FLOAT_LIST)
- * @return Comparison result: <0, 0, or >0
+ * @return Comparison result: &lt;0, 0, or &gt;0
  */
 static int compare_items(const char *s1, const char *s2, int sort_type, int *ip1, int *ip2, double *fp1, double *fp2)
 {
@@ -3410,11 +3402,11 @@ void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref c
 
 /*---------------------------------------------------------------------------
  * fun_table:
- *   table(<list>,<field width>,<line length>,<list delim>,<field sep>,<pad>)
- *     Only the <list> parameter is mandatory.
- *   tables(<list>,<field widths>,<lead str>,<trail str>,
- *          <list delim>,<field sep str>,<pad>)
- *     Only the <list> and <field widths> parameters are mandatory.
+ *   table(&lt;list&gt;,&lt;field width&gt;,&lt;line length&gt;,&lt;list delim&gt;,&lt;field sep&gt;,&lt;pad&gt;)
+ *     Only the &lt;list&gt; parameter is mandatory.
+ *   tables(&lt;list&gt;,&lt;field widths&gt;,&lt;lead str&gt;,&lt;trail str&gt;,
+ *          &lt;list delim&gt;,&lt;field sep str&gt;,&lt;pad&gt;)
+ *     Only the &lt;list&gt; and &lt;field widths&gt; parameters are mandatory.
  *
  * There are a couple of PennMUSH incompatibilities. The handling here is
  * more complex and probably more desirable behavior. The issues are:
@@ -3429,10 +3421,10 @@ void process_tables(char *buff, char **bufc, dbref player, dbref caller, dbref c
 /**
  * @brief Turn a list into a table.
  *
- *   table(<list>,<field width>,<line length>,<list delim>,<field sep>,<pad>)
- *     Only the <list> parameter is mandatory.
- *   tables(<list>,<field widths>,<lead str>,<trail str>,<list delim>,<field sep str>,<pad>)
- *     Only the <list> and <field widths> parameters are mandatory.
+ *   table(&lt;list&gt;,&lt;field width&gt;,&lt;line length&gt;,&lt;list delim&gt;,&lt;field sep&gt;,&lt;pad&gt;)
+ *     Only the &lt;list&gt; parameter is mandatory.
+ *   tables(&lt;list&gt;,&lt;field widths&gt;,&lt;lead str&gt;,&lt;trail str&gt;,&lt;list delim&gt;,&lt;field sep str&gt;,&lt;pad&gt;)
+ *     Only the &lt;list&gt; and &lt;field widths&gt; parameters are mandatory.
  *
  * There are a couple of PennMUSH incompatibilities. The handling here is
  * more complex and probably more desirable behavior. The issues are:
@@ -3652,7 +3644,7 @@ void fun_elements(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		{
 			/**
 			 * Support Python-style slicing syntax:
-			 * <start>:<end>:<step> If start is empty, start from
+			 * &lt;start&gt;:&lt;end&gt;:&lt;step&gt; If start is empty, start from
 			 * element 0. If start is positive, start from that
 			 * number. If start is negative, start from that
 			 * number back from the end (-1 is the last item, -2
@@ -4445,7 +4437,7 @@ void fun_choose(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * element. Useful for passing to a column-type function where you want the
  * list to go down rather than across, for instance.
  *
- * group(<list>, <number of groups>, <idelim>, <odelim>, <gdelim>)
+ * group(&lt;list&gt;, &lt;number of groups&gt;, &lt;idelim&gt;, &lt;odelim&gt;, &lt;gdelim&gt;)
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -4553,7 +4545,7 @@ void fun_group(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * @brief Take a string such as 'this "Joe Bloggs" John' and turn it
  * into an output delim-separated list.
  *
- * tokens(<string>[,<obj>/<attr>][,<open>][,<close>][,<sep>][,<osep>])
+ * tokens(&lt;string&gt;[,&lt;obj&gt;/&lt;attr&gt;][,&lt;open&gt;][,&lt;close&gt;][,&lt;sep&gt;][,&lt;osep&gt;])
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker

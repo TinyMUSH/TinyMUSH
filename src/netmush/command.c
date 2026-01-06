@@ -627,7 +627,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
-	case CS_NO_ARGS: /*!< <cmd> (no args) */
+	case CS_NO_ARGS: /*!< &lt;cmd&gt; (no args) */
 	{
 		handler_cs_no_args = cmdp->info.handler;
 		(*(handler_cs_no_args))(player, cause, key);
@@ -635,7 +635,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	//(*(cmdp->info.handler))(player, cause, key);
 	break;
 
-	case CS_ONE_ARG: /*!< <cmd> <arg> */
+	case CS_ONE_ARG: /*!< &lt;cmd&gt; &lt;arg&gt; */
 		/**
 		 * If an unparsed command, just give it to the handler
 		 *
@@ -832,7 +832,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 		break;
 
-	case CS_TWO_ARG: /* <cmd> <arg1> = <arg2> */
+	case CS_TWO_ARG: /* &lt;cmd&gt; &lt;arg1&gt; = &lt;arg2&gt; */
 		/**
 		 * Interpret ARG1
 		 *
@@ -1201,10 +1201,10 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				 * set to 'yes', or we'll match here only to encounter dead
 				 * silence when we try to find the exit inside the move routine.
 				 * We also need to directly find what the pointer for the move
-				 * (goto) command is, since we could have @addcommand'd it
+				 * (goto) command is, since we could have \@addcommand'd it
 				 * (and probably did, if this conf option is on). Finally, we've
-				 * got to make this look like we really did type 'goto <exit>',
-				 * or the @addcommand will just skip over the string.
+				 * got to make this look like we really did type 'goto &lt;exit&gt;',
+				 * or the \@addcommand will just skip over the string.
 				 */
 				cmdp = (CMDENT *)hashfind("goto", &mushstate.command_htab);
 
@@ -1376,7 +1376,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	succ = 0;
 
 	/**
-	 * Idea for enter/leave aliases from R'nice@TinyTIM
+	 * Idea for enter/leave aliases from R'nice\@TinyTIM
 	 *
 	 */
 	if (Has_location(player) && Good_obj(Location(player)))
@@ -1975,7 +1975,6 @@ void list_attrtable(dbref player)
  *
  * @param player	DBref of the player
  * @param ctab		Command table
- * @param buff		Buffer for the list
  */
 void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 {
@@ -2187,12 +2186,12 @@ void list_attrtypes(dbref player)
 /**
  * @brief Change command or switch permissions.
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return int
+ * @param vp		Unused
+ * @param str		Command or switch name
+ * @param extra		Extra data
+ * @param player	Player making the change
+ * @param cmd		Command name
+ * @return int		Status code
  */
 int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
 {
@@ -2415,7 +2414,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 	if (!orig)
 	{
 		/**
-		 * we only got one argument to @alias. Bad.
+		 * we only got one argument to \@alias. Bad.
 		 *
 		 */
 		cf_log(player, "CNF", "SYNTX", cmd, "Invalid original for alias %s", alias);

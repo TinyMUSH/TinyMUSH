@@ -666,7 +666,7 @@ bool xlate(char *arg)
 		else
 		{
 			/**
-			 * Case of '#-1 <string>'
+			 * Case of '#-1 &lt;string&gt;'
 			 *
 			 */
 			return !((arg[0] == '-') && (arg[1] == '1') && (arg[2] == ' ')) ? true : false;
