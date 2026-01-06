@@ -1513,7 +1513,7 @@ void do_mail_stats(dbref player, char *name, int full)
      * find player
      */
 
-    if ((*name == '\0') || !name)
+    if (!name || (*name == '\0'))
     {
         if Wizard (player)
             target = AMBIGUOUS;
