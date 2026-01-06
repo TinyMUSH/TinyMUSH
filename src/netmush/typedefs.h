@@ -703,7 +703,7 @@ typedef struct match_state
     int count;           /*!< # of matches at this confidence */
     int pref_type;       /*!< The preferred object type */
     int check_keys;      /*!< Should we test locks? */
-    dbref absolute_form; /*!< If #num, then the number */
+    dbref absolute_form; /*!< If \#num, then the number */
     dbref match;         /*!< What I've found so far */
     dbref player;        /*!< Who is performing match */
     char *string;        /*!< The string to search for */
