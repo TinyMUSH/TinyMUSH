@@ -4173,8 +4173,8 @@ void fun_shuffle(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief If a <word> in <list of words> is in <old words>, replace it with the
- * corresponding word from <new words>. This is basically a mass-edit. This
+ * @brief If a &lt;word&gt; in &lt;list of words&gt; is in &lt;old words&gt;, replace it with the
+ * corresponding word from &lt;new words&gt;. This is basically a mass-edit. This
  * is an EXACT, not a case-insensitive or wildcarded, match.
  *
  * ledit(<list of words>,<old words>,<new words>[,<delim>[,<output delim>]])

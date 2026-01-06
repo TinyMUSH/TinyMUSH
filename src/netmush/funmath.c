@@ -300,7 +300,7 @@ void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief   Returns the integer quotient from dividing <number1> by <number2>,
+ * @brief   Returns the integer quotient from dividing &lt;number1&gt; by &lt;number2&gt;,
  *          rounded down (towards zero if positive, away from zero if negative).
  *
  * @param buff Output buffer
@@ -319,7 +319,7 @@ void fun_floor(char *buff, char **bufc, dbref player __attribute__((unused)), db
 }
 
 /**
- * @brief Returns the smallest integer greater than or equal to <number>.
+ * @brief Returns the smallest integer greater than or equal to &lt;number&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -337,7 +337,7 @@ void fun_ceil(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 }
 
 /**
- * @brief Rounds <number> to <places> decimal places.
+ * @brief Rounds &lt;number&gt; to &lt;places&gt; decimal places.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -355,7 +355,7 @@ void fun_round(char *buff, char **bufc, dbref player __attribute__((unused)), db
 }
 
 /**
- * @brief Returns the value of <number> after truncating off any fractional value.
+ * @brief Returns the value of &lt;number&gt; after truncating off any fractional value.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -378,7 +378,7 @@ void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), db
 }
 
 /**
- * @brief Returns <number>, incremented by 1 (the <number>, plus 1).
+ * @brief Returns &lt;number&gt;, incremented by 1 (the &lt;number&gt;, plus 1).
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -396,7 +396,7 @@ void fun_inc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief Returns <number>, decremented by 1 (the <number>, minus 1).
+ * @brief Returns &lt;number&gt;, decremented by 1 (the &lt;number&gt;, minus 1).
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -468,7 +468,7 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief Returns the square root of <number>.
+ * @brief Returns the square root of &lt;number&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -500,7 +500,7 @@ void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 }
 
 /**
- * @brief Returns the result of raising the numeric constant e to <power>.
+ * @brief Returns the result of raising the numeric constant e to &lt;power&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -519,7 +519,7 @@ void fun_exp(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 
 /**
  * @brief If only given one argument, this function returns a list of numbers
- *        from 0 to <number>-1.  <number> must be at least 1.
+ *        from 0 to &lt;number&gt;-1. &lt;number&gt; must be at least 1.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -788,8 +788,8 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
 }
 
 /**
- * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
- *        than <number2>, and 0 otherwise.
+ * @brief Takes two numbers, and returns 1 if and only if &lt;number1&gt; is greater
+ *        than &lt;number2&gt;, and 0 otherwise.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -807,8 +807,8 @@ void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 }
 
 /**
- * @brief Takes two numbers, and returns 1 if and only if <number1> is greater
- *        than or equal to <number2>, and 0 otherwise.
+ * @brief Takes two numbers, and returns 1 if and only if &lt;number1&gt; is greater
+ *        than or equal to &lt;number2&gt;, and 0 otherwise.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -826,8 +826,8 @@ void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief Takes two numbers, and returns 1 if and only if <number1> is less
- *        than <number2>, and 0 otherwise.
+ * @brief Takes two numbers, and returns 1 if and only if &lt;number1&gt; is less
+ *        than &lt;number2&gt;, and 0 otherwise.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -845,8 +845,8 @@ void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
 }
 
 /**
- * @brief Takes two numbers, and returns 1 if and only if <number1> is less
- *        than or equal to <number2>, and 0 otherwise.
+ * @brief Takes two numbers, and returns 1 if and only if &lt;number1&gt; is less
+ *        than or equal to &lt;number2&gt;, and 0 otherwise.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -936,7 +936,7 @@ void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
 }
 
 /**
- * @brief Returns the result of subtracting <number2> from <number1>.
+ * @brief Returns the result of subtracting &lt;number2&gt; from &lt;number1&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -954,7 +954,7 @@ void fun_sub(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief   Returns the integer quotient from dividing <number1> by <number2>,
+ * @brief   Returns the integer quotient from dividing &lt;number1&gt; by &lt;number2&gt;,
  *          rounded towards zero.
  *
  * @param buff Output buffer
@@ -1009,7 +1009,7 @@ void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief   Returns the integer quotient from dividing <number1> by <number2>,
+ * @brief   Returns the integer quotient from dividing &lt;number1&gt; by &lt;number2&gt;,
  *          rounded down (towards zero if positive, away from zero if negative).
  *
  * @param buff Output buffer
@@ -1076,7 +1076,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
 }
 
 /**
- * @brief Returns the floating point quotient from dividing <number1> by <number2>.
+ * @brief Returns the floating point quotient from dividing &lt;number1&gt; by &lt;number2&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1103,9 +1103,9 @@ void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 }
 
 /**
- * @brief Returns the smallest integer with the same sign as <integer2> such
- *        that the difference between <integer1> and the result is divisible
- *        by <integer2>.
+ * @brief Returns the smallest integer with the same sign as &lt;integer2&gt; such
+ *        that the difference between &lt;integer1&gt; and the result is divisible
+ *        by &lt;integer2&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1159,9 +1159,9 @@ void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), d
 }
 
 /**
- * @brief Returns the smallest integer with the same sign as <integer1> such
- *        that the difference between <integer1> and the result is divisible
- *        by <integer2>.
+ * @brief Returns the smallest integer with the same sign as &lt;integer1&gt; such
+ *        that the difference between &lt;integer1&gt; and the result is divisible
+ *        by &lt;integer2&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1215,7 +1215,7 @@ void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused))
 }
 
 /**
- * @brief Returns the result of raising <number> to the <power>'th power.
+ * @brief Returns the result of raising &lt;number&gt; to the &lt;power&gt;'th power.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1243,7 +1243,7 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
 }
 
 /**
- * @brief Returns the result of raising <number> to the <power>'th power.
+ * @brief Returns the result of raising &lt;number&gt; to the &lt;power&gt;'th power.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1290,8 +1290,8 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief This function returns the result of leftwards bit-shifting <number>
- *        by <count> times.
+ * @brief This function returns the result of leftwards bit-shifting &lt;number&gt;
+ *        by &lt;count&gt; times.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1309,8 +1309,8 @@ void fun_shl(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 }
 
 /**
- * @brief This function returns the result of rightwards bit-shifting <number>
- *        by <count> times.
+ * @brief This function returns the result of rightwards bit-shifting &lt;number&gt;
+ *        by &lt;count&gt; times.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker

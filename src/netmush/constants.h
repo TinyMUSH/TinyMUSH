@@ -1268,7 +1268,7 @@
 /**
  * These chars get replaced by the current item from a list in commands and
  * functions that do iterative replacement, such as @apply_marked, dolist,
- * the eval= operator for @search, and iter().
+ * the eval= operator for \@search, and iter().
  *
  */
 #define BOUND_VAR "##"

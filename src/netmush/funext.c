@@ -217,7 +217,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute
 }
 
 /**
- * @brief Returns the dbref or #1- of an object in a @program.
+ * @brief Returns the dbref or #1- of an object in a \@program.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -378,7 +378,7 @@ void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unus
 }
 
 /**
- * @brief Check if a characters should be converted to %<hex>
+ * @brief Check if a characters should be converted to %&lt;hex&gt;
  *
  * @param ch Character to check
  * @return true Convert to hex

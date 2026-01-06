@@ -1,5 +1,5 @@
 /**
- * @file prototypes.h.in
+ * @file prototypes.h
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Centralized function prototypes generated for the core engine
  * @version 4.0

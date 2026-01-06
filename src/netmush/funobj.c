@@ -228,7 +228,7 @@ void handle_loc(char *buff, char **bufc, dbref player, dbref caller __attribute_
 }
 
 /**
- * @brief Returns the recursed location of something (specifying #levels)
+ * @brief Returns the recursed location of something (specifying \#levels)
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -466,9 +466,9 @@ void fun_nearby(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 /**
  * @brief Handle presence functions.
- *        hears(<object>, <speaker>): Can <object> hear <speaker> speak?
- *        knows(<object>, <target>): Can <object> know about <target>?
- *        moves(<object>, <mover>): Can <object> see <mover> move?
+ *        hears(&lt;object&gt;, &lt;speaker&gt;): Can &lt;object&gt; hear &lt;speaker&gt; speak?
+ *        knows(&lt;object&gt;, &lt;target&gt;): Can &lt;object&gt; know about &lt;target&gt;?
+ *        moves(&lt;object&gt;, &lt;mover&gt;): Can &lt;object&gt; see &lt;mover&gt; move?
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -633,7 +633,7 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 }
 
 /**
- * @brief Checks if <actor> would pass the named lock on <object>.
+ * @brief Checks if &lt;actor&gt; would pass the named lock on &lt;object&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -703,8 +703,8 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller __attribute__
 }
 
 /**
- * @brief   Checks if <actor> would pass a lock on <locked object> with syntax
- *          <lock string>
+ * @brief   Checks if &lt;actor&gt; would pass a lock on &lt;locked object&gt; with syntax
+ *          &lt;lock string&gt;
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -971,7 +971,7 @@ void fun_lexits(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief Approximate equivalent of @entrances command.
+ * @brief Approximate equivalent of \@entrances command.
  *        Borrowed in part from PennMUSH.
  *
  * @param buff Output buffer
@@ -1291,7 +1291,7 @@ void fun_visible(char *buff, char **bufc, dbref player, dbref caller __attribute
 }
 
 /**
- * @brief Returns 1 if player could set <obj>/<attr>.
+ * @brief Returns 1 if player could set &lt;obj&gt;/&lt;attr&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1370,7 +1370,7 @@ void fun_writable(char *buff, char **bufc, dbref player, dbref caller __attribut
 }
 
 /**
- * @brief Returns the flags on an object. Because @switch is case-insensitive,
+ * @brief Returns the flags on an object. Because \@switch is case-insensitive,
  *        not quite as useful as it could be.
  *
  * @param buff Output buffer
@@ -1611,8 +1611,8 @@ bool atr_has_flag(dbref player, dbref thing, ATTR *attr, int aowner, int aflags,
 }
 
 /**
- * @brief   Returns true if object <object> has the flag named <flag> set on
- *          it, or, if <flag> is PLAYER, THING, ROOM, or EXIT, if <object> is
+ * @brief   Returns true if object &lt;object&gt; has the flag named &lt;flag&gt; set on
+ *          it, or, if &lt;flag&gt; is PLAYER, THING, ROOM, or EXIT, if &lt;object&gt; is
  *          of the specified type.
  *
  * @param buff Output buffer
@@ -1667,8 +1667,8 @@ void fun_hasflag(char *buff, char **bufc, dbref player, dbref caller __attribute
 }
 
 /**
- * @brief Returns true if object <object> has the flag named <flag> set on
- *        it, or, if <flag> is PLAYER, THING, ROOM, or EXIT, if <object> is
+ * @brief Returns true if object &lt;object&gt; has the flag named &lt;flag&gt; set on
+ *        it, or, if &lt;flag&gt; is PLAYER, THING, ROOM, or EXIT, if &lt;object&gt; is
  *        of the specified type.
  *
  * @param buff Output buffer
@@ -1704,8 +1704,8 @@ void fun_haspower(char *buff, char **bufc, dbref player, dbref caller __attribut
 }
 
 /**
- * @brief This function returns 1 if <object> has all the flags in
- *        <flag list 1>, or all the flags in <flag list 2>, and so
+ * @brief This function returns 1 if &lt;object&gt; has all the flags in
+ *        &lt;flag list 1&gt;, or all the flags in &lt;flag list 2&gt;, and so
  *        forth (up to eight lists). Otherwise, it returns 0.
  *
  * @param buff Output buffer
@@ -1799,8 +1799,8 @@ void handle_timestamp(char *buff, char **bufc, dbref player, dbref caller __attr
 }
 
 /**
- * @brief This function returns 1 if <object> has all the flags in
- *        <flag list 1>, or all the flags in <flag list 2>, and so
+ * @brief This function returns 1 if &lt;object&gt; has all the flags in
+ *        &lt;flag list 1&gt;, or all the flags in &lt;flag list 2&gt;, and so
  *        forth (up to eight lists). Otherwise, it returns 0.
  *
  * @param buff Output buffer
@@ -1834,7 +1834,7 @@ void fun_parent(char *buff, char **bufc, dbref player, dbref caller __attribute_
 /**
  * @brief This function returns the list of dbrefs of the object's "parent
  *        chain", including itself: i.e., its own dbref, the dbref of the
- *        object it is @parent'd to, its parent's parent (grandparent),
+ *        object it is \@parent'd to, its parent's parent (grandparent),
  *        and so forth. Note that the function will always return at least one
  *        element, the dbref of the object itself.
  *
@@ -1897,7 +1897,7 @@ void fun_lparent(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief This function returns a list of objects that are parented to <object>.
+ * @brief This function returns a list of objects that are parented to &lt;object&gt;.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1963,7 +1963,7 @@ void fun_children(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 }
 
 /**
- * @brief Returns the dbref of <object>'s zone (the dbref of the master object
+ * @brief Returns the dbref of &lt;object&gt;'s zone (the dbref of the master object
  *        which defines the zone).
  *
  * @param buff Output buffer
@@ -2343,8 +2343,8 @@ void perform_get(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 /**
  * @brief The first form of this function is identical to get_eval(), but
- *        splits the <object> and <attribute> into two arguments, rather
- *        than having an <object>/<attribute> pair. It is provided for
+ *        splits the &lt;object&gt; and &lt;attribute&gt; into two arguments, rather
+ *        than having an &lt;object&gt;/&lt;attribute&gt; pair. It is provided for
  *        PennMUSH compatibility.
  *
  * @param buff Output buffer
@@ -2740,7 +2740,7 @@ void fun_private(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief This function returns the value of <obj>/<attr>, as if retrieved via
+ * @brief This function returns the value of &lt;obj&gt;/&lt;attr&gt;, as if retrieved via
  *        the get() function, if the attribute exists and is readable by Player
  *
  * @param buff Output buffer
@@ -2803,7 +2803,7 @@ void fun_default(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief This function returns the evaluated value of <obj>/<attr>, as if
+ * @brief This function returns the evaluated value of &lt;obj&gt;/&lt;attr&gt;, as if
  *        retrieved via the get_eval() function, if the attribute exists and
  *        is readable by you. Otherwise, it evaluates the default case, and
  *        returns that. The default case is only evaluated if the attribute
@@ -2872,8 +2872,8 @@ void fun_edefault(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 /**
  * @brief This function returns the value of the user-defined function as
- *        defined by <attr> (or <obj>/<attr>), as if retrieved via the u()
- *        function, with <args>, if the attribute exists and is readable
+ *        defined by &lt;attr&gt; (or &lt;obj&gt;/&lt;attr&gt;), as if retrieved via the u()
+ *        function, with &lt;args&gt;, if the attribute exists and is readable
  *        by you.
  *
  * @param buff Output buffer
@@ -3183,7 +3183,7 @@ void fun_pmatch(char *buff, char **bufc, dbref player, dbref caller __attribute_
 }
 
 /**
- * @brief If <object> is a dbref, if the dbref is valid, that dbref will be
+ * @brief If &lt;object&gt; is a dbref, if the dbref is valid, that dbref will be
  *        returned. If the dbref is not valid, #-1 will be returned.
  *
  * @param buff Output buffer
@@ -3736,7 +3736,7 @@ void fun_objmem(char *buff, char **bufc, dbref player, dbref caller __attribute_
 
 /**
  * @brief   Returns the sum total of the size, in bytes, of all objects in the
- *          database that are owned by <player> (equivalent to doing an objmem()
+ *          database that are owned by &lt;player&gt; (equivalent to doing an objmem()
  *          on everything that player owns). You must be a Wizard, or have the
  *          Search power, in order to use this on another player.
  *
@@ -3775,7 +3775,7 @@ void fun_playmem(char *buff, char **bufc, dbref player, dbref caller __attribute
 }
 
 /**
- * @brief Returns a string indicating the object type of <object>, either EXIT,
+ * @brief Returns a string indicating the object type of &lt;object&gt;, either EXIT,
  *        PLAYER, ROOM, or THING.
  *
  * @param buff Output buffer
@@ -3825,7 +3825,7 @@ void fun_type(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 }
 
 /**
- * @brief Returns 1 if <object> is of type <type>, and 0 otherwise. Valid
+ * @brief Returns 1 if &lt;object&gt; is of type &lt;type&gt;, and 0 otherwise. Valid
  *        types are: ROOM, EXIT, THING, and PLAYER. If an invalid type is
  *        given, the function returns #-1.
  *

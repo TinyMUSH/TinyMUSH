@@ -1091,7 +1091,7 @@ bool can_destroy_exit(dbref player, dbref exit)
 }
 
 /**
- * @brief Indicates if target of a @destroy is a 'special' object in the database.
+ * @brief Indicates if target of a \@destroy is a 'special' object in the database.
  *
  * @param victim DBref of the target
  * @return int

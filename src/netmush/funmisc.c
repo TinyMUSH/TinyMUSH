@@ -204,12 +204,12 @@ static char parse_etimefmt_flags(char **p, int *width, int *hidezero, int *hidee
 }
 
 /**
- * @brief   The switchall() function compares <str> against <pat1>, <pat2>, etc.
+ * @brief   The switchall() function compares &lt;str&gt; against &lt;pat1&gt;, &lt;pat2&gt;, etc.
  *          (allowing * to match any number of characters and ? to match any 1
- *          character), and returns the corresponding <resN> parameters (without
- *          any delimiters) for all <patN> patterns that match.  If none match,
- *          then the default result <dflt> is returned. The evaluated value of
- *          <str> can be obtained as '#$'. If switchall() and switch() are
+ *          character), and returns the corresponding &lt;resN&gt; parameters (without
+ *          any delimiters) for all &lt;patN&gt; patterns that match. If none match,
+ *          then the default result &lt;dflt&gt; is returned. The evaluated value of
+ *          &lt;str&gt; can be obtained as '\#$'. If switchall() and switch() are
  *          nested, the nest level can be obtained with '#!'.
  *
  * @note This functions expect that its arguments has not been evaluated.
@@ -230,11 +230,11 @@ void fun_switchall(char *buff, char **bufc, dbref player, dbref caller, dbref ca
 }
 
 /**
- * @brief   The switch() function compares <str> against <pat1>, <pat2>, etc (allowing
+ * @brief   The switch() function compares &lt;str&gt; against &lt;pat1&gt;, &lt;pat2&gt;, etc (allowing
  *          to match any number of characters and ? to match any 1 character), and
- *          returns the corresponding <resN> parameter for the first <patN> pattern
- *          that matches.  If none match, then the default result <dflt> is returned.
- *          The evaluated value of <str> can be obtained as '#$'. If switch() and
+ *          returns the corresponding &lt;resN&gt; parameter for the first &lt;patN&gt; pattern
+ *          that matches. If none match, then the default result &lt;dflt&gt; is returned.
+ *          The evaluated value of &lt;str&gt; can be obtained as '\#$'. If switch() and
  *          switchall() are nested, the nest level can be obtained with '#!'.
  *
  * @note This functions expect that its arguments has not been evaluated.
@@ -257,7 +257,7 @@ void fun_switch(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 /**
  * @brief   This function is similar to switch(), save that it looks for an exact
  *          match between the patterns and the string, rather than doing a 'wildcard'
- *          match (case-insensitive match with '*' and '?'), and the '#$' token
+ *          match (case-insensitive match with '*' and '?'), and the `#$` token
  *          replacement is not done. It performs marginally faster than switch().
  *
  * @note This functions expect that its arguments has not been evaluated.
@@ -1783,7 +1783,7 @@ bool check_command(dbref player, char *name, char *buff, char **bufc, char *carg
 /**
  * @brief This side-effect function links an object to a location,
  *        behaving identically to the command:
- *        '@link <object>=<destination>'
+ *        '\@link &lt;object&gt;=&lt;destination&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1808,7 +1808,7 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 /**
  * @brief This side-effect function teleports an object from one place to
  *        another, behaving identically to the command:
- *        '@tel <object>=<destination>'
+ *        '\@tel &lt;object&gt;=&lt;destination&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1833,7 +1833,7 @@ void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((
 /**
  * @brief This side-effect function erases some or all attributes from an
  *        object, behaving identically to the command:
- *        '@wipe <object>[</wild-attr>]'
+ *        '\@wipe &lt;object&gt;[&lt;/wild-attr&gt;]'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1858,7 +1858,7 @@ void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__(
 /**
  * @brief This side-effect function sends a message to the list of dbrefs,
  *        behaving identically to the command:
- *        '@pemit/list <list of dbrefs>=<string>'
+ *        '\@pemit/list &lt;list of dbrefs&gt;=&lt;string&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1883,7 +1883,7 @@ void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 /**
  * @brief This side-effect function sends a message to the list of dbrefs,
  *        behaving identically to the command:
- *        '@pemit/list/contents <list of dbrefs>=<string>'
+ *        '\@pemit/list/contents &lt;list of dbrefs&gt;=&lt;string&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1906,10 +1906,10 @@ void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 }
 
 /**
- * @brief This side-effect function sends a message to everyone in <target>'s
- *        location with the exception of <target>,
+ * @brief This side-effect function sends a message to everyone in &lt;target&gt;'s
+ *        location with the exception of &lt;target&gt;,
  *        behaving identically to the command:
- *        '@oemit <target> = <string>'
+ *        '\@oemit &lt;target&gt; = &lt;string&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1933,7 +1933,7 @@ void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 /**
  * @brief This side-effect function behaves identically to the command
- *        '@force <object>=<action>'
+ *        '\@force &lt;object&gt;=&lt;action&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1957,7 +1957,7 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__
 
 /**
  * @brief This side-effect function behaves identically to the command
- *        '@trigger <object>/<attribute>=<arg 0>,<arg 1>,...<arg N>'
+ *        '\@trigger &lt;object&gt;/&lt;attribute&gt;=&lt;arg 0&gt;,&lt;arg 1&gt;,...&lt;arg N&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1987,7 +1987,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
 
 /**
  * @brief This side-effect function behaves identically to the command
- *        '@wait <timer>=<command>'
+ *        '\@wait &lt;timer&gt;=&lt;command&gt;'
  *
  * @param buff Not used
  * @param bufc Not used
@@ -2005,10 +2005,10 @@ void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unu
 }
 
 /**
- * @brief This function executes <command> with the given arguments.
- *        <command> is presently limited to @chown, @clone, @destroy,
- *        @link, @lock, @name, @parent, @teleport, @unlink, @unlock,
- *        and @wipe.
+ * @brief This function executes &lt;command&gt; with the given arguments.
+ *        &lt;command&gt; is presently limited to \@chown, \@clone, \@destroy,
+ *        \@link, \@lock, \@name, \@parent, \@teleport, \@unlink, \@unlock,
+ *        and \@wipe.
  *
  * @param buff Not used
  * @param bufc Not used
@@ -2433,8 +2433,8 @@ void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char
 /**
  * @brief Gets details about the queue.
  *        ps(): Lists everything on the queue by PID
- *        ps(<object or player>): Lists PIDs enqueued by object or player's stuff
- *        ps(<PID>): Results in '<PID>:<wait status> <command>'
+ *        ps(&lt;object or player&gt;): Lists PIDs enqueued by object or player's stuff
+ *        ps(&lt;PID&gt;): Results in '&lt;PID&gt;:&lt;wait status&gt; &lt;command&gt;'
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker

@@ -2956,7 +2956,7 @@ void list_db_stats(dbref player)
 
 /**
  * @brief List local resource usage stats of the MUSH process. Adapted
- * from code by Claudius@PythonMUCK, posted to the net by Howard/Dark_Lord.
+ * from code by Claudius\@PythonMUCK, posted to the net by Howard/Dark_Lord.
  *
  * @param player DBref of player
  */

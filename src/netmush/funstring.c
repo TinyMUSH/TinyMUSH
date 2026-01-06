@@ -1675,7 +1675,7 @@ void fun_merge(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 }
 
 /**
- * @brief Returns <string> after replacing the characters [](){};,%\$ with spaces.
+ * @brief Returns &lt;string&gt; after replacing the characters [](){};,%\$ with spaces.
  *
  * @param buff Output buffer
  * @param bufc Output buffer tracker
@@ -1726,7 +1726,7 @@ void fun_secure(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 }
 
 /**
- * @brief Returns <string> after adding an escape character (\) at the start
+ * @brief Returns &lt;string&gt; after adding an escape character (\) at the start
  *        of the string and also before each of the characters %;[]{}\ that
  *        appear in the string.
  *

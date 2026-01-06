@@ -468,7 +468,7 @@
  * player would pass the DarkLock), OR the player passes the DarkLock.
  * DarkLocks only apply when we are checking if we can see something on a
  * 'look'. They are not checked when matching, when looking at lexits(), when
- * determining whether a move is seen, on @sweep, etc.
+ * determining whether a move is seen, on \@sweep, etc.
  *
  */
 #define Darkened(p, x) (Dark(x) && (!H_Darklock(x) || could_doit(p, x, A_LDARK)))

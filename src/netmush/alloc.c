@@ -475,7 +475,7 @@ char *__xasprintf(const char *file, int line, const char *function, const char *
  * @param function Function where the allocation is done.
  * @param var      Name of the variable that will receive the pointer (not the variable itself).
  * @param format   Format string.
- * @param ...      Variables arguments for the format string.
+ * @param va       Variable argument list for the format string.
  * @return char*   Pointer to the new string buffer.
  */
 char *__xavsprintf(const char *file, int line, const char *function, const char *var, const char *format, va_list va)
@@ -1113,6 +1113,7 @@ void *__xmempcpy(void *dest, const void *src, size_t n)
  *
  * @param dest Pointer to destination buffer.
  * @param src Pointer to source buffer.
+ * @param c Character to stop copying at.
  * @param n Number of bytes to copy.
  * @return Pointer to the destination buffer.
  */
@@ -1234,7 +1235,7 @@ int __xsorttrace(const void *p1, const void *p2)
 /**
  * @brief Show to the player a summary of all allocations.
  *
- * Called by @list raw_memory. This is primary a debug function and
+ * Called by \@list raw_memory. This is primary a debug function and
  * may cause lag on a very large game. Use with caution.
  *
  * @param player   Dbref of the player making the request.

@@ -21,7 +21,7 @@
 #include <string.h>
 
 /**
- * @brief Take a dbref (loc) and generate a string.  -1, -3, or (#loc) Note, this
+ * @brief Take a dbref (loc) and generate a string.  -1, -3, or (\#loc) Note, this
  * will give players object numbers of stuff they don't control, but it's only
  * internal currently, so it's not a problem.
  *
@@ -283,7 +283,7 @@ char *unparse_boolexp(dbref player, BOOLEXP *b)
 }
 
 /**
- * @brief Render a boolean expression in decompile form suitable for @decompile/@lock
+ * @brief Render a boolean expression in decompile form suitable for \@decompile/\@lock
  *
  * External
  *

@@ -736,7 +736,7 @@ BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal)
 }
 
 /**
- * @brief F -> !F; F -> @L; F -> =L; F -> +L; F -> $L
+ * @brief F -> !F; F -> \@L; F -> =L; F -> +L; F -> $L
  *
  * The argument L must be type BOOLEXP_CONST
  *

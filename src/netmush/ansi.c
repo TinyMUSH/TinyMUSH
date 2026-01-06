@@ -338,7 +338,7 @@ static bool parse_color_value(const char *token, uint8_t *value)
 /**
  * @brief Parses a hexadecimal or decimal string to set an RGB color.
  *
- * Supports formats like #RRGGBB, RRGGBB, RRRGGGBBB, etc., and sets the foreground
+ * Supports formats like `#RRGGBB`, `RRGGBB`, `RRRGGGBBB`, etc., and sets the foreground
  * or background color accordingly.
  *
  * @param color Pointer to the color state to modify.
@@ -577,7 +577,7 @@ static char *extract_inner_content(const char *start, size_t *out_len)
  * @brief Parses a complex color string and sets the corresponding color.
  *
  * Supports color names, hex values, and MUSH code.
- * Handles wrappers like <color> or +color.
+ * Handles wrappers like &lt;color&gt; or +color.
  * If '/' is present, the part before is foreground, after is background.
  *
  * @param color Pointer to the color state to modify.
@@ -947,7 +947,7 @@ char *ansi_transition_colorstate(const ColorState from, const ColorState to, Col
 }
 
 /**
- * @brief Parses embedded ANSI sequences in a string marked with '%x<code>'.
+ * @brief Parses embedded ANSI sequences in a string marked with '%x&lt;code&gt;'.
  *
  * Scans the input string for patterns like '%xred' or '%xred/blue', parses the code
  * using ansi_parse_color_from_string, and builds an array of ColorSequence with positions

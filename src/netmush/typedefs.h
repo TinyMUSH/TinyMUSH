@@ -402,7 +402,7 @@ typedef struct object_xfuncs
 } OBJXFUNCS;
 
 /**
- * @brief Search structure, used by @search and search().
+ * @brief Search structure, used by \@search and search().
  *
  */
 typedef struct search_type
@@ -423,7 +423,7 @@ typedef struct search_type
 } SEARCH;
 
 /**
- * * @brief Stats structure, used by @stats and stats().
+ * * @brief Stats structure, used by \@stats and stats().
  *
  */
 typedef struct stats_type
