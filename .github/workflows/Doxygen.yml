@@ -42,10 +42,10 @@ jobs:
           sed -i "s|^PROJECT_NUMBER.*|PROJECT_NUMBER         = ${ver}|" .github/Doxyfile
       
       - name: Ensure build/docs directory exists
-        run: mkdir -p build/docs
+        run: mkdir -p build/docs/doxygen
 
       - name: Build documentation
-        run: doxygen .github/Doxyfile
+        run: doxygen .github/Doxyfile -v 2>&1
 
       - name: Upload docs artifact (PRs)
         if: ${{ github.event_name == 'pull_request' }}
