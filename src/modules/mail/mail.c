@@ -2929,9 +2929,11 @@ static int sign(int x)
 
 void do_malias_switch(dbref player, char *a1, char *a2)
 {
-    if ((!a2 || !*a2) && !(!a1 || !*a1))
+    /* If second argument is missing/empty and first is present/non-empty, list that alias */
+    if ((!a2 || !*a2) && a1 && *a1)
         do_malias_list(player, a1);
-    else if ((!*a1 || !a1) && (!*a2 || !a2))
+    /* If both arguments are missing/empty, list all aliases */
+    else if ((!a1 || !*a1) && (!a2 || !*a2))
         do_malias_list_all(player);
     else
         do_malias_create(player, a1, a2);
