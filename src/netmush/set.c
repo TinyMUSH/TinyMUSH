@@ -1302,12 +1302,19 @@ void do_cpattr(dbref player, dbref cause, int key, char *oldpair, char *newpair[
 	ATTR *oldattr;
 	char *s;
 
-	if (!oldpair || !newpair || !*newpair || !*oldpair || !**newpair)
+	/* Validate pointers before dereference. */
+	if (!oldpair || !newpair)
 	{
 		return;
 	}
 
 	if (nargs < 1)
+	{
+		return;
+	}
+
+	/* Ensure non-empty source and destination specification. */
+	if (!*oldpair || !*newpair[0])
 	{
 		return;
 	}
