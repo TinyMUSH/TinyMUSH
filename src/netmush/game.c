@@ -3112,6 +3112,7 @@ void recover_flatfile(char *flat)
 	void (*modfunc)(FILE *);
 	FILE *f;
 	char *s, *s1;
+	int saved_standalone;
 	vattr_init();
 
 	if (init_database(mushconf.db_file) < 0)
@@ -3119,6 +3120,13 @@ void recover_flatfile(char *flat)
 		log_write_raw(1, "Can't open database file\n");
 		exit(EXIT_FAILURE);
 	}
+
+	/*
+	 * Set standalone mode to prevent individual attribute syncing during flatfile load.
+	 * Attributes will be synced in bulk at the end via db_sync_attributes().
+	 */
+	saved_standalone = mushstate.standalone;
+	mushstate.standalone = 1;
 
 	db_lock();
 	f = fopen(flat, "r");
@@ -3159,6 +3167,10 @@ void recover_flatfile(char *flat)
 	 */
 	call_all_modules_nocache("db_write");
 	db_unlock();
+	/*
+	 * Restore standalone mode before syncing attributes
+	 */
+	mushstate.standalone = saved_standalone;
 	db_sync_attributes();
 	dddb_close();
 }
