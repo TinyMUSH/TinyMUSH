@@ -2639,7 +2639,7 @@ void list_costs(dbref player)
 		}
 		else
 		{
-			raw_notify(player, "%-49.49s Creation Cost");
+			raw_notify(player, "%-49.49s Creation Cost + %d", "Object Value", mushconf.sacadjust);
 		}
 	}
 	else
