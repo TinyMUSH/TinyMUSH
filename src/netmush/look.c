@@ -2102,21 +2102,18 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		savec = mushconf.many_coins[0];
 		mushconf.many_coins[0] = (islower(savec) ? toupper(savec) : savec);
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-		if (buf2)
+		// An empty lock or NULL lock still constitutes a valid lock (meaning the thing is unlocked)
+		// The parser can handle these cases and correctly returns TRUE_BOOLEXP (aka NULL), thus no null check is required here.
+		bexp = parse_boolexp(player, buf2, 1);
+		// A NULL boolexp is a valid boolexp (meaning the thing has no lock); the unparser can safely handle those, thus no null check is required here.
+		buf = unparse_boolexp(player, bexp);
+		if (buf)
 		{
-			bexp = parse_boolexp(player, buf2, 1);
-			if (bexp)
-			{
-				buf = unparse_boolexp(player, bexp);
-				if (buf)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", Name(Owner(thing)), buf, mushconf.many_coins, Pennies(thing));
-					XFREE(buf);
-				}
-				free_boolexp(bexp);
-			}
-			XFREE(buf2);
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", Name(Owner(thing)), buf, mushconf.many_coins, Pennies(thing));
+			XFREE(buf);
 		}
+		free_boolexp(bexp);
+		XFREE(buf2);
 		mushconf.many_coins[0] = savec;
 		if (localtime_r(&CreateTime(thing), &tm_created) != NULL)
 		{
