@@ -2,7 +2,7 @@ var searchData=
 [
   ['b_0',['b',['../structColorRGB.html#a4ff5067a754209e90a66ac7567b7b108',1,'ColorRGB::b'],['../structColorCIELab.html#adf209bb341ee42bd3f4cc5dd2d6f3f65',1,'ColorCIELab::b']]],
   ['back_20up_20my_20database_1',['How do I back up my database?',['../md_docs_2Historical_2FAQ.html#autotoc_md345',1,'']]],
-  ['backend_2',['Database Backend',['../md_README.html#autotoc_md445',1,'']]],
+  ['backend_2',['Backend',['../md_TEST__CUSTOM__ATTR__FIX.html#autotoc_md547',1,'1. Create Test Database with GDBM Backend'],['../md_TEST__CUSTOM__ATTR__FIX.html#autotoc_md550',1,'4. Build with LMDB Backend'],['../md_README.html#autotoc_md445',1,'Database Backend']]],
   ['backend_20selection_3',['Database backend selection',['../md_INSTALL.html#autotoc_md389',1,'']]],
   ['background_4',['Daemon Mode (Background)',['../md_INSTALL.html#autotoc_md394',1,'']]],
   ['background_5',['background',['../structColorState.html#a5acb2fe9e71c1fda2eb806c1c4ee8971',1,'ColorState']]],
@@ -74,11 +74,12 @@ var searchData=
   ['build_20modules_20mymodule_20so_71',['Result: build/modules/mymodule.so',['../md_src_2modules_2skeleton_2QUICK__REFERENCE.html#autotoc_md505',1,'']]],
   ['build_20options_72',['Build Options',['../md_INSTALL.html#autotoc_md388',1,'']]],
   ['build_20process_73',['Build Process',['../md_INSTALL.html#autotoc_md384',1,'']]],
-  ['building_74',['Pattern 1: Dynamic String Building',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md130',1,'']]],
-  ['building_20a_20module_75',['Building a Module',['../md_docs_2Code_2MODULES__DEVELOPMENT.html#autotoc_md188',1,'']]],
-  ['building_5flimit_76',['building_limit',['../structconfdata.html#adce69737c315de8c39f64b0f9217b9bc',1,'confdata']]],
-  ['builds_77',['Using Ninja (Faster Builds)',['../md_INSTALL.html#autotoc_md391',1,'']]],
-  ['builtin_20command_78',['Add a Builtin Command',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md174',1,'']]],
-  ['builtin_20function_79',['Add a Builtin Function',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md176',1,'']]],
-  ['by_20cs_5f_20flags_80',['Handler Signatures (by CS_* flags)',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md170',1,'']]]
+  ['build_20with_20lmdb_20backend_74',['4. Build with LMDB Backend',['../md_TEST__CUSTOM__ATTR__FIX.html#autotoc_md550',1,'']]],
+  ['building_75',['Pattern 1: Dynamic String Building',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md130',1,'']]],
+  ['building_20a_20module_76',['Building a Module',['../md_docs_2Code_2MODULES__DEVELOPMENT.html#autotoc_md188',1,'']]],
+  ['building_5flimit_77',['building_limit',['../structconfdata.html#adce69737c315de8c39f64b0f9217b9bc',1,'confdata']]],
+  ['builds_78',['Using Ninja (Faster Builds)',['../md_INSTALL.html#autotoc_md391',1,'']]],
+  ['builtin_20command_79',['Add a Builtin Command',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md174',1,'']]],
+  ['builtin_20function_80',['Add a Builtin Function',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md176',1,'']]],
+  ['by_20cs_5f_20flags_81',['Handler Signatures (by CS_* flags)',['../md_docs_2Code_2COMMANDS__AND__REGISTRIES__REFERENCE.html#autotoc_md170',1,'']]]
 ];

@@ -32,7 +32,8 @@ var searchData=
   ['3_20patchlevel_202_3a_29',['TinyMUX 1.3 patchlevel 2:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md261',1,'']]],
   ['3_20patchlevel_203_3a_30',['TinyMUX 1.3 patchlevel 3:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md262',1,'']]],
   ['3_20patchlevel_204_3a_31',['TinyMUX 1.3 patchlevel 4:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md263',1,'']]],
-  ['3_20strong_20robustness_20strong_32',['3. &lt;strong&gt;Robustness&lt;/strong&gt;',['../md_README.html#autotoc_md455',1,'']]],
-  ['3_3a_33',['3:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md305',1,'TinyMUSH 2.0 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md262',1,'TinyMUX 1.3 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md268',1,'TinyMUX 1.4 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md285',1,'TinyMUX 1.5 patchlevel 3:']]],
-  ['3_3a_20safe_20string_20duplication_34',['Pattern 3: Safe String Duplication',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md132',1,'']]]
+  ['3_20shutdown_20and_20create_20flatfile_32',['3. Shutdown and Create Flatfile',['../md_TEST__CUSTOM__ATTR__FIX.html#autotoc_md549',1,'']]],
+  ['3_20strong_20robustness_20strong_33',['3. &lt;strong&gt;Robustness&lt;/strong&gt;',['../md_README.html#autotoc_md455',1,'']]],
+  ['3_3a_34',['3:',['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md305',1,'TinyMUSH 2.0 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md262',1,'TinyMUX 1.3 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md268',1,'TinyMUX 1.4 patchlevel 3:'],['..//github/workspace/docs/Historical/ChangeLog.History.md#autotoc_md285',1,'TinyMUX 1.5 patchlevel 3:']]],
+  ['3_3a_20safe_20string_20duplication_35',['Pattern 3: Safe String Duplication',['../md_docs_2Code_2ALLOC__DOCUMENTATION.html#autotoc_md132',1,'']]]
 ];
