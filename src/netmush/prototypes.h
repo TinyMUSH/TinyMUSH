@@ -70,17 +70,11 @@ extern void register_hashtables(MODHASHES *htab, MODHASHES *ntab);
 extern unsigned int register_dbtype(char *modname);
 
 /* boolexp.c */
-extern _Bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key);
 extern BOOLEXP *alloc_boolexp(void);
 extern void free_boolexp(BOOLEXP *b);
 extern _Bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b);
 extern _Bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key);
-extern void skip_whitespace(char **pBuf);
-extern BOOLEXP *test_atr(char *s, dbref parse_player, _Bool parsing_internal);
-extern BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, _Bool parsing_internal);
-extern BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, _Bool parsing_internal);
-extern BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, _Bool parsing_internal);
-extern BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, _Bool parsing_internal);
+extern const char *skip_whitespace(const char *pBuf);
 extern BOOLEXP *parse_boolexp(dbref player, const char *buf, _Bool internal);
 
 /* bsd.c */
