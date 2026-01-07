@@ -47,6 +47,11 @@ jobs:
         run-id: ${{ github.event.workflow_run.id }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path: game/
+    - name: Get test name
+      id: testname
+      run: |
+        TEST_NAME=$(basename "${{ matrix.testfile }}" .conf)
+        echo "name=${TEST_NAME}" >> $GITHUB_OUTPUT
     - name: run test suite
       id: test
       continue-on-error: true
@@ -61,14 +66,13 @@ jobs:
     - name: Save test result
       if: always()
       run: |
-        TEST_NAME=$(basename "${{ matrix.testfile }}" .conf)
         mkdir -p results
-        echo "${{ steps.test.outcome }}" > "results/${TEST_NAME}.txt"
+        echo "${{ steps.test.outcome }}" > "results/${{ steps.testname.outputs.name }}.txt"
     - name: Upload test result
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: result-$(basename "${{ matrix.testfile }}" .conf)
+        name: result-${{ steps.testname.outputs.name }}
         path: results/*.txt
   
   update-summary:
