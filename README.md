@@ -2,8 +2,7 @@
 |------------|
 |[![Build (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml)|
 |[![Build (macOS)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml)|
-|[![Regression Test (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml)|
-|![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-summary.svg)|
+|[![Regression Test (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml) ![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-summary.svg)|
 |[![Doxygen](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml)|
 |[![CodeQL](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml)|
 
