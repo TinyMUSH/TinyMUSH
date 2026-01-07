@@ -23,6 +23,9 @@ jobs:
     name: Regression
     needs: list-tests
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -38,10 +41,11 @@ jobs:
         cache: 'pip'
     - run: pip install telnetlib3
     - name: download artifact
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v4
       with:
         name: netmush
         run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         path: game/
     - name: run test suite
       env:
