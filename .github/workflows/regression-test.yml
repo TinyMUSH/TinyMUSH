@@ -1,0 +1,52 @@
+name: Regression Test (Ubuntu)
+
+on:
+  workflow_run:
+    workflows: ["Build Test (Ubuntu)"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  list-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        run: echo "matrix=$(ls scripts/*.conf | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+  regression-test:
+    name: Regression
+    needs: list-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        testfile: ${{ fromJson(needs.list-tests.outputs.matrix) }}
+    env:
+      TINY_PASS: potrzebie
+      TINY_PORT: 6250
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    - run: pip install telnetlib3
+    - name: download artifact
+      uses: actions/download-artifact@v5
+      with:
+        name: netmush
+        run-id: ${{ github.event.workflow_run.id }}
+        path: game/
+    - name: run test suite
+      env:
+        TINY_CONFIG_FILE: ${{ github.workspace }}/${{ matrix.testfile }}
+      shell: bash
+      run: |
+        cd game
+        chmod +x netmush
+        ./netmush -m
+        $GITHUB_WORKSPACE/scripts/regression_test.py --auto-shutdown
