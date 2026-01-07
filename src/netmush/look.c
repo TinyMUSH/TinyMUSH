@@ -795,10 +795,7 @@ void pretty_print(char *dest, char *name, char *text)
 			return;
 		}
 
-		while (*word && isspace(*word))
-		{
-			word++;
-		}
+		word = (char *) skip_whitespace(word);
 
 		if (!*word || (*word == '#'))
 		{

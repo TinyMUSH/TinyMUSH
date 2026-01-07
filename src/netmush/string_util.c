@@ -820,3 +820,22 @@ char *repeatchar(int count, char ch)
 	*str = '\0';
 	return ptr;
 }
+
+/**
+ * @brief Advances a string pointer past any leading whitespace characters.
+ *
+ * This function modifies the provided pointer to skip over consecutive whitespace
+ * characters (as defined by isspace()) at the beginning of the string. It stops
+ * when a non-whitespace character is encountered or the end of the string is reached.
+ *
+ * @param pBuf Pointer to the string buffer.
+ * @return const char* Pointer to the first non-whitespace character.
+ */
+const char *skip_whitespace(const char *pBuf)
+{
+	while (*pBuf && isspace(*pBuf))
+	{
+		pBuf++;
+	}
+	return pBuf;
+}

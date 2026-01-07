@@ -26,6 +26,9 @@
 /* Number of env vars (%0 et al) */
 #define NUM_ENV_VARS ${NUM_ENV_VARS}
 
+/* Maximum parse depth to prevent stack overflow */
+#define MAX_BOOLEXP_PARSE_DEPTH ${MAX_BOOLEXP_PARSE_DEPTH}
+
 /* Define to the version broken down to it's components */
 #define TINYMUSH_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}
 #define TINYMUSH_VERSION_MINOR ${PROJECT_VERSION_MINOR}

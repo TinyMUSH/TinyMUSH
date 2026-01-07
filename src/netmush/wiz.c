@@ -271,10 +271,7 @@ void do_force_prefixed(dbref player, dbref cause, int key, char *command, char *
 		return;
 	}
 
-	while (*command && isspace(*command))
-	{
-		command++;
-	}
+	command = (char *) skip_whitespace(command);
 
 	if (*command)
 	{

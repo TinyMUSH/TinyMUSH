@@ -151,10 +151,7 @@ void munge_space_for_match(const char *name)
     q = md.string;
     space_left = LBUF_SIZE - 1;
 
-    while (*p && isspace((unsigned char)*p))
-    {
-        p++; /* remove initial spaces */
-    }
+    p = skip_whitespace(p);
 
     while (*p && space_left > 0)
     {
@@ -169,10 +166,7 @@ void munge_space_for_match(const char *name)
             break;
         }
 
-        while (*p && isspace((unsigned char)*p))
-        {
-            p++;
-        }
+        p = skip_whitespace(p);
 
         if (*p && space_left > 0)
         {

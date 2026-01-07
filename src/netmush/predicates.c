@@ -106,10 +106,7 @@ int member(dbref thing, dbref list)
 
 bool is_integer(char *str)
 {
-	while (*str && isspace(*str))
-	{
-		str++; /* Leading spaces */
-	}
+	str = (char *) skip_whitespace(str);
 
 	if (!*str)
 	{
@@ -148,10 +145,7 @@ int is_number(char *str)
 {
 	int got_one;
 
-	while (*str && isspace(*str))
-	{
-		str++; /* Leading spaces */
-	}
+	str = (char *) skip_whitespace(str);
 
 	if (!*str)
 	{
@@ -2141,10 +2135,7 @@ void parse_range(char **name, dbref *low_bound, dbref *high_bound)
 
 		if (buff1 && *buff1)
 		{
-			while (*buff1 && isspace(*buff1))
-			{
-				buff1++;
-			}
+			buff1 = (char *) skip_whitespace(buff1);
 
 			if (*buff1 == NUMBER_TOKEN)
 			{
@@ -2171,10 +2162,7 @@ void parse_range(char **name, dbref *low_bound, dbref *high_bound)
 			*high_bound = mushstate.db_top - 1;
 		}
 
-		while (*buff2 && isspace(*buff2))
-		{
-			buff2++;
-		}
+		buff2 = (char *) skip_whitespace(buff2);
 
 		if (*buff2 == NUMBER_TOKEN)
 		{

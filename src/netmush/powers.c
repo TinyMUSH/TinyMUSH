@@ -281,19 +281,13 @@ POWERENT *find_power(dbref thing __attribute__((unused)), const char *powername)
     }
 
     /* Skip leading whitespace */
-    while (*powername && isspace((unsigned char)*powername))
-    {
-        powername++;
-    }
+    powername = skip_whitespace(powername);
 
     /* Tolerate a leading negation/plus sign if passed inadvertently */
     if (*powername == '!' || *powername == '+')
     {
         powername++;
-        while (*powername && isspace((unsigned char)*powername))
-        {
-            powername++;
-        }
+        powername = skip_whitespace(powername);
     }
 
     /* Copy until delimiter or NUL, guarding against overflow */
@@ -377,10 +371,7 @@ void power_set(dbref target, dbref player, char *power, int key)
      */
     negate = 0;
 
-    while (*power && isspace((unsigned char)*power))
-    {
-        power++;
-    }
+    power = (char *) skip_whitespace(power);
 
     if (*power == '!')
     {
@@ -388,10 +379,7 @@ void power_set(dbref target, dbref player, char *power, int key)
         power++;
     }
 
-    while (*power && isspace((unsigned char)*power))
-    {
-        power++;
-    }
+    power = (char *) skip_whitespace(power);
 
     /* Early exit: ensure a power name was specified after trimming */
     if (*power == '\0')

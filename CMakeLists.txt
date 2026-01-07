@@ -13,6 +13,9 @@ set(MAX_ITER_NESTING 1024)
 # Number of env vars (%0 et al)
 set(NUM_ENV_VARS 10)
 
+# Maximum parse depth to prevent stack overflow
+set(MAX_BOOLEXP_PARSE_DEPTH 100)
+
 ###############################################################################
 # Project configuration
 #

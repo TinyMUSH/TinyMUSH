@@ -1358,10 +1358,7 @@ int cf_ntab_access(int *vp, char *str, long extra, dbref player, char *cmd)
         *ap++ = '\0';
     }
 
-    while (*ap && isspace(*ap))
-    {
-        ap++;
-    }
+    ap = (char *) skip_whitespace(ap);
 
     for (np = (NAMETAB *)vp; np->name; np++)
     {

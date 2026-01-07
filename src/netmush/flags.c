@@ -544,10 +544,7 @@ void flag_set(dbref target, dbref player, char *flag, int key)
 
     negate = 0;
 
-    while (*flag && isspace(*flag))
-    {
-        flag++;
-    }
+    flag = (char *) skip_whitespace(flag);
 
     if (*flag == '!')
     {
@@ -555,10 +552,7 @@ void flag_set(dbref target, dbref player, char *flag, int key)
         flag++;
     }
 
-    while (*flag && isspace(*flag))
-    {
-        flag++;
-    }
+    flag = (char *) skip_whitespace(flag);
 
     /**
      * Make sure a flag name was specified

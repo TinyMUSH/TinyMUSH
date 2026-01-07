@@ -1092,10 +1092,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 * Eat leading whitespace, and space-compress if configured
 	 *
 	 */
-	while (*command && isspace(*command))
-	{
-		command++;
-	}
+	command = (char *) skip_whitespace(command);
 
 	XSTRCPY(preserve_cmd, command);
 	mushstate.debug_cmd = command;
@@ -1310,10 +1307,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	*q++ = '\0';
 
-	while (*p && isspace(*p))
-	{
-		p++;
-	}
+	p = (char *) skip_whitespace(p);
 
 	arg = p;
 
@@ -2216,10 +2210,7 @@ int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref play
 			*ap++ = '\0';
 		}
 
-		while (*ap && isspace(*ap))
-		{
-			ap++;
-		}
+		ap = (char *) skip_whitespace(ap);
 	}
 
 	cmdp = (CMDENT *)hashfind(str, &mushstate.command_htab);
