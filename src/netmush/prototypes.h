@@ -78,27 +78,15 @@ extern const char *skip_whitespace(const char *pBuf);
 extern BOOLEXP *parse_boolexp(dbref player, const char *buf, _Bool internal);
 
 /* bsd.c */
-extern MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr);
-extern void *dnsResolver(void *args);
-extern void check_dnsResolver_status(dbref player, dbref cause, int key);
-extern int make_socket(int port);
 extern void shovechars(int port);
-extern DESC *new_connection(int sock);
 extern char *connReasons(int reason);
 extern char *connMessages(int reason);
 extern void shutdownsock(DESC *d, int reason);
-extern void make_nonblocking(int s);
-extern DESC *initializesock(int s, struct sockaddr_in *a);
 extern int process_output(DESC *d);
-extern int process_input(DESC *d);
 extern void close_sockets(int emergency, char *message);
-extern void emergency_shutdown(void);
 extern void report(void);
-extern void sighandler(int sig);
 extern void set_signals(void);
-extern void unset_signals(void);
-extern void check_panicking(int sig);
-extern void log_signal(const char *signame);
+extern void check_dnsResolver_status(dbref player, dbref cause, int key);
 
 /* command.c */
 extern void init_cmdtab(void);
