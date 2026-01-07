@@ -2,7 +2,7 @@ name: Regression Test (Ubuntu)
 
 on:
   workflow_run:
-    workflows: ["Build (Ubuntu)"]
+    workflows: ["Build Test (Ubuntu)"]
     types: [completed]
 
 permissions:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   list-tests:
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -18,6 +19,7 @@ jobs:
       - id: set-matrix
         run: echo "matrix=$(ls scripts/*.conf | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
   regression-test:
+    if: github.event.workflow_run.conclusion == 'success'
     name: Regression
     needs: list-tests
     runs-on: ubuntu-latest
