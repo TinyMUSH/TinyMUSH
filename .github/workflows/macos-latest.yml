@@ -1,4 +1,4 @@
-name: Build Test (MacOS Latest)
+name: Build (MacOS)
 
 on:
   push:
