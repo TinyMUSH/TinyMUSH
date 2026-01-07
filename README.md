@@ -1,9 +1,10 @@
 |Build status|
 |------------|
-|[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/ubuntu-latest.yml)|
-|[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/macos-latest.yml)|
-|[![Build Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/Doxygen.yml)|
-|[![CodeQL Status](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/codeql.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/security/code-scanning)|
+|[![Build (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml)|
+|[![Build (macOS)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml)|
+|[![Regression Test (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml)|
+|[![Doxygen](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml)|
+|[![CodeQL](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml)|
 
 - [TinyMUSH 4](#tinymush-4)
   - [Introduction](#introduction)
