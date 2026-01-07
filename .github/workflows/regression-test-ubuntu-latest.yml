@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   list-tests:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: read
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -48,6 +48,8 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path: game/
     - name: run test suite
+      id: test
+      continue-on-error: true
       env:
         TINY_CONFIG_FILE: ${{ github.workspace }}/${{ matrix.testfile }}
       shell: bash
@@ -56,3 +58,68 @@ jobs:
         chmod +x netmush
         ./netmush -m
         $GITHUB_WORKSPACE/scripts/regression_test.py --auto-shutdown
+    - name: Save test result
+      if: always()
+      run: |
+        TEST_NAME=$(basename "${{ matrix.testfile }}" .conf)
+        mkdir -p results
+        echo "${{ steps.test.outcome }}" > "results/${TEST_NAME}.txt"
+    - name: Upload test result
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: result-$(basename "${{ matrix.testfile }}" .conf)
+        path: results/*.txt
+  
+  update-summary:
+    needs: regression-test
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: gh-pages
+    - name: Download all test results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: result-*
+        path: results/
+        merge-multiple: true
+    - name: Generate summary badge
+      run: |
+        # Count test results
+        TOTAL=$(find results -name "*.txt" | wc -l)
+        PASSED=$(grep -l "success" results/*.txt 2>/dev/null | wc -l || echo 0)
+        FAILED=$((TOTAL - PASSED))
+        
+        # Determine badge color
+        if [ $FAILED -eq 0 ]; then
+          COLOR="brightgreen"
+          MESSAGE="${PASSED}%20passed"
+        else
+          COLOR="yellow"
+          MESSAGE="${PASSED}%2F${TOTAL}%20passed"
+        fi
+        
+        # Generate badge
+        mkdir -p badges
+        curl -s "https://img.shields.io/badge/tests-${MESSAGE}-${COLOR}" > badges/regression-summary.svg
+        
+        # Create JSON with details
+        cat > badges/regression-stats.json <<EOF
+        {
+          "total": ${TOTAL},
+          "passed": ${PASSED},
+          "failed": ${FAILED},
+          "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        }
+        EOF
+    - name: Commit summary badge
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add badges/regression-summary.svg badges/regression-stats.json || true
+        git commit -m "Update regression test summary badge" || true
+        git push || true

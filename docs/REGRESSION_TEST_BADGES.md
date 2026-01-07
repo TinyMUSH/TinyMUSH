@@ -4,7 +4,7 @@ Ce document explique comment les badges pour les tests de régression sont gén�
 
 ## Vue d'ensemble
 
-Le workflow GitHub Actions [regression-test-ubuntu-latest.yml](../.github/workflows/regression-test-ubuntu-latest.yml) exécute automatiquement tous les fichiers de test de régression (`.conf`) dans le dossier `scripts/`. Un badge de résumé est généré et stocké dans la branche `badges` du dépôt.
+Le workflow GitHub Actions [regression-test-ubuntu-latest.yml](../.github/workflows/regression-test-ubuntu-latest.yml) exécute automatiquement tous les fichiers de test de régression (`.conf`) dans le dossier `scripts/`. Un badge de résumé est généré et stocké dans la branche `gh-pages` du dépôt.
 
 ## Badge de résumé
 
@@ -13,7 +13,7 @@ Le workflow GitHub Actions [regression-test-ubuntu-latest.yml](../.github/workfl
 Un badge de résumé global affiche le nombre total de tests qui passent:
 
 ```markdown
-![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/badges/badges/regression-summary.svg)
+![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-summary.svg)
 ```
 
 Ce badge est affiché dans le [README.md](../README.md) principal du projet.
@@ -33,7 +33,7 @@ Le badge est automatiquement mis à jour après chaque exécution du workflow de
 Un fichier JSON contenant les statistiques détaillées est également généré et disponible à:
 
 ```
-https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/badges/badges/regression-stats.json
+https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-stats.json
 ```
 
 ### Format du fichier JSON
@@ -73,27 +73,50 @@ Découvre automatiquement tous les fichiers `.conf` dans le dossier `scripts/`.
 - Crée le fichier JSON de statistiques
 - Commite les fichiers dans la branche `badges`
 
-## Structure de la branche badges
+## Structure de la branche gh-pages
 
 ```
-badges/
-├── README.md
-├── regression-summary.svg    # Badge de résumé
-└── regression-stats.json     # Statistiques détaillées
+gh-pages/
+├── badges/
+│   ├── regression-summary.svg    # Badge de résumé
+│   └── regression-stats.json     # Statistiques détaillées
+└── ... (autres contenus GitHub Pages)
 ```
 
-## Création initiale de la branche badges
+## Utilisation de gh-pages
 
-Si la branche `badges` n'existe pas encore, créez-la:
+La branche `gh-pages` est utilisée pour GitHub Pages et héberge également les badges de tests. Cette approche présente plusieurs avantages:
+
+- **Standardisation**: `gh-pages` est une branche standard pour les projets GitHub
+- **Intégration**: Si vous avez déjà un site GitHub Pages, les badges sont au même endroit
+- **URLs stables**: Les URLs des badges restent cohérentes avec votre documentation
+- **Pas de pollution**: Le code principal reste propre
+
+## Configuration initiale de gh-pages
+
+Si la branche `gh-pages` n'existe pas encore, créez-la:
 
 ```bash
-git checkout --orphan badges
+git checkout --orphan gh-pages
 git rm -rf .
 mkdir badges
-echo "# Regression Test Badges" > README.md
-git add README.md
-git commit -m "Initialize badges branch"
-git push origin badges
+echo "# TinyMUSH GitHub Pages" > index.html
+echo "<h1>TinyMUSH</h1>" >> index.html
+echo "<p>See <a href='https://github.com/TinyMUSH/TinyMUSH'>main repository</a></p>" >> index.html
+git add index.html
+git commit -m "Initialize gh-pages"
+git push origin gh-pages
+git checkout master
+```
+
+Si `gh-pages` existe déjà (par exemple pour Doxygen), créez simplement le dossier `badges/`:
+
+```bash
+git checkout gh-pages
+mkdir -p badges
+git add badges/
+git commit -m "Add badges directory for regression test badges"
+git push
 git checkout master
 ```
 
@@ -107,7 +130,7 @@ Le badge est déjà intégré dans le README principal:
 |[![Build (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-ubuntu-latest.yml)|
 |[![Build (macOS)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/build-test-macos-latest.yml)|
 |[![Regression Test (Ubuntu)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/regression-test-ubuntu-latest.yml)|
-|![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/badges/badges/regression-summary.svg)|
+|![Regression Tests](https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-summary.svg)|
 |[![Doxygen](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-doxygen.yml)|
 |[![CodeQL](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml/badge.svg)](https://github.com/TinyMUSH/TinyMUSH/actions/workflows/update-codeql.yml)|
 ```
@@ -128,35 +151,35 @@ Pour implémenter les badges individuels, vous devrez étendre le workflow pour 
 
 ### Le badge n'apparaît pas
 
-1. Vérifiez que la branche `badges` existe:
+1. Vérifiez que la branche `gh-pages` existe:
    ```bash
-   git ls-remote --heads origin badges
+   git ls-remote --heads origin gh-pages
    ```
 
 2. Vérifiez que le workflow a été exécuté au moins une fois:
    - Allez sur Actions → Regression Test (Ubuntu)
    - Vérifiez qu'une exécution s'est terminée
 
-3. Vérifiez que le fichier badge existe dans la branche `badges`:
+3. Vérifiez que le fichier badge existe dans la branche `gh-pages`:
    ```bash
-   git checkout badges
+   git checkout gh-pages
    ls -la badges/
    git checkout master
    ```
 
 ### Le badge affiche une erreur 404
 
-L'URL du badge doit pointer vers la branche `badges`:
+L'URL du badge doit pointer vers la branche `gh-pages`:
 ```
-https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/badges/badges/regression-summary.svg
-                                                      ^^^^^^
+https://raw.githubusercontent.com/TinyMUSH/TinyMUSH/gh-pages/badges/regression-summary.svg
+                                                      ^^^^^^^^
                                                       nom de la branche
 ```
 
 ### Les statistiques ne se mettent pas à jour
 
 Vérifiez les permissions du workflow:
-- Le workflow doit avoir `contents: write` pour pouvoir pousser vers la branche `badges`
+- Le workflow doit avoir `contents: write` pour pouvoir pousser vers la branche `gh-pages`
 - Vérifiez dans Settings → Actions → General → Workflow permissions
 
 ## Améliorations futures
