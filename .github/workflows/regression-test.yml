@@ -2,7 +2,7 @@ name: Regression Test (Ubuntu)
 
 on:
   workflow_run:
-    workflows: ["Build Test (Ubuntu)"]
+    workflows: ["Build (Ubuntu)"]
     types: [completed]
 
 permissions:
