@@ -3557,9 +3557,14 @@ void print_memory(dbref player, const char *item, size_t size)
 }
 
 /**
- * @brief Breaks down memory usage of the process
+ * @brief Report a breakdown of in-memory structures used by the process.
  *
- * @param player DBref of player
+ * Walks key runtime data structures (objects, tables, caches, hash tables,
+ * user vars, grids, structures) and emits a per-category size line plus a
+ * final total. Sizes are computed in bytes and formatted via `print_memory()`
+ * using binary units (B/KiB/MiB/GiB).
+ *
+ * @param player Database reference of the viewer
  */
 void list_memory(dbref player)
 {
@@ -3635,7 +3640,7 @@ void list_memory(dbref player)
 		while (htab != NULL)
 		{
 			each += sizeof(HASHENT);
-			each += strlen(mushstate.command_htab.entry[i]->target.s) + 1;
+			each += strlen(htab->target.s) + 1; /* Use the current entry, not the bucket head. */
 
 			/* Add up all the little bits in the CMDENT. */
 
@@ -3949,7 +3954,7 @@ void list_memory(dbref player)
 
 	if (each)
 	{
-		raw_notify(player, "X-Variables      : %12.2fk", each / 1024);
+		print_memory(player, "X-Variables", each);
 	}
 
 	total += each;
@@ -4005,17 +4010,44 @@ void list_memory(dbref player)
 }
 
 /**
- * @brief List information stored in internal structures.
+ * @brief Dispatch @list to the appropriate reporting helper.
  *
- * @param player	DBref of player
- * @param cause		DBref of cause
- * @param extra		Not used.
- * @param arg		Arguments
+ * Resolves the user's argument against `list_names` via `search_nametab()` and
+ * invokes the matching reporting routine (allocator stats, hash tables, params,
+ * memory, etc.). When the argument is missing or unknown, it shows the valid
+ * options; if the player lacks permission for a matched entry, it reports that
+ * explicitly. The `cause` and `extra` parameters are currently unused but kept
+ * for call-signature compatibility with the command dispatcher.
+ *
+ * @param player Database reference of the viewer
+ * @param cause  Unused command cause (retained for interface compatibility)
+ * @param extra  Unused extra argument
+ * @param arg    Subcommand to dispatch (matches entries in `list_names`)
  */
 void do_list(dbref player, dbref cause, int extra, char *arg)
 {
-	int flagvalue = search_nametab(player, list_names, arg);
+	/* Resolve the subcommand; show choices on missing/unknown input. */
+	if (!arg || !*arg)
+	{
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
+		return;
+	}
 
+	const int flagvalue = search_nametab(player, list_names, arg);
+
+	if (flagvalue == -2)
+	{
+		notify(player, "Permission denied.");
+		return;
+	}
+
+	if (flagvalue < 0)
+	{
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
+		return;
+	}
+
+	/* Dispatch to the specific listing helper. */
 	switch (flagvalue)
 	{
 	case LIST_ALLOCATOR:
@@ -4099,6 +4131,7 @@ void do_list(dbref player, dbref cause, int extra, char *arg)
 		break;
 
 	case LIST_LOGGING:
+		/* Two tables: event toggles, then data toggles. */
 		interp_nametab(player, logoptions_nametab, mushconf.log_options, (char *)"Events Logged", (char *)"Status", (char *)"enabled", (char *)"disabled", true);
 		notify(player, "");
 		interp_nametab(player, logdata_nametab, mushconf.log_info, (char *)"Information Type", (char *)"Logged", (char *)"yes", (char *)"no", true);
