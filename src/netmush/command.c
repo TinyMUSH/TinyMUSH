@@ -52,16 +52,16 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp; /*!< Commonly u
  *
  * This function performs a complete initialization of the MUSH command system by:
  * 1. Creating the command hash table with appropriate sizing based on configuration
- * 2. Generating attribute-setter commands (@name, @desc, etc.) from the attribute table
+ * 2. Generating attribute-setter commands (\@name, \@desc, etc.) from the attribute table
  * 3. Registering all builtin commands from the static command_table
  * 4. Setting up prefix command dispatch array for single-character command leaders
  * 5. Caching frequently-used command pointers for performance optimization
  *
  * Each attribute-setter command is dynamically allocated and configured with:
- * - Lowercased "@attribute" naming convention
+ * - Lowercased "\@attribute" naming convention
  * - Standard permission mask (no guests/slaves, wizard-only if attribute requires it)
  * - CS_TWO_ARG calling sequence (command arg1=arg2)
- * - Double-underscore alias (__@name) for programmatic access
+ * - Double-underscore alias (__\@name) for programmatic access
  *
  * Builtin commands are registered directly from command_table with their aliases.
  * Prefix commands (:, ;, #, &, ", \) enable single-character command dispatch.
@@ -117,7 +117,7 @@ void init_cmdtab(void)
 
 		/* Configure command entry for attribute setting */
 		cp->extra = ap->number;	  /* Store attribute number for handler */
-		cp->callseq = CS_TWO_ARG; /* Standard <cmd> <obj>=<value> format */
+		cp->callseq = CS_TWO_ARG; /* Standard cmd obj=value format */
 		cp->pre_hook = NULL;
 		cp->post_hook = NULL;
 		cp->userperms = NULL;
@@ -807,11 +807,11 @@ bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
  *
  * **Command Dispatch (by calling sequence):**
  * - **CS_NO_ARGS**: Commands with no arguments (e.g., WHO, QUIT)
- * - **CS_ONE_ARG**: Single-argument commands (e.g., LOOK <object>)
+ * - **CS_ONE_ARG**: Single-argument commands (e.g., LOOK object)
  *   - CS_UNPARSE: Pass raw command text without parsing
- *   - CS_ADDED: Dynamic softcode commands (user-defined via @addcommand)
+ *   - CS_ADDED: Dynamic softcode commands (user-defined via \@addcommand)
  *   - CS_CMDARG: Pass original command args (%0-%9) to handler
- * - **CS_TWO_ARG**: Two-argument commands with = separator (e.g., @name obj=value)
+ * - **CS_TWO_ARG**: Two-argument commands with = separator (e.g., \@name obj=value)
  *   - CS_ARGV: Parse arg2 as space-separated list
  *   - CS_CMDARG: Pass original command args to handler
  *
@@ -820,11 +820,11 @@ bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
  * - Post-hook: Executed after command handler (achievement tracking, notifications)
  *
  * **Dynamic Command Handling (CS_ADDED):**
- * For @addcommand-registered softcode commands:
+ * For \@addcommand-registered softcode commands:
  * - Reconstructs command with switches
  * - Matches against wildcard/regex patterns in attributes
  * - Executes matching attribute softcode
- * - Handles multiple matches and @addcommand_obey_stop setting
+ * - Handles multiple matches and \@addcommand_obey_stop setting
  * - Preserves/restores global registers during execution
  *
  * @param cmdp        Pointer to command entry containing handler, switches, and metadata
@@ -842,7 +842,7 @@ bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
  *       Callers should pass copies if they need to preserve the original strings.
  *
  * @note For CS_ADDED commands, this function may execute multiple attribute matches
- *       depending on @addcommand_match_blindly and @addcommand_obey_stop settings.
+ *       depending on \@addcommand_match_blindly and \@addcommand_obey_stop settings.
  *
  * @warning Command handlers are called with cause as both the enactor and executor
  *          for evaluation context. This is intentional for maintaining causality chains.
@@ -1039,7 +1039,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 		else if (cmdp->callseq & CS_ADDED)
 		{
-			/* Handle dynamic softcode commands registered via @addcommand */
+			/* Handle dynamic softcode commands registered via \@addcommand */
 			preserve = save_global_regs("process_cmdent_added");
 
 			/* Determine where command arguments start (skip prefix/command name) */
@@ -1190,7 +1190,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 		break;
 
-	case CS_TWO_ARG: /* Commands with two arguments: <cmd> <arg1>=<arg2> */
+	case CS_TWO_ARG: /* Commands with two arguments: cmd arg1=arg2 */
 		/* Parse and interpret first argument (before '=') */
 		buf2 = parse_to(&arg, '=', EV_STRIP_TS);
 
@@ -1563,7 +1563,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				 * We also need to directly find what the pointer for the move
 				 * (goto) command is, since we could have \@addcommand'd it
 				 * (and probably did, if this conf option is on). Finally, we've
-				 * got to make this look like we really did type 'goto <exit>',
+				 * got to make this look like we really did type 'goto exit',
 				 * or the \@addcommand will just skip over the string.
 				 */
 				cmdp = (CMDENT *)hashfind("goto", &mushstate.command_htab);
@@ -2390,7 +2390,7 @@ void list_cmdaccess(dbref player)
 		XFREE(p);
 	}
 
-	/* Attribute-setter commands ("@name", "@desc", etc.) */
+	/* Attribute-setter commands ("\@name", "\@desc", etc.) */
 	for (ap = attr; ap->name; ap++)
 	{
 		if (ap->flags & AF_NOCMD)
@@ -2638,7 +2638,7 @@ int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @brief Apply a permission change to every attribute-setter command.
  *
  * Iterates all defined attributes, derives their setter command name (e.g.,
- * "@name"), and applies the requested bitmask change to each matching
+ * "\@name"), and applies the requested bitmask change to each matching
  * command's permissions. If any update fails, the first failed command is
  * restored to its original permissions and the function returns -1.
  *
@@ -2847,7 +2847,7 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 	if (alias[0] == '_' && alias[1] == '_')
 	{
-		cf_log(player, "CNF", "SYNTX", cmd, "Alias %s would cause @addcommand conflict", alias);
+		cf_log(player, "CNF", "SYNTX", cmd, "Alias %s would cause \@addcommand conflict", alias);
 		return -1;
 	}
 
@@ -4010,7 +4010,7 @@ void list_memory(dbref player)
 }
 
 /**
- * @brief Dispatch @list to the appropriate reporting helper.
+ * @brief Dispatch \@list to the appropriate reporting helper.
  *
  * Parses the subcommand from arg, resolves it against list_names with
  * search_nametab(), and invokes the matching reporting routine (allocator
