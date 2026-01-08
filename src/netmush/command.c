@@ -1295,15 +1295,59 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 }
 
 /**
- * @brief Execute a command.
+ * @brief Parse, normalize, resolve, and dispatch a raw command string.
  *
- * @param player		DBref of player doing the command
- * @param cause			DBref of what caused the action
- * @param interactive	Is the command interractive?
- * @param command		Command
- * @param args			Arguments
- * @param nargs			Number of arguments
- * @return char*
+ * This is the high-level entrypoint for command execution. It receives the
+ * raw input line, performs normalization and logging, lets modules intercept
+ * the command, resolves quick lead-in commands and special cases (like HOME
+ * and exits/goto), looks up builtins and aliases, then delegates execution to
+ * `process_cmdent()` for the matched command entry.
+ *
+ * Responsibilities (execution flow):
+ * - Input guardrails and player validation (halted/going objects)
+ * - Logging of user input, including suspect logging and optional God monitor
+ * - Whitespace normalization and optional space compression
+ * - Module interception via `MODULE.process_command` (early consume/transform)
+ * - Single-character lead-in dispatch (fast path via `prefix_cmds`)
+ * - Special command: `home` movement (outside the regular table)
+ * - Exit matching and `goto` permission check for room navigation
+ * - Builtin command/alias resolution from `command_htab`
+ * - Alias evaluation (softcode) to produce the final command tokens
+ * - Enter/leave alias handling based on player location
+ * - Delegation to `process_cmdent()` with parsed switches and arguments
+ *
+ * Parameters:
+ * - player: DBref du joueur qui exécute la commande (enactor)
+ * - cause:  DBref de l'entité qui a causé l'exécution (souvent le joueur)
+ * - interactive: Vrai si la commande provient d'une entrée directe, faux si
+ *   issue de la file/trigger (affecte l'interprétation des arguments)
+ * - command: Chaîne brute saisie par l'utilisateur (sera normalisée)
+ * - args: Tableau d'arguments d'environnement (%0-%9) transmis en aval
+ * - nargs: Taille du tableau `args`
+ *
+ * Return value:
+ * - Retourne un pointeur vers une copie préservée de la chaîne de commande;
+ *   utilisée par l'infrastructure de debug et d'observabilité.
+ *
+ * Notes et interactions:
+ * - Réinitialise plusieurs compteurs/limites (fonctions, notifications, locks)
+ *   et bascule le `cputime_base` si la limite CPU des fonctions est active.
+ * - Les modules peuvent consommer la commande et empêcher l'exécution standard.
+ * - La commande `home` est gérée en dehors de la table de commandes.
+ * - Les hooks de mouvement associés à `internalgoto` sont déclenchés ailleurs
+ *   via `call_move_hook()`.
+ *
+ * Sécurité et permission:
+ * - Les vérifications de permission spécifiques à un builtin se font au moment
+ *   de la délégation dans `process_cmdent()`.
+ *
+ * @warning Les side-effects (journalisation, compteurs, reset de registres)
+ *          se produisent même si un module intercepte et consomme la commande.
+ *
+ * @see process_cmdent() pour la résolution des switches, l'interprétation des
+ *      arguments et l'invocation des hooks de commandes
+ * @see call_move_hook() pour les hooks de mouvement sur les transitions de
+ *      salle
  */
 char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
@@ -1424,6 +1468,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	}
 
 	/* Eat leading whitespace, and space-compress if configured */
+	/* Normaliser les espaces en tête; évite les "commandes vides" accidentelles */
 	command = (char *)skip_whitespace(command);
 
 	XSTRCPY(preserve_cmd, command);
@@ -1471,15 +1516,14 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	}
 
 	/*
-	 * Now comes the fun stuff.  First check for single-letter leadins.
-	 * We check these before checking HOME because they are among the most
-	 * frequently executed commands, and they can never be the HOME command.
+	 * Fast path: commandes à préfixe d’un caractère (lead-ins). On les traite
+	 * avant HOME car elles sont fréquentes et ne peuvent pas correspondre à HOME.
 	 */
-	i = command[0] & 0xff;
+	int leadin_index = command[0] & 0xff;
 
-	if ((prefix_cmds[i] != NULL) && command[0])
+	if ((prefix_cmds[leadin_index] != NULL) && command[0])
 	{
-		process_cmdent(prefix_cmds[i], NULL, player, cause, interactive, command, command, args, nargs);
+		process_cmdent(prefix_cmds[leadin_index], NULL, player, cause, interactive, command, command, args, nargs);
 		mushstate.debug_cmd = cmdsave;
 		return preserve_cmd;
 	}
