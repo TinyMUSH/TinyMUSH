@@ -1448,10 +1448,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			}
 			else
 			{
-				/*
-				 * We have no pointer, we should have no flags.
-				 *
-				 */
+				/* We have no pointer, we should have no flags. */
 				s_Flags3(player, Flags3(player) & ~HAS_REDIRECT);
 			}
 		}
@@ -1836,10 +1833,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	if (Has_location(player) && Good_obj(Location(player)))
 	{
-		/*
-		 * 2.2 style location
-		 *
-		 */
+		/* 2.2 style location */
 		if (!succ && mushconf.local_masters)
 		{
 			pcount = 0;
@@ -1857,24 +1851,15 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			}
 		}
 
-		/*
-		 * MUX style location
-		 *
-		 */
+		/* MUX style location */
 		if ((!succ) && mushconf.have_zones && (Zone(Location(player)) != NOTHING))
 		{
 			if (Typeof(Zone(Location(player))) == TYPE_ROOM)
 			{
-				/*
-				 * zone of player's location is a parent room
-				 *
-				 */
+				/* zone of player's location is a parent room */
 				if (Location(player) != Zone(player))
 				{
-					/*
-					 * check parent room exits
-					 *
-					 */
+					/* check parent room exits */
 					init_match_check_keys(player, command, TYPE_EXIT);
 					match_zone_exit();
 					exit = last_match_result();
@@ -1922,10 +1907,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 				}
 			}
 			else
-				/*
-				 * try matching commands on area zone object
-				 *
-				 */
+				/* try matching commands on area zone object */
 				if (!got_stop && !succ && mushconf.have_zones && (Zone(Location(player)) != NOTHING))
 				{
 					succ += atr_match(Zone(Location(player)), player, AMATCH_CMD, lcbuf, preserve_cmd, 1);
@@ -1933,10 +1915,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 	}
 
-	/*
-	 * 2.2 style player
-	 *
-	 */
+	/* 2.2 style player */
 	if (!succ && mushconf.local_masters)
 	{
 		parent = Parent(player);
@@ -1970,10 +1949,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		succ += atr_match(Zone(player), player, AMATCH_CMD, lcbuf, preserve_cmd, 1);
 	}
 
-	/*
-	 * If we didn't find anything, try in the master room
-	 *
-	 */
+	/* If we didn't find anything, try in the master room */
 	if (!got_stop && !succ)
 	{
 		if (Good_loc(mushconf.master_room))
@@ -2005,10 +1981,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	XFREE(lcbuf);
 
-	/*
-	 * If we still didn't find anything, tell how to get help.
-	 *
-	 */
+	/* If we still didn't find anything, tell how to get help. */
 	if (!succ)
 	{
 		notify(player, mushconf.huh_msg);
@@ -2738,10 +2711,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 
 	if (!orig)
 	{
-		/*
-		 * we only got one argument to \@alias. Bad.
-		 *
-		 */
+		/* we only got one argument to \@alias. Bad. */
 		cf_log(player, "CNF", "SYNTX", cmd, "Invalid original for alias %s", alias);
 		return -1;
 	}
@@ -2762,10 +2732,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		 * command + a switch
 		 */
 		*ap++ = '\0';
-		/*
-		 * Look up the command
-		 *
-		 */
+		/* Look up the command */
 		cmdp = (CMDENT *)hashfind(orig, (HASHTAB *)vp);
 
 		if (cmdp == NULL)
@@ -2773,10 +2740,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", str);
 			return -1;
 		}
-		/*
-		 * Look up the switch
-		 *
-		 */
+		/* Look up the switch */
 		nt = find_nametab_ent(player, (NAMETAB *)cmdp->switches, ap);
 
 		if (!nt)
@@ -2784,10 +2748,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Switch", str);
 			return -1;
 		}
-		/*
-		 * Got it, create the new command table entry
-		 *
-		 */
+		/* Got it, create the new command table entry */
 		cmd2 = (CMDENT *)XMALLOC(sizeof(CMDENT), "cmd2");
 		cmd2->cmdname = XSTRDUP(alias, "cmd2->cmdname");
 		cmd2->switches = cmdp->switches;
@@ -2824,10 +2785,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 	}
 	else
 	{
-		/*
-		 * A normal (non-switch) alias
-		 *
-		 */
+		/* A normal (non-switch) alias */
 		hp = hashfind(orig, (HASHTAB *)vp);
 
 		if (hp == NULL)
@@ -3403,10 +3361,7 @@ void list_memory(dbref player)
 			each += sizeof(HASHENT);
 			each += strlen(mushstate.command_htab.entry[i]->target.s) + 1;
 
-			/*
-			 * Add up all the little bits in the CMDENT.
-			 *
-			 */
+			/* Add up all the little bits in the CMDENT. */
 
 			if (!(htab->flags & HASH_ALIAS))
 			{
