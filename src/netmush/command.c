@@ -553,7 +553,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
  * @see process_cmdent() for hook invocation during command execution
  * @see HOOKENT structure for hook registration interface
  */
-void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause __attribute__((unused)), char *cargs[], int ncargs)
+void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause , char *cargs[], int ncargs)
 {
 	char *buf = NULL, *bp = NULL, *tstr = NULL, *str = NULL;
 	int aflags = 0, alen = 0;
@@ -2571,233 +2571,279 @@ void list_attrtypes(dbref player)
 }
 
 /**
- * @brief Change command or switch permissions.
+ * @brief Update permissions on a command or one of its switches.
  *
- * @param vp		Unused
- * @param str		Command or switch name
- * @param extra		Extra data
- * @param player	Player making the change
- * @param cmd		Command name
- * @return int		Status code
+ * Accepts a token of the form "command" or "command/switch", looks up the
+ * command in the global hash, and applies `cf_modify_bits()` (for commands)
+ * or `cf_ntab_access()` (for switches). Missing commands are logged.
+ *
+ * @param vp     Unused
+ * @param str    Command name, optionally suffixed with "/switch"
+ * @param extra  Bitmask operation selector
+ * @param player DBref requesting the change
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
  */
-int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
+int cf_access(int *vp , char *str, long extra, dbref player, char *cmd)
 {
-	CMDENT *cmdp = NULL;
-	char *ap = NULL;
+	if (!str || !*str)
+	{
+		cf_log(player, "CNF", "SYNTX", cmd, "No command name provided");
+		return -1;
+	}
+
+	char *ap = str;
 	int set_switch = 0;
 
-	for (ap = str; *ap && !isspace(*ap) && (*ap != '/'); ap++)
-		;
+	/* Split on whitespace or '/'; the command token ends there. */
+	while (*ap && !isspace(*ap) && (*ap != '/'))
+	{
+		ap++;
+	}
 
 	if (*ap == '/')
 	{
 		set_switch = 1;
-		*ap++ = '\0';
+		*ap++ = '\0'; /* Terminate the command portion */
 	}
 	else
 	{
-		set_switch = 0;
-
 		if (*ap)
 		{
-			*ap++ = '\0';
+			*ap++ = '\0'; /* Trim trailing token separator */
 		}
-
-		ap = (char *)skip_whitespace(ap);
 	}
 
-	cmdp = (CMDENT *)hashfind(str, &mushstate.command_htab);
+	/* Skip any whitespace before the switch/permission string */
+	ap = (char *)skip_whitespace(ap);
 
-	if (cmdp != NULL)
-	{
-		if (set_switch)
-			return cf_ntab_access((int *)cmdp->switches, ap, extra, player, cmd);
-		else
-			return cf_modify_bits(&(cmdp->perms), ap, extra, player, cmd);
-	}
-	else
+	CMDENT *cmdp = (CMDENT *)hashfind(str, &mushstate.command_htab);
+
+	if (!cmdp)
 	{
 		cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", str);
 		return -1;
 	}
+
+	if (set_switch)
+	{
+		/* Apply permissions to a specific switch entry */
+		return cf_ntab_access((int *)cmdp->switches, ap, extra, player, cmd);
+	}
+
+	/* Apply permissions to the command itself */
+	return cf_modify_bits(&(cmdp->perms), ap, extra, player, cmd);
 }
 
 /**
- * @brief Change command permissions for all attr-setting cmds.
+ * @brief Apply a permission change to every attribute-setter command.
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return int
+ * Iterates all defined attributes, derives their setter command name (e.g.,
+ * "@name"), and applies the requested bitmask change to each matching
+ * command's permissions. If any update fails, the first failed command is
+ * restored to its original permissions and the function returns -1.
+ *
+ * @param vp     Unused
+ * @param str    Permission string to apply (cf_modify_bits syntax)
+ * @param extra  Bitmask operation selector
+ * @param player DBref requesting the change
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
  */
-int cf_acmd_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
+int cf_acmd_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-	CMDENT *cmdp = NULL;
-	ATTR *ap = NULL;
-	int failure = 0, save = 0;
-	char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
-
-	for (ap = attr; ap->name; ap++)
+	if (!str || !*str)
 	{
-		p = buff;
+		cf_log(player, "CNF", "SYNTX", cmd, "No permission string provided");
+		return -1;
+	}
+
+	char buff[SBUF_SIZE];
+
+	for (ATTR *ap = attr; ap->name; ap++)
+	{
+		/* Build the setter command name: "@" + lowercase attribute name */
+		char *p = buff;
 		*p++ = '@';
 
-		for (q = (char *)ap->name; *q; p++, q++)
+		for (char *q = (char *)ap->name; *q && (p < (buff + SBUF_SIZE - 1)); p++, q++)
 		{
 			*p = tolower(*q);
 		}
 
 		*p = '\0';
-		cmdp = (CMDENT *)hashfind(buff, &mushstate.command_htab);
 
-		if (cmdp != NULL)
+		CMDENT *cmdp = (CMDENT *)hashfind(buff, &mushstate.command_htab);
+
+		if (!cmdp)
 		{
-			save = cmdp->perms;
-			failure = cf_modify_bits(&(cmdp->perms), str, extra, player, cmd);
+			continue; /* Attribute has no associated command */
+		}
 
-			if (failure != 0)
-			{
-				cmdp->perms = save;
-				XFREE(buff);
-				return -1;
-			}
+		int save = cmdp->perms;
+		int failure = cf_modify_bits(&(cmdp->perms), str, extra, player, cmd);
+
+		if (failure != 0)
+		{
+			/* Revert on first failure to avoid partial updates */
+			cmdp->perms = save;
+			return -1;
 		}
 	}
 
-	XFREE(buff);
 	return 0;
 }
 
 /**
- * @brief Change access on an attribute.
+ * @brief Modify the access flags of a specific attribute.
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return int
+ * Parses "name perms" where `name` is the attribute to adjust and `perms`
+ * follows `cf_modify_bits()` syntax. Looks up the attribute by name and
+ * applies the requested bitmask change; logs an error if the attribute is
+ * unknown.
+ *
+ * @param vp     Unused
+ * @param str    Attribute name followed by a permission string
+ * @param extra  Bitmask operation selector
+ * @param player DBref requesting the change
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
  */
-int cf_attr_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
+int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-	ATTR *ap = NULL;
-	char *sp = NULL;
+	if (!str || !*str)
+	{
+		cf_log(player, "CNF", "SYNTX", cmd, "No attribute name provided");
+		return -1;
+	}
 
-	for (sp = str; *sp && !isspace(*sp); sp++)
-		;
+	/* Split into attribute name and permission string */
+	char *sp = str;
+	while (*sp && !isspace(*sp))
+	{
+		sp++;
+	}
 
 	if (*sp)
 	{
 		*sp++ = '\0';
 	}
 
-	while (*sp && isspace(*sp))
-	{
-		sp++;
-	}
+	sp = (char *)skip_whitespace(sp);
 
-	ap = atr_str(str);
+	ATTR *ap = atr_str(str);
 
-	if (ap != NULL)
-	{
-		return cf_modify_bits(&(ap->flags), sp, extra, player, cmd);
-	}
-	else
+	if (!ap)
 	{
 		cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Attribute", str);
 		return -1;
 	}
+
+	return cf_modify_bits(&(ap->flags), sp, extra, player, cmd);
 }
 
 /**
- * @brief Define attribute flags for new user-named attributes whose
- * names match a certain pattern.
+ * @brief Register wildcard attribute patterns and their default flags.
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return int
+ * Accepts "PATTERN privs" where PATTERN is uppercased and truncated to the
+ * maximum attribute name length, and `privs` is a cf_modify_bits() mask to
+ * apply when creating attributes that match the pattern. On success, the
+ * pattern is prepended to mushconf.vattr_flag_list so later lookups can
+ * inherit the configured flags.
+ *
+ * @param vp     Unused
+ * @param str    In-place buffer containing "PATTERN privs"
+ * @param extra  Bitmask operation selector
+ * @param player DBref requesting the change
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
  */
-int cf_attr_type(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
+int cf_attr_type(int *vp , char *str, long extra, dbref player, char *cmd)
 {
-	char *privs = NULL;
-	KEYLIST *kp = NULL;
-	int succ = 0;
+	if (!str || !*str)
+	{
+		cf_log(player, "CNF", "SYNTX", cmd, "No attribute pattern provided");
+		return -1;
+	}
 
-	/*
-	 * Split our string into the attribute pattern and privileges. Also
-	 * uppercase it, while we're at it. Make sure it's not longer than an
-	 * attribute name can be.
-	 *
-	 */
-	for (privs = str; *privs && !isspace(*privs); privs++)
+	char *privs = str;
+
+	/* Uppercase the pattern while scanning for the privilege string. */
+	while (*privs && !isspace(*privs))
 	{
 		*privs = toupper(*privs);
+		privs++;
 	}
 
 	if (*privs)
 	{
 		*privs++ = '\0';
+		privs = (char *)skip_whitespace(privs);
 	}
 
-	while (*privs && isspace(*privs))
+	if (!*privs)
 	{
-		privs++;
+		cf_log(player, "CNF", "SYNTX", cmd, "No privilege string provided for %s", str);
+		return -1;
 	}
 
+	/* Enforce maximum attribute-name length. */
 	if (strlen(str) >= VNAME_SIZE)
 	{
 		str[VNAME_SIZE - 1] = '\0';
 	}
 
-	/*
-	 * Create our new data blob. Make sure that we're setting the privs
-	 * to something reasonable before trying to link it in. (If we're
-	 * not, an error will have been logged; we don't need to do it.)
-	 */
-	kp = (KEYLIST *)XMALLOC(sizeof(KEYLIST), "kp");
-	kp->data = 0;
-	succ = cf_modify_bits(&(kp->data), privs, extra, player, cmd);
+	/* Evaluate privileges before allocating list node to avoid churn on failure. */
+	int data = 0;
+	int succ = cf_modify_bits(&data, privs, extra, player, cmd);
 
 	if (succ < 0)
 	{
-		XFREE(kp);
 		return -1;
 	}
 
+	KEYLIST *kp = (KEYLIST *)XMALLOC(sizeof(KEYLIST), "kp");
+	kp->data = data;
 	kp->name = XSTRDUP(str, "kp->name");
 	kp->next = mushconf.vattr_flag_list;
 	mushconf.vattr_flag_list = kp;
-	return (succ);
+	return succ;
 }
 
 /**
- * @brief Add a command alias.
+ * @brief Add a new alias for an existing command (optionally for a specific switch).
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return int
+ * Accepts two tokens in `str`: `alias` and `original[/switch]`. If a switch is
+ * provided, a new CMDENT is created that mirrors the original command and
+ * applies the switch's flags; otherwise an alias entry is inserted that points
+ * to the existing command.
+ *
+ * @param vp     Hash table of commands (treated as opaque by callers)
+ * @param str    Mutable buffer containing "alias original[/switch]"
+ * @param extra  Unused
+ * @param player DBref requesting the alias
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
  */
-int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+int cf_cmd_alias(int *vp, char *str, long extra , dbref player, char *cmd)
 {
+	UNUSED_PARAMETER(extra);
 
 	CMDENT *cmdp = NULL, *cmd2 = NULL;
 	NAMETAB *nt = NULL;
 	int *hp = NULL;
-	char *ap = NULL, *tokst = NULL;
+	char *tokst = NULL;
 	char *alias = strtok_r(str, " \t=,", &tokst);
 	char *orig = strtok_r(NULL, " \t=,", &tokst);
 
-	if (!orig)
+	if (!alias || !*alias)
 	{
-		/* we only got one argument to \@alias. Bad. */
+		cf_log(player, "CNF", "SYNTX", cmd, "No alias name provided");
+		return -1;
+	}
+
+	if (!orig || !*orig)
+	{
 		cf_log(player, "CNF", "SYNTX", cmd, "Invalid original for alias %s", alias);
 		return -1;
 	}
@@ -2808,33 +2854,27 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 		return -1;
 	}
 
-	for (ap = orig; *ap && (*ap != '/'); ap++)
-		;
+	char *slash = strchr(orig, '/');
 
-	if (*ap == '/')
+	if (slash)
 	{
-		/*
-		 * Switch form of command aliasing: create an alias for a
-		 * command + a switch
-		 */
-		*ap++ = '\0';
-		/* Look up the command */
-		cmdp = (CMDENT *)hashfind(orig, (HASHTAB *)vp);
+		/* Switch-specific alias: split the command/switch tokens. */
+		*slash++ = '\0';
 
-		if (cmdp == NULL)
+		cmdp = (CMDENT *)hashfind(orig, (HASHTAB *)vp);
+		if (!cmdp)
 		{
-			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", str);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Command", orig);
 			return -1;
 		}
-		/* Look up the switch */
-		nt = find_nametab_ent(player, (NAMETAB *)cmdp->switches, ap);
 
+		nt = find_nametab_ent(player, (NAMETAB *)cmdp->switches, slash);
 		if (!nt)
 		{
-			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Switch", str);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s/%s not found", "Switch", orig, slash);
 			return -1;
 		}
-		/* Got it, create the new command table entry */
+
 		cmd2 = (CMDENT *)XMALLOC(sizeof(CMDENT), "cmd2");
 		cmd2->cmdname = XSTRDUP(alias, "cmd2->cmdname");
 		cmd2->switches = cmdp->switches;
@@ -2848,16 +2888,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 
 		cmd2->callseq = cmdp->callseq;
 
-		/*
-		 * KNOWN PROBLEM: We are not inheriting the hook that the
-		 * 'original' command had -- we will have to add it manually
-		 * (whereas an alias of a non-switched command is just
-		 * another hashtable entry for the same command pointer and
-		 * therefore gets the hook). This is preferable to having to
-		 * search the hashtable for hooks when a hook is deleted,
-		 * though.
-		 *
-		 */
+		/* Hook pointers are intentionally not inherited; see note below. */
 		cmd2->pre_hook = NULL;
 		cmd2->post_hook = NULL;
 		cmd2->userperms = NULL;
@@ -2865,18 +2896,18 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 
 		if (hashadd(cmd2->cmdname, (int *)cmd2, (HASHTAB *)vp, 0))
 		{
+			/* Insertion failed, drop the allocated alias entry. */
 			XFREE(cmd2->cmdname);
 			XFREE(cmd2);
 		}
 	}
 	else
 	{
-		/* A normal (non-switch) alias */
+		/* Simple alias: point the new name at the existing command entry. */
 		hp = hashfind(orig, (HASHTAB *)vp);
-
-		if (hp == NULL)
+		if (!hp)
 		{
-			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Entry", str);
+			cf_log(player, "CNF", "NFND", cmd, "%s %s not found", "Entry", orig);
 			return -1;
 		}
 
@@ -2887,68 +2918,73 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 }
 
 /**
- * @brief List default flags at create time.
+ * @brief List the default flag sets applied when new objects are created.
  *
- * @param player DBref of player
+ * Decodes the configured default flags for each object type (player, room,
+ * exit, thing, robot, stripped) and emits a compact table showing what flags
+ * new instances receive.
+ *
+ * @param player DBref of the viewer (used for decode_flags visibility)
  */
 void list_df_flags(dbref player)
 {
-	char *playerb = decode_flags(player, mushconf.player_flags);
-	char *roomb = decode_flags(player, mushconf.room_flags);
-	char *exitb = decode_flags(player, mushconf.exit_flags);
-	char *thingb = decode_flags(player, mushconf.thing_flags);
-	char *robotb = decode_flags(player, mushconf.robot_flags);
-	char *stripb = decode_flags(player, mushconf.stripped_flags);
+	char *flags[6];
+	const char *labels[] = { "Players", "Rooms", "Exits", "Things", "Robots", "Stripped" };
+	const char *formats[] = { "P%s", "R%s", "E%s", "%s", "P%s", "%s" };
+
+	/* Decode defaults for each object category so we can present a concise table. */
+	flags[0] = decode_flags(player, mushconf.player_flags);
+	flags[1] = decode_flags(player, mushconf.room_flags);
+	flags[2] = decode_flags(player, mushconf.exit_flags);
+	flags[3] = decode_flags(player, mushconf.thing_flags);
+	flags[4] = decode_flags(player, mushconf.robot_flags);
+	flags[5] = decode_flags(player, mushconf.stripped_flags);
+
 	notify(player, "Type           Default flags");
 	notify(player, "-------------- ----------------------------------------------------------------");
-	raw_notify(player, "Players        P%s", playerb);
-	raw_notify(player, "Rooms          R%s", roomb);
-	raw_notify(player, "Exits          E%s", exitb);
-	raw_notify(player, "Things         %s", thingb);
-	raw_notify(player, "Robots         P%s", robotb);
-	raw_notify(player, "Stripped       %s", stripb);
+
+	for (int i = 0; i < 6; i++)
+	{
+		raw_notify(player, "%-14s %s", labels[i], tprintf(formats[i], flags[i]));
+	}
+
 	notify(player, "-------------------------------------------------------------------------------");
-	XFREE(playerb);
-	XFREE(roomb);
-	XFREE(exitb);
-	XFREE(thingb);
-	XFREE(robotb);
-	XFREE(stripb);
+
+	for (int i = 0; i < 6; i++)
+	{
+		XFREE(flags[i]);
+	}
 }
 
 /**
- * @brief List the costs of things.
+ * @brief List per-action creation/operation costs and related quotas.
  *
- * @param player DBref of player
+ * Emits a table of common game actions with their configured minimum/maximum
+ * costs and, when quotas are enabled, the associated quota consumption. Also
+ * shows search/queue costs, sacrifice value rules, and clone value policy.
+ *
+ * @param player DBref of the viewer (used for decode/visibility)
  */
 void list_costs(dbref player)
 {
-	char *buff = XMALLOC(MBUF_SIZE, "buff");
+	const bool show_quota = mushconf.quotas;
 
 	notify(player, "Action                                            Minimum   Maximum   Quota");
 	notify(player, "------------------------------------------------- --------- --------- ---------");
 
-	if (mushconf.quotas)
+	/* Basic creation costs (quota-aware). */
+	if (show_quota)
 	{
 		raw_notify(player, "%-49.49s %-9d           %-9d", "Digging Room", mushconf.digcost, mushconf.room_quota);
-	}
-	else
-	{
-		raw_notify(player, "%-49.49s %-9d", "Digging Room", mushconf.digcost);
-	}
-
-	if (mushconf.quotas)
-	{
 		raw_notify(player, "%-49.49s %-9d           %-9d", "Opening Exit", mushconf.opencost, mushconf.exit_quota);
 	}
 	else
 	{
+		raw_notify(player, "%-49.49s %-9d", "Digging Room", mushconf.digcost);
 		raw_notify(player, "%-49.49s %-9d", "Opening Exit", mushconf.opencost);
 	}
-
 	raw_notify(player, "%-49.49s %-9d", "Linking Exit or DropTo", mushconf.linkcost);
-
-	if (mushconf.quotas)
+	if (show_quota)
 	{
 		raw_notify(player, "%-49.49s %-9d %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax, mushconf.exit_quota);
 	}
@@ -2956,8 +2992,7 @@ void list_costs(dbref player)
 	{
 		raw_notify(player, "%-49.49s %-9d %-9d", "Creating Thing", mushconf.createmin, mushconf.createmax);
 	}
-
-	if (mushconf.quotas)
+	if (show_quota)
 	{
 		raw_notify(player, "%-49.49s %-9d           %-9d", "Creating Robot", mushconf.robotcost, mushconf.player_quota);
 	}
@@ -2966,6 +3001,7 @@ void list_costs(dbref player)
 		raw_notify(player, "%-49.49s %-9d", "Creating Robot", mushconf.robotcost);
 	}
 
+	/* Killing and success chance. */
 	raw_notify(player, "%-49.49s %-9d %-9d", "Killing Player", mushconf.killmin, mushconf.killmax);
 	if (mushconf.killmin == mushconf.killmax)
 	{
@@ -2976,6 +3012,7 @@ void list_costs(dbref player)
 		raw_notify(player, "%-49.49s %-9d", "Guaranted Kill Success", mushconf.killguarantee);
 	}
 
+	/* Miscellaneous CPU/search and queue-related costs. */
 	raw_notify(player, "%-49.49s %-9d", "Computationally expensive commands or functions", mushconf.searchcost);
 	raw_notify(player, "  @entrances, @find, @search, @stats,");
 	raw_notify(player, "  search() and stats()");
@@ -2991,6 +3028,7 @@ void list_costs(dbref player)
 		raw_notify(player, "  Deposit refund when command is run or cancel");
 	}
 
+	/* Sacrifice value math depends on sacfactor/sacadjust. */
 	if (mushconf.sacfactor == 0)
 	{
 		raw_notify(player, "%-49.49s %-9d", "Object Value", mushconf.sacadjust);
@@ -3007,7 +3045,7 @@ void list_costs(dbref player)
 		}
 		else
 		{
-			raw_notify(player, "%-49.49s Creation Cost + %d", "Object Value", mushconf.sacadjust);
+			raw_notify(player, "%-49.49s Creation Cost", "Object Value");
 		}
 	}
 	else
@@ -3037,8 +3075,6 @@ void list_costs(dbref player)
 
 	notify(player, "-------------------------------------------------------------------------------");
 	raw_notify(player, "All costs are in %s", mushconf.many_coins);
-
-	XFREE(buff);
 }
 
 /**
@@ -3822,7 +3858,7 @@ void list_memory(dbref player)
  * @param extra		Not used.
  * @param arg		Arguments
  */
-void do_list(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
+void do_list(dbref player, dbref cause , int extra , char *arg)
 {
 	int flagvalue = search_nametab(player, list_names, arg);
 
