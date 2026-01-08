@@ -974,9 +974,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		interp = EV_STRIP;
 		key &= ~SW_NOEVAL; /* Remove switch from key (already processed) */
 	}
-	else if ((cmdp->callseq & CS_INTERP) || (interactive && !(cmdp->callseq & CS_NOINTERP)))
+	else if ((cmdp->callseq & CS_INTERP) || (!(cmdp->callseq & CS_NOINTERP) && !interactive))
 	{
-		/* Command interprets args, or interactive command without CS_NOINTERP */
+		/* If CS_INTERP is set, always interpret the arg. */
+		/* Else if CS_NOINTERP is set, never interpret the arg. */
+		/* If neither flag is set, interpret the arg in non-interactive mode only. */
+		/* Therefore: If CS_NOINTERP is NOT set, then we must check for interactivity, and only interpret if we're NOT interactive. */
 		interp = EV_EVAL | EV_STRIP;
 	}
 	else if (cmdp->callseq & CS_STRIP)
