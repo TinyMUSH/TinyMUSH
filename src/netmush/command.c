@@ -2850,7 +2850,7 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 	if (alias[0] == '_' && alias[1] == '_')
 	{
-		cf_log(player, "CNF", "SYNTX", cmd, "Alias %s would cause \@addcommand conflict", alias);
+		cf_log(player, "CNF", "SYNTX", cmd, "Alias %s would cause @addcommand conflict", alias);
 		return -1;
 	}
 
