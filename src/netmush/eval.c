@@ -1489,6 +1489,11 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 					*bufc = oldp;
 					XSAFESPRINTF(buff, bufc, "#-1 FUNCTION (%s) NOT FOUND", xtbuf);
 				}
+				else
+				{
+					// Preserve the parenthesis verbatim
+					XSAFELBCHR('(', buff, bufc);
+				}
 
 				eval &= ~EV_FCHECK;
 				break;
