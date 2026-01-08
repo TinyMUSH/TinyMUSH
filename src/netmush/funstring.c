@@ -2115,7 +2115,7 @@ void fun_decrypt(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 /* Borrowed from PennMUSH 1.50 */
 void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int n, i, j;
+	int n, i, j, num_transitions;
 	ColorState *color_states;
 	char *stripped, *seq_buf;
 	char escape_buffer[256];
@@ -2143,6 +2143,7 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 
 	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
+	num_transitions = 0;
 
 	for (i = 0; i < n; i++)
 	{
@@ -2152,6 +2153,7 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		ColorState before = (i > 0) ? color_states[i - 1] : (ColorState){0};
 		if (memcmp(&before, &color_states[j], sizeof(ColorState)) != 0)
 		{
+			num_transitions++;
 			escape_offset = 0;
 			to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &color_states[j], color_type);
 			if (escape_offset > 0)
@@ -2173,11 +2175,11 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		stripped[i] = temp_char;
 	}
 
-	// Reset to normal at the end
+	// Reset to normal at the end, if required
 	escape_offset = 0;
 	ColorState reset_state = (ColorState){.reset = ColorStatusReset};
 	to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &reset_state, color_type);
-	if (escape_offset > 0)
+	if (escape_offset > 0 && num_transitions > 0)
 	{
 		XSAFELBSTR(escape_buffer, buff, bufc);
 	}
@@ -2193,7 +2195,7 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 
 void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	int n, i;
+	int n, i, num_transitions;
 	ColorState *color_states;
 	char *stripped;
 	char escape_buffer[256];
@@ -2221,6 +2223,7 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
+	num_transitions = 0;
 
 	// Reverse iteration through characters
 	for (i = n - 1; i >= 0; i--)
@@ -2229,6 +2232,7 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		ColorState before = (i < n - 1) ? color_states[i + 1] : (ColorState){0};
 		if (memcmp(&before, &color_states[i], sizeof(ColorState)) != 0)
 		{
+			num_transitions++;
 			escape_offset = 0;
 			to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &color_states[i], color_type);
 			if (escape_offset > 0)
@@ -2241,11 +2245,11 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 		XSAFELBCHR(stripped[i], buff, bufc);
 	}
 
-	// Reset to normal at the end
+	// Reset to normal at the end, if required
 	escape_offset = 0;
 	ColorState reset_state = (ColorState){.reset = ColorStatusReset};
 	to_ansi_escape_sequence(escape_buffer, sizeof(escape_buffer), &escape_offset, &reset_state, color_type);
-	if (escape_offset > 0)
+	if (escape_offset > 0 && num_transitions > 0)
 	{
 		XSAFELBSTR(escape_buffer, buff, bufc);
 	}
