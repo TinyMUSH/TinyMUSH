@@ -2077,7 +2077,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 		if (cp && *cp)
 		{
-			/* Journalisation concise du segment courant (évite des strlen répétés) */
+			/* Log the current segment once (avoid repeated strlen) */
 			int cp_len = (int)strlen(cp);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
 						 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
@@ -2088,7 +2088,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 						 "[DEBUG process_cmdline] about to call process_command: '%s'",
 						 cp);
 			numpipes = 0;
-			/* Balayer les pipes consécutifs pour ce segment */
+			/* Scan consecutive pipes for this segment */
 			while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
 			{
 				cmdline++;
@@ -2208,10 +2208,14 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 }
 
 /**
- * @brief List internal commands. Note that user-defined command permissions are
- * ignored in this context.
+ * @brief Display the built-in and module-provided commands visible to a player.
  *
- * @param player DBref of the player
+ * Lists all compiled-in commands and any commands exposed by loaded modules,
+ * filtered by the caller's permissions and omitting `CF_DARK` entries.
+ *
+ * @param player Database reference of the requesting player
+ *
+ * @see display_nametab() for printing logged-out command names
  */
 void list_cmdtable(dbref player)
 {
@@ -2222,13 +2226,12 @@ void list_cmdtable(dbref player)
 	XSPRINTF(buf, "Built-in commands:");
 	for (cmdp = command_table; cmdp->cmdname; cmdp++)
 	{
-		if (check_access(player, cmdp->perms))
+		if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
 		{
-			if (!(cmdp->perms & CF_DARK))
-			{
-				XSPRINTFCAT(buf, " %s", cmdp->cmdname);
-			}
+			continue;
 		}
+
+		XSPRINTFCAT(buf, " %s", cmdp->cmdname);
 	}
 
 	/* Players get the list of logged-out cmds too */
@@ -2250,13 +2253,12 @@ void list_cmdtable(dbref player)
 			XSPRINTF(buf, "Module %s commands:", mp->modname);
 			for (cmdp = modcmds; cmdp->cmdname; cmdp++)
 			{
-				if (check_access(player, cmdp->perms))
+				if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
 				{
-					if (!(cmdp->perms & CF_DARK))
-					{
-						XSPRINTFCAT(buf, " %s", cmdp->cmdname);
-					}
+					continue;
 				}
+
+				XSPRINTFCAT(buf, " %s", cmdp->cmdname);
 			}
 			notify(player, buf);
 		}
@@ -2268,16 +2270,22 @@ void list_cmdtable(dbref player)
 }
 
 /**
- * @brief List available attributes.
+ * @brief Show attribute names the player is allowed to see.
  *
- * @param player
+ * Builds a single line beginning with "Attributes:" followed by each attribute
+ * name the caller can see (filtered via `See_attr`). Hidden attributes are
+ * skipped; the list is truncated if it would exceed the notification buffer.
+ *
+ * @param player Database reference of the requesting player
  */
 void list_attrtable(dbref player)
 {
 	ATTR *ap = NULL;
 	char *cp = NULL, *bp = NULL, *buf = NULL;
+	char *buf_end = NULL;
 
 	bp = buf = XMALLOC(LBUF_SIZE, "buf");
+	buf_end = buf + LBUF_SIZE - 1; /* Keep space for terminator */
 
 	for (cp = (char *)"Attributes:"; *cp; cp++)
 	{
@@ -2288,6 +2296,13 @@ void list_attrtable(dbref player)
 	{
 		if (See_attr(player, player, ap, player, 0))
 		{
+			/* Ensure we never overrun the output buffer */
+			size_t needed = 1 + strlen(ap->name); /* leading space + name */
+			if ((bp + needed) >= buf_end)
+			{
+				break;
+			}
+
 			*bp++ = ' ';
 
 			for (cp = (char *)(ap->name); *cp; cp++)
@@ -2303,10 +2318,14 @@ void list_attrtable(dbref player)
 }
 
 /**
- * @brief Helper for the list access commands.
+ * @brief Emit visible command permissions from a command table.
  *
- * @param player	DBref of the player
- * @param ctab		Command table
+ * Iterates a command table (core or module) and prints each command the caller
+ * can access, skipping dark entries. If a command uses user-defined permissions
+ * (`userperms`), the output annotates which object/attribute provides them.
+ *
+ * @param player Database reference of the requesting player
+ * @param ctab   Pointer to the command table to list
  */
 void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 {
@@ -2315,28 +2334,21 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 
 	for (cmdp = ctab; cmdp->cmdname; cmdp++)
 	{
-		if (check_access(player, cmdp->perms))
+		if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
 		{
-			if (!(cmdp->perms & CF_DARK))
-			{
-				if (cmdp->userperms)
-				{
-					ap = atr_num(cmdp->userperms->atr);
+			continue;
+		}
 
-					if (!ap)
-					{
-						listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/?BAD?)", cmdp->cmdname, cmdp->userperms->thing);
-					}
-					else
-					{
-						listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, ap->name);
-					}
-				}
-				else
-				{
-					listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s ", cmdp->cmdname);
-				}
-			}
+		if (cmdp->userperms)
+		{
+			ap = atr_num(cmdp->userperms->atr);
+			/* Annotate the source of user-defined permissions; fallback if missing */
+			const char *attr_name = ap ? ap->name : "?BAD?";
+			listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, attr_name);
+		}
+		else
+		{
+			listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s ", cmdp->cmdname);
 		}
 	}
 }
