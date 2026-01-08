@@ -726,30 +726,6 @@ void hashreplall(int *old, int *new, HASHTAB *htab)
         }
 }
 
-/* ---------------------------------------------------------------------------
- * hashinfo: return an mbuf with hashing stats
- */
-
-char *hashinfo(const char *tab_name, HASHTAB *htab)
-{
-    char *buff;
-
-    if (htab == NULL || tab_name == NULL)
-    {
-        return NULL;
-    }
-
-    buff = XMALLOC(MBUF_SIZE, "buff");
-
-    if (buff == NULL)
-    {
-        return NULL;
-    }
-
-    XSPRINTF(buff, "%-15.15s%8d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
-    return buff;
-}
-
 /* Returns the data for the first hash entry in 'htab'. */
 
 int *hash_firstentry(HASHTAB *htab)

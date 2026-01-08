@@ -876,7 +876,6 @@ extern void hashdelall(int *old, HASHTAB *htab);
 extern void hashflush(HASHTAB *htab, int size);
 extern int hashrepl_generic(HASHKEY key, int *hashdata, HASHTAB *htab);
 extern void hashreplall(int *old, int *new, HASHTAB *htab);
-extern char *hashinfo(const char *tab_name, HASHTAB *htab);
 extern int *hash_firstentry(HASHTAB *htab);
 extern int *hash_nextentry(HASHTAB *htab);
 extern HASHKEY hash_firstkey_generic(HASHTAB *htab);

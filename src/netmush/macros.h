@@ -714,7 +714,6 @@
 #define nhashflush(h, sz) hashflush((h), (sz))
 #define hashrepl(s, d, h) hashrepl_generic((HASHKEY)(s), (d), (h))
 #define nhashrepl(n, d, h) hashrepl_generic((HASHKEY)(n), (d), (h))
-#define nhashinfo(t, h) hashinfo((t), (h))
 #define hash_firstkey(h) (hash_firstkey_generic((h)).s)
 #define hash_nextkey(h) (hash_nextkey_generic((h)).s)
 #define nhashresize(h, sz) hashresize((h), (sz))

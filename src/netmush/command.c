@@ -116,7 +116,7 @@ void init_cmdtab(void)
 		}
 
 		/* Configure command entry for attribute setting */
-		cp->extra = ap->number; /* Store attribute number for handler */
+		cp->extra = ap->number;	  /* Store attribute number for handler */
 		cp->callseq = CS_TWO_ARG; /* Standard <cmd> <obj>=<value> format */
 		cp->pre_hook = NULL;
 		cp->post_hook = NULL;
@@ -268,13 +268,13 @@ bool check_access(dbref player, int mask)
 		/* Case 1: Only privilege bits set (no markers) */
 		if (priv_mask && !marker_mask)
 		{
-			if (!(((mask & CA_WIZARD) && Wizard(player)) || 
-			      ((mask & CA_ADMIN) && WizRoy(player)) || 
-			      ((mask & CA_BUILDER) && Builder(player)) || 
-			      ((mask & CA_STAFF) && Staff(player)) || 
-			      ((mask & CA_HEAD) && Head(player)) || 
-			      ((mask & CA_IMMORTAL) && Immortal(player)) || 
-			      ((mask & CA_MODULE_OK) && Can_Use_Module(player))))
+			if (!(((mask & CA_WIZARD) && Wizard(player)) ||
+				  ((mask & CA_ADMIN) && WizRoy(player)) ||
+				  ((mask & CA_BUILDER) && Builder(player)) ||
+				  ((mask & CA_STAFF) && Staff(player)) ||
+				  ((mask & CA_HEAD) && Head(player)) ||
+				  ((mask & CA_IMMORTAL) && Immortal(player)) ||
+				  ((mask & CA_MODULE_OK) && Can_Use_Module(player))))
 			{
 				return false; /* Player lacks required privilege level */
 			}
@@ -282,16 +282,16 @@ bool check_access(dbref player, int mask)
 		/* Case 2: Only marker bits set (no privileges) */
 		else if (!priv_mask && marker_mask)
 		{
-			if (!(((mask & CA_MARKER0) && H_Marker0(player)) || 
-			      ((mask & CA_MARKER1) && H_Marker1(player)) || 
-			      ((mask & CA_MARKER2) && H_Marker2(player)) || 
-			      ((mask & CA_MARKER3) && H_Marker3(player)) || 
-			      ((mask & CA_MARKER4) && H_Marker4(player)) || 
-			      ((mask & CA_MARKER5) && H_Marker5(player)) || 
-			      ((mask & CA_MARKER6) && H_Marker6(player)) || 
-			      ((mask & CA_MARKER7) && H_Marker7(player)) || 
-			      ((mask & CA_MARKER8) && H_Marker8(player)) || 
-			      ((mask & CA_MARKER9) && H_Marker9(player))))
+			if (!(((mask & CA_MARKER0) && H_Marker0(player)) ||
+				  ((mask & CA_MARKER1) && H_Marker1(player)) ||
+				  ((mask & CA_MARKER2) && H_Marker2(player)) ||
+				  ((mask & CA_MARKER3) && H_Marker3(player)) ||
+				  ((mask & CA_MARKER4) && H_Marker4(player)) ||
+				  ((mask & CA_MARKER5) && H_Marker5(player)) ||
+				  ((mask & CA_MARKER6) && H_Marker6(player)) ||
+				  ((mask & CA_MARKER7) && H_Marker7(player)) ||
+				  ((mask & CA_MARKER8) && H_Marker8(player)) ||
+				  ((mask & CA_MARKER9) && H_Marker9(player))))
 			{
 				return false; /* Player lacks required marker flags */
 			}
@@ -299,23 +299,23 @@ bool check_access(dbref player, int mask)
 		/* Case 3: Both privilege and marker bits set (OR semantics) */
 		else
 		{
-			if (!(((mask & CA_WIZARD) && Wizard(player)) || 
-			      ((mask & CA_ADMIN) && WizRoy(player)) || 
-			      ((mask & CA_BUILDER) && Builder(player)) || 
-			      ((mask & CA_STAFF) && Staff(player)) || 
-			      ((mask & CA_HEAD) && Head(player)) || 
-			      ((mask & CA_IMMORTAL) && Immortal(player)) || 
-			      ((mask & CA_MODULE_OK) && Can_Use_Module(player)) || 
-			      ((mask & CA_MARKER0) && H_Marker0(player)) || 
-			      ((mask & CA_MARKER1) && H_Marker1(player)) || 
-			      ((mask & CA_MARKER2) && H_Marker2(player)) || 
-			      ((mask & CA_MARKER3) && H_Marker3(player)) || 
-			      ((mask & CA_MARKER4) && H_Marker4(player)) || 
-			      ((mask & CA_MARKER5) && H_Marker5(player)) || 
-			      ((mask & CA_MARKER6) && H_Marker6(player)) || 
-			      ((mask & CA_MARKER7) && H_Marker7(player)) || 
-			      ((mask & CA_MARKER8) && H_Marker8(player)) || 
-			      ((mask & CA_MARKER9) && H_Marker9(player))))
+			if (!(((mask & CA_WIZARD) && Wizard(player)) ||
+				  ((mask & CA_ADMIN) && WizRoy(player)) ||
+				  ((mask & CA_BUILDER) && Builder(player)) ||
+				  ((mask & CA_STAFF) && Staff(player)) ||
+				  ((mask & CA_HEAD) && Head(player)) ||
+				  ((mask & CA_IMMORTAL) && Immortal(player)) ||
+				  ((mask & CA_MODULE_OK) && Can_Use_Module(player)) ||
+				  ((mask & CA_MARKER0) && H_Marker0(player)) ||
+				  ((mask & CA_MARKER1) && H_Marker1(player)) ||
+				  ((mask & CA_MARKER2) && H_Marker2(player)) ||
+				  ((mask & CA_MARKER3) && H_Marker3(player)) ||
+				  ((mask & CA_MARKER4) && H_Marker4(player)) ||
+				  ((mask & CA_MARKER5) && H_Marker5(player)) ||
+				  ((mask & CA_MARKER6) && H_Marker6(player)) ||
+				  ((mask & CA_MARKER7) && H_Marker7(player)) ||
+				  ((mask & CA_MARKER8) && H_Marker8(player)) ||
+				  ((mask & CA_MARKER9) && H_Marker9(player))))
 			{
 				return false; /* Player must match at least one privilege OR marker */
 			}
@@ -325,11 +325,11 @@ bool check_access(dbref player, int mask)
 	/* Check exclusion bits (things player must NOT have, unless they're a wizard) */
 	if ((mask & CA_ISNOT_MASK) && !Wizard(player))
 	{
-		if (((mask & CA_NO_HAVEN) && Player_haven(player)) || 
-		    ((mask & CA_NO_ROBOT) && Robot(player)) || 
-		    ((mask & CA_NO_SLAVE) && Slave(player)) || 
-		    ((mask & CA_NO_SUSPECT) && Suspect(player)) || 
-		    ((mask & CA_NO_GUEST) && Guest(player)))
+		if (((mask & CA_NO_HAVEN) && Player_haven(player)) ||
+			((mask & CA_NO_ROBOT) && Robot(player)) ||
+			((mask & CA_NO_SLAVE) && Slave(player)) ||
+			((mask & CA_NO_SUSPECT) && Suspect(player)) ||
+			((mask & CA_NO_GUEST) && Guest(player)))
 		{
 			return false; /* Player has a forbidden flag/state */
 		}
@@ -474,8 +474,8 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	bp = buf;
 	str = tstr;
-	eval_expression_string(buf, &bp, hookp->thing, player, player, 
-	                       EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+	eval_expression_string(buf, &bp, hookp->thing, player, player,
+						   EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 
 	/* Restore global registers to pre-evaluation state */
 	restore_global_regs("check_userdef_access", preserve);
@@ -553,7 +553,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
  * @see process_cmdent() for hook invocation during command execution
  * @see HOOKENT structure for hook registration interface
  */
-void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause , char *cargs[], int ncargs)
+void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause, char *cargs[], int ncargs)
 {
 	char *buf = NULL, *bp = NULL, *tstr = NULL, *str = NULL;
 	int aflags = 0, alen = 0;
@@ -572,15 +572,15 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause , char 
 	/* CS_PRIVATE: Create isolated register context by hiding current registers */
 	else if (save_globs & CS_PRIVATE)
 	{
-		preserve = mushstate.rdata;       /* Save current register context pointer */
-		mushstate.rdata = NULL;            /* Clear context to force fresh allocation */
+		preserve = mushstate.rdata; /* Save current register context pointer */
+		mushstate.rdata = NULL;		/* Clear context to force fresh allocation */
 	}
 
 	/* Evaluate hook softcode with player as enactor */
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	bp = buf;
-	eval_expression_string(buf, &bp, hp->thing, player, player, 
-	                       EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+	eval_expression_string(buf, &bp, hp->thing, player, player,
+						   EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 
 	/* Hook result is discarded (hooks produce side effects only) */
 	XFREE(buf);
@@ -606,15 +606,15 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause , char 
 			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
 			{
 				XFREE(mushstate.rdata->x_names[z]); /* Register name strings */
-				XFREE(mushstate.rdata->x_regs[z]);  /* Register value strings */
+				XFREE(mushstate.rdata->x_regs[z]);	/* Register value strings */
 			}
 
 			/* Free register array structures */
-			XFREE(mushstate.rdata->q_regs);   /* Q-register value array */
-			XFREE(mushstate.rdata->q_lens);   /* Q-register length array */
-			XFREE(mushstate.rdata->x_names);  /* X-register name array */
-			XFREE(mushstate.rdata->x_regs);   /* X-register value array */
-			XFREE(mushstate.rdata->x_lens);   /* X-register length array */
+			XFREE(mushstate.rdata->q_regs);	 /* Q-register value array */
+			XFREE(mushstate.rdata->q_lens);	 /* Q-register length array */
+			XFREE(mushstate.rdata->x_names); /* X-register name array */
+			XFREE(mushstate.rdata->x_regs);	 /* X-register value array */
+			XFREE(mushstate.rdata->x_lens);	 /* X-register length array */
 
 			/* Free register context structure itself */
 			XFREE(mushstate.rdata);
@@ -926,8 +926,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 			if (xkey == -1) /* Unrecognized switch */
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, 
-				            "Unrecognized switch '%s' for command '%s'.", switchp, cmdp->cmdname);
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN,
+							 "Unrecognized switch '%s' for command '%s'.", switchp, cmdp->cmdname);
 				return;
 			}
 			else if (xkey == -2) /* Permission denied for this switch */
@@ -949,15 +949,15 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				xkey &= ~SW_MULTIPLE;
 			}
 
-			key |= xkey;      /* Accumulate switch flags */
-			switchp = buf1;   /* Move to next switch */
+			key |= xkey;	/* Accumulate switch flags */
+			switchp = buf1; /* Move to next switch */
 		} while (buf1);
 	}
 	else if (switchp && !(cmdp->callseq & CS_ADDED))
 	{
 		/* Switches specified but command doesn't support them */
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, 
-		            "Command %s does not take switches.", cmdp->cmdname);
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN,
+					 "Command %s does not take switches.", cmdp->cmdname);
 		return;
 	}
 
@@ -1021,8 +1021,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
 			str = arg;
-			eval_expression_string(buf1, &bp, player, cause, cause, 
-			                       interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+			eval_expression_string(buf1, &bp, player, cause, cause,
+								   interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 		}
 		else
 		{
@@ -1114,9 +1114,9 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				if (aflags & AF_REGEXP)
 				{
 					/* Regex matching with optional case-insensitivity */
-					pattern_matches = regexp_match(buff + 1, new, 
-					                               (aflags & AF_CASE) ? 0 : PCRE2_CASELESS, 
-					                               aargs, NUM_ENV_VARS);
+					pattern_matches = regexp_match(buff + 1, new,
+												   (aflags & AF_CASE) ? 0 : PCRE2_CASELESS,
+												   aargs, NUM_ENV_VARS);
 				}
 				else
 				{
@@ -1125,14 +1125,13 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				}
 
 				/* Check uselock if configured */
-				bool has_permission = !mushconf.addcmd_obey_uselocks || 
-				                      could_doit(player, add->thing, A_LUSE);
+				bool has_permission = !mushconf.addcmd_obey_uselocks ||
+									  could_doit(player, add->thing, A_LUSE);
 
 				if (pattern_matches && has_permission)
 				{
 					/* Execute action softcode with captured wildcard/regex groups */
-					dbref executor = (!(cmdp->callseq & CS_ACTOR) || God(player)) ? 
-					                 add->thing : player;
+					dbref executor = (!(cmdp->callseq & CS_ACTOR) || God(player)) ? add->thing : player;
 					process_cmdline(executor, player, s, aargs, NUM_ENV_VARS, NULL);
 
 					/* Free captured argument strings */
@@ -1163,8 +1162,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 				{
 					lname = log_getname(Location(player));
-					log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", 
-					         pname, lname, new);
+					log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s",
+							  pname, lname, new);
 					XFREE(lname);
 				}
 				else
@@ -1206,15 +1205,15 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		buf1 = XMALLOC(LBUF_SIZE, "buf1");
 		bp = buf1;
 		str = buf2;
-		eval_expression_string(buf1, &bp, player, cause, cause, 
-		                       EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
+		eval_expression_string(buf1, &bp, player, cause, cause,
+							   EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
 
 		if (cmdp->callseq & CS_ARGV)
 		{
 			/* Second argument is ARGV-style (space-separated list) */
-			parse_arglist(player, cause, cause, arg, '\0', 
-			             interp | EV_STRIP_LS | EV_STRIP_TS, 
-			             args, mushconf.max_command_args, cargs, ncargs);
+			parse_arglist(player, cause, cause, arg, '\0',
+						  interp | EV_STRIP_LS | EV_STRIP_TS,
+						  args, mushconf.max_command_args, cargs, ncargs);
 
 			/* Count arguments */
 			for (nargs = 0; (nargs < mushconf.max_command_args) && args[nargs]; nargs++)
@@ -1224,8 +1223,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			if (cmdp->callseq & CS_CMDARG)
 			{
 				handler_cs_two_args_cmdargs_argv = cmdp->info.handler;
-				(*handler_cs_two_args_cmdargs_argv)(player, cause, key, buf1, args, nargs, 
-				                                    cargs, ncargs);
+				(*handler_cs_two_args_cmdargs_argv)(player, cause, key, buf1, args, nargs,
+													cargs, ncargs);
 			}
 			else
 			{
@@ -1248,8 +1247,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				buf2 = XMALLOC(LBUF_SIZE, "buf2");
 				bp = buf2;
 				str = arg;
-				eval_expression_string(buf2, &bp, player, cause, cause, 
-				                       interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+				eval_expression_string(buf2, &bp, player, cause, cause,
+									   interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 			}
 			else if (cmdp->callseq & CS_UNPARSE)
 			{
@@ -1289,8 +1288,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	/* Execute post-command hook if registered (not for CS_ADDED commands) */
 	if (cmdp->post_hook && !(cmdp->callseq & CS_ADDED))
 	{
-		process_hook(cmdp->post_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), 
-		            player, cause, cargs, ncargs);
+		process_hook(cmdp->post_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE),
+					 player, cause, cargs, ncargs);
 	}
 }
 
@@ -2584,7 +2583,7 @@ void list_attrtypes(dbref player)
  * @param cmd    Config directive name (for logging)
  * @return 0 on success, -1 on failure
  */
-int cf_access(int *vp , char *str, long extra, dbref player, char *cmd)
+int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
 	if (!str || !*str)
 	{
@@ -2758,7 +2757,7 @@ int cf_attr_access(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd    Config directive name (for logging)
  * @return 0 on success, -1 on failure
  */
-int cf_attr_type(int *vp , char *str, long extra, dbref player, char *cmd)
+int cf_attr_type(int *vp, char *str, long extra, dbref player, char *cmd)
 {
 	if (!str || !*str)
 	{
@@ -2825,10 +2824,8 @@ int cf_attr_type(int *vp , char *str, long extra, dbref player, char *cmd)
  * @param cmd    Config directive name (for logging)
  * @return 0 on success, -1 on failure
  */
-int cf_cmd_alias(int *vp, char *str, long extra , dbref player, char *cmd)
+int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-	UNUSED_PARAMETER(extra);
-
 	CMDENT *cmdp = NULL, *cmd2 = NULL;
 	NAMETAB *nt = NULL;
 	int *hp = NULL;
@@ -2929,8 +2926,6 @@ int cf_cmd_alias(int *vp, char *str, long extra , dbref player, char *cmd)
 void list_df_flags(dbref player)
 {
 	char *flags[6];
-	const char *labels[] = { "Players", "Rooms", "Exits", "Things", "Robots", "Stripped" };
-	const char *formats[] = { "P%s", "R%s", "E%s", "%s", "P%s", "%s" };
 
 	/* Decode defaults for each object category so we can present a concise table. */
 	flags[0] = decode_flags(player, mushconf.player_flags);
@@ -2940,15 +2935,15 @@ void list_df_flags(dbref player)
 	flags[4] = decode_flags(player, mushconf.robot_flags);
 	flags[5] = decode_flags(player, mushconf.stripped_flags);
 
-	notify(player, "Type           Default flags");
-	notify(player, "-------------- ----------------------------------------------------------------");
-
-	for (int i = 0; i < 6; i++)
-	{
-		raw_notify(player, "%-14s %s", labels[i], tprintf(formats[i], flags[i]));
-	}
-
-	notify(player, "-------------------------------------------------------------------------------");
+	raw_notify(player, "%-14s %s", "Type", "Default flags");
+	raw_notify(player, "-------------- ----------------------------------------------------------------");
+	raw_notify(player, "%-14s P%s", "Players", flags[0]);
+	raw_notify(player, "%-14s R%s", "Rooms", flags[1]);
+	raw_notify(player, "%-14s E%s", "Exits", flags[2]);
+	raw_notify(player, "%-14s %s", "Things", flags[3]);
+	raw_notify(player, "%-14s P%s", "Robots", flags[4]);
+	raw_notify(player, "%-14s %s", "Stripped", flags[5]);
+	raw_notify(player, "-------------------------------------------------------------------------------");
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -3078,203 +3073,244 @@ void list_costs(dbref player)
 }
 
 /**
- * @brief List boolean game options from mushconf. list_config: List non-boolean game options.
+ * @brief Display key configuration parameters for game setup and limits.
  *
- * @param player DBref of player
+ * Emits a structured overview of prototype objects, defaults, limits,
+ * quotas, currency, and timers so admins can confirm current runtime
+ * configuration. Adds wizard-only sections for queue sizing, dump/clean
+ * intervals, and cache sizing.
+ *
+ * @param player Database reference of the viewer (visibility gates wizard-only sections)
  */
 void list_params(dbref player)
 {
-	time_t now = time(NULL);
+	time_t now = time(NULL); /* Capture current time once for timer deltas below. */
 
-	notify(player, "Prototype           Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Room                #%d", mushconf.room_proto);
-	raw_notify(player, "Exit                #%d", mushconf.exit_proto);
-	raw_notify(player, "Thing               #%d", mushconf.thing_proto);
-	raw_notify(player, "Player              #%d", mushconf.player_proto);
-	notify(player, "\nAttr Default        Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Room                #%d", mushconf.room_defobj);
-	raw_notify(player, "Exit                #%d", mushconf.exit_defobj);
-	raw_notify(player, "Thing               #%d", mushconf.thing_defobj);
-	raw_notify(player, "Player              #%d", mushconf.player_defobj);
-	notify(player, "\nDefault Parents     Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Room                #%d", mushconf.room_parent);
-	raw_notify(player, "Exit                #%d", mushconf.exit_parent);
-	raw_notify(player, "Thing               #%d", mushconf.thing_parent);
-	raw_notify(player, "Player              #%d", mushconf.player_parent);
-	notify(player, "\nLimits              Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Function recursion  %d", mushconf.func_nest_lim);
-	raw_notify(player, "Function invocation %d", mushconf.func_invk_lim);
-	raw_notify(player, "Command recursion   %d", mushconf.cmd_nest_lim);
-	raw_notify(player, "Command invocation  %d", mushconf.cmd_invk_lim);
-	raw_notify(player, "Output              %d", mushconf.output_limit);
-	raw_notify(player, "Queue               %d", mushconf.queuemax);
-	raw_notify(player, "CPU                 %d", mushconf.func_cpu_lim_secs);
-	raw_notify(player, "Wild                %d", mushconf.wild_times_lim);
-	raw_notify(player, "Aliases             %d", mushconf.max_player_aliases);
-	raw_notify(player, "Forwardlist         %d", mushconf.fwdlist_lim);
-	raw_notify(player, "Propdirs            %d", mushconf.propdir_lim);
-	raw_notify(player, "Registers           %d", mushconf.register_limit);
-	raw_notify(player, "Stacks              %d", mushconf.stack_lim);
-	raw_notify(player, "Variables           %d", mushconf.numvars_lim);
-	raw_notify(player, "Structures          %d", mushconf.struct_lim);
-	raw_notify(player, "Instances           %d", mushconf.instance_lim);
-	raw_notify(player, "Objects             %d", mushconf.building_limit);
-	raw_notify(player, "Allowance           %d", mushconf.paylimit);
-	raw_notify(player, "Trace levels        %d", mushconf.trace_limit);
-	raw_notify(player, "Connect tries       %d", mushconf.retry_limit);
+	raw_notify(player, "%-19s %s", "Prototype", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s #%d", "Room", mushconf.room_proto);
+	raw_notify(player, "%-19s #%d", "Exit", mushconf.exit_proto);
+	raw_notify(player, "%-19s #%d", "Thing", mushconf.thing_proto);
+	raw_notify(player, "%-19s #%d", "Player", mushconf.player_proto);
 
+	raw_notify(player, "\r\n%-19s %s", "Attr Default", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s #%d", "Room", mushconf.room_defobj);
+	raw_notify(player, "%-19s #%d", "Exit", mushconf.exit_defobj);
+	raw_notify(player, "%-19s #%d", "Thing", mushconf.thing_defobj);
+	raw_notify(player, "%-19s #%d", "Player", mushconf.player_defobj);
+
+	raw_notify(player, "\r\n%-19s %s", "Default Parents", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s #%d", "Room", mushconf.room_parent);
+	raw_notify(player, "%-19s #%d", "Exit", mushconf.exit_parent);
+	raw_notify(player, "%-19s #%d", "Thing", mushconf.thing_parent);
+	raw_notify(player, "%-19s #%d", "Player", mushconf.player_parent);
+
+	raw_notify(player, "\r\n%-19s %s", "Limits", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s %d", "Function recursion", mushconf.func_nest_lim);
+	raw_notify(player, "%-19s %d", "Function invocation", mushconf.func_invk_lim);
+	raw_notify(player, "%-19s %d", "Command recursion", mushconf.cmd_nest_lim);
+	raw_notify(player, "%-19s %d", "Command invocation", mushconf.cmd_invk_lim);
+	raw_notify(player, "%-19s %d", "Output", mushconf.output_limit);
+	raw_notify(player, "%-19s %d", "Queue", mushconf.queuemax);
+	raw_notify(player, "%-19s %d", "CPU", mushconf.func_cpu_lim_secs);
+	raw_notify(player, "%-19s %d", "Wild", mushconf.wild_times_lim);
+	raw_notify(player, "%-19s %d", "Aliases", mushconf.max_player_aliases);
+	raw_notify(player, "%-19s %d", "Forwardlist", mushconf.fwdlist_lim);
+	raw_notify(player, "%-19s %d", "Propdirs", mushconf.propdir_lim);
+	raw_notify(player, "%-19s %d", "Registers", mushconf.register_limit);
+	raw_notify(player, "%-19s %d", "Stacks", mushconf.stack_lim);
+	raw_notify(player, "%-19s %d", "Variables", mushconf.numvars_lim);
+	raw_notify(player, "%-19s %d", "Structures", mushconf.struct_lim);
+	raw_notify(player, "%-19s %d", "Instances", mushconf.instance_lim);
+	raw_notify(player, "%-19s %d", "Objects", mushconf.building_limit);
+	raw_notify(player, "%-19s %d", "Allowance", mushconf.paylimit);
+	raw_notify(player, "%-19s %d", "Trace levels", mushconf.trace_limit);
+	raw_notify(player, "%-19s %d", "Connect tries", mushconf.retry_limit);
 	if (mushconf.max_players >= 0)
 	{
-		raw_notify(player, "Logins              %d", mushconf.max_players);
+		raw_notify(player, "%-19s %d", "Logins", mushconf.max_players);
 	}
 
-	notify(player, "\nNesting             Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Locks               %d", mushconf.lock_nest_lim);
-	raw_notify(player, "Parents             %d", mushconf.parent_nest_lim);
-	raw_notify(player, "Messages            %d", mushconf.ntfy_nest_lim);
-	raw_notify(player, "Zones               %d", mushconf.zone_nest_lim);
-	notify(player, "\nTimeouts            Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Idle                %d", mushconf.idle_timeout);
-	raw_notify(player, "Connect             %d", mushconf.conn_timeout);
-	raw_notify(player, "Tries               %d", mushconf.retry_limit);
-	raw_notify(player, "Lag                 %d", mushconf.max_cmdsecs);
-	notify(player, "\nMoney               Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Start               %d", mushconf.paystart);
-	raw_notify(player, "Daily               %d", mushconf.paycheck);
-	raw_notify(player, "Singular            %s", mushconf.one_coin);
-	raw_notify(player, "Plural              %s", mushconf.many_coins);
+	raw_notify(player, "\r\n%-19s %s", "Nesting", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s %d", "Locks", mushconf.lock_nest_lim);
+	raw_notify(player, "%-19s %d", "Parents", mushconf.parent_nest_lim);
+	raw_notify(player, "%-19s %d", "Messages", mushconf.ntfy_nest_lim);
+	raw_notify(player, "%-19s %d", "Zones", mushconf.zone_nest_lim);
+
+	raw_notify(player, "\r\n%-19s %s", "Timeouts", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s %d", "Idle", mushconf.idle_timeout);
+	raw_notify(player, "%-19s %d", "Connect", mushconf.conn_timeout);
+	raw_notify(player, "%-19s %d", "Tries", mushconf.retry_limit);
+	raw_notify(player, "%-19s %d", "Lag", mushconf.max_cmdsecs);
+
+	raw_notify(player, "\r\n%-19s %s", "Money", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s %d", "Start", mushconf.paystart);
+	raw_notify(player, "%-19s %d", "Daily", mushconf.paycheck);
+	raw_notify(player, "%-19s %s", "Singular", mushconf.one_coin);
+	raw_notify(player, "%-19s %s", "Plural", mushconf.many_coins);
 
 	if (mushconf.payfind > 0)
 	{
-		raw_notify(player, "Find money          1 chance in %d", mushconf.payfind);
+		raw_notify(player, "%-19s 1 chance in %d", "Find money", mushconf.payfind);
 	}
 
-	notify(player, "\nStart Quotas        Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Total               %d", mushconf.start_quota);
-	raw_notify(player, "Rooms               %d", mushconf.start_room_quota);
-	raw_notify(player, "Exits               %d", mushconf.start_exit_quota);
-	raw_notify(player, "Things              %d", mushconf.start_thing_quota);
-	raw_notify(player, "Players             %d", mushconf.start_player_quota);
+	raw_notify(player, "\r\n%-19s %s", "Start Quotas", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s %d", "Total", mushconf.start_quota);
+	raw_notify(player, "%-19s %d", "Rooms", mushconf.start_room_quota);
+	raw_notify(player, "%-19s %d", "Exits", mushconf.start_exit_quota);
+	raw_notify(player, "%-19s %d", "Things", mushconf.start_thing_quota);
+	raw_notify(player, "%-19s %d", "Players", mushconf.start_player_quota);
 
-	notify(player, "\nDbrefs              Value");
-	notify(player, "------------------- -----------------------------------------------------------");
-	raw_notify(player, "Master Room         #%d", mushconf.master_room);
-	raw_notify(player, "Start Room          #%d", mushconf.start_room);
-	raw_notify(player, "Start Home          #%d", mushconf.start_home);
-	raw_notify(player, "Default Home        #%d", mushconf.default_home);
+	raw_notify(player, "\r\n%-19s %s", "Dbrefs", "Value");
+	raw_notify(player, "------------------- -----------------------------------------------------------");
+	raw_notify(player, "%-19s #%d", "Master Room", mushconf.master_room);
+	raw_notify(player, "%-19s #%d", "Start Room", mushconf.start_room);
+	raw_notify(player, "%-19s #%d", "Start Home", mushconf.start_home);
+	raw_notify(player, "%-19s #%d", "Default Home", mushconf.default_home);
 
 	if (Wizard(player))
 	{
-		raw_notify(player, "Guest Char          #%d", mushconf.guest_char);
-		raw_notify(player, "GuestStart          #%d", mushconf.guest_start_room);
-		raw_notify(player, "Freelist            #%d", mushstate.freelist);
+		raw_notify(player, "%-19s #%d", "Guest Char", mushconf.guest_char);
+		raw_notify(player, "%-19s #%d", "GuestStart", mushconf.guest_start_room);
+		raw_notify(player, "%-19s #%d", "Freelist", mushstate.freelist);
 
-		notify(player, "\nQueue run sizes     Value");
-		notify(player, "------------------- -----------------------------------------------------------");
-		raw_notify(player, "No net activity     %d", mushconf.queue_chunk);
-		raw_notify(player, "Activity            %d", mushconf.active_q_chunk);
-		notify(player, "\nIntervals           Value");
-		notify(player, "------------------- -----------------------------------------------------------");
-		raw_notify(player, "Dump                %d", mushconf.dump_interval);
-		raw_notify(player, "Clean               %d", mushconf.check_interval);
-		raw_notify(player, "Idle Check          %d", mushconf.idle_interval);
-		raw_notify(player, "Optimize            %d", mushconf.dbopt_interval);
-		notify(player, "\nTimers              Value");
-		notify(player, "------------------- -----------------------------------------------------------");
-		raw_notify(player, "Dump                %d", (int)(mushstate.dump_counter - now));
-		raw_notify(player, "Clean               %d", (int)(mushstate.check_counter - now));
-		raw_notify(player, "Idle Check          %d", (int)(mushstate.idle_counter - now));
-		notify(player, "\nScheduling          Value");
-		notify(player, "------------------- -----------------------------------------------------------");
-		raw_notify(player, "Timeslice           %d", mushconf.timeslice);
-		raw_notify(player, "Max_Quota           %d", mushconf.cmd_quota_max);
-		raw_notify(player, "Increment           %d", mushconf.cmd_quota_incr);
-		notify(player, "\nAttribute cache     Value");
-		notify(player, "------------------- -----------------------------------------------------------");
-		raw_notify(player, "Width               %d", mushconf.cache_width);
-		raw_notify(player, "Size                %d", mushconf.cache_size);
+		raw_notify(player, "\r\n%-19s %s", "Queue run sizes", "Value");
+		raw_notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "%-19s %d", "No net activity", mushconf.queue_chunk);
+		raw_notify(player, "%-19s %d", "Activity", mushconf.active_q_chunk);
+
+		raw_notify(player, "\r\n%-19s %s", "Intervals", "Value");
+		raw_notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "%-19s %d", "Dump", mushconf.dump_interval);
+		raw_notify(player, "%-19s %d", "Clean", mushconf.check_interval);
+		raw_notify(player, "%-19s %d", "Idle Check", mushconf.idle_interval);
+		raw_notify(player, "%-19s %d", "Optimize", mushconf.dbopt_interval);
+
+		raw_notify(player, "\r\n%-19s %s", "Timers", "Value");
+		raw_notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "%-19s %d", "Dump", (int)(mushstate.dump_counter - now));
+		raw_notify(player, "%-19s %d", "Clean", (int)(mushstate.check_counter - now));
+		raw_notify(player, "%-19s %d", "Idle Check", (int)(mushstate.idle_counter - now));
+
+		raw_notify(player, "\r\n%-19s %s", "Scheduling", "Value");
+		raw_notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "%-19s %d", "Timeslice", mushconf.timeslice);
+		raw_notify(player, "%-19s %d", "Max_Quota", mushconf.cmd_quota_max);
+		raw_notify(player, "%-19s %d", "Increment", mushconf.cmd_quota_incr);
+
+		raw_notify(player, "\r\n%-19s %s", "Attribute cache", "Value");
+		raw_notify(player, "------------------- -----------------------------------------------------------");
+		raw_notify(player, "%-19s %d", "Width", mushconf.cache_width);
+		raw_notify(player, "%-19s %d", "Size", mushconf.cache_size);
 	}
+
 	notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
- * @brief List user-defined attributes
+ * @brief List non-deleted user-defined attributes (vattrs) and their flags.
  *
- * @param player DBref of player
+ * Emits a table of user-created attributes, showing each attribute's name,
+ * internal numeric ID, and its permission/behavior flags decoded via
+ * `attraccess_nametab`. Attributes marked with `AF_DELETED` are skipped.
+ *
+ * The output is bracketed by a header/footer for readability and ends with a
+ * short summary line indicating how many attributes were listed and what the
+ * next automatically assigned attribute ID will be.
+ *
+ * @param player Database reference of the viewer
  */
 void list_vattrs(dbref player)
 {
 	VATTR *va = NULL;
-	int na = 0;
+	int listed = 0; /* Count of attributes actually displayed (non-deleted) */
 
-	notify(player, "User-Defined Attributes    Attr ID  Permissions");
-	notify(player, "-------------------------- -------- -------------------------------------------");
+	raw_notify(player, "%-26.26s %-8s %s", "User-Defined Attributes", "Attr ID", "Permissions");
+	raw_notify(player, "-------------------------- -------- -------------------------------------------");
 
-	for (va = vattr_first(), na = 0; va; va = vattr_next(va), na++)
+	/*
+	 * Walk the vattr registry and print only entries that are not marked
+	 * deleted. We keep a count of displayed entries for the summary.
+	 */
+	for (va = vattr_first(); va; va = vattr_next(va))
 	{
 		if (!(va->flags & AF_DELETED))
 		{
 			listset_nametab(player, attraccess_nametab, va->flags, true, "%-26.26s %-8d ", va->name, va->number);
+			listed++;
 		}
 	}
 
-	notify(player, "-------------------------------------------------------------------------------");
-	raw_notify(player, "%d attributes, next=%d", na, mushstate.attr_next);
+	raw_notify(player, "-------------------------------------------------------------------------------");
+	/*
+	 * Report how many were listed and the next attribute ID that will be
+	 * assigned on creation. `raw_notify()` terminates the line for us.
+	 */
+	raw_notify(player, "%d attributes, next=%d", listed, mushstate.attr_next);
 }
 
 /**
- * @brief Helper for listing information from an hash table
+ * @brief Display one-line statistics for a hash table.
  *
- * @param player	DBref of player
- * @param tab_name	Hash table name
- * @param htab		Hash table
+ * Retrieves a formatted, heap-allocated summary from `hashinfo(tab_name, htab)`,
+ * sends it to the viewer, and frees the buffer afterward. If `hashinfo()`
+ * returns `NULL`, emits a simple fallback line indicating that statistics are
+ * unavailable.
+ *
+ * @param player   Database reference of the viewer
+ * @param tab_name Label used by `hashinfo()` to identify the table in output
+ * @param htab     Pointer to the hash table to summarize
  */
 void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
-	char *buff = hashinfo(tab_name, htab);
+	/* Get a formatted summary line; ownership of the returned buffer is ours. */
+	char *buff = XASPRINTF("hashinfo", "%-15s%8d%8d%8d%8d%8d%8d%8d%8d", tab_name, htab->hashsize, htab->entries, htab->deletes, htab->nulls, htab->scans, htab->hits, htab->checks, htab->max_scan);
 
-	notify(player, buff);
+	if (!buff)
+	{
+		/* Defensive fallback: avoid NULL dereference and still inform the user. */
+		raw_notify(player, "%-15.15s %s", (tab_name ? tab_name : "(unknown)"), "No stats available");
+		return;
+	}
 
+	/* Send the summary; raw_notify() appends CRLF automatically. */
+	raw_notify(player, buff);
+
+	/* Free the heap buffer provided by hashinfo(). */
 	XFREE(buff);
 }
 
 /**
- * @brief Helper for listing information from an nhash table
+ * @brief Display statistics for all core and module-provided hash tables.
  *
- * @param player	DBref of player
- * @param tab_name	NHash table name
- * @param htab		NHash table
- */
-void list_nhashstat(dbref player, const char *tab_name, HASHTAB *htab)
-{
-	char *buff = nhashinfo(tab_name, htab);
-
-	notify(player, buff);
-
-	XFREE(buff);
-}
-
-/**
- * @brief List informations from Hash/NHash tables
+ * Outputs a formatted table showing performance metrics (size, entries, deletes,
+ * nulls, scans, hits, checks, max_scan) for all compiled-in hash tables managed
+ * by `mushstate`, followed by any hash/nhash tables exported by loaded modules via
+ * the `mod_<name>_hashtable` and `mod_<name>_nhashtable` symbols.
  *
- * @param player DBref of player
+ * The output is bracketed by a header and footer for readability.
+ *
+ * @param player Database reference of the viewer
  */
 void list_hashstats(dbref player)
 {
 	MODULE *mp = NULL;
-	MODHASHES *m_htab = NULL, *hp = NULL, *m_ntab = NULL, *np = NULL;
+	MODHASHES *m_htab = NULL, *hp = NULL;
+	MODHASHES *m_ntab = NULL, *np = NULL;
 	char *s = NULL;
 
+	/* Output header with column labels. */
 	notify(player, "Hash Stats         Size Entries Deleted   Empty Lookups    Hits  Checks Longest");
 	notify(player, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
+
+	/* Display statistics for all core hash tables. */
 	list_hashstat(player, "Commands", &mushstate.command_htab);
 	list_hashstat(player, "Logged-out Cmds", &mushstate.logout_cmd_htab);
 	list_hashstat(player, "Functions", &mushstate.func_htab);
@@ -3285,14 +3321,14 @@ void list_hashstats(dbref player)
 	list_hashstat(player, "Vattr names", &mushstate.vattr_name_htab);
 	list_hashstat(player, "Player Names", &mushstate.player_htab);
 	list_hashstat(player, "References", &mushstate.nref_htab);
-	list_nhashstat(player, "Net Descriptors", &mushstate.desc_htab);
-	list_nhashstat(player, "Queue Entries", &mushstate.qpid_htab);
-	list_nhashstat(player, "Forwardlists", &mushstate.fwdlist_htab);
-	list_nhashstat(player, "Propdirs", &mushstate.propdir_htab);
-	list_nhashstat(player, "Redirections", &mushstate.redir_htab);
-	list_nhashstat(player, "Overlaid $-cmds", &mushstate.parent_htab);
-	list_nhashstat(player, "Object Stacks", &mushstate.objstack_htab);
-	list_nhashstat(player, "Object Grids", &mushstate.objgrid_htab);
+	list_hashstat(player, "Net Descriptors", &mushstate.desc_htab);
+	list_hashstat(player, "Queue Entries", &mushstate.qpid_htab);
+	list_hashstat(player, "Forwardlists", &mushstate.fwdlist_htab);
+	list_hashstat(player, "Propdirs", &mushstate.propdir_htab);
+	list_hashstat(player, "Redirections", &mushstate.redir_htab);
+	list_hashstat(player, "Overlaid $-cmds", &mushstate.parent_htab);
+	list_hashstat(player, "Object Stacks", &mushstate.objstack_htab);
+	list_hashstat(player, "Object Grids", &mushstate.objgrid_htab);
 	list_hashstat(player, "Variables", &mushstate.vars_htab);
 	list_hashstat(player, "Structure Defs", &mushstate.structs_htab);
 	list_hashstat(player, "Component Defs", &mushstate.cdefs_htab);
@@ -3300,32 +3336,50 @@ void list_hashstats(dbref player)
 	list_hashstat(player, "Instance Data", &mushstate.instdata_htab);
 	list_hashstat(player, "Module APIs", &mushstate.api_func_htab);
 
+	/*
+	 * Iterate through loaded modules and look up their exported hash table
+	 * arrays via dynamic symbol resolution (dlsym). Each module may provide
+	 * up to two symbol exports: "mod_<name>_hashtable" and "mod_<name>_nhashtable".
+	 * These are arrays of MODHASHES structs terminated by a null entry.
+	 */
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
+		/*
+		 * Look up regular hash tables exported by this module.
+		 * The symbol name is dynamically constructed as "mod_<name>_hashtable".
+		 */
 		s = XASPRINTF("s", "mod_%s_%s", mp->modname, "hashtable");
 		m_htab = (MODHASHES *)dlsym(mp->handle, s);
 		XFREE(s);
 
 		if (m_htab)
 		{
+			/* Iterate through the MODHASHES array until the null terminator. */
 			for (hp = m_htab; hp->htab != NULL; hp++)
 			{
 				list_hashstat(player, hp->tabname, hp->htab);
 			}
 		}
 
+		/*
+		 * Look up nhash (numeric hash) tables exported by this module.
+		 * The symbol name is dynamically constructed as "mod_<name>_nhashtable".
+		 */
 		s = XASPRINTF("s", "mod_%s_%s", mp->modname, "nhashtable");
 		m_ntab = (MODHASHES *)dlsym(mp->handle, s);
 		XFREE(s);
 
 		if (m_ntab)
 		{
+			/* Iterate through the MODHASHES array until the null terminator. */
 			for (np = m_ntab; np->tabname != NULL; np++)
 			{
-				list_nhashstat(player, np->tabname, np->htab);
+				list_hashstat(player, np->tabname, np->htab);
 			}
 		}
 	}
+
+	/* Output footer separator. */
 	notify(player, "-------------------------------------------------------------------------------");
 }
 
@@ -3858,7 +3912,7 @@ void list_memory(dbref player)
  * @param extra		Not used.
  * @param arg		Arguments
  */
-void do_list(dbref player, dbref cause , int extra , char *arg)
+void do_list(dbref player, dbref cause, int extra, char *arg)
 {
 	int flagvalue = search_nametab(player, list_names, arg);
 
