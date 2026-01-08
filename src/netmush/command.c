@@ -974,9 +974,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		interp = EV_STRIP;
 		key &= ~SW_NOEVAL; /* Remove switch from key (already processed) */
 	}
-	else if ((cmdp->callseq & CS_INTERP) || (interactive && !(cmdp->callseq & CS_NOINTERP)))
+	else if ((cmdp->callseq & CS_INTERP) || (!interactive && !(cmdp->callseq & CS_NOINTERP)))
 	{
-		/* Command interprets args, or interactive command without CS_NOINTERP */
+		/* Command interprets args, or is neither interactive nor has CS_NOINTERP */
+		/* Interactive commands only respect CS_INTERP. */
+		/* Non-interactive commands are only interpreted if either CS_INTERP is set, or CS_NOINTERP is unset. */
+		/* Why there are two flags for this, I do not know. */
 		interp = EV_EVAL | EV_STRIP;
 	}
 	else if (cmdp->callseq & CS_STRIP)
