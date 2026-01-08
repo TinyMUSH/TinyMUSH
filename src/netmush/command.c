@@ -3384,75 +3384,176 @@ void list_hashstats(dbref player)
 }
 
 /**
- * @brief List textfiles
+ * @brief List hash statistics for all loaded helpfiles.
  *
- * @param player DBref of player
+ * Produces a compact table with one row per helpfile, reporting the same
+ * metrics as other hash-stat listings: size, entries, deletes, empty buckets,
+ * scans/lookups, hits, checks, and longest probe chain. This helps admins
+ * understand help index performance and load characteristics.
+ *
+ * The output uses `raw_notify()` for consistent CRLF line endings and includes
+ * a header and footer. If no helpfiles are loaded, a short notice is emitted.
+ *
+ * @param player Database reference of the viewer
  */
 void list_textfiles(dbref player)
 {
-	raw_notify(player, NULL, "Help File       Size    Entries Deleted Empty   Lookups Hits    Checks  Longest");
-	raw_notify(player, NULL, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
-
-	for (int i = 0; i < mushstate.helpfiles; i++)
+	/* Early exit when the build has no helpfiles configured/loaded. */
+	if (mushstate.helpfiles <= 0 || !mushstate.hfiletab || !mushstate.hfile_hashes)
 	{
-		raw_notify(player, "%-15.15s %7d %7d %7d %7d %7d %7d %7d %7d", basename(mushstate.hfiletab[i]), mushstate.hfile_hashes[i].hashsize, mushstate.hfile_hashes[i].entries, mushstate.hfile_hashes[i].deletes, mushstate.hfile_hashes[i].nulls, mushstate.hfile_hashes[i].scans, mushstate.hfile_hashes[i].hits, mushstate.hfile_hashes[i].checks, mushstate.hfile_hashes[i].max_scan);
+		raw_notify(player, "No help files are loaded.");
+		return;
 	}
 
-	raw_notify(player, NULL, "-------------------------------------------------------------------------------");
+	/* Column headers aligned to match other hash statistics listings. */
+	raw_notify(player, "%-15s %7s %7s %7s %7s %7s %7s %7s %7s",
+			   "Help File", "Size", "Entries", "Deleted", "Empty",
+			   "Lookups", "Hits", "Checks", "Longest");
+	raw_notify(player, "--------------- ------- ------- ------- ------- ------- ------- ------- -------");
+
+	/* Walk each loaded helpfile and report its hash table stats in one line. */
+	for (int i = 0; i < mushstate.helpfiles; i++)
+	{
+		/* Resolve a human-friendly filename. We duplicate before basename()
+		 * because some implementations may modify the input buffer. */
+		const char *path = mushstate.hfiletab[i];
+		const char *name = "(unknown)";
+		if (path && *path)
+		{
+			char *dup = XSTRDUP(path, "helpfile_basename");
+			char *base = basename(dup);
+			name = base ? base : path;
+			XFREE(dup);
+		}
+
+		const HASHTAB *stats = &mushstate.hfile_hashes[i];
+		raw_notify(player, "%-15.15s %7d %7d %7d %7d %7d %7d %7d %7d",
+				   name,
+				   stats->hashsize,
+				   stats->entries,
+				   stats->deletes,
+				   stats->nulls,
+				   stats->scans,
+				   stats->hits,
+				   stats->checks,
+				   stats->max_scan);
+	}
+
+	/* Footer separator for readability. */
+	raw_notify(player, "-------------------------------------------------------------------------------");
 }
 
 /**
- * @brief Get useful info from the DB layer about hash stats, etc.
+ * @brief Report local resource usage of the running MUSH process.
  *
- * @param player DBref of player
- */
-void list_db_stats(dbref player)
-{
-	notify(player, "Database cache layer removed; backend is accessed directly.");
-	notify(player, "No cache statistics are available in this build.");
-}
-
-/**
- * @brief List local resource usage stats of the MUSH process. Adapted
- * from code by Claudius\@PythonMUCK, posted to the net by Howard/Dark_Lord.
+ * Prints a concise snapshot of process-level metrics obtained via
+ * `getrusage(RUSAGE_SELF)` and related system queries. The report includes
+ * CPU time, memory usage, page faults, disk and IPC counters, context switches,
+ * and the current limit on open file descriptors.
  *
- * @param player DBref of player
+ * Notes on portability and units:
+ * - Most `struct rusage` fields are of type `long`; we cast and format them
+ *   with width-stable specifiers to avoid UB from mismatched printf formats.
+ * - `ru_maxrss` is platform-dependent (pages on some BSDs, kilobytes on Linux).
+ *   We display both the raw value and an approximate byte size assuming pages;
+ *   this approximation may overstate on Linux where the unit is kilobytes.
+ *
+ * @param player Database reference of the viewer
  */
 void list_process(dbref player)
 {
-	int pid = 0, psize = 0, maxfds = 0;
 	struct rusage usage;
-	getrusage(RUSAGE_SELF, &usage);
-	maxfds = getdtablesize();
-	pid = getpid();
-	psize = getpagesize();
-	/* Go display everything */
-	raw_notify(player, "      Process ID: %10d        %10d bytes per page", pid, psize);
-	raw_notify(player, "       Time used: %10d user   %10d sys", usage.ru_utime.tv_sec, usage.ru_stime.tv_sec);
-	raw_notify(player, " Integral memory: %10d shared %10d private %10d stack", usage.ru_ixrss, usage.ru_idrss, usage.ru_isrss);
-	raw_notify(player, "  Max res memory: %10d pages  %10d bytes", usage.ru_maxrss, (usage.ru_maxrss * psize));
-	raw_notify(player, "     Page faults: %10d hard   %10d soft    %10d swapouts", usage.ru_majflt, usage.ru_minflt, usage.ru_nswap);
-	raw_notify(player, "        Disk I/O: %10d reads  %10d writes", usage.ru_inblock, usage.ru_oublock);
-	raw_notify(player, "     Network I/O: %10d in     %10d out", usage.ru_msgrcv, usage.ru_msgsnd);
-	raw_notify(player, "  Context switch: %10d vol    %10d forced  %10d sigs", usage.ru_nvcsw, usage.ru_nivcsw, usage.ru_nsignals);
-	raw_notify(player, " Descs available: %10d", maxfds);
+	int rstat = getrusage(RUSAGE_SELF, &usage);
+
+	/* Gather basic process/environment details. */
+	const long pid = (long)getpid();
+	const long psize = (long)getpagesize();
+	const long maxfds = (long)getdtablesize();
+
+	/* If getrusage fails, zero out the metrics to keep output predictable. */
+	if (rstat != 0)
+	{
+		memset(&usage, 0, sizeof(usage));
+	}
+
+	/* Display identifiers and basic system parameters. */
+	raw_notify(player, "      Process ID: %10ld        %10ld bytes per page", pid, psize);
+
+	/* CPU time used in seconds (user and system). */
+	raw_notify(player, "       Time used: %10ld user   %10ld sys",
+			   (long)usage.ru_utime.tv_sec, (long)usage.ru_stime.tv_sec);
+
+	/* Integral memory usage counters (platform-dependent semantics). */
+	raw_notify(player, " Integral memory: %10ld shared %10ld private %10ld stack",
+			   (long)usage.ru_ixrss, (long)usage.ru_idrss, (long)usage.ru_isrss);
+
+	/* Resident set size: raw value and an approximate bytes figure. */
+	{
+		const long long maxrss_raw = (long long)usage.ru_maxrss;
+		const long long maxrss_bytes = maxrss_raw * (long long)psize; /* may be kB on Linux */
+		raw_notify(player, "  Max res memory: %10lld raw    %10lld bytes", maxrss_raw, maxrss_bytes);
+	}
+
+	/* Page fault counts: major (hard) vs minor (soft) and swapouts. */
+	raw_notify(player, "     Page faults: %10ld hard   %10ld soft    %10ld swapouts",
+			   (long)usage.ru_majflt, (long)usage.ru_minflt, (long)usage.ru_nswap);
+
+	/* Block I/O counters (may be filesystem dependent). */
+	raw_notify(player, "        Disk I/O: %10ld reads  %10ld writes",
+			   (long)usage.ru_inblock, (long)usage.ru_oublock);
+
+	/* IPC message counters (typically zero for this process type). */
+	raw_notify(player, "     Network I/O: %10ld in     %10ld out",
+			   (long)usage.ru_msgrcv, (long)usage.ru_msgsnd);
+
+	/* Context switches and signals received. */
+	raw_notify(player, "  Context switch: %10ld vol    %10ld forced  %10ld sigs",
+			   (long)usage.ru_nvcsw, (long)usage.ru_nivcsw, (long)usage.ru_nsignals);
+
+	/* Current soft limit on open file descriptors. */
+	raw_notify(player, " Descs available: %10ld", maxfds);
 }
 
+/**
+ * @brief Format and print a human-readable memory size.
+ *
+ * Renders the provided count using binary multiples with two decimal places,
+ * selecting among B/KiB/MiB/GiB The output aligns with the table produced 
+ * by `list_memory()`.
+ *
+ * @param player  Database reference of the viewer
+ * @param item    Left-column label (padded/truncated to 30 characters)
+ * @param size    Size in bytes to format
+ */
 void print_memory(dbref player, const char *item, size_t size)
 {
+	/* Choose units and divisor thresholds using binary multiples. */
+	const char *unit;
+	double value;
 
-	if (size < 1024)
+	if (size < 1024) /* < 1 KiB */
 	{
-		raw_notify(player, "%-30.30s %0.2fB", item, size);
+		unit = "B";
+		value = (double)size;;
 	}
-	else if (size < 1048576)
+	else if (size < 1048576) /* < 1 MiB */
 	{
-		raw_notify(player, "%-30.30s %0.2fK", item, size / 1024.0);
+		unit = "KiB";
+		value = (double)size / 1024.0;
+	}
+	else if (size < 1073741824) /* < 1 GiB */
+	{
+		unit = "MiB";
+		value = (double)size / 1048576.0;
 	}
 	else
 	{
-		raw_notify(player, "%-30.30s %0.2fM", item, size / 1048576.0);
+		unit = "GiB";
+		value = (double)size / 1073741824.0;
 	}
+
+	/* Emit aligned label and value with unit; raw_notify appends CRLF. */
+	raw_notify(player, "%-30s %0.2f%s", item, value, unit);
 }
 
 /**
@@ -3479,9 +3580,8 @@ void list_memory(dbref player)
 
 	/* Calculate size of object structures */
 	each = mushstate.db_top * sizeof(OBJ);
-	// raw_notify(player, "%-20s %12.2fk", "Object structures", each / 1024);
 	raw_notify(player, "Item                          Size");
-	raw_notify(player, "------------------------------ ------------------------------------------------");
+	raw_notify(player, "----------------------------- ------------------------------------------------");
 	print_memory(player, "Object structures", each);
 	total += each;
 	/* Calculate size of mushstate and mushconf structures */
@@ -4005,7 +4105,7 @@ void do_list(dbref player, dbref cause, int extra, char *arg)
 		break;
 
 	case LIST_DB_STATS:
-		list_db_stats(player);
+		notify(player, "Database cache layer removed: database is accessed directly.");
 		break;
 
 	case LIST_PROCESS:
@@ -4017,7 +4117,7 @@ void do_list(dbref player, dbref cause, int extra, char *arg)
 		break;
 
 	case LIST_CACHEOBJS:
-		notify(player, "Object cache removed: backend is accessed directly.");
+		notify(player, "Object cache removed: database is accessed directly.");
 		break;
 
 	case LIST_TEXTFILES:
@@ -4037,7 +4137,7 @@ void do_list(dbref player, dbref cause, int extra, char *arg)
 		break;
 
 	case LIST_CACHEATTRS:
-		notify(player, "Attribute cache removed: backend is accessed directly.");
+		notify(player, "Attribute cache removed: database is accessed directly.");
 		break;
 
 	case LIST_RAWMEM:

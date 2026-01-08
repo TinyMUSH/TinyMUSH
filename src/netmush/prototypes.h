@@ -120,7 +120,6 @@ extern void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab);
 extern void list_nhashstat(dbref player, const char *tab_name, HASHTAB *htab);
 extern void list_hashstats(dbref player);
 extern void list_textfiles(dbref player);
-extern void list_db_stats(dbref player);
 extern void list_process(dbref player);
 extern void print_memory(dbref player, const char *item, size_t size);
 extern void list_memory(dbref player);

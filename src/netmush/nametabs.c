@@ -485,7 +485,6 @@ NAMETAB list_names[] = {
     {(char *)"config_permissions", 8, CA_GOD, LIST_CONF_PERMS},
     {(char *)"config_read_perms", 4, CA_PUBLIC, LIST_CF_RPERMS},
     {(char *)"costs", 3, CA_PUBLIC, LIST_COSTS},
-    {(char *)"db_stats", 2, CA_WIZARD, LIST_DB_STATS},
     {(char *)"default_flags", 1, CA_PUBLIC, LIST_DF_FLAGS},
     {(char *)"flags", 2, CA_PUBLIC, LIST_FLAGS},
     {(char *)"func_permissions", 5, CA_WIZARD, LIST_FUNCPERMS},
