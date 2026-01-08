@@ -21,7 +21,6 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
-#define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #include <sys/resource.h>
 #include <sys/time.h>
@@ -29,17 +28,24 @@
 #include <unistd.h>
 #include <libgen.h>
 
-void (*handler_cs_no_args)(dbref, dbref, int);
-void (*handler_cs_one_args)(dbref, dbref, int, char *);
-void (*handler_cs_one_args_unparse)(dbref, char *);
-void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);
-void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
-void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);
-void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);
-void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int);
+/**
+ * @brief Command handler function pointers for various call sequences
+ *
+ */
+void (*handler_cs_no_args)(dbref, dbref, int);													   /*!< Handler for no-arg commands */
+void (*handler_cs_one_args)(dbref, dbref, int, char *);											   /*!< Handler for one-arg commands */
+void (*handler_cs_one_args_unparse)(dbref, char *);												   /*!< Handler for one-arg unparsed commands */
+void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);					   /*!< Handler for one-arg commands with cmdargs */
+void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);									   /*!< Handler for two-arg commands */
+void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);			   /*!< Handler for two-arg commands with cmdargs */
+void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);						   /*!< Handler for two-arg commands with argv */
+void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int); /*!< Handler for two-arg commands with cmdargs and argv */
 
-CMDENT *prefix_cmds[256];
-CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
+/**
+ * @brief Command hash table and prefix command array
+ */
+CMDENT *prefix_cmds[256];										 /*!< Builtin prefix commands */
+CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp; /*!< Commonly used command pointers */
 
 /**
  * @brief Initialize the command table.
@@ -55,10 +61,7 @@ void init_cmdtab(void)
 
 	hashinit(&mushstate.command_htab, 250 * mushconf.hash_factor, HT_STR);
 
-	/*
-	 * Load attribute-setting commands
-	 *
-	 */
+	/* Load attribute-setting commands */
 	for (ap = attr; ap->name; ap++)
 	{
 		if ((ap->flags & AF_NOCMD) == 0)
@@ -96,10 +99,7 @@ void init_cmdtab(void)
 			}
 			else
 			{
-				/*
-				 * also add the __ alias form
-				 *
-				 */
+				/* also add the __ alias form */
 				s = XASPRINTF("s", "__%s", cp->cmdname);
 				hashadd(s, (int *)cp, &mushstate.command_htab, HASH_ALIAS);
 				XFREE(s);
@@ -109,10 +109,7 @@ void init_cmdtab(void)
 
 	XFREE(cbuff);
 
-	/*
-	 * Load the builtin commands, plus __ aliases
-	 *
-	 */
+	/* Load the builtin commands, plus __ aliases */
 	for (cp = command_table; cp->cmdname; cp++)
 	{
 		hashadd(cp->cmdname, (int *)cp, &mushstate.command_htab, 0);
@@ -121,10 +118,7 @@ void init_cmdtab(void)
 		XFREE(s);
 	}
 
-	/*
-	 * Set the builtin prefix commands
-	 *
-	 */
+	/* Set the builtin prefix commands */
 	for (i = 0; i < 256; i++)
 	{
 		prefix_cmds[i] = NULL;
@@ -472,29 +466,20 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	dbref aowner = NOTHING;
 	ADDENT *add = NULL;
 	GDATA *preserve = NULL;
-	/*
-	 * Validate arguments count to prevent buffer overflow
-	 *
-	 */
+	/* Validate arguments count to prevent buffer overflow */
 	if (ncargs < 0 || ncargs > NUM_ENV_VARS)
 	{
 		return;
 	}
 
-	/*
-	 * Perform object type checks.
-	 *
-	 */
+	/* Perform object type checks. */
 	if (Invalid_Objtype(player))
 	{
 		notify(player, "Command incompatible with invoker type.");
 		return;
 	}
 
-	/*
-	 * Check if we have permission to execute the command
-	 *
-	 */
+	/* Check if we have permission to execute the command */
 
 	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
@@ -502,10 +487,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		return;
 	}
 
-	/*
-	 * Check global flags
-	 *
-	 */
+	/* Check global flags */
 	if ((!Builder(player)) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD))
 	{
 		notify(player, "Sorry, building is not allowed now.");
@@ -636,20 +618,14 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	break;
 
 	case CS_ONE_ARG: /*!< &lt;cmd&gt; &lt;arg&gt; */
-		/*
-		 * If an unparsed command, just give it to the handler
-		 *
-		 */
+		/* If an unparsed command, just give it to the handler */
 		if (cmdp->callseq & CS_UNPARSE)
 		{
 			handler_cs_one_args_unparse = cmdp->info.handler;
 			(*(handler_cs_one_args_unparse))(player, unp_command);
 			break;
 		}
-		/*
-		 * Interpret if necessary, but not twice for CS_ADDED
-		 *
-		 */
+		/* Interpret if necessary, but not twice for CS_ADDED */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
 			buf1 = bp = XMALLOC(LBUF_SIZE, "buf1");
@@ -660,10 +636,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			buf1 = parse_to(&arg, '\0', interp | EV_TOP);
 		}
-		/*
-		 * Call the correct handler
-		 *
-		 */
+		/* Call the correct handler */
 		if (cmdp->callseq & CS_CMDARG)
 		{
 			handler_cs_one_args_cmdargs = cmdp->info.handler;
@@ -821,10 +794,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				(*handler_cs_one_args)(player, cause, key, buf1);
 			}
 		}
-		/*
-		 * Free the buffer if one was allocated
-		 *
-		 */
+		/* Free the buffer if one was allocated */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
 			XFREE(buf1);
@@ -833,15 +803,9 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		break;
 
 	case CS_TWO_ARG: /* &lt;cmd&gt; &lt;arg1&gt; = &lt;arg2&gt; */
-		/*
-		 * Interpret ARG1
-		 *
-		 */
+		/* Interpret ARG1 */
 		buf2 = parse_to(&arg, '=', EV_STRIP_TS);
-		/*
-		 * Handle when no '=' was specified
-		 *
-		 */
+		/* Handle when no '=' was specified */
 		if (!arg || (arg && !*arg))
 		{
 			arg = &tchar;
@@ -854,18 +818,12 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 
 		if (cmdp->callseq & CS_ARGV)
 		{
-			/*
-			 * Arg2 is ARGV style. Go get the args
-			 *
-			 */
+			/* Arg2 is ARGV style. Go get the args */
 			parse_arglist(player, cause, cause, arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS, args, mushconf.max_command_args, cargs, ncargs);
 
 			for (nargs = 0; (nargs < mushconf.max_command_args) && args[nargs]; nargs++)
 				;
-			/*
-			 * Call the correct command handler
-			 *
-			 */
+			/* Call the correct command handler */
 			if (cmdp->callseq & CS_CMDARG)
 			{
 				handler_cs_two_args_cmdargs_argv = cmdp->info.handler;
@@ -876,10 +834,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				handler_cs_two_args_argv = cmdp->info.handler;
 				(*handler_cs_two_args_argv)(player, cause, key, buf1, args, nargs);
 			}
-			/*
-			 * Free the argument buffers
-			 *
-			 */
+			/* Free the argument buffers */
 			for (i = 0; i < nargs; i++)
 				if (args[i])
 				{
@@ -888,10 +843,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 		else
 		{
-			/*
-			 * Arg2 is normal style. Interpret if needed
-			 *
-			 */
+			/* Arg2 is normal style. Interpret if needed */
 			if (interp & EV_EVAL)
 			{
 				buf2 = bp = XMALLOC(LBUF_SIZE, "buf2");
@@ -906,10 +858,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			{
 				buf2 = parse_to(&arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS | EV_TOP);
 			}
-			/*
-			 * Call the correct command handler
-			 *
-			 */
+			/* Call the correct command handler */
 			if (cmdp->callseq & CS_CMDARG)
 			{
 				handler_cs_two_args_cmdargs = cmdp->info.handler;
@@ -920,26 +869,17 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				handler_cs_two_args = cmdp->info.handler;
 				(*handler_cs_two_args)(player, cause, key, buf1, buf2);
 			}
-			/*
-			 * Free the buffer, if needed
-			 *
-			 */
+			/* Free the buffer, if needed */
 			if (interp & EV_EVAL)
 			{
 				XFREE(buf2);
 			}
 		}
-		/*
-		 * Free the buffer obtained by evaluating Arg1
-		 *
-		 */
+		/* Free the buffer obtained by evaluating Arg1 */
 		XFREE(buf1);
 		break;
 	}
-	/*
-	 * And now we go do the posthook, if we have one.
-	 *
-	 */
+	/* And now we go do the posthook, if we have one. */
 	if ((cmdp->post_hook != NULL) && !(cmdp->callseq & CS_ADDED))
 	{
 		process_hook(cmdp->post_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, cargs, ncargs);
@@ -976,10 +916,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	mushstate.cmd_invk_ctr++;
 
-	/*
-	 * Robustify player
-	 *
-	 */
+	/* Robustify player */
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = XSTRDUP("< process_command >", "mushstate.debug_cmd");
 
@@ -996,10 +933,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		return command;
 	}
 
-	/*
-	 * Make sure player isn't going or halted
-	 *
-	 */
+	/* Make sure player isn't going or halted */
 	if (Going(player) || (Halted(player) && !((Typeof(player) == TYPE_PLAYER) && interactive)))
 	{
 		notify_check(Owner(player), Owner(player), MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Attempt to execute command by halted object #%d", player);
@@ -1079,20 +1013,14 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 	}
 
-	/**
-	 * @warning NOTE THAT THIS WILL BREAK IF "GOD" IS NOT A DBREF.
-	 *
-	 */
+	/* NOTE THAT THIS WILL BREAK IF "GOD" IS NOT A DBREF. */
 	if (mushconf.control_flags & CF_GODMONITOR)
 	{
 		raw_notify(GOD, "%s(#%d)%c %s", Name(player), player, (interactive) ? '|' : ':', command);
 	}
 
-	/*
-	 * Eat leading whitespace, and space-compress if configured
-	 *
-	 */
-	command = (char *) skip_whitespace(command);
+	/* Eat leading whitespace, and space-compress if configured */
+	command = (char *)skip_whitespace(command);
 
 	XSTRCPY(preserve_cmd, command);
 	mushstate.debug_cmd = command;
@@ -1123,10 +1051,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		*q = '\0';
 	}
 
-	/*
-	 * Allow modules to intercept command strings.
-	 *
-	 */
+	/* Allow modules to intercept command strings. */
 	for (csm__mp = mushstate.modules_list, retval = 0; (csm__mp != NULL) && !retval; csm__mp = csm__mp->next)
 	{
 		if (csm__mp->process_command)
@@ -1173,16 +1098,10 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		return preserve_cmd;
 	}
 
-	/*
-	 * Only check for exits if we may use the goto command
-	 *
-	 */
+	/* Only check for exits if we may use the goto command */
 	if (check_cmd_access(player, goto_cmdp, args, nargs))
 	{
-		/*
-		 * Check for an exit name
-		 *
-		 */
+		/* Check for an exit name */
 		init_match_check_keys(player, command, TYPE_EXIT);
 		match_exit_with_parents();
 		exit = last_match_result();
@@ -1191,7 +1110,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		{
 			if (mushconf.exit_calls_move)
 			{
-				/**
+				/*
 				 * Exits literally call the 'move' command. Note that,
 				 * later, when we go to matching master-room and other
 				 * global-ish exits, that we also need to have move_match_more
@@ -1219,20 +1138,14 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			}
 			else
 			{
-				/*
-				 * Execute the pre-hook for the goto command
-				 *
-				 */
+				/* Execute the pre-hook for the goto command */
 
 				if ((goto_cmdp->pre_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
 				{
 					process_hook(goto_cmdp->pre_hook, goto_cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, args, nargs);
 				}
 				move_exit(player, exit, 0, NOGO_MESSAGE, 0);
-				/*
-				 * Execute the post-hook for the goto command
-				 *
-				 */
+				/* Execute the post-hook for the goto command */
 				if ((goto_cmdp->post_hook != NULL) && !(goto_cmdp->callseq & CS_ADDED))
 				{
 					process_hook(goto_cmdp->post_hook, goto_cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, args, nargs);
@@ -1243,10 +1156,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			return preserve_cmd;
 		}
 
-		/*
-		 * Check for an exit in the master room
-		 *
-		 */
+		/* Check for an exit in the master room */
 		init_match_check_keys(player, command, TYPE_EXIT);
 		match_master_exit();
 		exit = last_match_result();
@@ -1307,7 +1217,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 
 	*q++ = '\0';
 
-	p = (char *) skip_whitespace(p);
+	p = (char *)skip_whitespace(p);
 
 	arg = p;
 
@@ -1318,10 +1228,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		*slashp++ = '\0';
 	}
 
-	/*
-	 * Check for a builtin command (or an alias of a builtin command)
-	 *
-	 */
+	/* Check for a builtin command (or an alias of a builtin command) */
 	cmdp = (CMDENT *)hashfind(lcbuf, &mushstate.command_htab);
 
 	if (cmdp != NULL)
@@ -1369,17 +1276,10 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	XFREE(evcmd);
 	succ = 0;
 
-	/**
-	 * Idea for enter/leave aliases from R'nice\@TinyTIM
-	 *
-	 */
+	/* Idea for enter/leave aliases from R'nice\@TinyTIM */
 	if (Has_location(player) && Good_obj(Location(player)))
 	{
-		/*
-		 * Check for a leave alias, if we have permissions to use the
-		 * 'leave' command.
-		 *
-		 */
+		/* Check for a leave alias, if permitted ('leave' command). */
 		if (check_cmd_access(player, leave_cmdp, args, nargs))
 		{
 			p = atr_pget(Location(player), A_LALIAS, &aowner, &aflags, &alen);
@@ -1410,10 +1310,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 			XFREE(p);
 		}
 
-		/*
-		 * Check for enter aliases, if we have permissions to use the
-		 * 'enter' command.
-		 */
+		/* Check for enter aliases, if permitted ('enter' command). */
 		if (check_cmd_access(player, enter_cmdp, args, nargs))
 		{
 			for (exit = Contents(Location(player)); (exit != NOTHING) && (Next(exit) != exit); exit = Next(exit))
@@ -1451,10 +1348,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	 */
 	got_stop = 0;
 
-	/*
-	 * Check for $-command matches on me
-	 *
-	 */
+	/* Check for $-command matches on me */
 	if (mushconf.match_mine)
 	{
 		if (((Typeof(player) != TYPE_PLAYER) || mushconf.match_mine_pl) && (atr_match(player, player, AMATCH_CMD, lcbuf, preserve_cmd, 1) > 0))
@@ -1464,10 +1358,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 	}
 
-	/*
-	 * Check for $-command matches on nearby things and on my room
-	 *
-	 */
+	/* Check for $-command matches on nearby things and on my room */
 	if (!got_stop && Has_location(player))
 	{
 		succ += list_check(Contents(Location(player)), player, AMATCH_CMD, lcbuf, preserve_cmd, 1, &got_stop);
@@ -1479,9 +1370,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 		}
 	}
 
-	/*
-	 * Check for $-command matches in my inventory
-	 */
+	/* Check for $-command matches in my inventory */
 	if (!got_stop && Has_contents(player))
 		succ += list_check(Contents(player), player, AMATCH_CMD, lcbuf, preserve_cmd, 1, &got_stop);
 
@@ -1732,128 +1621,128 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 	save_pout = mushstate.pout;
 	mushstate.break_called = 0;
 
-	       while (cmdline && (!qent || qent == mushstate.qfirst) && !mushstate.break_called)
-	       {
-			   cp = parse_to(&cmdline, ';', 0);
+	while (cmdline && (!qent || qent == mushstate.qfirst) && !mushstate.break_called)
+	{
+		cp = parse_to(&cmdline, ';', 0);
 
-		       if (cp && *cp)
-		       {
+		if (cp && *cp)
+		{
 
-					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
-										 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
-										 cp, (int)strlen(cp));
-					   log_write(LOG_ALWAYS, "TRIG", "CMDLINE", "[DEBUG process_cmdline] RAW cp='%s' (len=%d) (player=#%d, cause=#%d)",
-								 cp, (int)strlen(cp), player, cause);
-					   notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
-									 "[DEBUG process_cmdline] about to call process_command: '%s'",
-									 cp);
-				       numpipes = 0;
-				       while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
-				       {
-					       cmdline++;
-					       numpipes++;
-					       mushstate.inpipe = 1;
-					       mushstate.poutnew = XMALLOC(LBUF_SIZE, "mushstate.poutnew");
-					       mushstate.poutbufc = mushstate.poutnew;
-					       mushstate.poutobj = player;
-					       mushstate.debug_cmd = cp;
-					       process_command(player, cause, 0, cp, args, nargs);
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
+						 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
+						 cp, (int)strlen(cp));
+			log_write(LOG_ALWAYS, "TRIG", "CMDLINE", "[DEBUG process_cmdline] RAW cp='%s' (len=%d) (player=#%d, cause=#%d)",
+					  cp, (int)strlen(cp), player, cause);
+			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
+						 "[DEBUG process_cmdline] about to call process_command: '%s'",
+						 cp);
+			numpipes = 0;
+			while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
+			{
+				cmdline++;
+				numpipes++;
+				mushstate.inpipe = 1;
+				mushstate.poutnew = XMALLOC(LBUF_SIZE, "mushstate.poutnew");
+				mushstate.poutbufc = mushstate.poutnew;
+				mushstate.poutobj = player;
+				mushstate.debug_cmd = cp;
+				process_command(player, cause, 0, cp, args, nargs);
 
-					       if (mushstate.pout && mushstate.pout != save_pout)
-					       {
-						       XFREE(mushstate.pout);
-					       }
+				if (mushstate.pout && mushstate.pout != save_pout)
+				{
+					XFREE(mushstate.pout);
+				}
 
-					       *mushstate.poutbufc = '\0';
-					       mushstate.pout = mushstate.poutnew;
-					       cp = parse_to(&cmdline, ';', 0);
-				       }
+				*mushstate.poutbufc = '\0';
+				mushstate.pout = mushstate.poutnew;
+				cp = parse_to(&cmdline, ';', 0);
+			}
 
-			       mushstate.inpipe = save_inpipe;
-			       mushstate.poutnew = save_poutnew;
-			       mushstate.poutbufc = save_poutbufc;
-			       mushstate.poutobj = save_poutobj;
-			       mushstate.debug_cmd = cp;
-			       if (qent && qent != mushstate.qfirst)
-			       {
-				       if (mushstate.pout && mushstate.pout != save_pout)
-				       {
-					       XFREE(mushstate.pout);
-				       }
-				       break;
-			       }
+			mushstate.inpipe = save_inpipe;
+			mushstate.poutnew = save_poutnew;
+			mushstate.poutbufc = save_poutbufc;
+			mushstate.poutobj = save_poutobj;
+			mushstate.debug_cmd = cp;
+			if (qent && qent != mushstate.qfirst)
+			{
+				if (mushstate.pout && mushstate.pout != save_pout)
+				{
+					XFREE(mushstate.pout);
+				}
+				break;
+			}
 
-			       if (mushconf.lag_check)
-			       {
-				       gettimeofday(&begin_time, NULL);
-				       if (mushconf.lag_check_cpu)
-				       {
-					       getrusage(RUSAGE_SELF, &b_usage);
-				       }
-			       }
+			if (mushconf.lag_check)
+			{
+				gettimeofday(&begin_time, NULL);
+				if (mushconf.lag_check_cpu)
+				{
+					getrusage(RUSAGE_SELF, &b_usage);
+				}
+			}
 
-			       log_cmdbuf = process_command(player, cause, 0, cp, args, nargs);
+			log_cmdbuf = process_command(player, cause, 0, cp, args, nargs);
 
-			       if (mushstate.pout && mushstate.pout != save_pout)
-			       {
-				       XFREE(mushstate.pout);
-				       mushstate.pout = save_pout;
-			       }
+			if (mushstate.pout && mushstate.pout != save_pout)
+			{
+				XFREE(mushstate.pout);
+				mushstate.pout = save_pout;
+			}
 
-			       save_poutbufc = mushstate.poutbufc;
+			save_poutbufc = mushstate.poutbufc;
 
-			       if (mushconf.lag_check)
-			       {
-				       gettimeofday(&end_time, NULL);
-				       if (mushconf.lag_check_cpu)
-				       {
-					       getrusage(RUSAGE_SELF, &e_usage);
-				       }
-				       used_time = msec_diff(end_time, begin_time);
-				       if ((used_time / 1000) >= mushconf.max_cmdsecs)
-				       {
-					       pname = log_getname(player);
-					       if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
-					       {
-						       lname = log_getname(Location(player));
-						       log_write(LOG_PROBLEMS, "CMD", "CPU", "%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
-						       XFREE(lname);
-					       }
-					       else
-					       {
-						       log_write(LOG_PROBLEMS, "CMD", "CPU", "%s queued command taking %.2f secs (enactor #%d): %s", pname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
-					       }
-					       XFREE(pname);
-				       }
-				       if (mushconf.lag_check_clk)
-				       {
-					       obj_time = Time_Used(player);
-					       if (mushconf.lag_check_cpu)
-					       {
-						       obj_time.tv_usec += e_usage.ru_utime.tv_usec;
-						       obj_time.tv_sec += e_usage.ru_utime.tv_sec - b_usage.ru_utime.tv_sec;
-					       }
-					       else
-					       {
-						       obj_time.tv_usec += end_time.tv_usec - begin_time.tv_usec;
-						       obj_time.tv_sec += end_time.tv_sec - begin_time.tv_sec;
-					       }
-					       if (obj_time.tv_usec < 0)
-					       {
-						       obj_time.tv_usec += 1000000;
-						       obj_time.tv_sec--;
-					       }
-					       else if (obj_time.tv_usec >= 1000000)
-					       {
-						       obj_time.tv_sec += obj_time.tv_usec / 1000000;
-						       obj_time.tv_usec = obj_time.tv_usec % 1000000;
-					       }
-					       db[player].cpu_time_used.tv_sec = obj_time.tv_sec;
-					       db[player].cpu_time_used.tv_usec = obj_time.tv_usec;
-				       }
-			       }
-		       }
-	       }
+			if (mushconf.lag_check)
+			{
+				gettimeofday(&end_time, NULL);
+				if (mushconf.lag_check_cpu)
+				{
+					getrusage(RUSAGE_SELF, &e_usage);
+				}
+				used_time = msec_diff(end_time, begin_time);
+				if ((used_time / 1000) >= mushconf.max_cmdsecs)
+				{
+					pname = log_getname(player);
+					if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
+					{
+						lname = log_getname(Location(player));
+						log_write(LOG_PROBLEMS, "CMD", "CPU", "%s in %s queued command taking %.2f secs (enactor #%d): %s", pname, lname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
+						XFREE(lname);
+					}
+					else
+					{
+						log_write(LOG_PROBLEMS, "CMD", "CPU", "%s queued command taking %.2f secs (enactor #%d): %s", pname, (double)(used_time / 1000), mushstate.qfirst->cause, log_cmdbuf);
+					}
+					XFREE(pname);
+				}
+				if (mushconf.lag_check_clk)
+				{
+					obj_time = Time_Used(player);
+					if (mushconf.lag_check_cpu)
+					{
+						obj_time.tv_usec += e_usage.ru_utime.tv_usec;
+						obj_time.tv_sec += e_usage.ru_utime.tv_sec - b_usage.ru_utime.tv_sec;
+					}
+					else
+					{
+						obj_time.tv_usec += end_time.tv_usec - begin_time.tv_usec;
+						obj_time.tv_sec += end_time.tv_sec - begin_time.tv_sec;
+					}
+					if (obj_time.tv_usec < 0)
+					{
+						obj_time.tv_usec += 1000000;
+						obj_time.tv_sec--;
+					}
+					else if (obj_time.tv_usec >= 1000000)
+					{
+						obj_time.tv_sec += obj_time.tv_usec / 1000000;
+						obj_time.tv_usec = obj_time.tv_usec % 1000000;
+					}
+					db[player].cpu_time_used.tv_sec = obj_time.tv_sec;
+					db[player].cpu_time_used.tv_usec = obj_time.tv_usec;
+				}
+			}
+		}
+	}
 
 	mushstate.debug_cmd = cmdsave;
 	mushstate.curr_enactor = save_enactor;
@@ -2210,7 +2099,7 @@ int cf_access(int *vp __attribute__((unused)), char *str, long extra, dbref play
 			*ap++ = '\0';
 		}
 
-		ap = (char *) skip_whitespace(ap);
+		ap = (char *)skip_whitespace(ap);
 	}
 
 	cmdp = (CMDENT *)hashfind(str, &mushstate.command_htab);
@@ -2404,7 +2293,7 @@ int cf_cmd_alias(int *vp, char *str, long extra __attribute__((unused)), dbref p
 
 	if (!orig)
 	{
-		/**
+		/*
 		 * we only got one argument to \@alias. Bad.
 		 *
 		 */
