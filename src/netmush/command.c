@@ -4012,17 +4012,17 @@ void list_memory(dbref player)
 /**
  * @brief Dispatch @list to the appropriate reporting helper.
  *
- * Resolves the user's argument against `list_names` via `search_nametab()` and
- * invokes the matching reporting routine (allocator stats, hash tables, params,
- * memory, etc.). When the argument is missing or unknown, it shows the valid
- * options; if the player lacks permission for a matched entry, it reports that
- * explicitly. The `cause` and `extra` parameters are currently unused but kept
- * for call-signature compatibility with the command dispatcher.
+ * Parses the subcommand from arg, resolves it against list_names with
+ * search_nametab(), and invokes the matching reporting routine (allocator
+ * stats, hash tables, parameters, memory, process info, etc.). When the input
+ * is missing or unknown, the valid options are displayed. Permission failures
+ * are reported explicitly. The cause and extra parameters are kept for command
+ * dispatcher compatibility and are otherwise unused.
  *
- * @param player Database reference of the viewer
- * @param cause  Unused command cause (retained for interface compatibility)
- * @param extra  Unused extra argument
- * @param arg    Subcommand to dispatch (matches entries in `list_names`)
+ * @param player Database reference of the viewer.
+ * @param cause  Command cause (unused).
+ * @param extra  Extra argument (unused).
+ * @param arg    Subcommand to dispatch.
  */
 void do_list(dbref player, dbref cause, int extra, char *arg)
 {
