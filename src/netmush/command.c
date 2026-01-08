@@ -2354,9 +2354,17 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 }
 
 /**
- * @brief List access commands.
+ * @brief Display command permission masks the caller can see.
  *
- * @param player DBref of the player
+ * Prints a header row, then lists:
+ * - All built-in commands visible to the caller
+ * - Commands exported by loaded modules
+ * - Attribute-setter commands ("@attr") that exist in the command table
+ *
+ * Entries hidden by `CF_DARK` or failing `check_access()` are skipped so the
+ * output only shows commands the player can actually run or inspect.
+ *
+ * @param player Database reference of the requesting player
  */
 void list_cmdaccess(dbref player)
 {
@@ -2368,8 +2376,10 @@ void list_cmdaccess(dbref player)
 	notify(player, "Command                    Permissions");
 	notify(player, "-------------------------- ----------------------------------------------------");
 
+	/* Core command table */
 	helper_list_cmdaccess(player, command_table);
 
+	/* Module command tables (if exported) */
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
 		p = XASPRINTF("p", "mod_%s_%s", mp->modname, "cmdtable");
@@ -2381,19 +2391,26 @@ void list_cmdaccess(dbref player)
 		XFREE(p);
 	}
 
+	/* Attribute-setter commands ("@name", "@desc", etc.) */
 	for (ap = attr; ap->name; ap++)
 	{
+		if (ap->flags & AF_NOCMD)
+		{
+			continue; /* Attribute is not exposed as a command */
+		}
+
+		size_t name_len = strlen(ap->name);
+		if ((name_len + 2) >= SBUF_SIZE)
+		{
+			continue; /* Avoid buffer overflow on extremely long names */
+		}
+
 		p = buff;
 		*p++ = '@';
 
 		for (q = (char *)ap->name; *q; p++, q++)
 		{
 			*p = tolower(*q);
-		}
-
-		if (ap->flags & AF_NOCMD)
-		{
-			continue;
 		}
 
 		*p = '\0';
@@ -2421,62 +2438,67 @@ void list_cmdaccess(dbref player)
 	XFREE(buff);
 }
 
+/* Emit switches for every command in a table, applying access and dark filters. */
+static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
+{
+	CMDENT *cmdp = NULL;
+
+	for (cmdp = ctab; cmdp->cmdname; cmdp++)
+	{
+		if (!cmdp->switches)
+		{
+			continue; /* Command defines no switches */
+		}
+
+		if (!check_access(player, cmdp->perms))
+		{
+			continue; /* Caller cannot see this command */
+		}
+
+		if (cmdp->perms & CF_DARK)
+		{
+			continue; /* Explicitly hidden from listings */
+		}
+
+		display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
+	}
+}
+
 /**
- * @brief List switches for commands.
+ * @brief List visible command switches for a player.
  *
- * @param player DBref of the player
+ * Prints the switch sets for each built-in and module-provided command the
+ * caller can access, hiding entries that are dark or permission-restricted.
+ * The output begins with a header row for readability.
+ *
+ * @param player Database reference of the requesting player
  */
 void list_cmdswitches(dbref player)
 {
-	CMDENT *cmdp = NULL, *ctab = NULL;
+	CMDENT *ctab = NULL;
 	MODULE *mp = NULL;
-	char *s = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
+	char *symname = XMALLOC(MBUF_SIZE, "symname");
 
 	notify(player, "Command          Switches");
 	notify(player, "---------------- ---------------------------------------------------------------");
 
-	for (cmdp = command_table; cmdp->cmdname; cmdp++)
-	{
-		if (cmdp->switches)
-		{
-			if (check_access(player, cmdp->perms))
-			{
-				if (!(cmdp->perms & CF_DARK))
-				{
-					display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
-				}
-			}
-		}
-	}
+	/* Built-in command table */
+	emit_cmdswitches_for_table(player, command_table);
 
-	s = XMALLOC(MBUF_SIZE, "s");
-
+	/* Module command tables (if they export one) */
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
-		XSNPRINTF(s, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
+		XSNPRINTF(symname, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
 
-		if ((ctab = (CMDENT *)dlsym(mp->handle, s)) != NULL)
+		if ((ctab = (CMDENT *)dlsym(mp->handle, symname)) != NULL)
 		{
-			for (cmdp = ctab; cmdp->cmdname; cmdp++)
-			{
-				if (cmdp->switches)
-				{
-					if (check_access(player, cmdp->perms))
-					{
-						if (!(cmdp->perms & CF_DARK))
-						{
-							display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
-						}
-					}
-				}
-			}
+			emit_cmdswitches_for_table(player, ctab);
 		}
 	}
 
 	notify(player, "--------------------------------------------------------------------------------");
 
-	XFREE(s);
-	XFREE(buff);
+	XFREE(symname);
 }
 
 /**
