@@ -2006,46 +2006,43 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 }
 
 /**
- * @brief Exécute une série de commandes délimitées par ';' et gère les pipes '|'.
+ * @brief Execute a semicolon-delimited command line and handle pipe segments.
  *
- * `process_cmdline` traite une ligne pouvant contenir plusieurs commandes
- * séparées par des points-virgules ';'. Chaque commande peut être suivie de
- * segments de pipe '|' qui gèrent la sortie dirigée (`pout*`) et l'état de
- * pipeline via `mushstate.inpipe`.
+ * Splits the incoming `cmdline` on ';' to obtain individual commands, scans
+ * any trailing '|' segments to set up piped output (`pout*`, `mushstate.inpipe`),
+ * preserves and restores global state around each segment, and delegates
+ * execution to `process_command()` with `interactive` set to false.
  *
- * Rôles principaux:
- * - Segmentation par ';' et itération sur chaque commande.
- * - Gestion des pipes consécutifs '|' (jusqu'à `mushconf.ntfy_nest_lim`).
- * - Sauvegarde/restauration de l'état global: enactor, player, pipe/output.
- * - Journalisation (notify/log) des segments et des performances (lag-check).
- * - Délégation à `process_command()` pour l'exécution de chaque segment.
+ * Responsibilities:
+ * - Split by ';' and iterate over each command segment.
+ * - Handle consecutive pipes '|' up to `mushconf.ntfy_nest_lim`.
+ * - Save/restore enactor/player and pipe/output state across segments.
+ * - Log segments and, when enabled, capture lag metrics.
+ * - Call `process_command()` for each segment.
  *
- * Détails d'exécution:
- * - `mushstate.inpipe`, `pout*` et `poutobj` sont sauvegardés puis restaurés
- *   autour de l'exécution de chaque segment.
- * - Si `mushconf.lag_check` est actif, les temps et l'usage CPU sont mesurés via
+ * Execution notes:
+ * - `mushstate.inpipe`, `pout*`, and `poutobj` are saved then restored around
+ *   each segment execution.
+ * - When `mushconf.lag_check` is on, timing/CPU is measured via
  *   `gettimeofday`/`getrusage`.
- * - La boucle s'interrompt si `break` est appelé (`mushstate.break_called`).
- * - Les segments vides sont ignorés.
+ * - Loop stops on `mushstate.break_called` or when the queue entry is no longer
+ *   at the head of the queue.
+ * - Empty segments are ignored.
  *
- * Paramètres:
- * - player: DBref du joueur
- * - cause:  DBref du cause
- * - cmdline: Ligne de commande à segmenter
- * - args:    Tableau d'arguments (%0-%9)
- * - nargs:   Taille de `args`
- * - qent:    Entrée de file (détermine si l'exécution est en tête de file)
+ * @param player  DBref of the player executing the command line
+ * @param cause   DBref of the cause (often the same as player)
+ * @param cmdline Raw command line to parse (modified in place during parsing)
+ * @param args    Environment argument array (%0-%9)
+ * @param nargs   Number of entries in `args`
+ * @param qent    Command queue entry; only the head is allowed to execute
  *
- * Retour:
- * - Aucun. `log_cmdbuf` alloué par `process_command` est libéré si présent.
+ * @return void
  *
- * Notes:
- * - Limite d'imbrication via `mushconf.cmd_nest_lim`.
- * - `process_command()` est appelé avec `interactive=0`.
- * - Les permissions et hooks spécifiques sont gérés par `process_command()`.
+ * @note Nesting is limited by `mushconf.cmd_nest_lim`.
+ * @note `process_command()` handles permissions and hooks for each segment.
  *
- * @see process_command() pour la normalisation et la résolution d'un segment
- * @see mushstate.inpipe et les variables `pout*` pour la gestion de pipe
+ * @see process_command()
+ * @see mushstate.inpipe
  */
 void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
