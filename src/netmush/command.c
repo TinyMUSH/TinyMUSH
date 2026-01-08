@@ -164,10 +164,7 @@ bool check_access(dbref player, int mask)
 {
 	int mval = 0, nval = 0;
 
-	/*
-	 * Check if we have permission to execute
-	 *
-	 */
+	/* Check if we have permission to execute */
 	if (mask & (CA_DISABLED | CA_STATIC))
 	{
 		return false;
@@ -217,10 +214,7 @@ bool check_access(dbref player, int mask)
 			}
 		}
 	}
-	/*
-	 * Check the things that we can't be.
-	 *
-	 */
+	/* Check the things that we can't be. */
 	if (((mask & CA_ISNOT_MASK) && !Wizard(player)) && (((mask & CA_NO_HAVEN) && Player_haven(player)) || ((mask & CA_NO_ROBOT) && Robot(player)) || ((mask & CA_NO_SLAVE) && Slave(player)) || ((mask & CA_NO_SUSPECT) && Suspect(player)) || ((mask & CA_NO_GUEST) && Guest(player))))
 	{
 		return false;
@@ -973,10 +967,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	XFREE(pname);
 	s_Accessed(player);
 
-	/*
-	 * Reset recursion and other limits. Baseline the CPU counter.
-	 *
-	 */
+	/* Reset recursion and other limits. Baseline the CPU counter. */
 	mushstate.func_nest_lev = 0;
 	mushstate.func_invk_ctr = 0;
 	mushstate.f_limitmask = 0;
@@ -1779,10 +1770,7 @@ void list_cmdtable(dbref player)
 		}
 	}
 
-	/*
-	 * Players get the list of logged-out cmds too
-	 *
-	 */
+	/* Players get the list of logged-out cmds too */
 	if (isPlayer(player))
 	{
 		display_nametab(player, logout_cmdtable, true, buf);
@@ -2847,10 +2835,7 @@ void list_process(dbref player)
 	maxfds = getdtablesize();
 	pid = getpid();
 	psize = getpagesize();
-	/*
-	 * Go display everything
-	 *
-	 */
+	/* Go display everything */
 	raw_notify(player, "      Process ID: %10d        %10d bytes per page", pid, psize);
 	raw_notify(player, "       Time used: %10d user   %10d sys", usage.ru_utime.tv_sec, usage.ru_stime.tv_sec);
 	raw_notify(player, " Integral memory: %10d shared %10d private %10d stack", usage.ru_ixrss, usage.ru_idrss, usage.ru_isrss);
@@ -2901,27 +2886,18 @@ void list_memory(dbref player)
 	INSTANCE *inst_ptr = NULL;
 	STRUCTDATA *data_ptr = NULL;
 
-	/*
-	 * Calculate size of object structures
-	 *
-	 */
+	/* Calculate size of object structures */
 	each = mushstate.db_top * sizeof(OBJ);
 	// raw_notify(player, "%-20s %12.2fk", "Object structures", each / 1024);
 	raw_notify(player, "Item                          Size");
 	raw_notify(player, "------------------------------ ------------------------------------------------");
 	print_memory(player, "Object structures", each);
 	total += each;
-	/*
-	 * Calculate size of mushstate and mushconf structures
-	 *
-	 */
+	/* Calculate size of mushstate and mushconf structures */
 	each = sizeof(CONFDATA) + sizeof(STATEDATA);
 	print_memory(player, "mushconf/mushstate", each);
 	total += each;
-	/*
-	 * Calculate size of object pipelines
-	 *
-	 */
+	/* Calculate size of object pipelines */
 	each = 0;
 
 	for (i = 0; i < NUM_OBJPIPES; i++)
@@ -2934,9 +2910,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Object pipelines", each);
 	total += each;
-	/*
-	 * Calculate size of name caches
-	 */
+	/* Calculate size of name caches */
 	each = sizeof(NAME *) * mushstate.db_top * 2;
 
 	for (i = 0; i < mushstate.db_top; i++)
@@ -2954,18 +2928,12 @@ void list_memory(dbref player)
 
 	print_memory(player, "Name caches", each);
 	total += each;
-	/*
-	 * Calculate size of Raw Memory allocations
-	 *
-	 */
+	/* Calculate size of Raw Memory allocations */
 	each = total_rawmemory();
 
 	print_memory(player, "Raw Memory", each);
 	total += each;
-	/*
-	 * Calculate size of command hashtable
-	 *
-	 */
+	/* Calculate size of command hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.command_htab.hashsize;
 
@@ -3017,10 +2985,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Command table", each);
 	total += each;
-	/*
-	 * Calculate size of logged-out commands hashtable
-	 *
-	 */
+	/* Calculate size of logged-out commands hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.logout_cmd_htab.hashsize;
 
@@ -3046,9 +3011,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Logout cmd htab", each);
 	total += each;
-	/*
-	 * Calculate size of functions hashtable
-	 */
+	/* Calculate size of functions hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.func_htab.hashsize;
 
@@ -3077,10 +3040,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Functions htab", each);
 	total += each;
-	/*
-	 * Calculate size of user-defined functions hashtable
-	 *
-	 */
+	/* Calculate size of user-defined functions hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.ufunc_htab.hashsize;
 
@@ -3111,10 +3071,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "U-functions htab", each);
 	total += each;
-	/*
-	 * Calculate size of flags hashtable
-	 *
-	 */
+	/* Calculate size of flags hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.flags_htab.hashsize;
 
@@ -3143,10 +3100,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Flags htab", each);
 	total += each;
-	/*
-	 * Calculate size of powers hashtable
-	 *
-	 */
+	/* Calculate size of powers hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.powers_htab.hashsize;
 
@@ -3175,10 +3129,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Powers htab", each);
 	total += each;
-	/*
-	 * Calculate size of helpfile hashtables
-	 *
-	 */
+	/* Calculate size of helpfile hashtables */
 	each = 0;
 
 	for (j = 0; j < mushstate.helpfiles; j++)
@@ -3206,10 +3157,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Helpfiles htabs", each);
 	total += each;
-	/*
-	 * Calculate size of vattr name hashtable
-	 *
-	 */
+	/* Calculate size of vattr name hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.vattr_name_htab.hashsize;
 
@@ -3228,10 +3176,7 @@ void list_memory(dbref player)
 
 	print_memory(player, "Vattr name htab", each);
 	total += each;
-	/*
-	 * Calculate size of attr name hashtable
-	 *
-	 */
+	/* Calculate size of attr name hashtable */
 	each = 0;
 	each += sizeof(HASHENT *) * mushstate.attr_name_htab.hashsize;
 
@@ -3257,23 +3202,14 @@ void list_memory(dbref player)
 
 	print_memory(player, "Attr name htab", each);
 	total += each;
-	/*
-	 * Calculate the size of anum_table
-	 *
-	 */
+	/* Calculate the size of anum_table */
 	each = sizeof(ATTR *) * anum_alc_top;
 	print_memory(player, "Attr num table", each);
 	total += each;
 
-	/*
-	 * After this point, we only report if it's non-zero.
-	 *
-	 */
+	/* After this point, we only report if it's non-zero. */
 
-	/*
-	 * Calculate size of object stacks
-	 *
-	 */
+	/* Calculate size of object stacks */
 	each = 0;
 
 	for (stack = (OBJSTACK *)hash_firstentry((HASHTAB *)&mushstate.objstack_htab); stack != NULL; stack = (OBJSTACK *)hash_nextentry((HASHTAB *)&mushstate.objstack_htab))
@@ -3288,10 +3224,7 @@ void list_memory(dbref player)
 	}
 
 	total += each;
-	/*
-	 * Calculate the size of grids
-	 *
-	 */
+	/* Calculate the size of grids */
 	each = 0;
 
 	for (grid = (OBJGRID *)hash_firstentry((HASHTAB *)&mushstate.objgrid_htab); grid != NULL; grid = (OBJGRID *)hash_nextentry((HASHTAB *)&mushstate.objgrid_htab))
@@ -3317,9 +3250,7 @@ void list_memory(dbref player)
 	}
 
 	total += each;
-	/*
-	 * Calculate the size of xvars.
-	 */
+	/* Calculate the size of xvars. */
 	each = 0;
 
 	for (xvar = (VARENT *)hash_firstentry(&mushstate.vars_htab); xvar != NULL; xvar = (VARENT *)hash_nextentry(&mushstate.vars_htab))
@@ -3334,10 +3265,7 @@ void list_memory(dbref player)
 	}
 
 	total += each;
-	/*
-	 * Calculate the size of overhead associated with structures.
-	 *
-	 */
+	/* Calculate the size of overhead associated with structures. */
 	each = 0;
 
 	for (this_struct = (STRUCTDEF *)hash_firstentry(&mushstate.structs_htab); this_struct != NULL; this_struct = (STRUCTDEF *)hash_nextentry(&mushstate.structs_htab))
@@ -3364,10 +3292,7 @@ void list_memory(dbref player)
 	}
 
 	total += each;
-	/*
-	 * Calculate the size of data associated with structures.
-	 *
-	 */
+	/* Calculate the size of data associated with structures. */
 	each = 0;
 
 	for (data_ptr = (STRUCTDATA *)hash_firstentry(&mushstate.instdata_htab); data_ptr != NULL; data_ptr = (STRUCTDATA *)hash_nextentry(&mushstate.instdata_htab))
@@ -3386,10 +3311,7 @@ void list_memory(dbref player)
 	}
 
 	total += each;
-	/*
-	 * Report end total.
-	 *
-	 */
+	/* Report end total. */
 	raw_notify(player, "-------------------------------------------------------------------------------");
 	print_memory(player, "Total", total);
 }
