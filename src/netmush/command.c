@@ -2438,38 +2438,48 @@ void list_cmdaccess(dbref player)
 	XFREE(buff);
 }
 
-/* Emit switches for every command in a table, applying access and dark filters. */
+/**
+ * @brief Print visible switches for a command table.
+ *
+ * Walks a command table and displays each command's switch set if the caller
+ * can access it, skipping entries that define no switches or are marked dark.
+ * Used by `list_cmdswitches()` for both built-in and module command tables.
+ *
+ * @param player Database reference of the requesting player
+ * @param ctab   Null-terminated command table to enumerate
+ */
 static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
 {
-	CMDENT *cmdp = NULL;
-
-	for (cmdp = ctab; cmdp->cmdname; cmdp++)
+	if (!ctab)
 	{
+		return; /* Nothing to list */
+	}
+
+	for (CMDENT *cmdp = ctab; cmdp->cmdname; cmdp++)
+	{
+		/* Skip commands without switches first to avoid deeper checks */
 		if (!cmdp->switches)
 		{
-			continue; /* Command defines no switches */
+			continue;
 		}
 
-		if (!check_access(player, cmdp->perms))
+		/* Enforce permission and visibility filters */
+		if ((cmdp->perms & CF_DARK) || !check_access(player, cmdp->perms))
 		{
-			continue; /* Caller cannot see this command */
+			continue;
 		}
 
-		if (cmdp->perms & CF_DARK)
-		{
-			continue; /* Explicitly hidden from listings */
-		}
-
+		/* Emit aligned command name followed by its switch list */
 		display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
 	}
 }
 
 /**
- * @brief List visible command switches for a player.
+ * @brief List switches for every command visible to the caller.
  *
- * Prints the switch sets for each built-in and module-provided command the
- * caller can access, hiding entries that are dark or permission-restricted.
- * The output begins with a header row for readability.
+ * Prints switch names for all built-in commands and any module-exported
+ * command tables the player can access. Entries hidden by `CF_DARK` or failing
+ * `check_access()` are omitted so the output only shows runnable commands.
  *
  * @param player Database reference of the requesting player
  */
@@ -2477,7 +2487,7 @@ void list_cmdswitches(dbref player)
 {
 	CMDENT *ctab = NULL;
 	MODULE *mp = NULL;
-	char *symname = XMALLOC(MBUF_SIZE, "symname");
+	char symname[MBUF_SIZE];
 
 	notify(player, "Command          Switches");
 	notify(player, "---------------- ---------------------------------------------------------------");
@@ -2488,6 +2498,7 @@ void list_cmdswitches(dbref player)
 	/* Module command tables (if they export one) */
 	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
 	{
+		/* Symbol name: mod_<module>_cmdtable */
 		XSNPRINTF(symname, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
 
 		if ((ctab = (CMDENT *)dlsym(mp->handle, symname)) != NULL)
@@ -2497,27 +2508,33 @@ void list_cmdswitches(dbref player)
 	}
 
 	notify(player, "--------------------------------------------------------------------------------");
-
-	XFREE(symname);
 }
 
 /**
- * @brief List access to attributes.
+ * @brief List attribute visibility and flags for the caller.
  *
- * @param player DBref of player
+ * Shows each attribute the player may read and the associated flag bitmask,
+ * skipping hidden attributes. Output is bracketed by a header/footer for
+ * readability.
+ *
+ * @param player Database reference of the requesting player
  */
 void list_attraccess(dbref player)
 {
-	ATTR *ap = NULL;
 	notify(player, "Attribute                  Permissions");
 	notify(player, "-------------------------- ----------------------------------------------------");
-	for (ap = attr; ap->name; ap++)
+
+	for (ATTR *ap = attr; ap->name; ap++)
 	{
-		if (Read_attr(player, player, ap, player, 0))
+		/* Only display attributes visible to the caller */
+		if (!Read_attr(player, player, ap, player, 0))
 		{
-			listset_nametab(player, attraccess_nametab, ap->flags, true, "%-26.26s ", ap->name);
+			continue;
 		}
+
+		listset_nametab(player, attraccess_nametab, ap->flags, true, "%-26.26s ", ap->name);
 	}
+
 	notify(player, "-------------------------------------------------------------------------------");
 }
 
