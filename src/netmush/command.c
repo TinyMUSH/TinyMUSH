@@ -2539,14 +2539,16 @@ void list_attraccess(dbref player)
 }
 
 /**
- * @brief List attribute "types" (wildcards and permissions)
+ * @brief List wildcard attribute patterns and their flags.
  *
- * @param player DBref of player
+ * Displays all configured vattr flag patterns (e.g., NAME*, DESC*) and the
+ * permissions attached to each. If none are defined, notifies the caller and
+ * returns early.
+ *
+ * @param player Database reference of the requesting player
  */
 void list_attrtypes(dbref player)
 {
-	KEYLIST *kp = NULL;
-
 	if (!mushconf.vattr_flag_list)
 	{
 		notify(player, "No attribute type patterns defined.");
@@ -2556,11 +2558,13 @@ void list_attrtypes(dbref player)
 	notify(player, "Attribute                  Permissions");
 	notify(player, "-------------------------- ----------------------------------------------------");
 
-	for (kp = mushconf.vattr_flag_list; kp != NULL; kp = kp->next)
+	for (KEYLIST *kp = mushconf.vattr_flag_list; kp != NULL; kp = kp->next)
 	{
-		char *buff = XASPRINTF("buff", "%-26.26s ", kp->name);
+		char buff[MBUF_SIZE];
+
+		/* Format the pattern name once, avoiding heap churn per entry */
+		XSNPRINTF(buff, sizeof(buff), "%-26.26s ", kp->name);
 		listset_nametab(player, attraccess_nametab, kp->data, true, buff);
-		XFREE(buff);
 	}
 
 	notify(player, "-------------------------------------------------------------------------------");
