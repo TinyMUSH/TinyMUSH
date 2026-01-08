@@ -2006,14 +2006,46 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 }
 
 /**
- * @brief Execute a semicolon/pipe-delimited series of commands.
+ * @brief Exécute une série de commandes délimitées par ';' et gère les pipes '|'.
  *
- * @param player	DBref of the player
- * @param cause		DBref of the cause
- * @param cmdline	Command
- * @param args		Arguments
- * @param nargs		Number of arguments
- * @param qent		Command queue.
+ * `process_cmdline` traite une ligne pouvant contenir plusieurs commandes
+ * séparées par des points-virgules ';'. Chaque commande peut être suivie de
+ * segments de pipe '|' qui gèrent la sortie dirigée (`pout*`) et l'état de
+ * pipeline via `mushstate.inpipe`.
+ *
+ * Rôles principaux:
+ * - Segmentation par ';' et itération sur chaque commande.
+ * - Gestion des pipes consécutifs '|' (jusqu'à `mushconf.ntfy_nest_lim`).
+ * - Sauvegarde/restauration de l'état global: enactor, player, pipe/output.
+ * - Journalisation (notify/log) des segments et des performances (lag-check).
+ * - Délégation à `process_command()` pour l'exécution de chaque segment.
+ *
+ * Détails d'exécution:
+ * - `mushstate.inpipe`, `pout*` et `poutobj` sont sauvegardés puis restaurés
+ *   autour de l'exécution de chaque segment.
+ * - Si `mushconf.lag_check` est actif, les temps et l'usage CPU sont mesurés via
+ *   `gettimeofday`/`getrusage`.
+ * - La boucle s'interrompt si `break` est appelé (`mushstate.break_called`).
+ * - Les segments vides sont ignorés.
+ *
+ * Paramètres:
+ * - player: DBref du joueur
+ * - cause:  DBref du cause
+ * - cmdline: Ligne de commande à segmenter
+ * - args:    Tableau d'arguments (%0-%9)
+ * - nargs:   Taille de `args`
+ * - qent:    Entrée de file (détermine si l'exécution est en tête de file)
+ *
+ * Retour:
+ * - Aucun. `log_cmdbuf` alloué par `process_command` est libéré si présent.
+ *
+ * Notes:
+ * - Limite d'imbrication via `mushconf.cmd_nest_lim`.
+ * - `process_command()` est appelé avec `interactive=0`.
+ * - Les permissions et hooks spécifiques sont gérés par `process_command()`.
+ *
+ * @see process_command() pour la normalisation et la résolution d'un segment
+ * @see mushstate.inpipe et les variables `pout*` pour la gestion de pipe
  */
 void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
@@ -2048,16 +2080,18 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 
 		if (cp && *cp)
 		{
-
+			/* Journalisation concise du segment courant (évite des strlen répétés) */
+			int cp_len = (int)strlen(cp);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
 						 "[DEBUG process_cmdline] RAW cp='%s' (len=%d)",
-						 cp, (int)strlen(cp));
+						 cp, cp_len);
 			log_write(LOG_ALWAYS, "TRIG", "CMDLINE", "[DEBUG process_cmdline] RAW cp='%s' (len=%d) (player=#%d, cause=#%d)",
-					  cp, (int)strlen(cp), player, cause);
+					  cp, cp_len, player, cause);
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, NULL,
 						 "[DEBUG process_cmdline] about to call process_command: '%s'",
 						 cp);
 			numpipes = 0;
+			/* Balayer les pipes consécutifs pour ce segment */
 			while (cmdline && (*cmdline == '|') && (!qent || qent == mushstate.qfirst) && (numpipes < mushconf.ntfy_nest_lim))
 			{
 				cmdline++;
