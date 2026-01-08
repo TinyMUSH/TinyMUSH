@@ -783,17 +783,75 @@ bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
 }
 
 /**
- * @brief Perform indicated command with passed args.
+ * @brief Execute a validated command with argument parsing, switch processing, and hook invocation.
  *
- * @param cmdp			Command
- * @param switchp		Switches
- * @param player		DBref of player doing the command
- * @param cause			DBref of what caused the action
- * @param interactive	Is the command interractive?
- * @param arg			Raw Arguments
- * @param unp_command	Raw Commands
- * @param cargs			Arguments
- * @param ncargs		Number of arguments
+ * This function is the core command execution engine that handles the complete lifecycle
+ * of a command after it has been matched and validated. It performs:
+ *
+ * **Pre-Execution Validation:**
+ * 1. Argument count validation (prevent buffer overflows)
+ * 2. Object type compatibility checking
+ * 3. Permission validation (core, module, user-defined)
+ * 4. Global system flag checks (building disabled, queueing disabled)
+ *
+ * **Switch Processing:**
+ * - Parses switch strings (e.g., "/quiet/force")
+ * - Validates switches against command's allowed switch table
+ * - Handles SW_MULTIPLE for combinable switches vs exclusive switches
+ * - Accumulates switch flags via bitwise OR into the key parameter
+ *
+ * **Argument Interpretation:**
+ * - Determines evaluation mode based on CS_INTERP, CS_NOINTERP, /noeval
+ * - Handles EV_STRIP, EV_STRIP_AROUND, EV_EVAL modes
+ * - Preserves raw text for CS_UNPARSE commands
+ *
+ * **Command Dispatch (by calling sequence):**
+ * - **CS_NO_ARGS**: Commands with no arguments (e.g., WHO, QUIT)
+ * - **CS_ONE_ARG**: Single-argument commands (e.g., LOOK <object>)
+ *   - CS_UNPARSE: Pass raw command text without parsing
+ *   - CS_ADDED: Dynamic softcode commands (user-defined via @addcommand)
+ *   - CS_CMDARG: Pass original command args (%0-%9) to handler
+ * - **CS_TWO_ARG**: Two-argument commands with = separator (e.g., @name obj=value)
+ *   - CS_ARGV: Parse arg2 as space-separated list
+ *   - CS_CMDARG: Pass original command args to handler
+ *
+ * **Hook Invocation:**
+ * - Pre-hook: Executed before command handler (logging, validation, cost deduction)
+ * - Post-hook: Executed after command handler (achievement tracking, notifications)
+ *
+ * **Dynamic Command Handling (CS_ADDED):**
+ * For @addcommand-registered softcode commands:
+ * - Reconstructs command with switches
+ * - Matches against wildcard/regex patterns in attributes
+ * - Executes matching attribute softcode
+ * - Handles multiple matches and @addcommand_obey_stop setting
+ * - Preserves/restores global registers during execution
+ *
+ * @param cmdp        Pointer to command entry containing handler, switches, and metadata
+ * @param switchp     Slash-separated switch string (e.g., "quiet/force"), or NULL if no switches
+ * @param player      Database reference of the player executing the command (enactor)
+ * @param cause       Database reference of the object that caused this command execution
+ * @param interactive Boolean flag: true if command is interactive (direct player input),
+ *                    false if from queue/trigger (affects argument interpretation)
+ * @param arg         Argument string to be parsed (may be modified during parsing)
+ * @param unp_command Raw unparsed command string (preserved for CS_UNPARSE and logging)
+ * @param cargs       Array of original command arguments (%0-%9 context)
+ * @param ncargs      Number of command arguments in cargs array
+ *
+ * @note This function modifies the 'arg' and 'switchp' parameters during parsing.
+ *       Callers should pass copies if they need to preserve the original strings.
+ *
+ * @note For CS_ADDED commands, this function may execute multiple attribute matches
+ *       depending on @addcommand_match_blindly and @addcommand_obey_stop settings.
+ *
+ * @warning Command handlers are called with cause as both the enactor and executor
+ *          for evaluation context. This is intentional for maintaining causality chains.
+ *
+ * @see check_cmd_access() for permission validation logic
+ * @see process_hook() for pre/post hook execution
+ * @see process_cmdline() for recursive command execution (CS_ADDED)
+ * @see eval_expression_string() for argument interpretation
+ * @see CMDENT structure for command entry definition
  */
 void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool interactive, char *arg, char *unp_command, char *cargs[], int ncargs)
 {
@@ -806,399 +864,405 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 	dbref aowner = NOTHING;
 	ADDENT *add = NULL;
 	GDATA *preserve = NULL;
-	/* Validate arguments count to prevent buffer overflow */
+
+	/* Validate argument count to prevent buffer overflow attacks */
 	if (ncargs < 0 || ncargs > NUM_ENV_VARS)
 	{
 		return;
 	}
 
-	/* Perform object type checks. */
+	/* Validate player object type compatibility */
 	if (Invalid_Objtype(player))
 	{
 		notify(player, "Command incompatible with invoker type.");
 		return;
 	}
 
-	/* Check if we have permission to execute the command */
-
+	/* Perform comprehensive permission check (core/module/user-defined) */
 	if (!check_cmd_access(player, cmdp, cargs, ncargs))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;
 	}
 
-	/* Check global flags */
-	if ((!Builder(player)) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD))
+	/* Check global building restriction flag */
+	if (!Builder(player) && Protect(CA_GBL_BUILD) && !(mushconf.control_flags & CF_BUILD))
 	{
 		notify(player, "Sorry, building is not allowed now.");
 		return;
 	}
 
+	/* Check global queueing/triggering restriction flag */
 	if (Protect(CA_GBL_INTERP) && !(mushconf.control_flags & CF_INTERP))
 	{
 		notify(player, "Sorry, queueing and triggering are not allowed now.");
 		return;
 	}
 
+	/* Initialize key with command's extra flags, masking out SW_MULTIPLE */
 	key = cmdp->extra & ~SW_MULTIPLE;
 
-	if (key & SW_GOT_UNIQUE)
+	/* Track whether we've seen a non-SW_MULTIPLE switch (for exclusivity checking) */
+	bool seen_exclusive_switch = (key & SW_GOT_UNIQUE) != 0;
+	if (seen_exclusive_switch)
 	{
-		i = 1;
-		key = key & ~SW_GOT_UNIQUE;
-	}
-	else
-	{
-		i = 0;
+		key &= ~SW_GOT_UNIQUE; /* Remove marker bit from key */
 	}
 
-	/*
-	 * Check command switches.  Note that there may be more than one, and
-	 * that we OR all of them together along with the extra value from the command
-	 * table to produce the key value in the handler call.
-	 *
-	 */
+	/* Parse and validate command switches (e.g., /quiet/force) */
 	if (switchp && cmdp->switches)
 	{
 		do
 		{
+			/* Find next switch separator or end of string */
 			buf1 = strchr(switchp, '/');
-
 			if (buf1)
 			{
-				*buf1++ = '\0';
+				*buf1++ = '\0'; /* Terminate current switch, advance to next */
 			}
 
+			/* Look up switch in command's switch table */
 			xkey = search_nametab(player, cmdp->switches, switchp);
 
-			if (xkey == -1)
+			if (xkey == -1) /* Unrecognized switch */
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Unrecognized switch '%s' for command '%s'.", switchp, cmdp->cmdname);
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, 
+				            "Unrecognized switch '%s' for command '%s'.", switchp, cmdp->cmdname);
 				return;
 			}
-			else if (xkey == -2)
+			else if (xkey == -2) /* Permission denied for this switch */
 			{
 				notify(player, NOPERM_MESSAGE);
 				return;
 			}
-			else if (!(xkey & SW_MULTIPLE))
+			else if (!(xkey & SW_MULTIPLE)) /* Exclusive switch (cannot combine with others) */
 			{
-				if (i == 1)
+				if (seen_exclusive_switch)
 				{
 					notify(player, "Illegal combination of switches.");
 					return;
 				}
-
-				i = 1;
+				seen_exclusive_switch = true;
 			}
-			else
+			else /* SW_MULTIPLE flag set - strip it before ORing into key */
 			{
 				xkey &= ~SW_MULTIPLE;
 			}
 
-			key |= xkey;
-			switchp = buf1;
+			key |= xkey;      /* Accumulate switch flags */
+			switchp = buf1;   /* Move to next switch */
 		} while (buf1);
 	}
 	else if (switchp && !(cmdp->callseq & CS_ADDED))
 	{
-		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Command %s does not take switches.", cmdp->cmdname);
+		/* Switches specified but command doesn't support them */
+		notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, 
+		            "Command %s does not take switches.", cmdp->cmdname);
 		return;
 	}
 
-	/*
-	 * At this point we're guaranteed we're going to execute something.
-	 * Let's check to see if we have a pre-command hook.
-	 */
-	if (((cmdp)->pre_hook != NULL) && !((cmdp)->callseq & CS_ADDED))
+	/* Execute pre-command hook if registered (not for CS_ADDED commands) */
+	if (cmdp->pre_hook && !(cmdp->callseq & CS_ADDED))
 	{
-		process_hook((cmdp)->pre_hook, (cmdp)->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, (cargs), (ncargs));
+		process_hook(cmdp->pre_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, cargs, ncargs);
 	}
 
-	/*
-	 * If the command normally has interpreted args, but the user
-	 * specified, /noeval, just do EV_STRIP.
-	 *
-	 * If the command is interpreted, or we're interactive (and the command
-	 * isn't specified CS_NOINTERP), eval the args.
-	 *
-	 * The others are obvious.
-	 *
-	 */
+	/* Determine argument interpretation mode based on command flags and switches */
 	if ((cmdp->callseq & CS_INTERP) && (key & SW_NOEVAL))
 	{
+		/* Command normally evaluates, but /noeval switch specified */
 		interp = EV_STRIP;
-		key &= ~SW_NOEVAL; /* Remove SW_NOEVAL from 'key' */
+		key &= ~SW_NOEVAL; /* Remove switch from key (already processed) */
 	}
-	else if ((cmdp->callseq & CS_INTERP) || !(interactive || (cmdp->callseq & CS_NOINTERP)))
+	else if ((cmdp->callseq & CS_INTERP) || (interactive && !(cmdp->callseq & CS_NOINTERP)))
 	{
+		/* Command interprets args, or interactive command without CS_NOINTERP */
 		interp = EV_EVAL | EV_STRIP;
 	}
 	else if (cmdp->callseq & CS_STRIP)
 	{
+		/* Strip leading/trailing whitespace only */
 		interp = EV_STRIP;
 	}
 	else if (cmdp->callseq & CS_STRIP_AROUND)
 	{
+		/* Strip whitespace around delimiters */
 		interp = EV_STRIP_AROUND;
 	}
 	else
 	{
+		/* No interpretation - raw text */
 		interp = 0;
 	}
 
+	/* Dispatch command based on argument structure (calling sequence) */
 	switch (cmdp->callseq & CS_NARG_MASK)
 	{
-	case CS_NO_ARGS: /* <cmd> (no args) */
+	case CS_NO_ARGS: /* Commands with no arguments (e.g., WHO, QUIT, INVENTORY) */
 	{
 		handler_cs_no_args = cmdp->info.handler;
-		(*(handler_cs_no_args))(player, cause, key);
+		(*handler_cs_no_args)(player, cause, key);
+		break;
 	}
-	//(*(cmdp->info.handler))(player, cause, key);
-	break;
 
-	case CS_ONE_ARG: /* <cmd> <arg> */
-		/* If an unparsed command, just give it to the handler */
+	case CS_ONE_ARG: /* Commands with single argument (e.g., LOOK <object>) */
+		/* Handle unparsed commands (raw text passed directly to handler) */
 		if (cmdp->callseq & CS_UNPARSE)
 		{
 			handler_cs_one_args_unparse = cmdp->info.handler;
-			(*(handler_cs_one_args_unparse))(player, unp_command);
+			(*handler_cs_one_args_unparse)(player, unp_command);
 			break;
 		}
-		/* Interpret if necessary, but not twice for CS_ADDED */
+
+		/* Interpret/parse argument based on evaluation mode */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
-			buf1 = bp = XMALLOC(LBUF_SIZE, "buf1");
+			/* Evaluate argument with full softcode interpretation */
+			buf1 = XMALLOC(LBUF_SIZE, "buf1");
+			bp = buf1;
 			str = arg;
-			eval_expression_string(buf1, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+			eval_expression_string(buf1, &bp, player, cause, cause, 
+			                       interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 		}
 		else
 		{
+			/* Parse argument without evaluation (or CS_ADDED handles it separately) */
 			buf1 = parse_to(&arg, '\0', interp | EV_TOP);
 		}
-		/* Call the correct handler */
+
+		/* Dispatch to handler based on CS_CMDARG and CS_ADDED flags */
 		if (cmdp->callseq & CS_CMDARG)
 		{
+			/* Pass original command arguments (%0-%9) to handler */
 			handler_cs_one_args_cmdargs = cmdp->info.handler;
-			(*(handler_cs_one_args_cmdargs))(player, cause, key, buf1, cargs, ncargs);
+			(*handler_cs_one_args_cmdargs)(player, cause, key, buf1, cargs, ncargs);
 		}
-		else
+		else if (cmdp->callseq & CS_ADDED)
 		{
-			if (cmdp->callseq & CS_ADDED)
+			/* Handle dynamic softcode commands registered via @addcommand */
+			preserve = save_global_regs("process_cmdent_added");
+
+			/* Determine where command arguments start (skip prefix/command name) */
+			if (cmdp->callseq & CS_LEADIN)
 			{
-				preserve = save_global_regs("process_cmdent_added");
-				/*
-				 * Construct the matching buffer.
-				 *
-				 * In the case of a single-letter prefix, we want to just skip
-				 * past that first letter. want to just skip past that first
-				 * letter. Otherwise we want to go past the first word.
-				 *
-				 */
-				if (!(cmdp->callseq & CS_LEADIN))
-				{
-					for (j = unp_command; *j && (*j != ' '); j++)
-						;
-				}
-				else
-				{
-					j = unp_command;
-					j++;
-				}
-
-				new = XMALLOC(LBUF_SIZE, "new");
-				bp = new;
-
-				if (!*j)
-				{
-					/*
-					 * No args
-					 *
-					 */
-					if (!(cmdp->callseq & CS_LEADIN))
-					{
-						XSAFELBSTR(cmdp->cmdname, new, &bp);
-					}
-					else
-					{
-						XSAFELBSTR(unp_command, new, &bp);
-					}
-
-					if (switchp)
-					{
-						XSAFELBCHR('/', new, &bp);
-						XSAFELBSTR(switchp, new, &bp);
-					}
-
-					*bp = '\0';
-				}
-				else
-				{
-					if (!(cmdp->callseq & CS_LEADIN))
-					{
-						j++;
-					}
-
-					XSAFELBSTR(cmdp->cmdname, new, &bp);
-
-					if (switchp)
-					{
-						XSAFELBCHR('/', new, &bp);
-						XSAFELBSTR(switchp, new, &bp);
-					}
-
-					if (!(cmdp->callseq & CS_LEADIN))
-					{
-						XSAFELBCHR(' ', new, &bp);
-					}
-
-					XSAFELBSTR(j, new, &bp);
-					*bp = '\0';
-				}
-				/*
-				 * Now search against the attributes, unless we can't
-				 * pass the uselock.
-				 *
-				 */
-				for (add = (ADDENT *)cmdp->info.added; add != NULL; add = add->next)
-				{
-					buff = atr_get(add->thing, add->atr, &aowner, &aflags, &alen);
-					/*
-					 * Skip the '$' character, and the next
-					 *
-					 */
-					for (s = buff + 2; *s && ((*s != ':') || (*(s - 1) == '\\')); s++)
-						;
-
-					if (!*s)
-					{
-						XFREE(buff);
-						break;
-					}
-
-					*s++ = '\0';
-
-					if (((!(aflags & AF_REGEXP) && wild(buff + 1, new, aargs, NUM_ENV_VARS)) || ((aflags & AF_REGEXP) && regexp_match(buff + 1, new, ((aflags & AF_CASE) ? 0 : PCRE2_CASELESS), aargs, NUM_ENV_VARS))) && (!mushconf.addcmd_obey_uselocks || could_doit(player, add->thing, A_LUSE)))
-					{
-						process_cmdline(((!(cmdp->callseq & CS_ACTOR) || God(player)) ? add->thing : player), player, s, aargs, NUM_ENV_VARS, NULL);
-
-						for (i = 0; i < NUM_ENV_VARS; i++)
-						{
-							if (aargs[i])
-								XFREE(aargs[i]);
-						}
-
-						cmd_matches++;
-					}
-
-					XFREE(buff);
-
-					if (cmd_matches && mushconf.addcmd_obey_stop && Stop_Match(add->thing))
-					{
-						break;
-					}
-				}
-
-				if (!cmd_matches && !mushconf.addcmd_match_blindly)
-				{
-					/*
-					 * The command the player typed didn't match any of
-					 * the wildcard patterns we have for that addcommand. We
-					 * should raise an error. We DO NOT go back into trying to
-					 * match other stuff -- this is a 'Huh?' situation.
-					 *
-					 */
-					notify(player, mushconf.huh_msg);
-					pname = log_getname(player);
-
-					if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
-					{
-						lname = log_getname(Location(player));
-						log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", pname, lname, new);
-						XFREE(lname);
-					}
-					else
-					{
-						log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, new);
-					}
-
-					XFREE(pname);
-				}
-
-				XFREE(new);
-				restore_global_regs("process_cmdent", preserve);
+				/* Single-character prefix command (e.g., ":", ";") - skip 1 char */
+				j = unp_command + 1;
 			}
 			else
 			{
-				handler_cs_one_args = cmdp->info.handler;
-				(*handler_cs_one_args)(player, cause, key, buf1);
+				/* Multi-character command - skip to first space or end */
+				for (j = unp_command; *j && (*j != ' '); j++)
+					;
 			}
+
+			/* Reconstruct command with switches for pattern matching */
+			new = XMALLOC(LBUF_SIZE, "new");
+			bp = new;
+
+			if (!*j) /* No arguments after command name */
+			{
+				/* Build: <cmdname>[/switches] */
+				char *cmdname_str = (cmdp->callseq & CS_LEADIN) ? unp_command : cmdp->cmdname;
+				XSAFELBSTR(cmdname_str, new, &bp);
+				if (switchp)
+				{
+					XSAFELBCHR('/', new, &bp);
+					XSAFELBSTR(switchp, new, &bp);
+				}
+			}
+			else /* Arguments present */
+			{
+				/* Build: <cmdname>[/switches] <args> */
+				if (!(cmdp->callseq & CS_LEADIN))
+				{
+					j++; /* Skip space separator */
+				}
+				XSAFELBSTR(cmdp->cmdname, new, &bp);
+				if (switchp)
+				{
+					XSAFELBCHR('/', new, &bp);
+					XSAFELBSTR(switchp, new, &bp);
+				}
+				if (!(cmdp->callseq & CS_LEADIN))
+				{
+					XSAFELBCHR(' ', new, &bp);
+				}
+				XSAFELBSTR(j, new, &bp);
+			}
+			*bp = '\0';
+
+			/* Match command against registered attribute patterns */
+			for (add = (ADDENT *)cmdp->info.added; add != NULL; add = add->next)
+			{
+				/* Retrieve attribute containing pattern:action */
+				buff = atr_get(add->thing, add->atr, &aowner, &aflags, &alen);
+
+				/* Skip '$' marker and find ':' separator (handle escaped colons) */
+				for (s = buff + 2; *s && ((*s != ':') || (*(s - 1) == '\\')); s++)
+					;
+
+				if (!*s) /* Malformed attribute (no separator) */
+				{
+					XFREE(buff);
+					break;
+				}
+
+				*s++ = '\0'; /* Terminate pattern, s now points to action code */
+
+				/* Match pattern against reconstructed command */
+				bool pattern_matches = false;
+				if (aflags & AF_REGEXP)
+				{
+					/* Regex matching with optional case-insensitivity */
+					pattern_matches = regexp_match(buff + 1, new, 
+					                               (aflags & AF_CASE) ? 0 : PCRE2_CASELESS, 
+					                               aargs, NUM_ENV_VARS);
+				}
+				else
+				{
+					/* Wildcard matching */
+					pattern_matches = wild(buff + 1, new, aargs, NUM_ENV_VARS);
+				}
+
+				/* Check uselock if configured */
+				bool has_permission = !mushconf.addcmd_obey_uselocks || 
+				                      could_doit(player, add->thing, A_LUSE);
+
+				if (pattern_matches && has_permission)
+				{
+					/* Execute action softcode with captured wildcard/regex groups */
+					dbref executor = (!(cmdp->callseq & CS_ACTOR) || God(player)) ? 
+					                 add->thing : player;
+					process_cmdline(executor, player, s, aargs, NUM_ENV_VARS, NULL);
+
+					/* Free captured argument strings */
+					for (i = 0; i < NUM_ENV_VARS; i++)
+					{
+						XFREE(aargs[i]);
+					}
+
+					cmd_matches++;
+				}
+
+				XFREE(buff);
+
+				/* Stop processing if match found and STOP_MATCH flag set */
+				if (cmd_matches && mushconf.addcmd_obey_stop && Stop_Match(add->thing))
+				{
+					break;
+				}
+			}
+
+			/* Handle no matches (if not configured to match blindly) */
+			if (!cmd_matches && !mushconf.addcmd_match_blindly)
+			{
+				notify(player, mushconf.huh_msg);
+
+				/* Log failed command attempt */
+				pname = log_getname(player);
+				if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
+				{
+					lname = log_getname(Location(player));
+					log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s in %s entered: %s", 
+					         pname, lname, new);
+					XFREE(lname);
+				}
+				else
+				{
+					log_write(LOG_BADCOMMANDS, "CMD", "BAD", "%s entered: %s", pname, new);
+				}
+				XFREE(pname);
+			}
+
+			XFREE(new);
+			restore_global_regs("process_cmdent", preserve);
 		}
-		/* Free the buffer if one was allocated */
+		else
+		{
+			/* Standard one-argument command handler */
+			handler_cs_one_args = cmdp->info.handler;
+			(*handler_cs_one_args)(player, cause, key, buf1);
+		}
+
+		/* Free allocated buffer if we performed evaluation */
 		if ((interp & EV_EVAL) && !(cmdp->callseq & CS_ADDED))
 		{
 			XFREE(buf1);
 		}
-
 		break;
 
-	case CS_TWO_ARG: /* <cmd> <arg1> = <arg2> */
-		/* Interpret ARG1 */
+	case CS_TWO_ARG: /* Commands with two arguments: <cmd> <arg1>=<arg2> */
+		/* Parse and interpret first argument (before '=') */
 		buf2 = parse_to(&arg, '=', EV_STRIP_TS);
-		/* Handle when no '=' was specified */
-		if (!arg || (arg && !*arg))
+
+		/* Handle missing '=' separator */
+		if (!arg || !*arg)
 		{
 			arg = &tchar;
 			*arg = '\0';
 		}
 
-		buf1 = bp = XMALLOC(LBUF_SIZE, "buf1");
+		/* Evaluate first argument */
+		buf1 = XMALLOC(LBUF_SIZE, "buf1");
+		bp = buf1;
 		str = buf2;
-		eval_expression_string(buf1, &bp, player, cause, cause, EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
+		eval_expression_string(buf1, &bp, player, cause, cause, 
+		                       EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
 
 		if (cmdp->callseq & CS_ARGV)
 		{
-			/* Arg2 is ARGV style. Go get the args */
-			parse_arglist(player, cause, cause, arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS, args, mushconf.max_command_args, cargs, ncargs);
+			/* Second argument is ARGV-style (space-separated list) */
+			parse_arglist(player, cause, cause, arg, '\0', 
+			             interp | EV_STRIP_LS | EV_STRIP_TS, 
+			             args, mushconf.max_command_args, cargs, ncargs);
 
+			/* Count arguments */
 			for (nargs = 0; (nargs < mushconf.max_command_args) && args[nargs]; nargs++)
 				;
-			/* Call the correct command handler */
+
+			/* Dispatch to handler with or without cmdargs */
 			if (cmdp->callseq & CS_CMDARG)
 			{
 				handler_cs_two_args_cmdargs_argv = cmdp->info.handler;
-				(*handler_cs_two_args_cmdargs_argv)(player, cause, key, buf1, args, nargs, cargs, ncargs);
+				(*handler_cs_two_args_cmdargs_argv)(player, cause, key, buf1, args, nargs, 
+				                                    cargs, ncargs);
 			}
 			else
 			{
 				handler_cs_two_args_argv = cmdp->info.handler;
 				(*handler_cs_two_args_argv)(player, cause, key, buf1, args, nargs);
 			}
-			/* Free the argument buffers */
+
+			/* Free ARGV argument buffers */
 			for (i = 0; i < nargs; i++)
-				if (args[i])
-				{
-					XFREE(args[i]);
-				}
+			{
+				XFREE(args[i]);
+			}
 		}
 		else
 		{
-			/* Arg2 is normal style. Interpret if needed */
+			/* Second argument is normal style (single string) */
 			if (interp & EV_EVAL)
 			{
-				buf2 = bp = XMALLOC(LBUF_SIZE, "buf2");
+				/* Evaluate second argument */
+				buf2 = XMALLOC(LBUF_SIZE, "buf2");
+				bp = buf2;
 				str = arg;
-				eval_expression_string(buf2, &bp, player, cause, cause, interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
+				eval_expression_string(buf2, &bp, player, cause, cause, 
+				                       interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 			}
 			else if (cmdp->callseq & CS_UNPARSE)
 			{
+				/* Preserve whitespace for unparsed commands */
 				buf2 = parse_to(&arg, '\0', interp | EV_TOP | EV_NO_COMPRESS);
 			}
 			else
 			{
+				/* Strip whitespace from parsed argument */
 				buf2 = parse_to(&arg, '\0', interp | EV_STRIP_LS | EV_STRIP_TS | EV_TOP);
 			}
-			/* Call the correct command handler */
+
+			/* Dispatch to handler with or without cmdargs */
 			if (cmdp->callseq & CS_CMDARG)
 			{
 				handler_cs_two_args_cmdargs = cmdp->info.handler;
@@ -1209,22 +1273,25 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				handler_cs_two_args = cmdp->info.handler;
 				(*handler_cs_two_args)(player, cause, key, buf1, buf2);
 			}
-			/* Free the buffer, if needed */
+
+			/* Free evaluated buffer if allocated */
 			if (interp & EV_EVAL)
 			{
 				XFREE(buf2);
 			}
 		}
-		/* Free the buffer obtained by evaluating Arg1 */
+
+		/* Free first argument buffer (always allocated) */
 		XFREE(buf1);
 		break;
 	}
-	/* And now we go do the posthook, if we have one. */
-	if ((cmdp->post_hook != NULL) && !(cmdp->callseq & CS_ADDED))
+
+	/* Execute post-command hook if registered (not for CS_ADDED commands) */
+	if (cmdp->post_hook && !(cmdp->callseq & CS_ADDED))
 	{
-		process_hook(cmdp->post_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), player, cause, cargs, ncargs);
+		process_hook(cmdp->post_hook, cmdp->callseq & (CS_PRESERVE | CS_PRIVATE), 
+		            player, cause, cargs, ncargs);
 	}
-	return;
 }
 
 /**
