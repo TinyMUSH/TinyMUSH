@@ -16,6 +16,9 @@ set(NUM_ENV_VARS 10)
 # Maximum parse depth to prevent stack overflow
 set(MAX_BOOLEXP_PARSE_DEPTH 100)
 
+# PCRE2 configuration
+set(PCRE2_CODE_UNIT_WIDTH 8)
+
 ###############################################################################
 # Project configuration
 #

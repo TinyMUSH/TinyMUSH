@@ -35,26 +35,30 @@
 #include <ctype.h>
 #include <signal.h>
 
-static MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr);
-static void *dnsResolver(void *args);
-void check_dnsResolver_status(dbref player, dbref cause, int key);
-static int make_socket(int port);
-void shovechars(int port);
-static DESC *new_connection(int sock);
-char *connReasons(int reason);
-char *connMessages(int reason);
-void shutdownsock(DESC *d, int reason);
-static inline void make_nonblocking(int s);
-static DESC *initializesock(int s, struct sockaddr_in *a);
-int process_output(DESC *d);
-static int process_input(DESC *d);
-void close_sockets(int emergency, char *message);
-void report(void);
-static void sighandler(int sig);
-void set_signals(void);
-static void unset_signals(void);
-static inline void check_panicking(int sig);
-static inline void log_signal(const char *signame);
+/**
+ * @brief Function prototypes for internal functions
+ *
+ */
+static MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr);	   /*!< Create DNS resolver message queue entry */
+static void *dnsResolver(void *args);							   /*!< DNS resolver thread function */
+void check_dnsResolver_status(dbref player, dbref cause, int key); /*!< Check DNS resolver thread status */
+static int make_socket(int port);								   /*!< Create and bind server socket */
+void shovechars(int port);										   /*!< Accept new connections on server socket */
+static DESC *new_connection(int sock);							   /*!< Initialize new connection descriptor */
+char *connReasons(int reason);									   /*!< Connection reason strings */
+char *connMessages(int reason);									   /*!< Connection message strings */
+void shutdownsock(DESC *d, int reason);							   /*!< Shutdown a socket connection */
+static inline void make_nonblocking(int s);						   /*!< Set socket to non-blocking mode */
+static DESC *initializesock(int s, struct sockaddr_in *a);		   /*!< Initialize socket descriptor */
+int process_output(DESC *d);									   /*!< Process output for a descriptor */
+static int process_input(DESC *d);								   /*!< Process input for a descriptor */
+void close_sockets(int emergency, char *message);				   /*!< Close all sockets and descriptors */
+void report(void);												   /*!< Report current descriptor status */
+static void sighandler(int sig);								   /*!< Signal handler function */
+void set_signals(void);											   /*!< Set up signal handlers */
+static void unset_signals(void);								   /*!< Unset signal handlers */
+static inline void check_panicking(int sig);					   /*!< Check if already panicking on signal */
+static inline void log_signal(const char *signame);				   /*!< Log received signal */
 
 /**
  * @attention Since this is the core of the whole show, better keep theses globals.
@@ -111,13 +115,16 @@ static MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr)
 	h.destination = MSGQ_DEST_DNSRESOLVER;
 	h.payload.addrf = AF_UNSPEC;
 
-	if (addr && *addr) {
+	if (addr && *addr)
+	{
 		/* Try IPv4 first (most common case) */
-		if (inet_pton(AF_INET, addr, &h.payload.ip.v4) == 1) {
+		if (inet_pton(AF_INET, addr, &h.payload.ip.v4) == 1)
+		{
 			h.payload.addrf = AF_INET;
 		}
 		/* If not IPv4, try IPv6 */
-		else if (inet_pton(AF_INET6, addr, &h.payload.ip.v6) == 1) {
+		else if (inet_pton(AF_INET6, addr, &h.payload.ip.v6) == 1)
+		{
 			h.payload.addrf = AF_INET6;
 		}
 		/* Invalid address format - leave as AF_UNSPEC */
@@ -160,13 +167,15 @@ static void *dnsResolver(void *args)
 
 	/* Create/open the message queue */
 	msgq_id = msgget(msgq_key, 0666 | IPC_CREAT);
-	if (msgq_id == -1) {
+	if (msgq_id == -1)
+	{
 		log_perror("DNS", "FAIL", "dnsResolver", "msgget");
 		return NULL;
 	}
 
 	/* Main processing loop */
-	for (;;) {
+	for (;;)
+	{
 		MSGQ_DNSRESOLVER response_msg;
 		int lookup_success = 0;
 		char hostname[NI_MAXHOST];
@@ -174,13 +183,15 @@ static void *dnsResolver(void *args)
 		/* Receive next DNS resolution request */
 		memset(&request_msg, 0, sizeof(request_msg));
 		if (msgrcv(msgq_id, &request_msg, sizeof(request_msg.payload),
-				   MSGQ_DEST_DNSRESOLVER, 0) <= 0) {
+				   MSGQ_DEST_DNSRESOLVER, 0) <= 0)
+		{
 			/* Error receiving message or shutdown signal */
 			break;
 		}
 
 		/* Check for shutdown signal (unspecified address family) */
-		if (request_msg.payload.addrf == AF_UNSPEC) {
+		if (request_msg.payload.addrf == AF_UNSPEC)
+		{
 			break;
 		}
 
@@ -190,35 +201,38 @@ static void *dnsResolver(void *args)
 		response_msg.payload.hostname = NULL;
 
 		/* Perform reverse DNS lookup based on address family */
-		if (request_msg.payload.addrf == AF_INET) {
+		if (request_msg.payload.addrf == AF_INET)
+		{
 			/* IPv4 lookup */
 			struct sockaddr_in sa = {
 				.sin_family = AF_INET,
-				.sin_addr = request_msg.payload.ip.v4
-			};
+				.sin_addr = request_msg.payload.ip.v4};
 
 			if (getnameinfo((struct sockaddr *)&sa, sizeof(sa), hostname, sizeof(hostname),
-						   NULL, 0, NI_NAMEREQD) == 0) {
+							NULL, 0, NI_NAMEREQD) == 0)
+			{
 				response_msg.payload.hostname = strdup(hostname);
 				lookup_success = (response_msg.payload.hostname != NULL);
 			}
 		}
-		else if (request_msg.payload.addrf == AF_INET6) {
+		else if (request_msg.payload.addrf == AF_INET6)
+		{
 			/* IPv6 lookup */
 			struct sockaddr_in6 sa6 = {
 				.sin6_family = AF_INET6,
-				.sin6_addr = request_msg.payload.ip.v6
-			};
+				.sin6_addr = request_msg.payload.ip.v6};
 
 			if (getnameinfo((struct sockaddr *)&sa6, sizeof(sa6), hostname, sizeof(hostname),
-						   NULL, 0, NI_NAMEREQD) == 0) {
+							NULL, 0, NI_NAMEREQD) == 0)
+			{
 				response_msg.payload.hostname = strdup(hostname);
 				lookup_success = (response_msg.payload.hostname != NULL);
 			}
 		}
 
 		/* Send response only if lookup was successful */
-		if (lookup_success) {
+		if (lookup_success)
+		{
 			msgsnd(msgq_id, &response_msg, sizeof(response_msg.payload), 0);
 		}
 	}
@@ -294,13 +308,15 @@ static int make_socket(int port)
 
 	/* Create IPv4 TCP socket */
 	sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock_fd < 0) {
+	if (sock_fd < 0)
+	{
 		log_perror("NET", "FAIL", NULL, "creating master socket");
 		return -1;
 	}
 
 	/* Enable address reuse to allow quick server restarts */
-	if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr)) < 0) {
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr)) < 0)
+	{
 		log_perror("NET", "FAIL", NULL, "setsockopt SO_REUSEADDR");
 		close(sock_fd);
 		return -1;
@@ -309,12 +325,14 @@ static int make_socket(int port)
 	/* Configure server address structure */
 	memset(&server_addr, 0, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = INADDR_ANY;  /* Listen on all interfaces */
+	server_addr.sin_addr.s_addr = INADDR_ANY; /* Listen on all interfaces */
 	server_addr.sin_port = htons(port);
 
 	/* Bind socket to address (skip during restart to preserve existing binding) */
-	if (!mushstate.restarting) {
-		if (bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+	if (!mushstate.restarting)
+	{
+		if (bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+		{
 			log_perror("NET", "FAIL", NULL, "bind socket");
 			close(sock_fd);
 			return -1;
@@ -322,7 +340,8 @@ static int make_socket(int port)
 	}
 
 	/* Set socket to listen for incoming connections */
-	if (listen(sock_fd, 5) < 0) {
+	if (listen(sock_fd, 5) < 0)
+	{
 		log_perror("NET", "FAIL", NULL, "listen on socket");
 		close(sock_fd);
 		return -1;
@@ -397,7 +416,8 @@ void shovechars(int port)
 	}
 
 	/* Check if socket creation failed */
-	if (!mushstate.restarting && sock == -1) {
+	if (!mushstate.restarting && sock == -1)
+	{
 		log_write(LOG_STARTUP, "NET", "FATAL", "Cannot create listening socket, server cannot start");
 		mushstate.shutdown_flag = 1;
 	}
@@ -465,7 +485,7 @@ void shovechars(int port)
 		}
 		/* test for events */
 		dispatch();
-		
+
 		/* any queued robot commands waiting? */
 		timeout.tv_sec = que_next();
 		timeout.tv_usec = 0;
@@ -500,8 +520,8 @@ void shovechars(int port)
 		{
 			if (errno == EBADF)
 			{
-				/* This one is bad, as it results in a spiral of doom, 
-				 * unless we can figure out what the bad file descriptor 
+				/* This one is bad, as it results in a spiral of doom,
+				 * unless we can figure out what the bad file descriptor
 				 * is and get rid of it. */
 				log_perror("NET", "FAIL", "checking for activity", "select");
 
@@ -759,10 +779,10 @@ inline char *connReasons(int reason)
 		"Login Retry Limit",
 		"Logins Disabled",
 		"Logout (Connection Not Dropped)",
-		"Too Many Connected Players"
-	};
+		"Too Many Connected Players"};
 
-	if (reason >= 0 && reason < 14) {
+	if (reason >= 0 && reason < 14)
+	{
 		return (char *)reason_strings[reason];
 	}
 	return NULL;
@@ -803,10 +823,10 @@ inline char *connMessages(int reason)
 		"shutdown",
 		"badlogin",
 		"nologins",
-		"logout"
-	};
+		"logout"};
 
-	if (reason >= 0 && reason < 13) {
+	if (reason >= 0 && reason < 13)
+	{
 		return (char *)message_strings[reason];
 	}
 	return NULL;
@@ -1982,7 +2002,7 @@ void set_signals(void)
 	sigset_t sigs;
 	struct sigaction sa;
 	/* We have to reset our signal mask, because of the possibility that we triggered a restart on a SIGUSR1.
-	 * If we did so, then the signal became blocked, and stays blocked, since control never returns to the 
+	 * If we did so, then the signal became blocked, and stays blocked, since control never returns to the
 	 * caller; i.e., further attempts to send a SIGUSR1 would fail. */
 	sigfillset(&sigs);
 	sigprocmask(SIG_UNBLOCK, &sigs, NULL);
