@@ -1024,10 +1024,8 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 			buf1 = XMALLOC(LBUF_SIZE, "buf1");
 			bp = buf1;
 			str = arg;
-		    log_write_raw(1, "Parsing single argument command; raw string is '%s'\n", arg);
 			eval_expression_string(buf1, &bp, player, cause, cause,
 								   interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
-		    log_write_raw(1, "Parsed argument is: %s\n", buf1);
 		}
 		else
 		{
@@ -1040,13 +1038,10 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			/* Pass original command arguments (%0-%9) to handler */
 			handler_cs_one_args_cmdargs = cmdp->info.handler;
-		    log_write_raw(1, "Dispatched command case 1\n");
 			(*handler_cs_one_args_cmdargs)(player, cause, key, buf1, cargs, ncargs);
 		}
 		else if (cmdp->callseq & CS_ADDED)
 		{
-		    log_write_raw(1, "We're in that elif case\n");
-			(*handler_cs_one_args_cmdargs)(player, cause, key, buf1, cargs, ncargs);
 			/* Handle dynamic softcode commands registered via @addcommand */
 			preserve = save_global_regs("process_cmdent_added");
 
@@ -1188,9 +1183,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		{
 			/* Standard one-argument command handler */
 			handler_cs_one_args = cmdp->info.handler;
-		    log_write_raw(1, "Buffer at this point is: %s\n", buf1);
 			(*handler_cs_one_args)(player, cause, key, buf1);
-		    log_write_raw(1, "Dispatched command case 2\n");
 		}
 
 		/* Free allocated buffer if we performed evaluation */
@@ -1215,7 +1208,6 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		buf1 = XMALLOC(LBUF_SIZE, "buf1");
 		bp = buf1;
 		str = buf2;
-		log_write_raw(1, "Parsing double argument command (arg 1); raw string is '%s'\n", arg);
 		eval_expression_string(buf1, &bp, player, cause, cause,
 							   EV_STRIP | EV_FCHECK | EV_EVAL | EV_TOP, &str, cargs, ncargs);
 
@@ -1258,7 +1250,6 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 				buf2 = XMALLOC(LBUF_SIZE, "buf2");
 				bp = buf2;
 				str = arg;
-		        log_write_raw(1, "Parsing double argument command (arg 2); raw string is '%s'\n", arg);
 				eval_expression_string(buf2, &bp, player, cause, cause,
 									   interp | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
 			}
