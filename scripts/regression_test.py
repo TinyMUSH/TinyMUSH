@@ -170,9 +170,10 @@ def main() -> None:
         print("[login]\n" + login_resp.strip())
 
     # Activate ANSI colors for testing
-    ansi_resp = send_cmd(tn, "@set me=ANSI", TIMEOUT, args.delay)
-    if args.verbose:
-        print("[set ANSI]\n" + ansi_resp.strip())
+    for flag in ["ANSI", "!COLOR256", "!COLOR24BIT"]:
+        flag_resp = send_cmd(tn, f"@set me={flag}", TIMEOUT, args.delay)
+        if args.verbose:
+            print(f"[set {flag}]\n" + flag_resp.strip())
 
     commands = []
     skipped_disconnect = []
@@ -214,7 +215,8 @@ def main() -> None:
             if expected_sub == "" and resp.strip() == "":
                 status = "OK"
             else:
-                status = "OK" if expected_sub in resp else "ERR"
+                expected_ansi = expected_sub.replace("¢", "\033")
+                status = "OK" if expected_ansi in resp else "ERR"
         else:
             # Si pas d'expectation, considérer OK tant qu'il y a une réponse (même vide)
             status = "OK"
@@ -243,7 +245,8 @@ def main() -> None:
         for cmd, expected, resp in failures:
             trimmed = resp.strip()
             preview = trimmed.splitlines()[0] if trimmed else "<no output>"
-            expectation = f" (expected contains: '{expected}')" if expected else ""
+            expected_ansi = expected.replace("¢", "\033")
+            expectation = f" (expected contains: '{expected_ansi}')" if expected else ""
             print(f" - {cmd}: {preview}{expectation}")
 
     # Exit with non-zero status if any command failed
