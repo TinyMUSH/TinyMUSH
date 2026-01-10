@@ -1446,8 +1446,26 @@ static bool ansi_parse_ansi_code(ColorState *state, const char *code)
         case 1: // bold
             state->highlight = ColorStatusSet;
             break;
+        case 4: // underline
+            state->underline = ColorStatusSet;
+            break;
+        case 5: // flash
+            state->flash = ColorStatusSet;
+            break;
+        case 7: // inverse
+            state->inverse = ColorStatusSet;
+            break;
         case 22: // no bold
             state->highlight = ColorStatusReset;
+            break;
+        case 24: // no underline
+            state->underline = ColorStatusReset;
+            break;
+        case 25: // no flash
+            state->flash = ColorStatusReset;
+            break;
+        case 27: // no inverse
+            state->inverse = ColorStatusReset;
             break;
         // fg colors 30-37
         case 30: set_color_by_ansi_index(state, 0, false); changed = true; break;
@@ -3051,21 +3069,31 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                                       void (*write_fn)(const char *data, size_t len, void *ctx),
                                       void *ctx)
 {
-    if (xterm)
-    {
-        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
-        bool has_bg = (attr->background.is_set == ColorStatusSet);
+    // If client does not need colors, nothing needs to be done - return early
+    if (!ansi && !xterm) return;
 
-        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+    bool has_fg = (attr->foreground.is_set == ColorStatusSet);
+    bool has_bg = (attr->background.is_set == ColorStatusSet);
+    bool has_effect = (attr->flash == ColorStatusSet || attr->highlight == ColorStatusSet || attr->inverse == ColorStatusSet || attr->underline == ColorStatusSet);
+    bool has_reset = (attr->reset == ColorStatusReset);
+
+    // If no color change needs to be emitted, nothing needs to be done - return early
+    if (!has_fg && !has_bg && !has_effect && !has_reset) return;
+
+    // Now we know for sure that we do need an escape sequence.
+    if (check_space_fn)
+        check_space_fn(64, ctx);
+
+    char seq[64];
+    int seq_len = 0;
+    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", C_ANSI_ESC);
+
+    bool is_first_code = true;
+
+    if (has_fg || has_bg) {
+
+        if (xterm)
         {
-            if (check_space_fn)
-                check_space_fn(64, ctx);
-
-            char seq[64];
-            int seq_len = 0;
-
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", C_ANSI_ESC);
-
             if (has_fg)
             {
                 int xterm_fg;
@@ -3079,6 +3107,7 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                 }
 
                 seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "38;5;%d", xterm_fg);
+                is_first_code = false;
             }
 
             if (has_bg)
@@ -3093,48 +3122,22 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                     xterm_bg = closest.xterm_index;
                 }
 
-                if (has_fg)
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
-                else
+                if (is_first_code)
                     seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "48;5;%d", xterm_bg);
-            }
-
-            if (attr->reset == ColorStatusReset)
-            {
-                if (has_fg || has_bg)
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
                 else
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";48;5;%d", xterm_bg);
+                is_first_code = false;
             }
 
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-
-            write_fn(seq, seq_len, ctx);
         }
-    }
-    else if (ansi)
-    {
-        bool has_fg = (attr->foreground.is_set == ColorStatusSet);
-        bool has_bg = (attr->background.is_set == ColorStatusSet);
-
-        if (has_fg || has_bg || (attr->reset == ColorStatusReset))
+        else if (ansi)
         {
-            if (check_space_fn)
-                check_space_fn(64, ctx);
-
-            char seq[64];
-            int seq_len = 0;
-
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%c[", C_ANSI_ESC);
-
             if (has_fg)
             {
                 int f;
                 if (attr->foreground.ansi_index >= 0 && attr->foreground.ansi_index <= 15)
                 {
-                    ColorCIELab lab = ansi_rgb_to_cielab(attr->foreground.truecolor);
-                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
-                    uint8_t idx = closest.xterm_index & 0xF;
+                    uint8_t idx = attr->foreground.ansi_index;
                     f = (idx < 8) ? (30 + idx) : (90 + (idx - 8));
                 }
                 else
@@ -3145,6 +3148,7 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                     f = (a < 8) ? (30 + a) : (90 + (a - 8));
                 }
                 seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", f);
+                is_first_code = false;
             }
 
             if (has_bg)
@@ -3152,9 +3156,7 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                 int b;
                 if (attr->background.ansi_index >= 0 && attr->background.ansi_index <= 15)
                 {
-                    ColorCIELab lab = ansi_rgb_to_cielab(attr->background.truecolor);
-                    ColorEntry closest = ansi_find_closest_color_with_lab(lab, ColorTypeXTerm);
-                    uint8_t idx = closest.xterm_index & 0xF;
+                    uint8_t idx = attr->background.ansi_index;
                     b = (idx < 8) ? (40 + idx) : (100 + (idx - 8));
                 }
                 else
@@ -3165,25 +3167,66 @@ static void convert_color_to_sequence(const ColorState *attr, bool ansi, bool xt
                     b = (a < 8) ? (40 + a) : (100 + (a - 8));
                 }
 
-                if (has_fg)
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
-                else
+                if (is_first_code)
                     seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "%d", b);
-            }
-
-            if (attr->reset == ColorStatusReset)
-            {
-                if (has_fg || has_bg)
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
                 else
-                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+                    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";%d", b);
+                is_first_code = false;
             }
-
-            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
-
-            write_fn(seq, seq_len, ctx);
         }
     }
+
+    if (attr->highlight == ColorStatusSet)
+    {
+        if (is_first_code)
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "1");
+        else
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";1");
+        is_first_code = false;
+    }
+
+    if (attr->underline == ColorStatusSet)
+    {
+        if (is_first_code)
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "4");
+        else
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";4");
+        is_first_code = false;
+    }
+
+    if (attr->flash == ColorStatusSet)
+    {
+        if (is_first_code)
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "5");
+        else
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";5");
+        is_first_code = false;
+    }
+
+    if (attr->inverse == ColorStatusSet)
+    {
+        if (is_first_code)
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "7");
+        else
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";7");
+        is_first_code = false;
+    }
+
+    // NOTE(aa): We currently don't handle `ColorStatusReset` for any of the above attributes.
+    // This is probably fine, since it's not possible to generate individual attribute resets with MUSHcode.
+
+    if (attr->reset == ColorStatusReset)
+    {
+        if (is_first_code)
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "0");
+        else
+            seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, ";0");
+        is_first_code = false;
+    }
+
+    seq_len += XSNPRINTF(seq + seq_len, sizeof(seq) - seq_len, "m");
+
+    write_fn(seq, seq_len, ctx);
 }
 
 typedef struct LevelAnsiStreamContext
