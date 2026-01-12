@@ -472,7 +472,7 @@ void edit_string(char *src, char **dst, char *from, char *to, dbref player, dbre
 	 * have any embedded ANSI codes.
 	 */
 	to_color_state = (ColorState){0};
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 
 	do
 	{
