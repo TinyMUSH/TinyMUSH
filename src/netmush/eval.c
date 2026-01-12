@@ -1038,24 +1038,8 @@ void eval_expression_string(char *buff, char **bufc, dbref player, dbref caller,
 
 					if (consumed > 0)
 					{
-						// Successfully parsed a color code - generate ANSI escape sequence.
-						// Determine color type based on player capabilities.
-						ColorType color_type = ColorTypeNone;
-						dbref color_target = (cause != NOTHING) ? cause : player; // Prefer enactor/viewer flags for ANSI output
-
-						if (color_target != NOTHING && Color24Bit(color_target))
-						{
-							color_type = ColorTypeTrueColor;
-						}
-						else if (color_target != NOTHING && Color256(color_target))
-						{
-							color_type = ColorTypeXTerm;
-						}
-						else if (color_target != NOTHING && Ansi(color_target))
-						{
-							color_type = ColorTypeAnsi;
-						}
-
+						// Always process colors at highest fidelity: they get converted to player-appropriate level at send time.
+						ColorType color_type = ColorTypeTrueColor;
 						char ansi_buf[256];
 						size_t ansi_offset = 0;
 						ColorStatus result = to_ansi_escape_sequence(ansi_buf, sizeof(ansi_buf), &ansi_offset, &color, color_type);

@@ -395,7 +395,7 @@ void pairs_print(dbref player, char *atext, char *buff, char **bufc)
 {
 	int pos, depth;
 	char *str, *strbuf, *parenlist, *endp;
-	ColorType color_type = resolve_color_type(player, player);
+	ColorType color_type = ColorTypeTrueColor;
 	ColorState normal = color_normal;
 	ColorState hilite_state = color_hilite;
 	ColorState red_state = color_red;

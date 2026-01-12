@@ -605,7 +605,7 @@ void fun_after(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	char *hay_text = NULL;
 	char *needle_text = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	ColorState zero_state = {0};
 	int match_pos = -1;
 	bool needle_has_color = false;
@@ -739,7 +739,7 @@ void fun_before(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	char *hay_text = NULL;
 	char *needle_text = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	ColorState zero_state = {0};
 	int match_pos = -1;
 	bool needle_has_color = false;
@@ -1395,7 +1395,7 @@ void fun_left(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 	ColorState *states = NULL;
 	char *stripped = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (nchars <= 0)
@@ -1441,7 +1441,7 @@ void fun_right(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 	ColorState *states = NULL;
 	char *stripped = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	int nchars = (int)strtol(fargs[1], (char **)NULL, 10);
 
 	if (nchars <= 0)
@@ -2128,19 +2128,8 @@ void fun_scramble(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		return;
 	}
 
-	// Determine color type for output
-	if (color_target != NOTHING && Color24Bit(color_target))
-	{
-		color_type = ColorTypeTrueColor;
-	}
-	else if (color_target != NOTHING && Color256(color_target))
-	{
-		color_type = ColorTypeXTerm;
-	}
-	else if (color_target != NOTHING && Ansi(color_target))
-	{
-		color_type = ColorTypeAnsi;
-	}
+	// Always process colors at highest fidelity: they get converted to player-appropriate level at send time.
+	color_type = ColorTypeTrueColor;
 
 	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
 	num_transitions = 0;
@@ -2209,18 +2198,8 @@ void fun_reverse(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 	}
 
 	// Determine color type for output
-	if (color_target != NOTHING && Color24Bit(color_target))
-	{
-		color_type = ColorTypeTrueColor;
-	}
-	else if (color_target != NOTHING && Color256(color_target))
-	{
-		color_type = ColorTypeXTerm;
-	}
-	else if (color_target != NOTHING && Ansi(color_target))
-	{
-		color_type = ColorTypeAnsi;
-	}
+	// Always process colors at highest fidelity: they get converted to player-appropriate level at send time.
+	color_type = ColorTypeTrueColor;
 
 	n = ansi_map_states_colorstate(fargs[0], &color_states, &stripped);
 	num_transitions = 0;
@@ -2268,7 +2247,7 @@ void fun_mid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, c
 	ColorState *states = NULL;
 	char *stripped = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	int start = (int)strtol(fargs[1], (char **)NULL, 10);
 	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
@@ -2768,7 +2747,7 @@ void perform_border(char *buff, char **bufc, dbref player, dbref caller, dbref c
 	sl_ansi_state = el_ansi_state = color_normal;
 	sw_ansi_state = ew_ansi_state = color_normal;
 	sl_pos = el_pos = sw_pos = ew_pos = 0;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	const ColorState ansi_normal = color_normal;
 
 	while (1)
@@ -3090,7 +3069,7 @@ void perform_align(int n_cols, char **raw_colstrs, char **data, char fillc, Deli
 	int width = 0, just = 0, nleft = 0, max = 0, lead_chrs = 0;
 	int n_done = 0, pending_coaright = 0;
 	const ColorState ansi_normal = color_normal;
-	const ColorType color_type = resolve_color_type(player, cause);
+	const ColorType color_type = ColorTypeTrueColor;
 	/*
 	 * Parse the column widths and justifications
 	 */
@@ -3885,7 +3864,7 @@ void fun_delete(char *buff, char **bufc, dbref player, dbref caller, dbref cause
 	ColorState *states = NULL;
 	char *stripped = NULL;
 	ColorState normal = color_normal;
-	ColorType color_type = resolve_color_type(player, cause);
+	ColorType color_type = ColorTypeTrueColor;
 	int start = (int)strtol(fargs[1], (char **)NULL, 10);
 	int nchars = (int)strtol(fargs[2], (char **)NULL, 10);
 
