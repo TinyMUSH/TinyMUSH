@@ -25,6 +25,12 @@ set(NETMUSH_SOURCES
     string_util.c timer.c typedefs.h 
     unparse.c vattr.c version.c walkdb.c wild.c wiz.c
     db_storage.c db_storage.h
+        command_init.c
+        command_access.c
+        # command_dispatch.c
+        # command_list.c
+        # command_config.c
+        # command_info.c
 )
 
 # Add backend-specific source files

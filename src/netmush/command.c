@@ -17,6 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "command_internal.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -72,97 +73,7 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp; /*!< Commonly u
  * @see reset_prefix_cmds() for re-synchronizing prefix command pointers
  * @see command_table for the static builtin command definitions
  */
-void init_cmdtab(void)
-{
-	CMDENT *cp = NULL;
-	ATTR *ap = NULL;
-	char *alias = NULL;
-	size_t cmdname_len = 0;
-	char cbuff[SBUF_SIZE]; /* Stack allocation for temporary command name buffer */
-
-	/* Initialize hash table with size based on configuration factor */
-	hashinit(&mushstate.command_htab, 250 * mushconf.hash_factor, HT_STR);
-
-	/* Dynamically create attribute-setter commands (@name, @desc, @flags, etc.) */
-	for (ap = attr; ap->name; ap++)
-	{
-		/* Skip attributes marked as non-command (AF_NOCMD flag) */
-		if (ap->flags & AF_NOCMD)
-		{
-			continue;
-		}
-
-		/* Construct lowercased "@attributename" command string */
-		cbuff[0] = '@';
-		cmdname_len = 1;
-
-		for (const char *src = ap->name; *src && cmdname_len < SBUF_SIZE - 1; src++)
-		{
-			cbuff[cmdname_len++] = tolower(*src);
-		}
-
-		cbuff[cmdname_len] = '\0';
-
-		/* Allocate and initialize command entry structure */
-		cp = (CMDENT *)XMALLOC(sizeof(CMDENT), "cp");
-		cp->cmdname = XSTRDUP(cbuff, "cp->cmdname");
-		cp->perms = CA_NO_GUEST | CA_NO_SLAVE; /* Base permissions: no guests or slaves */
-		cp->switches = NULL;
-
-		/* Elevate to wizard permission if attribute requires it */
-		if (ap->flags & (AF_WIZARD | AF_MDARK))
-		{
-			cp->perms |= CA_WIZARD;
-		}
-
-		/* Configure command entry for attribute setting */
-		cp->extra = ap->number;	  /* Store attribute number for handler */
-		cp->callseq = CS_TWO_ARG; /* Standard cmd obj=value format */
-		cp->pre_hook = NULL;
-		cp->post_hook = NULL;
-		cp->userperms = NULL;
-		cp->info.handler = do_setattr; /* All attribute setters use same handler */
-
-		/* Add primary command to hash table; if collision occurs, free the duplicate */
-		if (hashadd(cp->cmdname, (int *)cp, &mushstate.command_htab, 0))
-		{
-			XFREE(cp->cmdname);
-			XFREE(cp);
-		}
-		else
-		{
-			/* Register double-underscore alias for programmatic command execution */
-			alias = XASPRINTF("alias", "__%s", cp->cmdname);
-			hashadd(alias, (int *)cp, &mushstate.command_htab, HASH_ALIAS);
-			XFREE(alias);
-		}
-	}
-
-	/* Register all builtin commands from static command_table with __ aliases */
-	for (cp = command_table; cp->cmdname; cp++)
-	{
-		hashadd(cp->cmdname, (int *)cp, &mushstate.command_htab, 0);
-
-		alias = XASPRINTF("alias", "__%s", cp->cmdname);
-		hashadd(alias, (int *)cp, &mushstate.command_htab, HASH_ALIAS);
-		XFREE(alias);
-	}
-
-	/* Initialize prefix command dispatch array (256 entries for all ASCII+extended chars) */
-	for (int i = 0; i < 256; i++)
-	{
-		prefix_cmds[i] = NULL;
-	}
-
-	/* Register single-character command leaders: " : ; \ # & */
-	register_prefix_cmds("\":;\\#&");
-
-	/* Cache frequently-used command pointers to avoid repeated hash lookups */
-	goto_cmdp = (CMDENT *)hashfind("goto", &mushstate.command_htab);
-	enter_cmdp = (CMDENT *)hashfind("enter", &mushstate.command_htab);
-	leave_cmdp = (CMDENT *)hashfind("leave", &mushstate.command_htab);
-	internalgoto_cmdp = (CMDENT *)hashfind("internalgoto", &mushstate.command_htab);
-}
+/* init_cmdtab moved to command_init.c */
 
 /**
  * @brief Re-synchronize prefix command pointers after hash table modifications.
@@ -185,24 +96,7 @@ void init_cmdtab(void)
  * @see register_prefix_cmds() for setting up prefix command entries
  * @see prefix_cmds[] for the global prefix dispatch array (256 entries)
  */
-void reset_prefix_cmds(void)
-{
-	char lookup_key[2] = {0, 0}; /* Single-character lookup string + null terminator */
-
-	/* Re-query hash table for each registered prefix command */
-	for (int i = 0; i < 256; i++)
-	{
-		/* Skip empty slots in the prefix dispatch array */
-		if (!prefix_cmds[i])
-		{
-			continue;
-		}
-
-		/* Build single-character key and refresh pointer from hash table */
-		lookup_key[0] = (char)i;
-		prefix_cmds[i] = (CMDENT *)hashfind(lookup_key, &mushstate.command_htab);
-	}
-}
+/* reset_prefix_cmds moved to command_init.c */
 
 /**
  * @brief Validate whether a player has permission to execute a command or access a resource.
@@ -237,106 +131,7 @@ void reset_prefix_cmds(void)
  * @see check_userdef_access() for user-defined permission hooks
  * @see CMDENT.perms for command permission mask structure
  */
-bool check_access(dbref player, int mask)
-{
-	/* Early exits for disabled commands and God-level bypass */
-	if (mask & (CA_DISABLED | CA_STATIC))
-	{
-		return false; /* Command is disabled or static (no runtime execution) */
-	}
-
-	if (God(player) || mushstate.initializing)
-	{
-		return true; /* God and initialization phase bypass all checks */
-	}
-
-	/* Extract privilege and marker components from permission mask */
-	int combined_mask = mask & (CA_ISPRIV_MASK | CA_MARKER_MASK);
-
-	/* God-only permission check (non-combinable with other privileges) */
-	if (combined_mask == CA_GOD)
-	{
-		return false; /* Only God can pass this check, and we know player is not God */
-	}
-
-	/* Check privilege bits and/or marker bits if either is present */
-	if (combined_mask)
-	{
-		int priv_mask = mask & CA_ISPRIV_MASK;
-		int marker_mask = mask & CA_MARKER_MASK;
-
-		/* Case 1: Only privilege bits set (no markers) */
-		if (priv_mask && !marker_mask)
-		{
-			if (!(((mask & CA_WIZARD) && Wizard(player)) ||
-				  ((mask & CA_ADMIN) && WizRoy(player)) ||
-				  ((mask & CA_BUILDER) && Builder(player)) ||
-				  ((mask & CA_STAFF) && Staff(player)) ||
-				  ((mask & CA_HEAD) && Head(player)) ||
-				  ((mask & CA_IMMORTAL) && Immortal(player)) ||
-				  ((mask & CA_MODULE_OK) && Can_Use_Module(player))))
-			{
-				return false; /* Player lacks required privilege level */
-			}
-		}
-		/* Case 2: Only marker bits set (no privileges) */
-		else if (!priv_mask && marker_mask)
-		{
-			if (!(((mask & CA_MARKER0) && H_Marker0(player)) ||
-				  ((mask & CA_MARKER1) && H_Marker1(player)) ||
-				  ((mask & CA_MARKER2) && H_Marker2(player)) ||
-				  ((mask & CA_MARKER3) && H_Marker3(player)) ||
-				  ((mask & CA_MARKER4) && H_Marker4(player)) ||
-				  ((mask & CA_MARKER5) && H_Marker5(player)) ||
-				  ((mask & CA_MARKER6) && H_Marker6(player)) ||
-				  ((mask & CA_MARKER7) && H_Marker7(player)) ||
-				  ((mask & CA_MARKER8) && H_Marker8(player)) ||
-				  ((mask & CA_MARKER9) && H_Marker9(player))))
-			{
-				return false; /* Player lacks required marker flags */
-			}
-		}
-		/* Case 3: Both privilege and marker bits set (OR semantics) */
-		else
-		{
-			if (!(((mask & CA_WIZARD) && Wizard(player)) ||
-				  ((mask & CA_ADMIN) && WizRoy(player)) ||
-				  ((mask & CA_BUILDER) && Builder(player)) ||
-				  ((mask & CA_STAFF) && Staff(player)) ||
-				  ((mask & CA_HEAD) && Head(player)) ||
-				  ((mask & CA_IMMORTAL) && Immortal(player)) ||
-				  ((mask & CA_MODULE_OK) && Can_Use_Module(player)) ||
-				  ((mask & CA_MARKER0) && H_Marker0(player)) ||
-				  ((mask & CA_MARKER1) && H_Marker1(player)) ||
-				  ((mask & CA_MARKER2) && H_Marker2(player)) ||
-				  ((mask & CA_MARKER3) && H_Marker3(player)) ||
-				  ((mask & CA_MARKER4) && H_Marker4(player)) ||
-				  ((mask & CA_MARKER5) && H_Marker5(player)) ||
-				  ((mask & CA_MARKER6) && H_Marker6(player)) ||
-				  ((mask & CA_MARKER7) && H_Marker7(player)) ||
-				  ((mask & CA_MARKER8) && H_Marker8(player)) ||
-				  ((mask & CA_MARKER9) && H_Marker9(player))))
-			{
-				return false; /* Player must match at least one privilege OR marker */
-			}
-		}
-	}
-
-	/* Check exclusion bits (things player must NOT have, unless they're a wizard) */
-	if ((mask & CA_ISNOT_MASK) && !Wizard(player))
-	{
-		if (((mask & CA_NO_HAVEN) && Player_haven(player)) ||
-			((mask & CA_NO_ROBOT) && Robot(player)) ||
-			((mask & CA_NO_SLAVE) && Slave(player)) ||
-			((mask & CA_NO_SUSPECT) && Suspect(player)) ||
-			((mask & CA_NO_GUEST) && Guest(player)))
-		{
-			return false; /* Player has a forbidden flag/state */
-		}
-	}
-
-	return true; /* All permission checks passed */
-}
+/* check_access moved to command_access.c */
 
 /**
  * @brief Validate player permissions through dynamically loaded module permission handlers.
@@ -370,26 +165,7 @@ bool check_access(dbref player, int mask)
  * @see check_cmd_access() for combining core and module permission checks
  * @see EXTFUNCS structure definition for handler registration interface
  */
-bool check_mod_access(dbref player, EXTFUNCS *xperms)
-{
-	/* Iterate through all registered module permission handlers */
-	for (int i = 0; i < xperms->num_funcs; i++)
-	{
-		/* Skip NULL handler slots (unloaded modules or registration gaps) */
-		if (!xperms->ext_funcs[i])
-		{
-			continue;
-		}
-
-		/* Invoke module handler; fail immediately if permission denied */
-		if (!(xperms->ext_funcs[i]->handler)(player))
-		{
-			return false; /* Module denied access - short-circuit chain */
-		}
-	}
-
-	return true; /* All module handlers approved or no handlers registered */
-}
+/* check_mod_access moved to command_access.c */
 
 /**
  * @brief Evaluate user-defined command permissions through in-game attribute softcode.
@@ -443,52 +219,7 @@ bool check_mod_access(dbref player, EXTFUNCS *xperms)
  * @see check_access() for core permission mask validation
  * @see HOOKENT structure for hook registration interface
  */
-bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncargs)
-{
-	char *buf = NULL, *bp = NULL, *tstr = NULL, *str = NULL;
-	int aflags = 0, alen = 0;
-	dbref aowner = NOTHING;
-	GDATA *preserve = NULL;
-	bool result = false;
-
-	/* Retrieve permission attribute from the specified object */
-	tstr = atr_get(hookp->thing, hookp->atr, &aowner, &aflags, &alen);
-
-	/* Missing attribute denies access */
-	if (!tstr)
-	{
-		return false;
-	}
-
-	/* Empty attribute denies access */
-	if (!*tstr)
-	{
-		XFREE(tstr);
-		return false;
-	}
-
-	/* Preserve global registers during permission evaluation */
-	preserve = save_global_regs("check_userdef_access");
-
-	/* Evaluate the attribute softcode with player as enactor */
-	buf = XMALLOC(LBUF_SIZE, "buf");
-	bp = buf;
-	str = tstr;
-	eval_expression_string(buf, &bp, hookp->thing, player, player,
-						   EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
-
-	/* Restore global registers to pre-evaluation state */
-	restore_global_regs("check_userdef_access", preserve);
-
-	/* Convert softcode result to boolean (0/"" → false, anything else → true) */
-	result = xlate(buf);
-
-	/* Clean up allocated buffers */
-	XFREE(buf);
-	XFREE(tstr);
-
-	return result;
-}
+/* check_userdef_access moved to command_access.c */
 
 /**
  * @brief Execute pre-command or post-command hook softcode with register context management.
@@ -553,80 +284,7 @@ bool check_userdef_access(dbref player, HOOKENT *hookp, char *cargs[], int ncarg
  * @see process_cmdent() for hook invocation during command execution
  * @see HOOKENT structure for hook registration interface
  */
-void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause, char *cargs[], int ncargs)
-{
-	char *buf = NULL, *bp = NULL, *tstr = NULL, *str = NULL;
-	int aflags = 0, alen = 0;
-	dbref aowner = NOTHING;
-	GDATA *preserve = NULL;
-
-	/* Retrieve hook attribute from the specified object */
-	tstr = atr_get(hp->thing, hp->atr, &aowner, &aflags, &alen);
-	str = tstr;
-
-	/* CS_PRESERVE: Save current register state for restoration after hook execution */
-	if (save_globs & CS_PRESERVE)
-	{
-		preserve = save_global_regs("process_hook");
-	}
-	/* CS_PRIVATE: Create isolated register context by hiding current registers */
-	else if (save_globs & CS_PRIVATE)
-	{
-		preserve = mushstate.rdata; /* Save current register context pointer */
-		mushstate.rdata = NULL;		/* Clear context to force fresh allocation */
-	}
-
-	/* Evaluate hook softcode with player as enactor */
-	buf = XMALLOC(LBUF_SIZE, "buf");
-	bp = buf;
-	eval_expression_string(buf, &bp, hp->thing, player, player,
-						   EV_EVAL | EV_FCHECK | EV_TOP, &str, cargs, ncargs);
-
-	/* Hook result is discarded (hooks produce side effects only) */
-	XFREE(buf);
-
-	/* CS_PRESERVE: Restore original register state, discarding hook modifications */
-	if (save_globs & CS_PRESERVE)
-	{
-		restore_global_regs("process_hook", preserve);
-	}
-	/* CS_PRIVATE: Deallocate private register context and restore original */
-	else if (save_globs & CS_PRIVATE)
-	{
-		/* Clean up private register allocations if hook created any */
-		if (mushstate.rdata)
-		{
-			/* Free all q-register contents (q0-q9 style registers) */
-			for (int z = 0; z < mushstate.rdata->q_alloc; z++)
-			{
-				XFREE(mushstate.rdata->q_regs[z]);
-			}
-
-			/* Free all x-register contents (named registers) */
-			for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
-			{
-				XFREE(mushstate.rdata->x_names[z]); /* Register name strings */
-				XFREE(mushstate.rdata->x_regs[z]);	/* Register value strings */
-			}
-
-			/* Free register array structures */
-			XFREE(mushstate.rdata->q_regs);	 /* Q-register value array */
-			XFREE(mushstate.rdata->q_lens);	 /* Q-register length array */
-			XFREE(mushstate.rdata->x_names); /* X-register name array */
-			XFREE(mushstate.rdata->x_regs);	 /* X-register value array */
-			XFREE(mushstate.rdata->x_lens);	 /* X-register length array */
-
-			/* Free register context structure itself */
-			XFREE(mushstate.rdata);
-		}
-
-		/* Restore original register context */
-		mushstate.rdata = preserve;
-	}
-
-	/* Clean up hook attribute buffer */
-	XFREE(tstr);
-}
+/* process_hook moved to command_access.c */
 
 /**
  * @brief Trigger pre-movement and post-movement hooks during room transitions.
@@ -672,35 +330,7 @@ void process_hook(HOOKENT *hp, int save_globs, dbref player, dbref cause, char *
  * @see internalgoto_cmdp for the internal movement command entry
  * @see init_cmdtab() for internalgoto_cmdp initialization
  */
-void call_move_hook(dbref player, dbref cause, bool state)
-{
-	/* Early exit if internalgoto command not initialized */
-	if (!internalgoto_cmdp)
-	{
-		return;
-	}
-
-	/* Extract register management mode from command callseq flags */
-	int register_mode = internalgoto_cmdp->callseq & (CS_PRESERVE | CS_PRIVATE);
-
-	/* Execute appropriate hook based on movement phase */
-	if (!state) /* Pre-movement: before location change */
-	{
-		/* Trigger pre-hook if registered and not a dynamically added command */
-		if (internalgoto_cmdp->pre_hook && !(internalgoto_cmdp->callseq & CS_ADDED))
-		{
-			process_hook(internalgoto_cmdp->pre_hook, register_mode, player, cause, NULL, 0);
-		}
-	}
-	else /* Post-movement: after location change */
-	{
-		/* Trigger post-hook if registered and not a dynamically added command */
-		if (internalgoto_cmdp->post_hook && !(internalgoto_cmdp->callseq & CS_ADDED))
-		{
-			process_hook(internalgoto_cmdp->post_hook, register_mode, player, cause, NULL, 0);
-		}
-	}
-}
+/* call_move_hook moved to command_access.c */
 
 /**
  * @brief Validate command execution permission by combining core, module, and user-defined checks.
@@ -761,26 +391,7 @@ void call_move_hook(dbref player, dbref cause, bool state)
  * @see CMDENT.perms for core permission mask structure
  * @see CMDENT.userperms for user-defined permission hook pointer
  */
-bool check_cmd_access(dbref player, CMDENT *cmdp, char *cargs[], int ncargs)
-{
-	/* Core permission check (privilege/marker/exclusion mask validation) */
-	if (!check_access(player, cmdp->perms))
-	{
-		return false; /* Core permissions failed - deny access */
-	}
-
-	/* User-defined permission check (if configured) with God override */
-	if (cmdp->userperms)
-	{
-		/* God bypasses user-defined permissions, non-God must pass softcode check */
-		if (!God(player) && !check_userdef_access(player, cmdp->userperms, cargs, ncargs))
-		{
-			return false; /* User-defined permission check failed - deny access */
-		}
-	}
-
-	return true; /* All permission checks passed - grant access */
-}
+/* check_cmd_access moved to command_access.c */
 
 /**
  * @brief Execute a validated command with argument parsing, switch processing, and hook invocation.
