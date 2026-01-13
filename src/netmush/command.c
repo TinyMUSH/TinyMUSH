@@ -464,7 +464,7 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp; /*!< Commonly u
  * @see eval_expression_string() for argument interpretation
  * @see CMDENT structure for command entry definition
  */
-void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool interactive, char *arg, char *unp_command, char *cargs[], int ncargs)
+void process_cmdent__moved(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool interactive, char *arg, char *unp_command, char *cargs[], int ncargs)
 {
 	int nargs = 0, i = 0, interp = 0, key = 0, xkey = 0, aflags = 0, alen = 0;
 	int cmd_matches = 0;
@@ -816,6 +816,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 		}
 
 		/* Evaluate first argument */
+			/* process_cmdent and process_command moved to command_dispatch.c */
 		buf1 = XMALLOC(LBUF_SIZE, "buf1");
 		bp = buf1;
 		str = buf2;
@@ -962,7 +963,7 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
  * @see call_move_hook() pour les hooks de mouvement sur les transitions de
  *      salle
  */
-char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
+char *process_command__moved(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
 	dbref exit = NOTHING, aowner = NOTHING, parent = NOTHING;
 	CMDENT *cmdp = NULL;
@@ -1657,7 +1658,7 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
  * @see process_command()
  * @see mushstate.inpipe
  */
-void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
+void process_cmdline__moved(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
 	char *cmdsave = NULL, *save_poutnew = NULL, *save_poutbufc = NULL, *save_pout = NULL;
 	char *cp = NULL, *log_cmdbuf = NULL, *pname = NULL, *lname = NULL;
@@ -1819,6 +1820,7 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 		XFREE(log_cmdbuf);
 	}
 }
+/* process_cmdline moved to command_dispatch.c */
 
 /**
  * @brief Display the built-in and module-provided commands visible to a player.

@@ -27,7 +27,7 @@ set(NETMUSH_SOURCES
     db_storage.c db_storage.h
         command_init.c
         command_access.c
-        # command_dispatch.c
+        command_dispatch.c
         # command_list.c
         # command_config.c
         # command_info.c
