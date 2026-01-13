@@ -1832,57 +1832,7 @@ void process_cmdline__moved(dbref player, dbref cause, char *cmdline, char *args
  *
  * @see display_nametab() for printing logged-out command names
  */
-void list_cmdtable(dbref player)
-{
-	CMDENT *cmdp = NULL, *modcmds = NULL;
-	MODULE *mp = NULL;
-	char *buf = XMALLOC(LBUF_SIZE, "buf");
-
-	XSPRINTF(buf, "Built-in commands:");
-	for (cmdp = command_table; cmdp->cmdname; cmdp++)
-	{
-		if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
-		{
-			continue;
-		}
-
-		XSPRINTFCAT(buf, " %s", cmdp->cmdname);
-	}
-
-	/* Players get the list of logged-out cmds too */
-	if (isPlayer(player))
-	{
-		display_nametab(player, logout_cmdtable, true, buf);
-	}
-	else
-	{
-		notify(player, buf);
-	}
-
-	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
-	{
-		char *modname = XASPRINTF("modname", "mod_%s_%s", mp->modname, "cmdtable");
-
-		if ((modcmds = (CMDENT *)dlsym(mp->handle, modname)) != NULL)
-		{
-			XSPRINTF(buf, "Module %s commands:", mp->modname);
-			for (cmdp = modcmds; cmdp->cmdname; cmdp++)
-			{
-				if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
-				{
-					continue;
-				}
-
-				XSPRINTFCAT(buf, " %s", cmdp->cmdname);
-			}
-			notify(player, buf);
-		}
-
-		XFREE(modname);
-	}
-
-	XFREE(buf);
-}
+/* list_cmdtable moved to command_list.c */
 
 /**
  * @brief Show attribute names the player is allowed to see.
@@ -1893,44 +1843,7 @@ void list_cmdtable(dbref player)
  *
  * @param player Database reference of the requesting player
  */
-void list_attrtable(dbref player)
-{
-	ATTR *ap = NULL;
-	char *cp = NULL, *bp = NULL, *buf = NULL;
-	char *buf_end = NULL;
-
-	bp = buf = XMALLOC(LBUF_SIZE, "buf");
-	buf_end = buf + LBUF_SIZE - 1; /* Keep space for terminator */
-
-	for (cp = (char *)"Attributes:"; *cp; cp++)
-	{
-		*bp++ = *cp;
-	}
-
-	for (ap = attr; ap->name; ap++)
-	{
-		if (See_attr(player, player, ap, player, 0))
-		{
-			/* Ensure we never overrun the output buffer */
-			size_t needed = 1 + strlen(ap->name); /* leading space + name */
-			if ((bp + needed) >= buf_end)
-			{
-				break;
-			}
-
-			*bp++ = ' ';
-
-			for (cp = (char *)(ap->name); *cp; cp++)
-			{
-				*bp++ = *cp;
-			}
-		}
-	}
-
-	*bp = '\0';
-	raw_notify(player, NULL, buf);
-	XFREE(buf);
-}
+/* list_attrtable moved to command_list.c */
 
 /**
  * @brief Emit visible command permissions from a command table.
@@ -1942,31 +1855,7 @@ void list_attrtable(dbref player)
  * @param player Database reference of the requesting player
  * @param ctab   Pointer to the command table to list
  */
-void helper_list_cmdaccess(dbref player, CMDENT *ctab)
-{
-	CMDENT *cmdp = NULL;
-	ATTR *ap = NULL;
-
-	for (cmdp = ctab; cmdp->cmdname; cmdp++)
-	{
-		if (!check_access(player, cmdp->perms) || (cmdp->perms & CF_DARK))
-		{
-			continue;
-		}
-
-		if (cmdp->userperms)
-		{
-			ap = atr_num(cmdp->userperms->atr);
-			/* Annotate the source of user-defined permissions; fallback if missing */
-			const char *attr_name = ap ? ap->name : "?BAD?";
-			listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s user(#%d/%s)", cmdp->cmdname, cmdp->userperms->thing, attr_name);
-		}
-		else
-		{
-			listset_nametab(player, access_nametab, cmdp->perms, true, "%-26.26s ", cmdp->cmdname);
-		}
-	}
-}
+/* helper_list_cmdaccess moved to command_list.c */
 
 /**
  * @brief Display command permission masks the caller can see.
@@ -1981,77 +1870,7 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab)
  *
  * @param player Database reference of the requesting player
  */
-void list_cmdaccess(dbref player)
-{
-	CMDENT *cmdp = NULL, *ctab = NULL;
-	ATTR *ap = NULL;
-	MODULE *mp = NULL;
-	char *p = NULL, *q = NULL, *buff = XMALLOC(SBUF_SIZE, "buff");
-
-	notify(player, "Command                    Permissions");
-	notify(player, "-------------------------- ----------------------------------------------------");
-
-	/* Core command table */
-	helper_list_cmdaccess(player, command_table);
-
-	/* Module command tables (if exported) */
-	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
-	{
-		p = XASPRINTF("p", "mod_%s_%s", mp->modname, "cmdtable");
-
-		if ((ctab = (CMDENT *)dlsym(mp->handle, p)) != NULL)
-		{
-			helper_list_cmdaccess(player, ctab);
-		}
-		XFREE(p);
-	}
-
-	/* Attribute-setter commands ("\@name", "\@desc", etc.) */
-	for (ap = attr; ap->name; ap++)
-	{
-		if (ap->flags & AF_NOCMD)
-		{
-			continue; /* Attribute is not exposed as a command */
-		}
-
-		size_t name_len = strlen(ap->name);
-		if ((name_len + 2) >= SBUF_SIZE)
-		{
-			continue; /* Avoid buffer overflow on extremely long names */
-		}
-
-		p = buff;
-		*p++ = '@';
-
-		for (q = (char *)ap->name; *q; p++, q++)
-		{
-			*p = tolower(*q);
-		}
-
-		*p = '\0';
-		cmdp = (CMDENT *)hashfind(buff, &mushstate.command_htab);
-
-		if (cmdp == NULL)
-		{
-			continue;
-		}
-
-		if (!check_access(player, cmdp->perms))
-		{
-			continue;
-		}
-
-		if (!(cmdp->perms & CF_DARK))
-		{
-			XSPRINTF(buff, "%-26.26s ", cmdp->cmdname);
-			listset_nametab(player, access_nametab, cmdp->perms, true, buff);
-		}
-	}
-
-	notify(player, "-------------------------------------------------------------------------------");
-
-	XFREE(buff);
-}
+/* list_cmdaccess moved to command_list.c */
 
 /**
  * @brief Print visible switches for a command table.
@@ -2098,32 +1917,7 @@ static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
  *
  * @param player Database reference of the requesting player
  */
-void list_cmdswitches(dbref player)
-{
-	CMDENT *ctab = NULL;
-	MODULE *mp = NULL;
-	char symname[MBUF_SIZE];
-
-	notify(player, "Command          Switches");
-	notify(player, "---------------- ---------------------------------------------------------------");
-
-	/* Built-in command table */
-	emit_cmdswitches_for_table(player, command_table);
-
-	/* Module command tables (if they export one) */
-	for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
-	{
-		/* Symbol name: mod_<module>_cmdtable */
-		XSNPRINTF(symname, MBUF_SIZE, "mod_%s_%s", mp->modname, "cmdtable");
-
-		if ((ctab = (CMDENT *)dlsym(mp->handle, symname)) != NULL)
-		{
-			emit_cmdswitches_for_table(player, ctab);
-		}
-	}
-
-	notify(player, "--------------------------------------------------------------------------------");
-}
+/* list_cmdswitches moved to command_list.c */
 
 /**
  * @brief List attribute visibility and flags for the caller.
@@ -2134,24 +1928,7 @@ void list_cmdswitches(dbref player)
  *
  * @param player Database reference of the requesting player
  */
-void list_attraccess(dbref player)
-{
-	notify(player, "Attribute                  Permissions");
-	notify(player, "-------------------------- ----------------------------------------------------");
-
-	for (ATTR *ap = attr; ap->name; ap++)
-	{
-		/* Only display attributes visible to the caller */
-		if (!Read_attr(player, player, ap, player, 0))
-		{
-			continue;
-		}
-
-		listset_nametab(player, attraccess_nametab, ap->flags, true, "%-26.26s ", ap->name);
-	}
-
-	notify(player, "-------------------------------------------------------------------------------");
-}
+/* list_attraccess moved to command_list.c */
 
 /**
  * @brief List wildcard attribute patterns and their flags.
@@ -2162,28 +1939,7 @@ void list_attraccess(dbref player)
  *
  * @param player Database reference of the requesting player
  */
-void list_attrtypes(dbref player)
-{
-	if (!mushconf.vattr_flag_list)
-	{
-		notify(player, "No attribute type patterns defined.");
-		return;
-	}
-
-	notify(player, "Attribute                  Permissions");
-	notify(player, "-------------------------- ----------------------------------------------------");
-
-	for (KEYLIST *kp = mushconf.vattr_flag_list; kp != NULL; kp = kp->next)
-	{
-		char buff[MBUF_SIZE];
-
-		/* Format the pattern name once, avoiding heap churn per entry */
-		XSNPRINTF(buff, sizeof(buff), "%-26.26s ", kp->name);
-		listset_nametab(player, attraccess_nametab, kp->data, true, buff);
-	}
-
-	notify(player, "-------------------------------------------------------------------------------");
-}
+/* list_attrtypes moved to command_list.c */
 
 /**
  * @brief Update permissions on a command or one of its switches.

@@ -26,6 +26,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <dlfcn.h>
 
 void list_cmdtable(dbref player)
 {
