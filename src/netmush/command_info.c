@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <dlfcn.h>
 #include <pcre2.h>
 #include <sys/resource.h>
 #include <sys/time.h>
@@ -1129,3 +1130,159 @@ void list_memory(dbref player)
  * @param arg    Subcommand to dispatch.
  */
 void do_list(dbref player, dbref cause, int extra, char *arg)
+{
+	/* Resolve the subcommand; show choices on missing/unknown input. */
+	if (!arg || !*arg)
+	{
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
+		return;
+	}
+
+	const int flagvalue = search_nametab(player, list_names, arg);
+
+	if (flagvalue == -2)
+	{
+		notify(player, "Permission denied.");
+		return;
+	}
+
+	if (flagvalue < 0)
+	{
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
+		return;
+	}
+
+	/* Dispatch to the specific listing helper. */
+	switch (flagvalue)
+	{
+	case LIST_ALLOCATOR:
+		list_bufstats(player);
+		break;
+
+	case LIST_BUFTRACE:
+		list_buftrace(player);
+		break;
+
+	case LIST_ATTRIBUTES:
+		list_attrtable(player);
+		break;
+
+	case LIST_COMMANDS:
+		list_cmdtable(player);
+		break;
+
+	case LIST_SWITCHES:
+		list_cmdswitches(player);
+		break;
+
+	case LIST_COSTS:
+		list_costs(player);
+		break;
+
+	case LIST_OPTIONS:
+		list_options(player);
+		break;
+
+	case LIST_HASHSTATS:
+		list_hashstats(player);
+		break;
+
+	case LIST_SITEINFO:
+		list_siteinfo(player);
+		break;
+
+	case LIST_FLAGS:
+		display_flagtab(player);
+		break;
+
+	case LIST_FUNCPERMS:
+		list_funcaccess(player);
+		break;
+
+	case LIST_FUNCTIONS:
+		list_functable(player);
+		break;
+
+	case LIST_GLOBALS:
+		interp_nametab(player, enable_names, mushconf.control_flags, (char *)"Global parameters", (char *)"Status", (char *)"enabled", (char *)"disabled", true);
+		break;
+
+	case LIST_DF_FLAGS:
+		list_df_flags(player);
+		break;
+
+	case LIST_PERMS:
+		list_cmdaccess(player);
+		break;
+
+	case LIST_CONF_PERMS:
+		list_cf_access(player);
+		break;
+
+	case LIST_CF_RPERMS:
+		list_cf_read_access(player);
+		break;
+
+	case LIST_POWERS:
+		display_powertab(player);
+		break;
+
+	case LIST_ATTRPERMS:
+		list_attraccess(player);
+		break;
+
+	case LIST_VATTRS:
+		list_vattrs(player);
+		break;
+
+	case LIST_LOGGING:
+		/* Two tables: event toggles, then data toggles. */
+		interp_nametab(player, logoptions_nametab, mushconf.log_options, (char *)"Events Logged", (char *)"Status", (char *)"enabled", (char *)"disabled", true);
+		notify(player, "");
+		interp_nametab(player, logdata_nametab, mushconf.log_info, (char *)"Information Type", (char *)"Logged", (char *)"yes", (char *)"no", true);
+		break;
+
+	case LIST_DB_STATS:
+		notify(player, "Database cache layer removed: database is accessed directly.");
+		break;
+
+	case LIST_PROCESS:
+		list_process(player);
+		break;
+
+	case LIST_BADNAMES:
+		badname_list(player, "Disallowed names:");
+		break;
+
+	case LIST_CACHEOBJS:
+		notify(player, "Object cache removed: database is accessed directly.");
+		break;
+
+	case LIST_TEXTFILES:
+		list_textfiles(player);
+		break;
+
+	case LIST_PARAMS:
+		list_params(player);
+		break;
+
+	case LIST_ATTRTYPES:
+		list_attrtypes(player);
+		break;
+
+	case LIST_MEMORY:
+		list_memory(player);
+		break;
+
+	case LIST_CACHEATTRS:
+		notify(player, "Attribute cache removed: database is accessed directly.");
+		break;
+
+	case LIST_RAWMEM:
+		list_rawmemory(player);
+		break;
+
+	default:
+		display_nametab(player, list_names, true, (char *)"Unknown option.  Use one of:");
+	}
+}

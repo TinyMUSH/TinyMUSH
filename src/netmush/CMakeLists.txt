@@ -29,8 +29,8 @@ set(NETMUSH_SOURCES
         command_access.c
         command_dispatch.c
         command_list.c
-        # command_config.c
-        # command_info.c
+        command_config.c
+        command_info.c
 )
 
 # Add backend-specific source files
