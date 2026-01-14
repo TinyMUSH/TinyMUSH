@@ -14,7 +14,7 @@ endif()
 
 # Base source files
 set(NETMUSH_SOURCES
-    alloc.c ansi.c ansi.h api.c boolexp_eval.c boolexp_internal.h boolexp_parse.c bsd.c bsd_conn.c bsd_dns.c 
+    alloc.c ansi.c ansi.h api.c boolexp_eval.c boolexp_parse.c bsd.c bsd_conn.c bsd_dns.c 
     bsd_io.c bsd_sig.c bsd_socket.c conf.c constants.h 
     cque.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 

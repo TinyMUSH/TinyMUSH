@@ -20,7 +20,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "boolexp_internal.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -38,7 +37,7 @@ static const char *ERR_PARSE_DEPTH_EXCEEDED = "ERROR: boolexp.c parse depth exce
  * Prevents stack overflow attacks by limiting expression complexity.
  * Shared across all parsing operations in this module.
  */
-int boolexp_parse_depth = 0;
+static int boolexp_parse_depth = 0;
 
 /**
  * @defgroup boolexp_parsing Parsing Functions
