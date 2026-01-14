@@ -29,6 +29,16 @@
 #include <string.h>
 
 /**
+ * @brief Error message for attribute number overflow
+ */
+static const char *ERR_ATTR_NUM_OVERFLOW = "ERROR: boolexp.c attribute number overflow or invalid\n";
+
+/**
+ * @brief Error message for parse depth exceeded
+ */
+static const char *ERR_PARSE_DEPTH_EXCEEDED = "ERROR: boolexp.c parse depth exceeded limit\n";
+
+/**
  * @brief Global recursion depth counter for parsing operations
  *
  * Prevents stack overflow attacks by limiting expression complexity.

@@ -25,8 +25,6 @@
 #define ERR_BOOLEXP_IS_NULL "ERROR: boolexp.c BOOLEXP_IS attribute check has NULL sub1->sub1\n"     /*!< BOOLEXP_IS node has invalid sub1->sub1 */
 #define ERR_BOOLEXP_CARRY_NULL "ERROR: boolexp.c BOOLEXP_CARRY attribute check has NULL sub1->sub1\n" /*!< BOOLEXP_CARRY node has invalid sub1->sub1 */
 #define ERR_BOOLEXP_UNKNOWN_TYPE "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n"       /*!< Unknown BOOLEXP type encountered */
-#define ERR_ATTR_NUM_OVERFLOW "ERROR: boolexp.c attribute number overflow or invalid\n"             /*!< Attribute number out of valid range */
-#define ERR_PARSE_DEPTH_EXCEEDED "ERROR: boolexp.c parse depth exceeded limit\n"                    /*!< Recursion depth limit exceeded during parsing */
 
 /**
  * @brief Global recursion depth counter for parsing operations
