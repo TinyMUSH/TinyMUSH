@@ -28,14 +28,8 @@
 #include <limits.h>
 #include <string.h>
 
-/**
- * @brief Error message for attribute number overflow
- */
+// Error messages
 static const char *ERR_ATTR_NUM_OVERFLOW = "ERROR: boolexp.c attribute number overflow or invalid\n";
-
-/**
- * @brief Error message for parse depth exceeded
- */
 static const char *ERR_PARSE_DEPTH_EXCEEDED = "ERROR: boolexp.c parse depth exceeded limit\n";
 
 /**

@@ -25,29 +25,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-/**
- * @brief Error message for BOOLEXP_ATR with NULL sub1
- */
+// Error messages
 static const char *ERR_BOOLEXP_ATR_NULL = "ERROR: boolexp.c BOOLEXP_ATR has NULL sub1\n";
-
-/**
- * @brief Error message for BOOLEXP_EVAL with NULL sub1
- */
 static const char *ERR_BOOLEXP_EVAL_NULL = "ERROR: boolexp.c BOOLEXP_EVAL has NULL sub1\n";
-
-/**
- * @brief Error message for BOOLEXP_IS with NULL sub1->sub1
- */
 static const char *ERR_BOOLEXP_IS_NULL = "ERROR: boolexp.c BOOLEXP_IS attribute check has NULL sub1->sub1\n";
-
-/**
- * @brief Error message for BOOLEXP_CARRY with NULL sub1->sub1
- */
 static const char *ERR_BOOLEXP_CARRY_NULL = "ERROR: boolexp.c BOOLEXP_CARRY attribute check has NULL sub1->sub1\n";
-
-/**
- * @brief Error message for unknown BOOLEXP type
- */
 static const char *ERR_BOOLEXP_UNKNOWN_TYPE = "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n";
 
 /**
