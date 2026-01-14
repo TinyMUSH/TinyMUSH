@@ -32,11 +32,12 @@ int check_type;
 
 void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const char *reftype, const char *errtype)
 {
-	char *obj_type, *obj_name, *obj_loc;
-	char *ref_type, *ref_name;
-	obj_type = log_gettype(obj, "Log_pointer_err");
+	const char *obj_type, *ref_type;
+	char *obj_name, *obj_loc;
+	char *ref_name;
+	obj_type = log_gettype(obj);
 	obj_name = log_getname(obj);
-	ref_type = log_gettype(ref, "Log_pointer_err");
+	ref_type = log_gettype(ref);
 	ref_name = log_getname(ref);
 
 	if (loc != NOTHING)
@@ -50,17 +51,17 @@ void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const char *r
 		log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s %s", obj_type, obj_name, ((prior == NOTHING) ? reftype : "Next pointer"), ref_type, ref_name, errtype);
 	}
 
-	XFREE(obj_type);
+	/* obj_type and ref_type are now static strings - do not free */
 	XFREE(obj_name);
-	XFREE(ref_type);
 	XFREE(ref_name);
 }
 
 void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype)
 {
-	char *obj_type, *obj_name, *obj_loc;
-	char *val_type, *val_name;
-	obj_type = log_gettype(obj, "Log_header_err");
+	const char *obj_type, *val_type;
+	char *obj_name, *obj_loc;
+	char *val_name;
+	obj_type = log_gettype(obj);
 	obj_name = log_getname(obj);
 
 	if (loc != NOTHING)
@@ -69,10 +70,10 @@ void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *
 
 		if (is_object)
 		{
-			val_type = log_gettype(val, "Log_header_err");
+			val_type = log_gettype(val);
 			val_name = log_getname(val);
 			log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s in %s: %s %s %s", obj_type, obj_name, obj_loc, val_type, val_name, errtype);
-			XFREE(val_type);
+			/* val_type is now a static string - do not free */
 			XFREE(val_name);
 		}
 		else
@@ -86,10 +87,10 @@ void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *
 	{
 		if (is_object)
 		{
-			val_type = log_gettype(val, "Log_header_err");
+			val_type = log_gettype(val);
 			val_name = log_getname(val);
 			log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s %s %s", obj_type, obj_name, val_type, val_name, errtype);
-			XFREE(val_type);
+			/* val_type is now a static string - do not free */
 			XFREE(val_name);
 		}
 		else
@@ -98,14 +99,15 @@ void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *
 		}
 	}
 
-	XFREE(obj_type);
+	/* obj_type is now a static string - do not free */
 	XFREE(obj_name);
 }
 
 void Log_simple_err(dbref obj, dbref loc, const char *errtype)
 {
-	char *obj_type, *obj_name, *obj_loc;
-	obj_type = log_gettype(obj, "Log_simple_err");
+	const char *obj_type;
+	char *obj_name, *obj_loc;
+	obj_type = log_gettype(obj);
 	obj_name = log_getname(obj);
 
 	if (loc != NOTHING)
@@ -119,8 +121,8 @@ void Log_simple_err(dbref obj, dbref loc, const char *errtype)
 		log_write(LOG_PROBLEMS, "OBJ", "DAMAG", "%s %s: %s", obj_type, obj_name, errtype);
 	}
 
+	/* obj_type is now a static string - do not free */
 	XFREE(obj_name);
-	XFREE(obj_type);
 }
 
 /* ---------------------------------------------------------------------------

@@ -897,7 +897,7 @@ extern void _log_perror(const char *file, int line, const char *primary, const c
 extern void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...);
 extern void log_write_raw(int key, const char *format, ...);
 extern char *log_getname(dbref target);
-extern char *log_gettype(dbref thing, char *d);
+extern const char *log_gettype(dbref thing);
 extern void do_logrotate(dbref player, dbref cause, int key);
 extern void logfile_close(void);
 

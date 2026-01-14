@@ -44,30 +44,11 @@
 #include <limits.h>
 #include <string.h>
 
-/**
- * @brief Error message constants for boolean expression operations
- *
- * These constants define error messages used throughout the boolean expression
- * system for logging and debugging purposes. Each message corresponds to a
- * specific error condition that can occur during parsing or evaluation.
- */
-#define ERR_BOOLEXP_ATR_NULL "ERROR: boolexp.c BOOLEXP_ATR has NULL sub1\n"          /*!< BOOLEXP_ATR node has null sub1 pointer */
-#define ERR_BOOLEXP_EVAL_NULL "ERROR: boolexp.c BOOLEXP_EVAL has NULL sub1\n"       /*!< BOOLEXP_EVAL node has null sub1 pointer */
-#define ERR_BOOLEXP_IS_NULL "ERROR: boolexp.c BOOLEXP_IS attribute check has NULL sub1->sub1\n"     /*!< BOOLEXP_IS node has invalid sub1->sub1 */
-#define ERR_BOOLEXP_CARRY_NULL "ERROR: boolexp.c BOOLEXP_CARRY attribute check has NULL sub1->sub1\n" /*!< BOOLEXP_CARRY node has invalid sub1->sub1 */
-#define ERR_BOOLEXP_UNKNOWN_TYPE "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n"       /*!< Unknown BOOLEXP type encountered */
-#define ERR_ATTR_NUM_OVERFLOW "ERROR: boolexp.c attribute number overflow or invalid\n"             /*!< Attribute number out of valid range */
-#define ERR_PARSE_DEPTH_EXCEEDED "ERROR: boolexp.c parse depth exceeded limit\n"                    /*!< Recursion depth limit exceeded during parsing */
-
 static int parse_depth = 0; /*!< Current recursion depth counter for parsing operations. Prevents stack overflow attacks by limiting expression complexity. */
 
-/* Forward declarations for static inline functions */
-static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key);
-static inline BOOLEXP *test_atr(char *s, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal);
+/* Forward declarations - only for functions called before their definition */
 static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal);
+BOOLEXP *parse_boolexp(dbref player, const char *buf, bool internal);
 
 /**
  * @defgroup boolexp_functions Boolean Expression Functions
@@ -87,121 +68,6 @@ static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool par
  * including attribute checking, parsing helpers, and recursion management.
  * They are not part of the public API.
  */
-
-/**
- * @ingroup boolexp_internal
- * @brief Helper function for attribute-based lock checks (IS and CARRY operators)
- *
- * This function performs attribute-based checks for lock expressions using the IS (=) and CARRY (+) operators.
- * It searches for objects that have a specific attribute matching a given key value.
- *
- * For IS operator (check_inventory=false):
- * - Checks if the player object itself has the attribute with the matching key
- *
- * For CARRY operator (check_inventory=true):
- * - Checks all objects in the player's inventory for the attribute with the matching key
- * - Uses the same attribute checking logic as the IS operator
- *
- * The function handles permission checking through the existing check_attr() function,
- * ensuring that attribute visibility rules are properly enforced.
- *
- * @param b				BOOLEXP structure containing the attribute check (BOOLEXP_ATR type expected in sub1)
- * @param player		DBref of the player being checked
- * @param from			DBref of the object containing the lock (used for permission checks)
- * @param check_inventory	If true, check player's inventory (CARRY operator), else check player only (IS operator)
- * @return bool			True if any checked object has the attribute matching the key, false otherwise
- */
-static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory)
-{
-	ATTR *a = NULL;
-	dbref obj = NOTHING;
-	char *key = NULL;
-
-	// Get the attribute
-	a = atr_num(b->sub1->thing);
-
-	if (!a)
-	{
-		return false;
-	}
-
-	// Cache the key pointer
-	key = (char *)(b->sub1)->sub1;
-
-	// Validate key pointer
-	if (!key)
-	{
-		log_write_raw(1, check_inventory ? ERR_BOOLEXP_CARRY_NULL : ERR_BOOLEXP_IS_NULL);
-		return false;
-	}
-
-	// Check player first (only for IS operator)
-	if (!check_inventory && check_attr(player, from, a, key))
-	{
-		return true;
-	}
-
-	// If checking inventory (CARRY operator), iterate through contents
-	if (check_inventory)
-	{
-		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
-		{
-			if (check_attr(obj, from, a, key))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	return false;
-}
-
-/**
- * @ingroup boolexp_internal
- * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
- *
- * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
- * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
- * to compare the attribute's value with the provided key.
- *
- * @param player    DBref of the player whose attribute is being checked.
- * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
- * @param attr      Pointer to the ATTR structure representing the attribute to check.
- * @param key       String representing the key to compare with the attribute's value.
- * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
- */
-static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
-{
-	char *buff = NULL;
-	dbref aowner = NOTHING;
-	int aflags = 0, alen = 0, checkit = 0;
-
-	buff = atr_pget(player, attr->number, &aowner, &aflags, &alen);
-	checkit = false;
-
-	if (attr->number == A_LCONTROL)
-	{
-		// We can see control locks... else we'd break zones
-		checkit = true;
-	}
-	else if (See_attr(lockobj, player, attr, aowner, aflags))
-	{
-		checkit = true;
-	}
-	else if (attr->number == A_NAME)
-	{
-		checkit = true;
-	}
-
-	if (checkit && (!wild_match(key, buff)))
-	{
-		checkit = false;
-	}
-
-	XFREE(buff);
-	return checkit;
-}
 
 /**
  * @defgroup boolexp_memory Memory Management Functions
@@ -266,6 +132,121 @@ void free_boolexp(BOOLEXP *b)
 	}
 
 	XFREE(b);
+}
+
+/**
+ * @ingroup boolexp_internal
+ * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
+ *
+ * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
+ * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
+ * to compare the attribute's value with the provided key.
+ *
+ * @param player    DBref of the player whose attribute is being checked.
+ * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
+ * @param attr      Pointer to the ATTR structure representing the attribute to check.
+ * @param key       String representing the key to compare with the attribute's value.
+ * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
+ */
+static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
+{
+	char *buff = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0, checkit = 0;
+
+	buff = atr_pget(player, attr->number, &aowner, &aflags, &alen);
+	checkit = false;
+
+	if (attr->number == A_LCONTROL)
+	{
+		// We can see control locks... else we'd break zones
+		checkit = true;
+	}
+	else if (See_attr(lockobj, player, attr, aowner, aflags))
+	{
+		checkit = true;
+	}
+	else if (attr->number == A_NAME)
+	{
+		checkit = true;
+	}
+
+	if (checkit && (!wild_match(key, buff)))
+	{
+		checkit = false;
+	}
+
+	XFREE(buff);
+	return checkit;
+}
+
+/**
+ * @ingroup boolexp_internal
+ * @brief Helper function for attribute-based lock checks (IS and CARRY operators)
+ *
+ * This function performs attribute-based checks for lock expressions using the IS (=) and CARRY (+) operators.
+ * It searches for objects that have a specific attribute matching a given key value.
+ *
+ * For IS operator (check_inventory=false):
+ * - Checks if the player object itself has the attribute with the matching key
+ *
+ * For CARRY operator (check_inventory=true):
+ * - Checks all objects in the player's inventory for the attribute with the matching key
+ * - Uses the same attribute checking logic as the IS operator
+ *
+ * The function handles permission checking through the existing check_attr() function,
+ * ensuring that attribute visibility rules are properly enforced.
+ *
+ * @param b				BOOLEXP structure containing the attribute check (BOOLEXP_ATR type expected in sub1)
+ * @param player		DBref of the player being checked
+ * @param from			DBref of the object containing the lock (used for permission checks)
+ * @param check_inventory	If true, check player's inventory (CARRY operator), else check player only (IS operator)
+ * @return bool			True if any checked object has the attribute matching the key, false otherwise
+ */
+static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory)
+{
+	ATTR *a = NULL;
+	dbref obj = NOTHING;
+	char *key = NULL;
+
+	// Get the attribute
+	a = atr_num(b->sub1->thing);
+
+	if (!a)
+	{
+		return false;
+	}
+
+	// Cache the key pointer
+	key = (char *)(b->sub1)->sub1;
+
+	// Validate key pointer
+	if (!key)
+	{
+		log_write(LOG_ALWAYS, "BUG", "BOOLEXP", check_inventory ? "CARRY node has NULL sub1->sub1" : "IS node has NULL sub1->sub1");
+		return false;
+	}
+
+	// Check player first (only for IS operator)
+	if (!check_inventory && check_attr(player, from, a, key))
+	{
+		return true;
+	}
+
+	// If checking inventory (CARRY operator), iterate through contents
+	if (check_inventory)
+	{
+		for (obj = Contents(player); (obj != NOTHING) && (Next(obj) != obj); obj = Next(obj))
+		{
+			if (check_attr(obj, from, a, key))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	return false;
 }
 
 /**
@@ -398,7 +379,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		// Validate sub1 pointer before casting to char*
 		if (!b->sub1)
 		{
-			log_write_raw(1, ERR_BOOLEXP_ATR_NULL);
+			log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "ATR node has NULL sub1");
 			return false;
 		}
 
@@ -437,7 +418,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		// Validate sub1 pointer before casting to char*
 		if (!b->sub1)
 		{
-			log_write_raw(1, ERR_BOOLEXP_EVAL_NULL);
+			log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "EVAL node has NULL sub1");
 			return false;
 		}
 
@@ -503,7 +484,7 @@ bool eval_boolexp(dbref player, dbref thing, dbref from, BOOLEXP *b)
 		return (Owner(b->sub1->thing) == Owner(player));
 
 	default:
-		log_write_raw(1, ERR_BOOLEXP_UNKNOWN_TYPE);
+		log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "Unknown expression type in eval_boolexp()");
 		// bad type
 		abort();
 		return false; // Unreachable, but for safety
@@ -540,7 +521,24 @@ bool eval_boolexp_atr(dbref player, dbref thing, dbref from, char *key)
 }
 
 /**
- * @ingroup boolexp_internal
+ * @defgroup boolexp_parsing Parsing Functions
+ * @brief Functions for parsing boolean expression strings into trees
+ *
+ * These functions implement a recursive descent parser that converts
+ * infix boolean expressions into BOOLEXP tree structures.
+ */
+
+/**
+ * @defgroup boolexp_parsing_internal Internal Parsing Functions
+ * @ingroup boolexp_parsing
+ * @brief Low-level recursive descent parsing functions
+ *
+ * These functions implement the recursive descent parser for boolean expressions.
+ * Each function corresponds to a grammar rule and parses a specific level of the expression hierarchy.
+ */
+
+/**
+ * @ingroup boolexp_parsing_internal
  * @brief Parses an attribute reference for boolean expressions.
  *
  * This function parses a string representing an attribute reference in the format "attribute:value" or "attribute/value"
@@ -605,7 +603,7 @@ static inline BOOLEXP *test_atr(char *s, dbref parse_player, bool parsing_intern
 
 		if (errno == ERANGE || temp <= 0 || temp > INT_MAX)
 		{
-			log_write_raw(1, ERR_ATTR_NUM_OVERFLOW);
+			log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "Attribute number overflow or invalid");
 			XFREE(buff);
 			return NULL;
 		}
@@ -798,7 +796,7 @@ static inline BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool par
 	// Check parse depth to prevent stack overflow
 	if (++parse_depth > MAX_BOOLEXP_PARSE_DEPTH)
 	{
-		log_write_raw(1, ERR_PARSE_DEPTH_EXCEEDED);
+		log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "Parse depth exceeded limit");
 		parse_depth--;
 		return TRUE_BOOLEXP;
 	}
@@ -913,7 +911,7 @@ static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool par
 	// Check parse depth to prevent stack overflow
 	if (++parse_depth > MAX_BOOLEXP_PARSE_DEPTH)
 	{
-		log_write_raw(1, ERR_PARSE_DEPTH_EXCEEDED);
+		log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "Parse depth exceeded limit");
 		parse_depth--;
 		return TRUE_BOOLEXP;
 	}
@@ -955,15 +953,6 @@ static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool par
 }
 
 /**
- * @defgroup boolexp_parsing_internal Internal Parsing Functions
- * @ingroup boolexp_parsing
- * @brief Low-level recursive descent parsing functions
- *
- * These functions implement the recursive descent parser for boolean expressions.
- * Each function corresponds to a grammar rule and parses a specific level of the expression hierarchy.
- */
-
-/**
  * @ingroup boolexp_parsing_internal
  * @brief Parses an expression in boolean expressions: E -> T | E | T
  *
@@ -985,7 +974,7 @@ static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool par
 	// Check parse depth to prevent stack overflow
 	if (++parse_depth > MAX_BOOLEXP_PARSE_DEPTH)
 	{
-		log_write_raw(1, ERR_PARSE_DEPTH_EXCEEDED);
+		log_write(LOG_ALWAYS, "BUG", "BOOLEXP", "Parse depth exceeded limit");
 		parse_depth--;
 		return TRUE_BOOLEXP;
 	}
@@ -1025,14 +1014,6 @@ static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool par
 	parse_depth--;
 	return b2;
 }
-
-/**
- * @defgroup boolexp_parsing Parsing Functions
- * @brief Functions for parsing boolean expression strings into trees
- *
- * These functions implement a recursive descent parser that converts
- * infix boolean expressions into BOOLEXP tree structures.
- */
 
 /**
  * @ingroup boolexp_parsing
