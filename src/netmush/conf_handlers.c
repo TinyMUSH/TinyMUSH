@@ -349,11 +349,11 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
 /**
  * @brief Set boolean parameter.
  *
- * @param vp        Boolean value
- * @param str       String buffer
+ * @param vp        Boolean value (0 or 1)
+ * @param str       String buffer ("yes"/"no", "true"/"false", etc)
  * @param extra     Not used
- * @param player    DBref of the player
- * @param cmd       Command
+ * @param player    DBref of player (not used)
+ * @param cmd       Command (not used)
  * @return CF_Result
  */
 CF_Result cf_bool(int *vp, char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
@@ -432,14 +432,14 @@ CF_Result cf_string(int *vp, char *str, long extra, dbref player, char *cmd)
 }
 
 /**
- * @brief define a generic hash table alias.
+ * @brief Define a generic hash table alias.
  *
- * @param vp
- * @param str
- * @param extra
- * @param player
- * @param cmd
- * @return CF_Result
+ * @param vp        Hash table pointer
+ * @param str       Alias definition string (alias=original)
+ * @param extra     Error message string
+ * @param player    DBref of player
+ * @param cmd       Command
+ * @return CF_Result indicating success or failure
  */
 CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 {

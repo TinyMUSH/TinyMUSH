@@ -28,7 +28,7 @@
 /**
  * @brief Wrapper around dlopen that can format filename.
  *
- * @param filename	filename to load (or construct if a format string is given)
+ * @param filename  Filename to load (or format string if va_args provided)
  * @param ...		arguments for the format string
  * @return void*    Handler for the module.
  */

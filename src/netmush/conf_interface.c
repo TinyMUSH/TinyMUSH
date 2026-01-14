@@ -28,7 +28,7 @@ extern STATEDATA mushstate;
 extern int (*cf_interpreter)(int *, char *, long, dbref, char *);
 
 /**
- * @brief Set config parameter.
+ * @brief Set config parameter with access and logging.
  *
  * @param cp       Configuration parameter string
  * @param ap       Argument parameter string
@@ -94,12 +94,12 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
 }
 
 /**
- * @brief Set a config directive
+ * @brief Set a configuration directive.
  *
- * @param cp
- * @param ap
- * @param player
- * @return CF_Result
+ * @param cp       Configuration parameter name
+ * @param ap       Argument value
+ * @param player   DBref of player
+ * @return CF_Result indicating success or failure
  */
 CF_Result cf_set(char *cp, char *ap, dbref player)
 {
@@ -152,10 +152,10 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
 }
 
 /**
- * @brief Read in config parameters from named file
+ * @brief Read in configuration parameters from named file.
  *
- * @param fn    Filename
- * @return int
+ * @param fn        Filename to read
+ * @return CF_Result indicating success or failure
  */
 CF_Result cf_read(char *fn)
 {
@@ -165,13 +165,14 @@ CF_Result cf_read(char *fn)
 }
 
 /**
- * @brief Command handler to set config params at runtime
+ * @brief Command handler to set configuration parameters at runtime.
  *
- * @param player    DBref of player
- * @param cause     DBref of cause
- * @param extra     Extra data
- * @param kw        Keyword
- * @param value     Value
+ * @param player    DBref of player executing command
+ * @param cause     DBref of cause (not used)
+ * @param extra     Extra flags (not used)
+ * @param kw        Keyword (parameter name)
+ * @param value     New value for parameter
+ * @return void
  */
 void do_admin(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *kw, char *value)
 {
