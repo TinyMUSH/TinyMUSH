@@ -28,6 +28,22 @@
 #include <unistd.h>
 #include <libgen.h>
 
+/**
+ * @brief Execute a command table entry with the appropriate access and privilege checks.
+ *
+ * @param cmdp         Command table entry
+ * @param switchp      Switch string (e.g., "/quiet")
+ * @param player       DBref of player executing the command
+ * @param cause        DBref of the cause (often same as player)
+ * @param interactive  True if from interactive input, false if queued
+ * @param arg          Argument string for the command
+ * @param unp_command  Unparsed command string for logging
+ * @param cargs        Array of command environment arguments
+ * @param ncargs       Number of arguments in cargs
+ *
+ * @note Performs access checks, privilege adjustments, and calls the command handler.
+ * @see process_command(), set_prefix_cmds()
+ */
 void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool interactive, char *arg, char *unp_command, char *cargs[], int ncargs)
 {
 	int nargs = 0, i = 0, interp = 0, key = 0, xkey = 0, aflags = 0, alen = 0;
@@ -474,57 +490,22 @@ void process_cmdent(CMDENT *cmdp, char *switchp, dbref player, dbref cause, bool
 /**
  * @brief Parse, normalize, resolve, and dispatch a raw command string.
  *
- * This is the high-level entrypoint for command execution. It receives the
- * raw input line, performs normalization and logging, lets modules intercept
- * the command, resolves quick lead-in commands and special cases (like HOME
- * and exits/goto), looks up builtins and aliases, then delegates execution to
- * `process_cmdent()` for the matched command entry.
+ * Receives raw input, performs normalization and logging, handles module
+ * interception, resolves lead-in commands and special cases (HOME, exits/goto),
+ * looks up built-ins and aliases, then delegates execution to process_cmdent().
  *
- * Responsibilities (execution flow):
- * - Input guardrails and player validation (halted/going objects)
- * - Logging of user input, including suspect logging and optional God monitor
- * - Whitespace normalization and optional space compression
- * - Module interception via `MODULE.process_command` (early consume/transform)
- * - Single-character lead-in dispatch (fast path via `prefix_cmds`)
- * - Special command: `home` movement (outside the regular table)
- * - Exit matching and `goto` permission check for room navigation
- * - Builtin command/alias resolution from `command_htab`
- * - Alias evaluation (softcode) to produce the final command tokens
- * - Enter/leave alias handling based on player location
- * - Delegation to `process_cmdent()` with parsed switches and arguments
+ * @param player      DBref of player executing the command
+ * @param cause       DBref of the cause (typically same as player)
+ * @param interactive True if issued from user input, false if from queue
+ * @param command     Command string (modified in place during parsing)
+ * @param args        Environment arguments (%0-%9)
+ * @param nargs       Number of elements in args
  *
- * Parameters:
- * - player: DBref du joueur qui exécute la commande (enactor)
- * - cause:  DBref de l'entité qui a causé l'exécution (souvent le joueur)
- * - interactive: Vrai si la commande provient d'une entrée directe, faux si
- *   issue de la file/trigger (affecte l'interprétation des arguments)
- * - command: Chaîne brute saisie par l'utilisateur (sera normalisée)
- * - args: Tableau d'arguments d'environnement (%0-%9) transmis en aval
- * - nargs: Taille du tableau `args`
+ * @return Preserved copy of the command string for debugging
  *
- * Return value:
- * - Retourne un pointeur vers une copie préservée de la chaîne de commande;
- *   utilisée par l'infrastructure de debug et d'observabilité.
- *
- * Notes et interactions:
- * - Réinitialise plusieurs compteurs/limites (fonctions, notifications, locks)
- *   et bascule le `cputime_base` si la limite CPU des fonctions est active.
- * - Les modules peuvent consommer la commande et empêcher l'exécution standard.
- * - La commande `home` est gérée en dehors de la table de commandes.
- * - Les hooks de mouvement associés à `internalgoto` sont déclenchés ailleurs
- *   via `call_move_hook()`.
- *
- * Sécurité et permission:
- * - Les vérifications de permission spécifiques à un builtin se font au moment
- *   de la délégation dans `process_cmdent()`.
- *
- * @warning Les side-effects (journalisation, compteurs, reset de registres)
- *          se produisent même si un module intercepte et consomme la commande.
- *
- * @see process_cmdent() pour la résolution des switches, l'interprétation des
- *      arguments et l'invocation des hooks de commandes
- * @see call_move_hook() pour les hooks de mouvement sur les transitions de
- *      salle
+ * @note Performs validation, logging, module interception, prefix dispatch, HOME handling, exit matching, alias resolution.
+ * @note Modules can consume the command and prevent standard execution.
+ * @see process_cmdent(), call_move_hook()
  */
 char *process_command(dbref player, dbref cause, int interactive, char *command, char *args[], int nargs)
 {
@@ -1182,6 +1163,24 @@ char *process_command(dbref player, dbref cause, int interactive, char *command,
 	return preserve_cmd;
 }
 
+/**
+ * @brief Execute a semicolon-delimited command line and handle pipe segments.
+ *
+ * Splits the command line on ';', handles pipe segments ('|'), and calls
+ * process_command() for each segment. Manages state preservation across
+ * segments and captures lag metrics when enabled.
+ *
+ * @param player  DBref of player executing the command line
+ * @param cause   DBref of the cause (often same as player)
+ * @param cmdline Raw command line (modified in place during parsing)
+ * @param args    Environment argument array (%0-%9)
+ * @param nargs   Number of entries in args
+ * @param qent    Command queue entry (only head can execute)
+ *
+ * @note Nesting is limited by mushconf.cmd_nest_lim.
+ * @note Stops on mushstate.break_called or queue reordering.
+ * @see process_command(), mushstate.inpipe
+ */
 void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int nargs, BQUE *qent)
 {
 	char *cmdsave = NULL, *save_poutnew = NULL, *save_poutbufc = NULL, *save_pout = NULL;
@@ -1345,42 +1344,3 @@ void process_cmdline(dbref player, dbref cause, char *cmdline, char *args[], int
 	}
 }
 
-/**
- * @brief Execute a semicolon-delimited command line and handle pipe segments.
- *
- * Splits the incoming `cmdline` on ';' to obtain individual commands, scans
- * any trailing '|' segments to set up piped output (`pout*`, `mushstate.inpipe`),
- * preserves and restores global state around each segment, and delegates
- * execution to `process_command()` with `interactive` set to false.
- *
- * Responsibilities:
- * - Split by ';' and iterate over each command segment.
- * - Handle consecutive pipes '|' up to `mushconf.ntfy_nest_lim`.
- * - Save/restore enactor/player and pipe/output state across segments.
- * - Log segments and, when enabled, capture lag metrics.
- * - Call `process_command()` for each segment.
- *
- * Execution notes:
- * - `mushstate.inpipe`, `pout*`, and `poutobj` are saved then restored around
- *   each segment execution.
- * - When `mushconf.lag_check` is on, timing/CPU is measured via
- *   `gettimeofday`/`getrusage`.
- * - Loop stops on `mushstate.break_called` or when the queue entry is no longer
- *   at the head of the queue.
- * - Empty segments are ignored.
- *
- * @param player  DBref of the player executing the command line
- * @param cause   DBref of the cause (often the same as player)
- * @param cmdline Raw command line to parse (modified in place during parsing)
- * @param args    Environment argument array (%0-%9)
- * @param nargs   Number of entries in `args`
- * @param qent    Command queue entry; only the head is allowed to execute
- *
- * @return void
- *
- * @note Nesting is limited by `mushconf.cmd_nest_lim`.
- * @note `process_command()` handles permissions and hooks for each segment.
- *
- * @see process_command()
- * @see mushstate.inpipe
- */

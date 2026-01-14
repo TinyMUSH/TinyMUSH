@@ -28,6 +28,15 @@
 #include <libgen.h>
 #include <dlfcn.h>
 
+/**
+ * @brief Display all built-in and module commands visible to the player.
+ *
+ * Lists command names from the core command table and any loaded modules,
+ * filtered by the caller's permissions. Commands marked CF_DARK are hidden.
+ * Players also see the logout command table.
+ *
+ * @param player DBref of the requesting player
+ */
 void list_cmdtable(dbref player)
 {
 	CMDENT *cmdp = NULL, *modcmds = NULL;
@@ -81,13 +90,13 @@ void list_cmdtable(dbref player)
 }
 
 /**
- * @brief Show attribute names the player is allowed to see.
+ * @brief List all attributes visible to the player in a single line.
  *
- * Builds a single line beginning with "Attributes:" followed by each attribute
- * name the caller can see (filtered via `See_attr`). Hidden attributes are
- * skipped; the list is truncated if it would exceed the notification buffer.
+ * Builds output starting with "Attributes:" followed by space-separated
+ * attribute names. Filtering via `See_attr` hides restricted attributes;
+ * truncation prevents buffer overrun.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  */
 void list_attrtable(dbref player)
 {
@@ -129,14 +138,14 @@ void list_attrtable(dbref player)
 }
 
 /**
- * @brief Emit visible command permissions from a command table.
+ * @brief Print command permissions from a command table for visible entries.
  *
- * Iterates a command table (core or module) and prints each command the caller
- * can access, skipping dark entries. If a command uses user-defined permissions
- * (`userperms`), the output annotates which object/attribute provides them.
+ * Iterates the command table and displays each accessible command's permission
+ * mask, skipping CF_DARK entries. User-defined permissions are annotated with
+ * the source object and attribute.
  *
- * @param player Database reference of the requesting player
- * @param ctab   Pointer to the command table to list
+ * @param player DBref of the requesting player
+ * @param ctab   Pointer to the command table to enumerate
  */
 void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 {
@@ -165,17 +174,16 @@ void helper_list_cmdaccess(dbref player, CMDENT *ctab)
 }
 
 /**
- * @brief Display command permission masks the caller can see.
+ * @brief Display comprehensive command permission list for the player.
  *
- * Prints a header row, then lists:
- * - All built-in commands visible to the caller
- * - Commands exported by loaded modules
- * - Attribute-setter commands ("@attr") that exist in the command table
+ * Emits a formatted table showing permission masks for:
+ * - Built-in commands
+ * - Module-exported commands
+ * - Attribute-setter commands (@name, @desc, etc.)
  *
- * Entries hidden by `CF_DARK` or failing `check_access()` are skipped so the
- * output only shows commands the player can actually run or inspect.
+ * Only shows commands the player can access; CF_DARK entries are hidden.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  */
 void list_cmdaccess(dbref player)
 {
@@ -250,13 +258,13 @@ void list_cmdaccess(dbref player)
 }
 
 /**
- * @brief Print visible switches for a command table.
+ * @brief Helper to emit switches for one command table.
  *
- * Walks a command table and displays each command's switch set if the caller
- * can access it, skipping entries that define no switches or are marked dark.
- * Used by `list_cmdswitches()` for both built-in and module command tables.
+ * Iterates the table and displays switch lists for accessible commands,
+ * skipping entries without switches or marked CF_DARK. Called by
+ * `list_cmdswitches()` for core and module tables.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  * @param ctab   Null-terminated command table to enumerate
  */
 static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
@@ -286,13 +294,13 @@ static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
 }
 
 /**
- * @brief List switches for every command visible to the caller.
+ * @brief Display switches for all accessible commands.
  *
- * Prints switch names for all built-in commands and any module-exported
- * command tables the player can access. Entries hidden by `CF_DARK` or failing
- * `check_access()` are omitted so the output only shows runnable commands.
+ * Emits a formatted table of switch names for built-in and module commands
+ * the player can access. CF_DARK entries and permission-failed commands are
+ * hidden.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  */
 void list_cmdswitches(dbref player)
 {
@@ -322,13 +330,12 @@ void list_cmdswitches(dbref player)
 }
 
 /**
- * @brief List attribute visibility and flags for the caller.
+ * @brief Display attribute names and permission flags.
  *
- * Shows each attribute the player may read and the associated flag bitmask,
- * skipping hidden attributes. Output is bracketed by a header/footer for
- * readability.
+ * Emits a formatted table showing each readable attribute and its flag bitmask,
+ * filtered by `Read_attr` to hide restricted entries. Includes header and footer.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  */
 void list_attraccess(dbref player)
 {
@@ -350,13 +357,12 @@ void list_attraccess(dbref player)
 }
 
 /**
- * @brief List wildcard attribute patterns and their flags.
+ * @brief Display wildcard attribute type patterns and flags.
  *
- * Displays all configured vattr flag patterns (e.g., NAME*, DESC*) and the
- * permissions attached to each. If none are defined, notifies the caller and
- * returns early.
+ * Emits a formatted table of vattr flag patterns (e.g., NAME*, DESC*) with
+ * their associated permissions. Notifies the player if no patterns are defined.
  *
- * @param player Database reference of the requesting player
+ * @param player DBref of the requesting player
  */
 void list_attrtypes(dbref player)
 {
@@ -380,18 +386,3 @@ void list_attrtypes(dbref player)
 
 	notify(player, "-------------------------------------------------------------------------------");
 }
-
-/**
- * @brief Update permissions on a command or one of its switches.
- *
- * Accepts a token of the form "command" or "command/switch", looks up the
- * command in the global hash, and applies `cf_modify_bits()` (for commands)
- * or `cf_ntab_access()` (for switches). Missing commands are logged.
- *
- * @param vp     Unused
- * @param str    Command name, optionally suffixed with "/switch"
- * @param extra  Bitmask operation selector
- * @param player DBref requesting the change
- * @param cmd    Config directive name (for logging)
- * @return 0 on success, -1 on failure
- */

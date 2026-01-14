@@ -25,15 +25,16 @@
 #include <stdlib.h>
 
 /**
- * @brief Log a signal reception event to the server log
- */
-static inline void log_signal(const char *signame)
-{
-	log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signame);
-}
-
-/**
  * @brief Check and handle panic state to prevent recursive signal processing
+ *
+ * If the server is already panicking, resets all signal handlers to default and
+ * re-raises the signal to trigger system default behavior (usually coredump).
+ * Otherwise, sets the panic flag to prevent recursive signal handling.
+ *
+ * @param sig Signal number to re-raise if already panicking
+ *
+ * @note This prevents infinite loops when signal handlers trigger additional signals
+ * @warning Modifies mushstate.panicking global state
  */
 static inline void check_panicking(int sig)
 {
@@ -53,6 +54,13 @@ static inline void check_panicking(int sig)
 
 /**
  * @brief Reset all signal handlers to system default behavior
+ *
+ * Iterates through all possible signals (0 to NSIG-1) and resets each handler
+ * to SIG_DFL. Used before re-executing the server or generating coredumps to
+ * ensure clean signal handling state.
+ *
+ * @note Called during panic handling and before server re-execution
+ * @see set_signals() for installing custom handlers
  */
 static void unset_signals(void)
 {
@@ -69,6 +77,24 @@ static void unset_signals(void)
 
 /**
  * @brief Handle system signals and perform appropriate server actions
+ *
+ * Central signal handler dispatching appropriate actions based on signal type:
+ * - SIGUSR1: Trigger server restart
+ * - SIGUSR2: Schedule flatfile dump
+ * - SIGALRM: Timer signal for periodic tasks
+ * - SIGCHLD: Handle child process status changes
+ * - SIGHUP: Schedule database dump
+ * - SIGINT: Force live backup
+ * - SIGQUIT: Schedule normal shutdown
+ * - SIGTERM/SIGXCPU: Graceful shutdown with full dump
+ * - SIGILL/SIGSEGV/etc.: Panic save and restart or coredump
+ * - SIGABRT: Immediate coredump
+ *
+ * @param sig Signal number received
+ *
+ * @note Uses sigaction with SA_RESTART, so handler is persistent
+ * @note Fatal signals trigger panic handling with database preservation
+ * @see set_signals() for handler installation
  */
 static void sighandler(int sig)
 {
@@ -81,7 +107,7 @@ static void sighandler(int sig)
 	switch (sig)
 	{
 	case SIGUSR1: /* Normal restart now */
-		log_signal(signames[sig]);
+		log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signames[sig]);
 		do_restart(GOD, GOD, 0);
 		break;
 
@@ -106,7 +132,7 @@ static void sighandler(int sig)
 		break;
 
 	case SIGHUP: /* Dump database soon */
-		log_signal(signames[sig]);
+		log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signames[sig]);
 		mushstate.dump_counter = 0;
 		break;
 
@@ -123,7 +149,7 @@ static void sighandler(int sig)
 	case SIGXCPU:
 #endif
 		check_panicking(sig);
-		log_signal(signames[sig]);
+		log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signames[sig]);
 		raw_broadcast(0, "GAME: Caught signal %s, shutting down gracefully.", signames[sig]);
 		al_store();								/* Persist any in-memory attribute list before exit */
 		dump_database_internal(DUMP_DB_NORMAL); /* Use normal dump for graceful shutdown */
@@ -150,7 +176,7 @@ static void sighandler(int sig)
 	case SIGSYS:
 #endif
 		check_panicking(sig);
-		log_signal(signames[sig]);
+		log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signames[sig]);
 		report();
 
 		if (mushconf.sig_action != SA_EXIT)
@@ -192,7 +218,7 @@ static void sighandler(int sig)
 
 	case SIGABRT: /* Coredump now */
 		check_panicking(sig);
-		log_signal(signames[sig]);
+		log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signames[sig]);
 		report();
 		unset_signals();
 		log_write_raw(1, "ABORT! bsd.c, SIGABRT received.\n");
@@ -207,6 +233,21 @@ static void sighandler(int sig)
 
 /**
  * @brief Install and configure signal handlers for the server
+ *
+ * Configures signal handling for the server using sigaction() with SA_RESTART
+ * to automatically restart interrupted system calls. Installs custom handlers
+ * for most signals and ignores SIGPIPE and SIGFPE.
+ *
+ * Signals handled:
+ * - SIGALRM, SIGCHLD, SIGHUP, SIGINT, SIGQUIT, SIGTERM: Custom handler
+ * - SIGUSR1, SIGUSR2, SIGTRAP, SIGXCPU: Custom handler
+ * - SIGILL, SIGSEGV, SIGABRT, SIGXFSZ, SIGEMT, SIGBUS, SIGSYS: Custom handler
+ * - SIGPIPE, SIGFPE: Ignored (SIG_IGN)
+ *
+ * @note Unblocks all signals first to handle SIGUSR1-triggered restarts
+ * @note Uses SA_RESTART flag to minimize syscall interruption impact
+ * @see sighandler() for signal processing logic
+ * @see unset_signals() for handler cleanup
  */
 void set_signals(void)
 {

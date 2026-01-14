@@ -27,6 +27,20 @@
 #include <unistd.h>
 #include <libgen.h>
 
+/**
+ * @brief Modify permissions for a specific command or command switch.
+ *
+ * Parses "command[/switch] perms" where command is the target, an optional
+ * switch specifies a subcommand, and perms follows cf_modify_bits() syntax.
+ * Looks up the command and applies the requested bitmask change.
+ *
+ * @param vp     Unused
+ * @param str    Mutable buffer containing "command[/switch] perms"
+ * @param extra  Bitmask operation selector
+ * @param player DBref requesting the change
+ * @param cmd    Config directive name (for logging)
+ * @return 0 on success, -1 on failure
+ */
 int cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
 	if (!str || !*str)
@@ -357,13 +371,3 @@ int cf_cmd_alias(int *vp, char *str, long extra, dbref player, char *cmd)
 
 	return 0;
 }
-
-/**
- * @brief List the default flag sets applied when new objects are created.
- *
- * Decodes the configured default flags for each object type (player, room,
- * exit, thing, robot, stripped) and emits a compact table showing what flags
- * new instances receive.
- *
- * @param player DBref of the viewer (used for decode_flags visibility)
- */

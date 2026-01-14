@@ -28,6 +28,15 @@
 #include <unistd.h>
 #include <libgen.h>
 
+/**
+ * @brief Display default flag sets for each object type.
+ *
+ * Emits a formatted table showing the default flags assigned to newly created
+ * objects of each type (players, rooms, exits, things, robots, and stripped).
+ * Uses `decode_flags()` to convert bitmasks to human-readable flag strings.
+ *
+ * @param player DBref of the viewer
+ */
 void list_df_flags(dbref player)
 {
 	char *flags[6];
@@ -57,13 +66,13 @@ void list_df_flags(dbref player)
 }
 
 /**
- * @brief List per-action creation/operation costs and related quotas.
+ * @brief Display action costs, quotas, and economic configuration.
  *
- * Emits a table of common game actions with their configured minimum/maximum
- * costs and, when quotas are enabled, the associated quota consumption. Also
- * shows search/queue costs, sacrifice value rules, and clone value policy.
+ * Emits a formatted table of creation/operation costs (min/max) for common actions,
+ * quota consumption (when enabled), search/queue costs, sacrifice rules, and clone
+ * value policy. All costs are displayed in the configured currency.
  *
- * @param player DBref of the viewer (used for decode/visibility)
+ * @param player DBref of the viewer
  */
 void list_costs(dbref player)
 {
@@ -178,14 +187,13 @@ void list_costs(dbref player)
 }
 
 /**
- * @brief Display key configuration parameters for game setup and limits.
+ * @brief Display comprehensive configuration parameters and limits.
  *
- * Emits a structured overview of prototype objects, defaults, limits,
- * quotas, currency, and timers so admins can confirm current runtime
- * configuration. Adds wizard-only sections for queue sizing, dump/clean
- * intervals, and cache sizing.
+ * Emits structured sections covering prototype objects, defaults, system limits,
+ * quotas, currency settings, and timers. Wizard-only sections show queue sizing,
+ * dump/clean intervals, and cache configuration.
  *
- * @param player Database reference of the viewer (visibility gates wizard-only sections)
+ * @param player DBref of the viewer (wizard check gates restricted sections)
  */
 void list_params(dbref player)
 {
@@ -320,17 +328,13 @@ void list_params(dbref player)
 }
 
 /**
- * @brief List non-deleted user-defined attributes (vattrs) and their flags.
+ * @brief Display user-defined attributes with IDs and permission flags.
  *
- * Emits a table of user-created attributes, showing each attribute's name,
- * internal numeric ID, and its permission/behavior flags decoded via
- * `attraccess_nametab`. Attributes marked with `AF_DELETED` are skipped.
+ * Emits a table of non-deleted vattrs showing name, numeric ID, and decoded
+ * permission flags. Includes a summary line with the count of listed attributes
+ * and the next available attribute ID.
  *
- * The output is bracketed by a header/footer for readability and ends with a
- * short summary line indicating how many attributes were listed and what the
- * next automatically assigned attribute ID will be.
- *
- * @param player Database reference of the viewer
+ * @param player DBref of the viewer
  */
 void list_vattrs(dbref player)
 {
@@ -362,16 +366,15 @@ void list_vattrs(dbref player)
 }
 
 /**
- * @brief Display one-line statistics for a hash table.
+ * @brief Display statistics for a single hash table.
  *
- * Retrieves a formatted, heap-allocated summary from `hashinfo(tab_name, htab)`,
- * sends it to the viewer, and frees the buffer afterward. If `hashinfo()`
- * returns `NULL`, emits a simple fallback line indicating that statistics are
- * unavailable.
+ * Formats and emits one line of hash table metrics (size, entries, deletes, nulls,
+ * scans, hits, checks, max_scan). Falls back to "No stats available" if formatting
+ * fails.
  *
- * @param player   Database reference of the viewer
- * @param tab_name Label used by `hashinfo()` to identify the table in output
- * @param htab     Pointer to the hash table to summarize
+ * @param player   DBref of the viewer
+ * @param tab_name Label for the hash table
+ * @param htab     Pointer to the hash table
  */
 void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 {
@@ -393,16 +396,13 @@ void list_hashstat(dbref player, const char *tab_name, HASHTAB *htab)
 }
 
 /**
- * @brief Display statistics for all core and module-provided hash tables.
+ * @brief Display statistics for all hash tables (core and modules).
  *
- * Outputs a formatted table showing performance metrics (size, entries, deletes,
- * nulls, scans, hits, checks, max_scan) for all compiled-in hash tables managed
- * by `mushstate`, followed by any hash/nhash tables exported by loaded modules via
- * the `mod_<name>_hashtable` and `mod_<name>_nhashtable` symbols.
+ * Emits a comprehensive table of hash metrics for all built-in hash tables plus
+ * any exported by loaded modules (via `mod_<name>_hashtable` and `mod_<name>_nhashtable`
+ * symbols). Includes header and footer.
  *
- * The output is bracketed by a header and footer for readability.
- *
- * @param player Database reference of the viewer
+ * @param player DBref of the viewer
  */
 void list_hashstats(dbref player)
 {
@@ -489,17 +489,13 @@ void list_hashstats(dbref player)
 }
 
 /**
- * @brief List hash statistics for all loaded helpfiles.
+ * @brief Display hash statistics for all loaded help files.
  *
- * Produces a compact table with one row per helpfile, reporting the same
- * metrics as other hash-stat listings: size, entries, deletes, empty buckets,
- * scans/lookups, hits, checks, and longest probe chain. This helps admins
- * understand help index performance and load characteristics.
+ * Emits a formatted table showing hash metrics for each help file index (size,
+ * entries, deletes, empty buckets, lookups, hits, checks, longest probe). Helps
+ * admins monitor help system performance. Notifies if no help files are loaded.
  *
- * The output uses `raw_notify()` for consistent CRLF line endings and includes
- * a header and footer. If no helpfiles are loaded, a short notice is emitted.
- *
- * @param player Database reference of the viewer
+ * @param player DBref of the viewer
  */
 void list_textfiles(dbref player)
 {
@@ -549,21 +545,13 @@ void list_textfiles(dbref player)
 }
 
 /**
- * @brief Report local resource usage of the running MUSH process.
+ * @brief Display process resource usage and limits.
  *
- * Prints a concise snapshot of process-level metrics obtained via
- * `getrusage(RUSAGE_SELF)` and related system queries. The report includes
- * CPU time, memory usage, page faults, disk and IPC counters, context switches,
- * and the current limit on open file descriptors.
+ * Reports CPU time, memory (with platform-specific `ru_maxrss` handling), page faults,
+ * I/O, IPC counters, context switches, and file descriptor limit via `getrusage()` and
+ * system queries. Handles failed `getrusage()` gracefully by zeroing metrics.
  *
- * Notes on portability and units:
- * - Most `struct rusage` fields are of type `long`; we cast and format them
- *   with width-stable specifiers to avoid UB from mismatched printf formats.
- * - `ru_maxrss` is platform-dependent (pages on some BSDs, kilobytes on Linux).
- *   We display both the raw value and an approximate byte size assuming pages;
- *   this approximation may overstate on Linux where the unit is kilobytes.
- *
- * @param player Database reference of the viewer
+ * @param player DBref of the viewer
  */
 void list_process(dbref player)
 {
@@ -620,15 +608,14 @@ void list_process(dbref player)
 }
 
 /**
- * @brief Format and print a human-readable memory size.
+ * @brief Format and display a memory size with binary units.
  *
- * Renders the provided count using binary multiples with two decimal places,
- * selecting among B/KiB/MiB/GiB The output aligns with the table produced 
- * by `list_memory()`.
+ * Converts byte count to human-readable format (B/KiB/MiB/GiB) with two decimal
+ * places and emits aligned output (30-char label, value, unit).
  *
- * @param player  Database reference of the viewer
- * @param item    Left-column label (padded/truncated to 30 characters)
- * @param size    Size in bytes to format
+ * @param player DBref of the viewer
+ * @param item   Left-column label (padded/truncated to 30 chars)
+ * @param size   Size in bytes
  */
 void print_memory(dbref player, const char *item, size_t size)
 {
@@ -662,14 +649,13 @@ void print_memory(dbref player, const char *item, size_t size)
 }
 
 /**
- * @brief Report a breakdown of in-memory structures used by the process.
+ * @brief Display detailed memory usage breakdown by category.
  *
- * Walks key runtime data structures (objects, tables, caches, hash tables,
- * user vars, grids, structures) and emits a per-category size line plus a
- * final total. Sizes are computed in bytes and formatted via `print_memory()`
- * using binary units (B/KiB/MiB/GiB).
+ * Analyzes and reports memory consumption for objects, attributes, hash tables,
+ * caches, user variables, grids, structures, and other runtime data. Emits per-category
+ * sizes and a final total via `print_memory()` with binary units.
  *
- * @param player Database reference of the viewer
+ * @param player DBref of the viewer
  */
 void list_memory(dbref player)
 {
@@ -1115,19 +1101,16 @@ void list_memory(dbref player)
 }
 
 /**
- * @brief Dispatch \@list to the appropriate reporting helper.
+ * @brief Dispatch @list subcommands to appropriate reporting functions.
  *
- * Parses the subcommand from arg, resolves it against list_names with
- * search_nametab(), and invokes the matching reporting routine (allocator
- * stats, hash tables, parameters, memory, process info, etc.). When the input
- * is missing or unknown, the valid options are displayed. Permission failures
- * are reported explicitly. The cause and extra parameters are kept for command
- * dispatcher compatibility and are otherwise unused.
+ * Resolves subcommand from `arg` via `search_nametab()` and invokes the matching
+ * reporting function (flags, costs, params, memory, process, etc.). Displays valid
+ * options if input is missing/unknown. Reports permission failures explicitly.
  *
- * @param player Database reference of the viewer.
- * @param cause  Command cause (unused).
- * @param extra  Extra argument (unused).
- * @param arg    Subcommand to dispatch.
+ * @param player DBref of the viewer
+ * @param cause  Command cause (unused)
+ * @param extra  Extra argument (unused)
+ * @param arg    Subcommand to dispatch
  */
 void do_list(dbref player, dbref cause, int extra, char *arg)
 {

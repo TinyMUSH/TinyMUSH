@@ -22,29 +22,23 @@
 #include <ctype.h>
 
 /**
- * @brief Initialize the command hash table and populate it with all available commands.
+ * @brief Initialize command hash table and register all available commands.
  *
- * This function performs a complete initialization of the MUSH command system by:
- * 1. Creating the command hash table with appropriate sizing based on configuration
- * 2. Generating attribute-setter commands (\@name, \@desc, etc.) from the attribute table
- * 3. Registering all builtin commands from the static command_table
- * 4. Setting up prefix command dispatch array for single-character command leaders
- * 5. Caching frequently-used command pointers for performance optimization
+ * Performs complete MUSH command system initialization:
+ * - Creates command hash table sized by `mushconf.hash_factor`
+ * - Generates attribute-setter commands (@name, @desc, etc.) from the attribute table
+ * - Registers all builtin commands from `command_table`
+ * - Populates prefix command dispatch array for single-char leaders (", :, ;, \, #, &)
+ * - Caches frequently-used command pointers (goto, enter, leave, internalgoto)
  *
- * Each attribute-setter command is dynamically allocated and configured with:
- * - Lowercased "\@attribute" naming convention
- * - Standard permission mask (no guests/slaves, wizard-only if attribute requires it)
- * - CS_TWO_ARG calling sequence (command arg1=arg2)
- * - Double-underscore alias (__\@name) for programmatic access
+ * Attribute-setters are dynamically allocated with lowercased names, CA_NO_GUEST | CA_NO_SLAVE
+ * permissions (plus CA_WIZARD if AF_WIZARD/AF_MDARK), CS_TWO_ARG call sequence, and __@attr aliases.
+ * All commands get double-underscore aliases for programmatic invocation.
  *
- * Builtin commands are registered directly from command_table with their aliases.
- * Prefix commands (:, ;, #, &, ", \) enable single-character command dispatch.
+ * @note Must be called during server initialization before command processing begins.
  *
- * @note This function must be called during server initialization before any
- *       command processing occurs. Hash collisions are handled by freeing the
- *       duplicate command entry.
- * @see reset_prefix_cmds() for re-synchronizing prefix command pointers
- * @see command_table for the static builtin command definitions
+ * @see reset_prefix_cmds() to refresh prefix pointers after hash modifications
+ * @see command_table for static builtin command definitions
  */
 void init_cmdtab(void)
 {
@@ -139,25 +133,17 @@ void init_cmdtab(void)
 }
 
 /**
- * @brief Re-synchronize prefix command pointers after hash table modifications.
+ * @brief Refresh prefix command pointers after hash table modifications.
  *
- * This function refreshes the prefix_cmds[] dispatch array by re-querying the
- * command hash table for each registered prefix command. It ensures that prefix
- * command pointers remain valid after operations that may invalidate or relocate
- * hash table entries (e.g., rehashing, dynamic command registration/removal).
+ * Re-queries the command hash for each registered prefix in the `prefix_cmds[]` array,
+ * ensuring pointers remain valid after rehashing or dynamic command changes. Maintains
+ * O(1) dispatch for single-character leaders (", :, ;, \, #, &) without runtime lookups.
  *
- * The prefix_cmds array provides O(1) dispatch for single-character command
- * leaders (", :, ;, \, #, &) without requiring hash lookups during command
- * processing. This function maintains that optimization after structural changes.
- *
- * @note This should be called after any operation that modifies the command hash
- *       table structure, such as adding/removing commands dynamically or after
- *       table rehashing. It is NOT needed after initial initialization via
- *       register_prefix_cmds() since those pointers are already fresh.
+ * @note Call after adding/removing commands dynamically or rehashing. Not needed after
+ *       initial `init_cmdtab()` since `register_prefix_cmds()` sets fresh pointers.
  *
  * @see init_cmdtab() for initial prefix command registration
- * @see register_prefix_cmds() for setting up prefix command entries
- * @see prefix_cmds[] for the global prefix dispatch array (256 entries)
+ * @see prefix_cmds for the global 256-entry dispatch array
  */
 void reset_prefix_cmds(void)
 {

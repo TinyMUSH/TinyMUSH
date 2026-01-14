@@ -6,8 +6,7 @@
  * while keeping their single definitions in command.c.
  */
 
-#ifndef COMMAND_INTERNAL_H
-#define COMMAND_INTERNAL_H
+#pragma once
 
 #include "typedefs.h"
 
@@ -34,5 +33,3 @@ extern void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
 extern void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);
 extern void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);
 extern void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int);
-
-#endif /* COMMAND_INTERNAL_H */
