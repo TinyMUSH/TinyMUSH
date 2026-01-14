@@ -696,7 +696,7 @@ void al_destroy(dbref thing)
  * @param atr   Attribute numbrer
  * @return char*
  */
-char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr __attribute__((unused)))
+char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr)
 {
     char *attr = XMALLOC(MBUF_SIZE, "attr");
 
@@ -734,7 +734,7 @@ char *atr_encode(char *iattr, dbref thing, dbref owner, int flags, int atr __att
  * @param atr   Attribute number
  * @param alen  Attribute len
  */
-void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr __attribute__((unused)), int *alen)
+void atr_decode(char *iattr, char *oattr, dbref thing, dbref *owner, int *flags, int atr, int *alen)
 {
     char *cp = NULL;
     int neg = 0;
@@ -1497,7 +1497,7 @@ void atr_free(dbref thing)
  * @param dest      DBref of source
  * @param source    DBref of destination
  */
-void atr_cpy(dbref player __attribute__((unused)), dbref dest, dbref source)
+void atr_cpy(dbref player, dbref dest, dbref source)
 {
     int attr = 0, aflags = 0, alen = 0;
     ATTR *at = NULL;

@@ -284,7 +284,7 @@ void do_force_prefixed(dbref player, dbref cause, int key, char *command, char *
  * do_force: Force an object to do something.
  */
 
-void do_force(dbref player, __attribute__((unused)) dbref cause, int key, char *what, char *command, char *args[], int nargs)
+void do_force(dbref player, dbref cause, int key, char *what, char *command, char *args[], int nargs)
 {
 	dbref victim;
 
@@ -310,7 +310,7 @@ void do_force(dbref player, __attribute__((unused)) dbref cause, int key, char *
  * do_toad: Turn a player into an object.
  */
 
-void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *toad, char *newowner)
+void do_toad(dbref player, dbref cause, int key, char *toad, char *newowner)
 {
 	dbref victim, recipient, loc, aowner;
 	char *buf, *pname, *vname;
@@ -437,7 +437,7 @@ void do_toad(dbref player, __attribute__((unused)) dbref cause, int key, char *t
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "%d connection%s closed.", count, (count == 1 ? "" : "s"));
 }
 
-void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *name, char *password)
+void do_newpassword(dbref player, dbref cause, int key, char *name, char *password)
 {
 	dbref victim;
 	char *pname, *vname;
@@ -510,7 +510,7 @@ void do_newpassword(dbref player, __attribute__((unused)) dbref cause, __attribu
 	notify_check(victim, victim, MSG_PUP_ALWAYS | MSG_ME, "Your password has been changed by %s.", Name(player));
 }
 
-void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *name)
+void do_boot(dbref player, dbref cause, int key, char *name)
 {
 	dbref victim;
 	char *buf, *bp, *pname, *vname, *lname;
@@ -636,7 +636,7 @@ void do_boot(dbref player, __attribute__((unused)) dbref cause, int key, char *n
   do_poor: Reduce the wealth of anyone over a specified amount.
  */
 
-void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *arg1)
+void do_poor(dbref player, dbref cause, int key, char *arg1)
 {
 	dbref a;
 	int amt, curamt, count = 0;
@@ -681,7 +681,7 @@ void do_poor(__attribute__((unused)) dbref player, __attribute__((unused)) dbref
  * do_cut: Chop off a contents or exits chain after the named item.
  */
 
-void do_cut(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int key, char *thing)
+void do_cut(dbref player, dbref cause, int key, char *thing)
 {
 	dbref object;
 	object = match_controlled(player, thing);
@@ -707,7 +707,7 @@ void do_cut(dbref player, __attribute__((unused)) dbref cause, __attribute__((un
  * do_motd: Wizard-settable message of the day (displayed on connect)
  */
 
-void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *message)
+void do_motd(dbref player, dbref cause, int key, char *message)
 {
 	int is_brief;
 	is_brief = 0;
@@ -907,7 +907,7 @@ void do_motd(dbref player, __attribute__((unused)) dbref cause, int key, char *m
  * do_global: enable or disable global control flags
  */
 
-void do_global(dbref player, __attribute__((unused)) dbref cause, int key, char *flag)
+void do_global(dbref player, dbref cause, int key, char *flag)
 {
 	int flagvalue;
 	char *name;

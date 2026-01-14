@@ -312,7 +312,7 @@ int propdir_rewrite(PROPDIR *fp, char *atext)
  * @param atext     Attribute text
  * @return int
  */
-int propdir_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext)
+int propdir_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     PROPDIR *fp = NULL;
     int count = 0;

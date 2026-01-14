@@ -61,7 +61,7 @@ void init_functab(void)
  * @param fname Function name
  * @param target Target
  */
-void do_function(dbref player, dbref cause __attribute__((unused)), int key, char *fname, char *target)
+void do_function(dbref player, dbref cause, int key, char *fname, char *target)
 {
     UFUN *ufp, *ufp2;
     ATTR *ap;
@@ -453,7 +453,7 @@ void list_funcaccess(dbref player)
  * @param cmd Command
  * @return int Result
  */
-int cf_func_access(int *vp __attribute__((unused)), char *str, long extra, dbref player, char *cmd)
+int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     FUN *fp;
     UFUN *ufp;

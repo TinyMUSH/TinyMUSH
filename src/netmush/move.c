@@ -651,7 +651,7 @@ void move_exit(dbref player, dbref exit, int divest, const char *failmsg, int hu
  * do_move: Move from one place to another via exits or 'home'.
  */
 
-void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *direction)
+void do_move(dbref player, dbref cause, int key, char *direction)
 {
     dbref exit, loc;
     int i, quiet;
@@ -753,7 +753,7 @@ void do_move(dbref player, dbref cause __attribute__((unused)), int key, char *d
  * do_get: Get an object.
  */
 
-void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *what)
+void do_get(dbref player, dbref cause, int key, char *what)
 {
     dbref thing, playerloc, thingloc;
     char *failmsg;
@@ -906,7 +906,7 @@ void do_get(dbref player, dbref cause __attribute__((unused)), int key, char *wh
  * do_drop: Drop an object.
  */
 
-void do_drop(dbref player, dbref cause __attribute__((unused)), int key, char *name)
+void do_drop(dbref player, dbref cause, int key, char *name)
 {
     dbref loc, exitloc, thing;
     char *buf, *bp;
@@ -1056,7 +1056,7 @@ void do_enter_internal(dbref player, dbref thing, int quiet)
     }
 }
 
-void do_enter(dbref player, dbref cause __attribute__((unused)), int key, char *what)
+void do_enter(dbref player, dbref cause, int key, char *what)
 {
     dbref thing;
     int quiet;
@@ -1094,7 +1094,7 @@ void do_enter(dbref player, dbref cause __attribute__((unused)), int key, char *
     return;
 }
 
-void do_leave(dbref player, dbref cause __attribute__((unused)), int key)
+void do_leave(dbref player, dbref cause, int key)
 {
     dbref loc;
     int quiet, oattr, aattr;

@@ -21,7 +21,7 @@
 #include <string.h>
 #include <limits.h>
 
-void do_kill(dbref player, __attribute__((unused)) dbref cause, int key, char *what, char *costchar)
+void do_kill(dbref player, dbref cause, int key, char *what, char *costchar)
 {
 	dbref victim;
 	char *buf1, *buf2, *bp;
@@ -519,7 +519,7 @@ void give_money(dbref giver, dbref recipient, int key, int amount)
 	return;
 }
 
-void do_give(dbref player, __attribute__((unused)) dbref cause, int key, char *who, char *amnt)
+void do_give(dbref player, dbref cause, int key, char *who, char *amnt)
 {
 	dbref recipient;
 	int has_long_fingers = Long_Fingers(player);

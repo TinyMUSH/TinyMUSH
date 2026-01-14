@@ -62,7 +62,7 @@ static void parse_port_or_player(dbref viewer, char *arg, dbref *target, int *po
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_config(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_config(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	cf_display(player, fargs[0], buff, bufc);
 }
@@ -80,7 +80,7 @@ void fun_config(char *buff, char **bufc, dbref player, dbref caller __attribute_
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_lwho(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_lwho(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	make_ulist(player, buff, bufc);
 }
@@ -98,7 +98,7 @@ void fun_lwho(char *buff, char **bufc, dbref player, dbref caller __attribute__(
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ports(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref target = NOTHING;
 
@@ -137,7 +137,7 @@ void fun_ports(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_doing(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref target;
 	int port;
@@ -171,7 +171,7 @@ void fun_doing(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Not used
  * @param ncargs Not used
  */
-void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref target;
 	int port;
@@ -200,7 +200,7 @@ void handle_conninfo(char *buff, char **bufc, dbref player, dbref caller __attri
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_session(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref target;
 	int port;
@@ -229,7 +229,7 @@ void fun_session(char *buff, char **bufc, dbref player, dbref caller __attribute
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_programmer(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref target = lookup_player(player, fargs[0], 1);
 
@@ -256,7 +256,7 @@ void fun_programmer(char *buff, char **bufc, dbref player, dbref caller __attrib
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_helptext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	CMDENT *cmdp = NULL;
 	char *p = NULL;
@@ -315,7 +315,7 @@ void fun_helptext(char *buff, char **bufc, dbref player, dbref caller __attribut
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_html_escape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_html_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	html_escape(fargs[0], buff, bufc);
 }
@@ -333,7 +333,7 @@ void fun_html_escape(char *buff, char **bufc, dbref player __attribute__((unused
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_html_unescape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_html_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	const char *msg_orig = NULL;
 	int ret = 0;
@@ -428,7 +428,7 @@ bool escaped_chars(unsigned char ch)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_url_escape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 
 	const char *msg_orig = NULL;
@@ -467,7 +467,7 @@ void fun_url_escape(char *buff, char **bufc, dbref player __attribute__((unused)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_url_unescape(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_url_unescape(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	const char *msg_orig;
 	int ret = 0;

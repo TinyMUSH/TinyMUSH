@@ -217,7 +217,7 @@ void fval(char *buff, char **bufc, long double result, int precision)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_pi(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, M_PI, (fargs[0] && *fargs[0]) ? (int)strtol(fargs[0], (char **)NULL, 10) : FPTS_DIG);
 }
@@ -235,7 +235,7 @@ void fun_pi(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_e(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_e(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, M_E, (fargs[0] && *fargs[0]) ? (int)strtol(fargs[0], (char **)NULL, 10) : FPTS_DIG);
 }
@@ -254,7 +254,7 @@ void fun_e(char *buff, char **bufc, dbref player __attribute__((unused)), dbref 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_sign(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double num = strtold(fargs[0], (char **)NULL);
 
@@ -281,7 +281,7 @@ void fun_sign(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_abs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double num = strtold(fargs[0], (char **)NULL);
 
@@ -313,7 +313,7 @@ void fun_abs(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_floor(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_floor(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, floorl(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
@@ -331,7 +331,7 @@ void fun_floor(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ceil(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ceil(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, ceill(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
@@ -349,7 +349,7 @@ void fun_ceil(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_round(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_round(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtold(fargs[0], (char **)NULL), strtol(fargs[1], (char **)NULL, 10));
 }
@@ -367,7 +367,7 @@ void fun_round(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_trunc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double x;
 
@@ -390,7 +390,7 @@ void fun_trunc(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_inc(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_inc(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtold(fargs[0], (char **)NULL) + 1.0, FPTS_DIG);
 }
@@ -408,7 +408,7 @@ void fun_inc(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_dec(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_dec(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtold(fargs[0], (char **)NULL) - 1.0, FPTS_DIG);
 }
@@ -416,7 +416,7 @@ void fun_dec(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
 /**
  * @brief Return a random number from 0 to arg1 - 1
  */
-void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_rand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int num = (int)strtol(fargs[0], (char **)NULL, 10);
 
@@ -433,7 +433,7 @@ void fun_rand(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
 /**
  * @brief Roll XdY dice
  */
-void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_die(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int n, die, count;
     int total = 0;
@@ -480,7 +480,7 @@ void fun_die(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_sqrt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double val;
     val = strtold(fargs[0], (char **)NULL);
@@ -512,7 +512,7 @@ void fun_sqrt(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_exp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_exp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, expl(strtold(fargs[0], (char **)NULL)), FPTS_DIG);
 }
@@ -531,7 +531,7 @@ void fun_exp(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ln(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double val;
     val = strtold(fargs[0], (char **)NULL);
@@ -559,7 +559,7 @@ void fun_ln(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  * @param cargs Not used
  * @param ncargs Not used
  */
-void handle_trig(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double val;
     int oper, flag;
@@ -687,7 +687,7 @@ char toBaseX(int i, int base)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_baseconv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long long n, m;
     int from, to, isneg;
@@ -801,7 +801,7 @@ void fun_baseconv(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_gt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) > strtold(fargs[1], (char **)NULL));
 }
@@ -820,7 +820,7 @@ void fun_gt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_gte(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) >= strtold(fargs[1], (char **)NULL));
 }
@@ -839,7 +839,7 @@ void fun_gte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_lt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) < strtold(fargs[1], (char **)NULL));
 }
@@ -858,7 +858,7 @@ void fun_lt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_lte(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) <= strtold(fargs[1], (char **)NULL));
 }
@@ -877,7 +877,7 @@ void fun_lte(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_eq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) == strtold(fargs[1], (char **)NULL));
 }
@@ -896,7 +896,7 @@ void fun_eq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_neq(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_neq(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtold(fargs[0], (char **)NULL) != strtold(fargs[1], (char **)NULL));
 }
@@ -916,7 +916,7 @@ void fun_neq(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ncomp(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double x = strtold(fargs[0], (char **)NULL);
     long double y = strtold(fargs[1], (char **)NULL);
@@ -948,7 +948,7 @@ void fun_ncomp(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_sub(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_sub(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtold(fargs[0], (char **)NULL) - strtold(fargs[1], (char **)NULL), FPTS_DIG);
 }
@@ -967,7 +967,7 @@ void fun_sub(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_div(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     /**
      * The C '/' operator is only fully specified for non-negative
@@ -1022,7 +1022,7 @@ void fun_div(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_floordiv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     /**
      * The C '/' operator is only fully specified for non-negative
@@ -1088,7 +1088,7 @@ void fun_floordiv(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_fdiv(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double bot = strtold(fargs[1], (char **)NULL);
 
@@ -1117,7 +1117,7 @@ void fun_fdiv(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_modulo(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long long top = strtoll(fargs[0], (char **)NULL, 10);
     long long bot = strtoll(fargs[1], (char **)NULL, 10);
@@ -1173,7 +1173,7 @@ void fun_modulo(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_remainder(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long long top = strtoll(fargs[0], (char **)NULL, 10);
     long long bot = strtoll(fargs[1], (char **)NULL, 10);
@@ -1227,7 +1227,7 @@ void fun_remainder(char *buff, char **bufc, dbref player __attribute__((unused))
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_power(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double val1 = strtold(fargs[0], (char **)NULL);
     long double val2 = strtold(fargs[1], (char **)NULL);
@@ -1255,7 +1255,7 @@ void fun_power(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_log(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double val = 0.0, base = 0.0;
 
@@ -1303,7 +1303,7 @@ void fun_log(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_shl(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_shl(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) << strtoll(fargs[1], (char **)NULL, 10), 0);
 }
@@ -1322,7 +1322,7 @@ void fun_shl(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_shr(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_shr(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) >> strtoll(fargs[1], (char **)NULL, 10), 0);
 }
@@ -1341,7 +1341,7 @@ void fun_shr(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_band(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_band(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) & strtoll(fargs[1], (char **)NULL, 10), 0);
 }
@@ -1361,7 +1361,7 @@ void fun_band(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_bor(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_bor(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) | strtoll(fargs[1], (char **)NULL, 10), 0);
 }
@@ -1380,7 +1380,7 @@ void fun_bor(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_bnand(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_bnand(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     fval(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) & ~(strtoll(fargs[1], (char **)NULL, 10)), 0);
 }
@@ -1398,7 +1398,7 @@ void fun_bnand(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_add(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_add(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     if (nfargs < 2)
     {
@@ -1432,7 +1432,7 @@ void fun_add(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_mul(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_mul(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     if (nfargs < 2)
     {
@@ -1466,7 +1466,7 @@ void fun_mul(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_max(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_max(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     if (nfargs < 1)
     {
@@ -1500,7 +1500,7 @@ void fun_max(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_min(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_min(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     if (nfargs < 1)
     {
@@ -1534,7 +1534,7 @@ void fun_min(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_bound(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double min = 0.0, max = 0.0, val = 0.0;
     char *cp = NULL;
@@ -1605,7 +1605,7 @@ void fun_bound(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_dist2d(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_dist2d(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double d;
     long double r;
@@ -1630,7 +1630,7 @@ void fun_dist2d(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_dist3d(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_dist3d(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     long double d;
     long double r;
@@ -2117,7 +2117,7 @@ void handle_vectors(char *buff, char **bufc, dbref player, dbref caller, dbref c
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_not(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, strtoll(fargs[0], (char **)NULL, 10) > 0 ? false : true);
 }
@@ -2135,7 +2135,7 @@ void fun_not(char *buff, char **bufc, dbref player __attribute__((unused)), dbre
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_notbool(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, !xlate(fargs[0]));
 }
@@ -2153,7 +2153,7 @@ void fun_notbool(char *buff, char **bufc, dbref player __attribute__((unused)), 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_t(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_t(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFEBOOL(buff, bufc, xlate(fargs[0]));
 }

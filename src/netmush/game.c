@@ -290,7 +290,7 @@ void do_dump(dbref player, dbref cause, int key)
  * Hashtable resize.
  */
 
-void do_hashresize(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+void do_hashresize(dbref player, dbref cause, int key)
 {
 	MODULE *mp;
 	MODHASHES *m_htab, *hp;
@@ -1500,7 +1500,7 @@ void report_timecheck(dbref player, int yes_screen, int yes_log, int yes_clear)
 	}
 }
 
-void do_timecheck(dbref player, dbref cause __attribute__((unused)), int key)
+void do_timecheck(dbref player, dbref cause, int key)
 {
 	int yes_screen, yes_log, yes_clear;
 	yes_screen = yes_log = yes_clear = 0;
@@ -1642,7 +1642,7 @@ void fork_and_backup(void)
 	}
 }
 
-int backup_mush(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+int backup_mush(dbref player, dbref cause, int key)
 {
 	int i, txt_n = 0, cnf_n = 0, dbf_n = 0;
 	int txt_cap = 0, cnf_cap = 0, dbf_cap = 0;
@@ -2248,7 +2248,7 @@ void write_status_file(dbref player, char *message)
 	tf_close(fd);
 }
 
-void do_shutdown(dbref player, dbref cause __attribute__((unused)), int key, char *message)
+void do_shutdown(dbref player, dbref cause, int key, char *message)
 {
 	char *name;
 	name = log_getname(player);
@@ -2503,7 +2503,7 @@ void dump_database(void)
 	mushstate.dumping = 0;
 }
 
-void fork_and_dump(dbref player, dbref cause __attribute__((unused)), int key)
+void fork_and_dump(dbref player, dbref cause, int key)
 {
 	if (mushconf.dump_msg)
 	{
@@ -2767,7 +2767,7 @@ int Hearer(dbref thing)
  * Write message to logfile.
  */
 
-void do_logwrite(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *msgtype, char *message)
+void do_logwrite(dbref player, dbref cause, int key, char *msgtype, char *message)
 {
 	const char *mt;
 	char *msg, *p, *pname;
@@ -2812,7 +2812,7 @@ void do_logwrite(dbref player, dbref cause __attribute__((unused)), int key __at
  * Database and startup stuff.
  */
 
-void do_readcache(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+void do_readcache(dbref player, dbref cause, int key)
 {
 	helpindex_load(player);
 	fcache_load(player);

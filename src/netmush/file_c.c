@@ -51,7 +51,7 @@ FCACHE fcache[] = {
  * @param extra  Not used
  * @param arg    File to show
  */
-void do_list_file(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *arg)
+void do_list_file(dbref player, dbref cause, int extra, char *arg)
 {
     int flagvalue;
     flagvalue = search_nametab(player, list_files, arg);

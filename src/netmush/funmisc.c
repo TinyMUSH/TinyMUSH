@@ -598,7 +598,7 @@ void fun_lnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_time(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char temp[26];
 	struct tm tm_buf;
@@ -620,7 +620,7 @@ void fun_time(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_secs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.now, LBUF_SIZE);
 }
@@ -638,7 +638,7 @@ void fun_secs(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_convsecs(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_convsecs(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	time_t tt = strtol(fargs[0], (char **)NULL, 10);
 	char temp[26];
@@ -911,7 +911,7 @@ bool do_convtime(char *str, struct tm *ttm)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_convtime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	struct tm ttm;
 	localtime_r(&mushstate.now, &ttm);
@@ -939,7 +939,7 @@ void fun_convtime(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_timefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	time_t tt = 0L;
 	struct tm *ttm = NULL;
@@ -1049,7 +1049,7 @@ void fun_timefmt(char *buff, char **bufc, dbref player __attribute__((unused)), 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_etimefmt(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *p = NULL, *mark = NULL, padc = 0, timec = 0;
 	int raw_secs = 0, secs = 0, mins = 0, hours = 0, days = 0, csecs = 0, cmins = 0, chours = 0, cdays = 0;
@@ -1351,7 +1351,7 @@ void fun_etimefmt(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_starttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char temp[26];
 	struct tm tm_buf;
@@ -1373,7 +1373,7 @@ void fun_starttime(char *buff, char **bufc, dbref player __attribute__((unused))
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_restarts(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.reboot_nums, LBUF_SIZE);
 }
@@ -1391,7 +1391,7 @@ void fun_restarts(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_restarttime(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char temp[26];
 	struct tm tm_buf;
@@ -1418,7 +1418,7 @@ void fun_restarttime(char *buff, char **bufc, dbref player __attribute__((unused
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_version(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELBSTR(mushstate.version.versioninfo, buff, bufc);
 }
@@ -1436,7 +1436,7 @@ void fun_version(char *buff, char **bufc, dbref player __attribute__((unused)), 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_mushname(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELBSTR(mushconf.mush_name, buff, bufc);
 }
@@ -1454,7 +1454,7 @@ void fun_mushname(char *buff, char **bufc, dbref player __attribute__((unused)),
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_modules(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_modules(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	MODULE *mp = NULL;
 	bool got_one = false;
@@ -1493,7 +1493,7 @@ void fun_modules(char *buff, char **bufc, dbref player __attribute__((unused)), 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_hasmodule(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	MODULE *mp = NULL;
 
@@ -1522,7 +1522,7 @@ void fun_hasmodule(char *buff, char **bufc, dbref player __attribute__((unused))
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_connrecord(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.record_players, LBUF_SIZE);
 }
@@ -1540,7 +1540,7 @@ void fun_connrecord(char *buff, char **bufc, dbref player __attribute__((unused)
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_fcount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.func_invk_ctr, LBUF_SIZE);
 }
@@ -1558,7 +1558,7 @@ void fun_fcount(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_fdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.func_nest_lev, LBUF_SIZE);
 }
@@ -1576,7 +1576,7 @@ void fun_fdepth(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ccount(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.cmd_invk_ctr, LBUF_SIZE);
 }
@@ -1594,7 +1594,7 @@ void fun_ccount(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_cdepth(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	XSAFELTOS(buff, bufc, mushstate.cmd_nest_lev, LBUF_SIZE);
 }
@@ -1612,7 +1612,7 @@ void fun_cdepth(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	struct timeval bt, et;
 	int i = 0, times = 0;
@@ -1710,7 +1710,7 @@ void fun_benchmark(char *buff, char **bufc, dbref player, dbref caller, dbref ca
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *str;
 	str = fargs[0];
@@ -1730,7 +1730,7 @@ void fun_s(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_subeval(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	char *str;
 	str = fargs[0];
@@ -1795,7 +1795,7 @@ bool check_command(dbref player, char *name, char *buff, char **bufc, char *carg
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_link(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@link", buff, bufc, cargs, ncargs))
 	{
@@ -1820,7 +1820,7 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller __attribute__(
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_tel(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@teleport", buff, bufc, cargs, ncargs))
 	{
@@ -1845,7 +1845,7 @@ void fun_tel(char *buff, char **bufc, dbref player, dbref caller __attribute__((
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_wipe(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@wipe", buff, bufc, cargs, ncargs))
 	{
@@ -1870,7 +1870,7 @@ void fun_wipe(char *buff, char **bufc, dbref player, dbref caller __attribute__(
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_pemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
@@ -1895,7 +1895,7 @@ void fun_pemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_remit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@pemit", buff, bufc, cargs, ncargs))
 	{
@@ -1921,7 +1921,7 @@ void fun_remit(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_oemit(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@oemit", buff, bufc, cargs, ncargs))
 	{
@@ -1945,7 +1945,7 @@ void fun_oemit(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_force(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (!check_command(player, "@force", buff, bufc, cargs, ncargs))
 	{
@@ -1969,7 +1969,7 @@ void fun_force(char *buff, char **bufc, dbref player, dbref caller __attribute__
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
+void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	if (nfargs < 1)
 	{
@@ -1999,7 +1999,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller __attribute
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_wait(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
 }
@@ -2020,7 +2020,7 @@ void fun_wait(char *buff __attribute__((unused)), char **bufc __attribute__((unu
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_command(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player, dbref caller __attribute__((unused)), dbref cause, char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_command(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	CMDENT *cmdp = NULL;
 	char *tbuf1 = NULL, *tbuf2 = NULL, *p = NULL;
@@ -2211,7 +2211,7 @@ void fun_create(char *buff, char **bufc, dbref player, dbref caller, dbref cause
  * @param cargs Command's arguments
  * @param ncargs Nomber of command's arguments
  */
-void fun_set(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[], int ncargs)
+void fun_set(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	dbref thing, thing2, aowner;
 	char *p, *buff2;
@@ -2446,7 +2446,7 @@ void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ps(char *buff, char **bufc, dbref player, dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ps(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
 	int qpid;
 	dbref player_targ, obj_targ;

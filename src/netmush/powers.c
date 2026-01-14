@@ -28,7 +28,7 @@
  * * ph_any: set or clear indicated bit, no security checking
  */
 
-int ph_any(dbref target, dbref player __attribute__((unused)), POWER power, int fpowers, int reset)
+int ph_any(dbref target, dbref player, POWER power, int fpowers, int reset)
 {
     POWER current;
     POWER newvalue;
@@ -266,7 +266,7 @@ void display_powertab(dbref player)
     XFREE(buf);
 }
 
-POWERENT *find_power(dbref thing __attribute__((unused)), const char *powername)
+POWERENT *find_power(dbref thing, const char *powername)
 {
     /* Build a lowercase, trimmed token without modifying the input.
      * The 'thing' parameter is unused; this function performs a global lookup
@@ -621,7 +621,7 @@ void decompile_powers(dbref player, dbref thing, char *thingname)
  * cf_flag_access.
  */
 
-int cf_power_access(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+int cf_power_access(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     char *fstr, *permstr, *tokst;
     POWERENT *fp;

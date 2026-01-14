@@ -56,7 +56,7 @@ void Log_pointer_err(dbref prior, dbref obj, dbref loc, dbref ref, const char *r
 	XFREE(ref_name);
 }
 
-void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *valtype __attribute__((unused)), const char *errtype)
+void Log_header_err(dbref obj, dbref loc, dbref val, int is_object, const char *valtype, const char *errtype)
 {
 	char *obj_type, *obj_name, *obj_loc;
 	char *val_type, *val_name;
@@ -790,7 +790,7 @@ void destroy_obj(dbref player, dbref obj)
  * do_freelist: Grab a garbage object, and move it to the top of the freelist.
  */
 
-void do_freelist(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *str)
+void do_freelist(dbref player, dbref cause, int key, char *str)
 {
 	dbref i, thing;
 
@@ -2081,7 +2081,7 @@ void check_contents_chains(void)
  * do_dbck: Perform a database consistency check and clean up damage.
  */
 
-void do_dbck(dbref player, dbref cause __attribute__((unused)), int key)
+void do_dbck(dbref player, dbref cause, int key)
 {
 	check_type = key;
 	make_freelist();

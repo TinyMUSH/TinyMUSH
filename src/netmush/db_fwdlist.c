@@ -311,7 +311,7 @@ int fwdlist_rewrite(FWDLIST *fp, char *atext)
  * @param atext     Attribute text
  * @return int
  */
-int fwdlist_ck(int key __attribute__((unused)), dbref player, dbref thing, int anum __attribute__((unused)), char *atext)
+int fwdlist_ck(int key, dbref player, dbref thing, int anum, char *atext)
 {
     FWDLIST *fp = NULL;
     int count = 0;

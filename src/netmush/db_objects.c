@@ -268,7 +268,7 @@ void s_Pass(dbref thing, const char *s)
  * @param aname     Attribute name
  * @param value     Value
  */
-void do_attribute(dbref player, dbref cause __attribute__((unused)), int key, char *aname, char *value)
+void do_attribute(dbref player, dbref cause, int key, char *aname, char *value)
 {
     int success = 0, negate = 0, f = 0;
     char *buff = NULL, *sp = NULL, *p = NULL, *q = NULL, *tbuf = NULL, *tokst = NULL;
@@ -437,7 +437,7 @@ void do_attribute(dbref player, dbref cause __attribute__((unused)), int key, ch
  * @param arg1      Argument 1
  * @param arg2      Argument 2
  */
-void do_fixdb(dbref player, dbref cause __attribute__((unused)), int key, char *arg1, char *arg2)
+void do_fixdb(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
     dbref thing = NOTHING, res = NOTHING;
     char *tname = NULL, *buf = NULL;

@@ -555,7 +555,7 @@ char *log_gettype(dbref thing, char *d)
  * Log rotation.
  */
 
-void do_logrotate(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+void do_logrotate(dbref player, dbref cause, int key)
 {
     LOGFILETAB *lp;
     char *ts, *pname;

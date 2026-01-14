@@ -151,7 +151,7 @@ int tf_open(char *fname, int mode)
  *
  * @param fdes  File descriptor
  */
-void tf_close(int fdes __attribute__((unused)))
+void tf_close(int fdes)
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);
@@ -182,7 +182,7 @@ FILE *tf_fopen(char *fname, int mode)
  *
  * @param fd File descriptor
  */
-void tf_fclose(FILE *fd __attribute__((unused)))
+void tf_fclose(FILE *fd)
 {
     tf_xclose(t_fd);
     tf_xopen(DEV_NULL, O_RDONLY);

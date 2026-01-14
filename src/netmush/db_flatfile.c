@@ -1605,7 +1605,7 @@ int db_read(void)
  * @param n_atrt	Number of attributes
  * @return int
  */
-int db_write_object_out(FILE *f, dbref i, int db_format __attribute__((unused)), int flags, int *n_atrt)
+int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 {
 	ATTR *a = NULL;
 	char *got = NULL, *as = NULL;

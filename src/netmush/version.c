@@ -23,7 +23,7 @@
 #include <sys/utsname.h>
 #include <dlfcn.h>
 
-void do_version(dbref player, __attribute__((unused)) dbref cause, __attribute__((unused)) int extra)
+void do_version(dbref player, dbref cause, int extra)
 {
     MODVER *mver;
     char *ptr;

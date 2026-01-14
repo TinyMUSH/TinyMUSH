@@ -500,7 +500,7 @@ void perform_iter(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[] __attribute__((unused)), int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ilev(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     XSAFELTOS(buff, bufc, mushstate.in_loop - 1, LBUF_SIZE);
 }
@@ -518,7 +518,7 @@ void fun_ilev(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_inum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -545,7 +545,7 @@ void fun_inum(char *buff, char **bufc, dbref player __attribute__((unused)), dbr
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_itext(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -571,7 +571,7 @@ void fun_itext(char *buff, char **bufc, dbref player __attribute__((unused)), db
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_itext2(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
     lev = (int)strtol(fargs[0], (char **)NULL, 10);
@@ -597,7 +597,7 @@ void fun_itext2(char *buff, char **bufc, dbref player __attribute__((unused)), d
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_ibreak(char *buff __attribute__((unused)), char **bufc __attribute__((unused)), dbref player __attribute__((unused)), dbref caller __attribute__((unused)), dbref cause __attribute__((unused)), char *fargs[], int nfargs __attribute__((unused)), char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_ibreak(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     int lev;
     lev = mushstate.in_loop - 1 - (int)strtol(fargs[0], (char **)NULL, 10);
@@ -1158,7 +1158,7 @@ void fun_step(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @param cargs Not used
  * @param ncargs Not used
  */
-void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[] __attribute__((unused)), int ncargs __attribute__((unused)))
+void fun_foreach(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
     dbref aowner = NOTHING, thing = NOTHING;
     int aflags = 0, alen = 0, i = 0, in_string = 1;

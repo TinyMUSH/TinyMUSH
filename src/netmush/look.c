@@ -1632,7 +1632,7 @@ void look_here(dbref player, dbref thing, int key, int look_key)
 	look_in(player, thing, look_key);
 }
 
-void do_look(dbref player, dbref cause __attribute__((unused)), int key, char *name)
+void do_look(dbref player, dbref cause, int key, char *name)
 {
 	dbref thing = NOTHING, loc = NOTHING, look_key = 0;
 	look_key = LK_SHOWATTR | LK_SHOWEXIT;
@@ -2382,12 +2382,12 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 	XFREE(timebuf);
 }
 
-void do_score(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+void do_score(dbref player, dbref cause, int key)
 {
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "You have %d %s.", Pennies(player), (Pennies(player) == 1) ? mushconf.one_coin : mushconf.many_coins);
 }
 
-void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)))
+void do_inventory(dbref player, dbref cause, int key)
 {
 	char *buff = NULL, *e = NULL;
 	dbref thing;
@@ -2441,7 +2441,7 @@ void do_inventory(dbref player, dbref cause __attribute__((unused)), int key __a
 	do_score(player, player, 0);
 }
 
-void do_entrances(dbref player, dbref cause __attribute__((unused)), int key __attribute__((unused)), char *name)
+void do_entrances(dbref player, dbref cause, int key, char *name)
 {
 	dbref thing = NOTHING, i = NOTHING, j = NOTHING;
 	char *exit = NULL, *message = NULL;
@@ -2781,7 +2781,7 @@ void sweep_check(dbref player, dbref what, int key, int is_loc)
 	}
 }
 
-void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *where)
+void do_sweep(dbref player, dbref cause, int key, char *where)
 {
 	dbref here, sweeploc;
 	int where_key, what_key;
@@ -2899,7 +2899,7 @@ void do_sweep(dbref player, dbref cause __attribute__((unused)), int key, char *
  * will almost certainly vary.  (i.e. different flags, etc.)
  */
 
-void do_decomp(dbref player, dbref cause __attribute__((unused)), int key, char *name, char *qual)
+void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 {
 	BOOLEXP *bexp = NULL;
 	char *got = NULL, *thingname = NULL, *as = NULL, *ltext = NULL, *buff = NULL, *tbuf = NULL, *tmp = NULL, *buf = NULL;

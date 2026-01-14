@@ -398,7 +398,7 @@ void show_quota_header(dbref player)
 	}
 }
 
-void do_quota(dbref player, __attribute__((unused)) dbref cause, int key, char *arg1, char *arg2)
+void do_quota(dbref player, dbref cause, int key, char *arg1, char *arg2)
 {
 	dbref who = NOTHING, i = NOTHING;
 	char *name = NULL, *target = NULL;

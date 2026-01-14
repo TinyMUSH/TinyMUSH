@@ -593,7 +593,7 @@ void help_helper(dbref player, int hf_num, int eval, char *topic, char *buff, ch
  * do_help: display information from new-format news and help files
  */
 
-void do_help(dbref player, dbref cause __attribute__((unused)), int key, char *message)
+void do_help(dbref player, dbref cause, int key, char *message)
 {
 	char *tbuf = XMALLOC(SBUF_SIZE + 8, "tbuf");
 	int hf_num;
