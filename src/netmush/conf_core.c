@@ -204,6 +204,9 @@ void cf_init(void)
     mushconf.player_name_min = 0;
     mushconf.register_limit = 50;
     mushconf.max_global_regs = DEFAULT_GLOBAL_REGS;
+    mushconf.max_command_args = 100;
+    mushconf.player_name_length = 22;
+    mushconf.hash_factor = 2;
     mushconf.max_qpid = 10000;
     mushconf.space_compress = 1; /*!< ??? Running SC on a non-SC DB may cause problems */
     mushconf.start_room = 0;
