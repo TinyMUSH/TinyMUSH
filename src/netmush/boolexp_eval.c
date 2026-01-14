@@ -39,6 +39,109 @@ static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key
  */
 
 /**
+ * @ingroup boolexp_memory
+ * @brief Allocates and initializes a BOOLEXP item.
+ *
+ * This function creates a new BOOLEXP item by allocating memory and initializing all fields to their default values (zero or NULL).
+ *
+ * @return Pointer to the initialized BOOLEXP item.
+ */
+BOOLEXP *alloc_boolexp(void)
+{
+	BOOLEXP *b = XMALLOC(sizeof(BOOLEXP), "b");
+
+	return b;
+}
+
+/**
+ * @ingroup boolexp_memory
+ * @brief Frees a BOOLEXP structure and all its sub-expressions recursively.
+ *
+ * This function deallocates memory for a BOOLEXP tree, handling different types
+ * of boolean expressions appropriately. It recursively frees sub-expressions
+ * before freeing the current node. For binary operations (AND/OR), both
+ * sub-expressions are freed. For unary operations and attribute checks,
+ * only the sub-expression is freed. Constants have no sub-expressions.
+ *
+ * @param b Pointer to the BOOLEXP structure to free. If b is TRUE_BOOLEXP,
+ *          no action is taken as it represents a constant true value that
+ *          should not be deallocated.
+ */
+void free_boolexp(BOOLEXP *b)
+{
+	if (b == TRUE_BOOLEXP)
+		return;
+
+	switch (b->type)
+	{
+	case BOOLEXP_AND:
+	case BOOLEXP_OR:
+		XFREE(b->sub1);
+		XFREE(b->sub2);
+		break;
+	case BOOLEXP_NOT:
+	case BOOLEXP_CARRY:
+	case BOOLEXP_IS:
+	case BOOLEXP_OWNER:
+	case BOOLEXP_INDIR:
+	case BOOLEXP_ATR:
+	case BOOLEXP_EVAL:
+		XFREE(b->sub1);
+		break;
+	case BOOLEXP_CONST:
+		break;
+	}
+
+	XFREE(b);
+}
+
+/**
+ * @ingroup boolexp_internal
+ * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
+ *
+ * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
+ * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
+ * to compare the attribute's value with the provided key.
+ *
+ * @param player    DBref of the player whose attribute is being checked.
+ * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
+ * @param attr      Pointer to the ATTR structure representing the attribute to check.
+ * @param key       String representing the key to compare with the attribute's value.
+ * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
+ */
+static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
+{
+	char *buff = NULL;
+	dbref aowner = NOTHING;
+	int aflags = 0, alen = 0, checkit = 0;
+
+	buff = atr_pget(player, attr->number, &aowner, &aflags, &alen);
+	checkit = false;
+
+	if (attr->number == A_LCONTROL)
+	{
+		// We can see control locks... else we'd break zones
+		checkit = true;
+	}
+	else if (See_attr(lockobj, player, attr, aowner, aflags))
+	{
+		checkit = true;
+	}
+	else if (attr->number == A_NAME)
+	{
+		checkit = true;
+	}
+
+	if (checkit && (!wild_match(key, buff)))
+	{
+		checkit = false;
+	}
+
+	XFREE(buff);
+	return checkit;
+}
+
+/**
  * @ingroup boolexp_internal
  * @brief Helper function for attribute-based lock checks (IS and CARRY operators)
  *
@@ -105,109 +208,6 @@ static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inv
 	}
 
 	return false;
-}
-
-/**
- * @ingroup boolexp_internal
- * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
- *
- * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
- * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
- * to compare the attribute's value with the provided key.
- *
- * @param player    DBref of the player whose attribute is being checked.
- * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
- * @param attr      Pointer to the ATTR structure representing the attribute to check.
- * @param key       String representing the key to compare with the attribute's value.
- * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
- */
-static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
-{
-	char *buff = NULL;
-	dbref aowner = NOTHING;
-	int aflags = 0, alen = 0, checkit = 0;
-
-	buff = atr_pget(player, attr->number, &aowner, &aflags, &alen);
-	checkit = false;
-
-	if (attr->number == A_LCONTROL)
-	{
-		// We can see control locks... else we'd break zones
-		checkit = true;
-	}
-	else if (See_attr(lockobj, player, attr, aowner, aflags))
-	{
-		checkit = true;
-	}
-	else if (attr->number == A_NAME)
-	{
-		checkit = true;
-	}
-
-	if (checkit && (!wild_match(key, buff)))
-	{
-		checkit = false;
-	}
-
-	XFREE(buff);
-	return checkit;
-}
-
-/**
- * @ingroup boolexp_memory
- * @brief Allocates and initializes a BOOLEXP item.
- *
- * This function creates a new BOOLEXP item by allocating memory and initializing all fields to their default values (zero or NULL).
- *
- * @return Pointer to the initialized BOOLEXP item.
- */
-BOOLEXP *alloc_boolexp(void)
-{
-	BOOLEXP *b = XMALLOC(sizeof(BOOLEXP), "b");
-
-	return b;
-}
-
-/**
- * @ingroup boolexp_memory
- * @brief Frees a BOOLEXP structure and all its sub-expressions recursively.
- *
- * This function deallocates memory for a BOOLEXP tree, handling different types
- * of boolean expressions appropriately. It recursively frees sub-expressions
- * before freeing the current node. For binary operations (AND/OR), both
- * sub-expressions are freed. For unary operations and attribute checks,
- * only the sub-expression is freed. Constants have no sub-expressions.
- *
- * @param b Pointer to the BOOLEXP structure to free. If b is TRUE_BOOLEXP,
- *          no action is taken as it represents a constant true value that
- *          should not be deallocated.
- */
-void free_boolexp(BOOLEXP *b)
-{
-	if (b == TRUE_BOOLEXP)
-		return;
-
-	switch (b->type)
-	{
-	case BOOLEXP_AND:
-	case BOOLEXP_OR:
-		XFREE(b->sub1);
-		XFREE(b->sub2);
-		break;
-	case BOOLEXP_NOT:
-	case BOOLEXP_CARRY:
-	case BOOLEXP_IS:
-	case BOOLEXP_OWNER:
-	case BOOLEXP_INDIR:
-	case BOOLEXP_ATR:
-	case BOOLEXP_EVAL:
-		XFREE(b->sub1);
-		break;
-	case BOOLEXP_CONST:
-		break;
-	}
-
-	XFREE(b);
 }
 
 /**
