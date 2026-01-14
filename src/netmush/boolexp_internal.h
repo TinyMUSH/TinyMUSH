@@ -14,19 +14,6 @@
 #define __BOOLEXP_INTERNAL_H
 
 /**
- * @brief Error message constants for boolean expression operations
- *
- * These constants define error messages used throughout the boolean expression
- * system for logging and debugging purposes. Each message corresponds to a
- * specific error condition that can occur during parsing or evaluation.
- */
-#define ERR_BOOLEXP_ATR_NULL "ERROR: boolexp.c BOOLEXP_ATR has NULL sub1\n"          /*!< BOOLEXP_ATR node has null sub1 pointer */
-#define ERR_BOOLEXP_EVAL_NULL "ERROR: boolexp.c BOOLEXP_EVAL has NULL sub1\n"       /*!< BOOLEXP_EVAL node has null sub1 pointer */
-#define ERR_BOOLEXP_IS_NULL "ERROR: boolexp.c BOOLEXP_IS attribute check has NULL sub1->sub1\n"     /*!< BOOLEXP_IS node has invalid sub1->sub1 */
-#define ERR_BOOLEXP_CARRY_NULL "ERROR: boolexp.c BOOLEXP_CARRY attribute check has NULL sub1->sub1\n" /*!< BOOLEXP_CARRY node has invalid sub1->sub1 */
-#define ERR_BOOLEXP_UNKNOWN_TYPE "ABORT! boolexp.c, unknown boolexp type in eval_boolexp().\n"       /*!< Unknown BOOLEXP type encountered */
-
-/**
  * @brief Global recursion depth counter for parsing operations
  *
  * Prevents stack overflow attacks by limiting expression complexity.
