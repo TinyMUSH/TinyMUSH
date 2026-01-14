@@ -2071,13 +2071,6 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
     char *cp = NULL, *ap = NULL, *zp = NULL, *buf = NULL;
     int line = 0;
 
-    /**
-     * @todo TODO Add stuff to fill
-     *
-     * **cfiletab;     // Array of config files
-     * cfiletab_size;  // Size of the table storing config pointers
-     */
-
     if (!mushstate.initializing)
     {
         return CF_Failure;
@@ -2242,14 +2235,15 @@ CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __at
 }
 
 int (*cf_interpreter)(int *, char *, long, dbref, char *);
+
 /**
  * @brief Set config parameter.
  *
- * @param cp
- * @param ap
- * @param player
- * @param tp
- * @return int
+ * @param cp       Configuration parameter string
+ * @param ap       Argument parameter string
+ * @param player   DBref of player executing command
+ * @param tp       Configuration table entry
+ * @return CF_Result indicating success or failure
  */
 CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
 {
