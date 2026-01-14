@@ -16,7 +16,7 @@ endif()
 set(NETMUSH_SOURCES
     alloc.c ansi.c ansi.h api.c boolexp_eval.c boolexp_parse.c bsd.c bsd_conn.c bsd_dns.c 
     bsd_io.c bsd_sig.c bsd_socket.c conf_core.c conf_handlers.c conf_advanced.c conf_access.c conf_help.c conf_interface.c conf_display.c conf_util.c constants.h 
-    cque.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
+    cque_core.c cque_management.c cque_halt.c cque_notify.c cque_execution.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
