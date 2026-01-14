@@ -48,28 +48,4 @@ CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp; /*!< Commonly u
 /* NOTE: process_command() has been moved to command_dispatch.c */
 /* NOTE: process_cmdline() has been moved to command_dispatch.c */
 
-static void emit_cmdswitches_for_table(dbref player, CMDENT *ctab)
-{
-	if (!ctab)
-	{
-		return; /* Nothing to list */
-	}
-
-	for (CMDENT *cmdp = ctab; cmdp->cmdname; cmdp++)
-	{
-		/* Skip commands without switches first to avoid deeper checks */
-		if (!cmdp->switches)
-		{
-			continue;
-		}
-
-		/* Enforce permission and visibility filters */
-		if ((cmdp->perms & CF_DARK) || !check_access(player, cmdp->perms))
-		{
-			continue;
-		}
-
-		/* Emit aligned command name followed by its switch list */
-		display_nametab(player, cmdp->switches, false, "%-16.16s", cmdp->cmdname);
-	}
-}
+/* NOTE: emit_cmdswitches_for_table() has been moved to command_list.c */
