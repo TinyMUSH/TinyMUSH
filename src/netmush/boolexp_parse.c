@@ -36,12 +36,6 @@
  */
 int boolexp_parse_depth = 0;
 
-/* Forward declarations for parsing functions */
-static inline BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal);
-static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal);
-
 /**
  * @defgroup boolexp_parsing Parsing Functions
  * @brief Functions for parsing boolean expression strings into trees
@@ -133,6 +127,21 @@ static inline BOOLEXP *test_atr(char *s, dbref parse_player, bool parsing_intern
 	XFREE(buff);
 	return b;
 }
+
+/**
+ * @defgroup boolexp_parsing_internal Internal Parsing Functions
+ * @ingroup boolexp_parsing
+ * @brief Low-level recursive descent parsing functions
+ *
+ * These functions implement the recursive descent parser for boolean expressions.
+ * Each function corresponds to a grammar rule and parses a specific level of the expression hierarchy.
+ */
+
+/* Forward declarations needed for mutual recursion (L calls E, E calls T, T calls F, F calls L) */
+static inline BOOLEXP *parse_boolexp_E(char **pBuf, dbref parse_player, bool parsing_internal);
+static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool parsing_internal);
+static inline BOOLEXP *parse_boolexp_F(char **pBuf, dbref parse_player, bool parsing_internal);
+static inline BOOLEXP *parse_boolexp_L(char **pBuf, dbref parse_player, bool parsing_internal);
 
 /**
  * @ingroup boolexp_parsing_internal
@@ -464,15 +473,6 @@ static inline BOOLEXP *parse_boolexp_T(char **pBuf, dbref parse_player, bool par
 	boolexp_parse_depth--;
 	return b2;
 }
-
-/**
- * @defgroup boolexp_parsing_internal Internal Parsing Functions
- * @ingroup boolexp_parsing
- * @brief Low-level recursive descent parsing functions
- *
- * These functions implement the recursive descent parser for boolean expressions.
- * Each function corresponds to a grammar rule and parses a specific level of the expression hierarchy.
- */
 
 /**
  * @ingroup boolexp_parsing_internal
