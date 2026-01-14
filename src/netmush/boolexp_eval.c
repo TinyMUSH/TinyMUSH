@@ -25,6 +25,19 @@
 #include <stdbool.h>
 #include <string.h>
 
+// Forward declarations
+static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory);
+static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key);
+
+/**
+ * @defgroup boolexp_memory Memory Management Functions
+ * @ingroup boolexp_internal
+ * @brief Functions for allocating and freeing boolean expression structures
+ *
+ * These functions handle the memory management of BOOLEXP trees,
+ * providing safe allocation and recursive deallocation.
+ */
+
 /**
  * @ingroup boolexp_internal
  * @brief Helper function for attribute-based lock checks (IS and CARRY operators)
@@ -48,41 +61,6 @@
  * @param check_inventory	If true, check player's inventory (CARRY operator), else check player only (IS operator)
  * @return bool			True if any checked object has the attribute matching the key, false otherwise
  */
-static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory);
-
-/**
- * @ingroup boolexp_internal
- * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
- *
- * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
- * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
- * to compare the attribute's value with the provided key.
- *
- * @param player    DBref of the player whose attribute is being checked.
- * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
- * @param attr      Pointer to the ATTR structure representing the attribute to check.
- * @param key       String representing the key to compare with the attribute's value.
- * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
- */
-static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key);
-
-/**
- * @defgroup boolexp_internal Internal Helper Functions
- * @brief Internal functions for parsing and evaluation support
- *
- * These functions provide internal support for the boolean expression system,
- * including attribute checking, parsing helpers, and recursion management.
- * They are not part of the public API.
- */
-
-/**
- * @defgroup boolexp_memory Memory Management Functions
- * @brief Functions for allocating and freeing boolean expression structures
- *
- * These functions handle the memory management of BOOLEXP trees,
- * providing safe allocation and recursive deallocation.
- */
-
 static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory)
 {
 	ATTR *a = NULL;
@@ -129,6 +107,20 @@ static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inv
 	return false;
 }
 
+/**
+ * @ingroup boolexp_internal
+ * @brief Checks if the specified attribute on the player matches the given key, taking into account visibility permissions.
+ *
+ * This function evaluates whether a particular attribute of a player passes a key check when performed by a locked object.
+ * It handles special cases for control (A_LCONTROL) and name (A_NAME) attributes, and uses wildcard pattern matching
+ * to compare the attribute's value with the provided key.
+ *
+ * @param player    DBref of the player whose attribute is being checked.
+ * @param lockobj   DBref of the locked object performing the check (used for visibility permission controls).
+ * @param attr      Pointer to the ATTR structure representing the attribute to check.
+ * @param key       String representing the key to compare with the attribute's value.
+ * @return          true if the attribute matches the key and is visible according to permissions, false otherwise.
+ */
 static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key)
 {
 	char *buff = NULL;
