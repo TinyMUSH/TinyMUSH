@@ -38,7 +38,7 @@ extern STATEDATA mushstate;
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_const(int *vp __attribute__((unused)), char *str __attribute__((unused)), long extra __attribute__((unused)), dbref player, char *cmd)
+CF_Result cf_const(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     /**
      * Fail on any attempt to change the value
@@ -291,7 +291,7 @@ CF_Result cf_dbref(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param cmd
  * @return int
  */
-CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
+CF_Result cf_module(int *vp, char *modname, long extra, dbref player, char *cmd)
 {
     void *handle;
     void (*initptr)(void) = NULL;
@@ -356,7 +356,7 @@ CF_Result cf_module(int *vp __attribute__((unused)), char *modname, long extra _
  * @param cmd       Command (not used)
  * @return CF_Result
  */
-CF_Result cf_bool(int *vp, char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
+CF_Result cf_bool(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     *vp = (int)search_nametab(GOD, bool_names, str);
 

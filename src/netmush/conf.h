@@ -35,7 +35,6 @@ typedef enum {
  */
 void cf_init(void);
 void cf_log(dbref player, const char *primary, const char *secondary, char *cmd, const char *format, ...);
-CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int failure);
 
 /*
  * Public interface functions from conf_interface.c
@@ -52,11 +51,3 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc);
 void list_cf_access(dbref player);
 void list_cf_read_access(dbref player);
 void list_options(dbref player);
-
-/*
- * Helper configuration handler types - used internally
- */
-typedef CF_Result (*CF_HANDLER)(int *, char *, long, dbref, char *);
-typedef CF_Result (*CF_HANDLER_LONG)(long **, char *, long, dbref, char *);
-
-#endif /* __CONF_H__ */

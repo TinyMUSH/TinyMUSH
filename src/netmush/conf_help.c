@@ -194,7 +194,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
  * @param cmd           Command
  * @return CF_Result
  */
-CF_Result cf_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     return add_helpfile(player, cmd, str, 0);
 }
@@ -209,7 +209,7 @@ CF_Result cf_helpfile(int *vp __attribute__((unused)), char *str, long extra __a
  * @param cmd           Command
  * @return CF_Result
  */
-CF_Result cf_raw_helpfile(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     return add_helpfile(player, cmd, str, 1);
 }
@@ -224,7 +224,7 @@ CF_Result cf_raw_helpfile(int *vp __attribute__((unused)), char *str, long extra
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_include(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     FILE *fp = NULL;
     char *cp = NULL, *ap = NULL, *zp = NULL, *buf = NULL;

@@ -17,6 +17,7 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
+#include "conf_internal.h"
 
 #include <stdbool.h>
 #include <ctype.h>
@@ -40,7 +41,7 @@ extern STATEDATA mushstate;
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_infotext(int *vp __attribute__((unused)), char *str, long extra __attribute__((unused)), dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
+CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     LINKEDLIST *itp = NULL, *prev = NULL;
     char *fvalue = NULL, *tokst = NULL;
@@ -589,7 +590,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_set_flags(int *vp, char *str, long extra __attribute__((unused)), dbref player, char *cmd)
+CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     char *sp = NULL, *tokst = NULL;
     FLAGENT *fp = NULL;
@@ -680,7 +681,7 @@ CF_Result cf_set_flags(int *vp, char *str, long extra __attribute__((unused)), d
  * @param cmd       Command
  * @return CF_Result
  */
-CF_Result cf_badname(int *vp __attribute__((unused)), char *str, long extra, dbref player __attribute__((unused)), char *cmd __attribute__((unused)))
+CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
 {
     if (extra)
     {

@@ -174,7 +174,7 @@ CF_Result cf_read(char *fn)
  * @param value     New value for parameter
  * @return void
  */
-void do_admin(dbref player, dbref cause __attribute__((unused)), int extra __attribute__((unused)), char *kw, char *value)
+void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
 {
     int i = cf_set(kw, value, player);
 
