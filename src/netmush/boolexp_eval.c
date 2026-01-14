@@ -25,10 +25,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-// Forward declarations
-static bool check_attr_lock(BOOLEXP *b, dbref player, dbref from, bool check_inventory);
-static inline bool check_attr(dbref player, dbref lockobj, ATTR *attr, char *key);
-
 /**
  * @defgroup boolexp_memory Memory Management Functions
  * @ingroup boolexp_internal
