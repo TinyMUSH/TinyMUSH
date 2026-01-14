@@ -3357,9 +3357,9 @@ int main(int argc, char *argv[])
 	 * Abort if someone tried to set the number of global registers to
 	 * something stupid. Also adjust the character table if we need to.
 	 */
-	if ((mushconf.max_global_regs < MIN_GLOBAL_REGS) || (mushconf.max_global_regs > MAX_GLOBAL_REGS))
+	if ((mushconf.max_global_regs < 10) || (mushconf.max_global_regs > 36))
 	{
-		fprintf(stderr, "max_global_registers is configured to be less than %d or more than %d. Please fix this error.\n", MIN_GLOBAL_REGS, MAX_GLOBAL_REGS);
+		fprintf(stderr, "max_global_registers is configured to be less than 10 or more than 36. Please fix this error.\n");
 		exit(EXIT_FAILURE);
 	}
 
