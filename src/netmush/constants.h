@@ -23,6 +23,17 @@
 #define XMAGIC 0x00deadbeefbaad00 /*!< __XMALLOC magic ID */
 
 /**
+ * @brief Global registers configuration limits
+ *
+ * Global registers (%q0-%q9, %qa-%qz) are used for temporary storage
+ * during command execution. The min/max values define valid configuration
+ * range, and the default is the recommended maximum.
+ */
+#define MIN_GLOBAL_REGS 10  /*!< Minimum global registers (0-9) */
+#define MAX_GLOBAL_REGS 36  /*!< Maximum global registers (0-9, a-z) */
+#define DEFAULT_GLOBAL_REGS 36  /*!< Default number of global registers */
+
+/**
  * @brief Maximum iterations for list/exit traversal in match.c
  *
  * Prevents infinite loops when traversing potentially circular

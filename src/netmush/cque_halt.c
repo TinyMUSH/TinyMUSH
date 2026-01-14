@@ -225,7 +225,7 @@ void remove_waitq(BQUE *qptr)
  * @param player DBref of player
  * @param cause  DBref of cause
  * @param key    Key
- * @param pidstr Pîd of the queue
+ * @param pidstr PID of the queue entry
  */
 void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {

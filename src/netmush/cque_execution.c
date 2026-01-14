@@ -519,15 +519,15 @@ int do_top(int ncmds)
 /**
  * @brief tell player what commands they have pending in the queue
  *
- * @param player      DBref of player
- * @param key         Key
- * @param queue       Queue Entry
- * @param qtot        Queue Total
- * @param qent        Queue Entries
- * @param qdel        Queue Deleted
- * @param player_targ DBref of player target
- * @param obj_targ    DBref of object target
- * @param header      Header
+ * @param player      DBref of player viewing the queue
+ * @param key         Display mode (PS_BRIEF, PS_SUMM, or PS_LONG)
+ * @param queue       Queue entry list to examine
+ * @param qtot        Pointer to total queue entries counter (output)
+ * @param qent        Pointer to matching queue entries counter (output)
+ * @param qdel        Pointer to deleted entries counter (output)
+ * @param player_targ DBref of player target to filter (NOTHING for all)
+ * @param obj_targ    DBref of object target to filter (NOTHING for all)
+ * @param header      Queue name for display header
  */
 void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
@@ -636,8 +636,8 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  *
  * @param player DBref of player
  * @param cause  DBref of cause
- * @param key    Key
- * @param target Target
+ * @param key    Display switches (PS_ALL, PS_BRIEF, PS_SUMM, PS_LONG)
+ * @param target Target object or player name to filter
  */
 void do_ps(dbref player, dbref cause, int key, char *target)
 {
@@ -746,8 +746,8 @@ void do_ps(dbref player, dbref cause, int key, char *target)
  *
  * @param player DBref of player
  * @param cause  DBref of cause
- * @param key    Key
- * @param arg    Arguments
+ * @param key    Operation mode (QUEUE_KICK or QUEUE_WARP)
+ * @param arg    Number of commands to process or time adjustment
  */
 void do_queue(dbref player, dbref cause, int key, char *arg)
 {
@@ -870,11 +870,11 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
  *
  * @param player DBref of player
  * @param cause  DBref of cause
- * @param key    Key
- * @param event  Event
- * @param cmd    Command
- * @param cargs  Command arguments
- * @param ncargs Number of commands
+ * @param key    Mode flags (WAIT_PID, WAIT_UNTIL)
+ * @param event  Wait time or semaphore object specification
+ * @param cmd    Command to execute after wait
+ * @param cargs  Command arguments array
+ * @param ncargs Number of command arguments
  */
 void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {

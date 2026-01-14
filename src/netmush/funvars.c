@@ -154,7 +154,7 @@ int set_register(const char *funcname, char *name, char *data)
 
         if (!mushstate.rdata->q_alloc)
         {
-            a_size = (regnum < 10) ? 10 : mushconf.max_global_regs;
+            a_size = (regnum < MIN_GLOBAL_REGS) ? MIN_GLOBAL_REGS : mushconf.max_global_regs;
             mushstate.rdata->q_alloc = a_size;
             mushstate.rdata->q_regs = XCALLOC(a_size, sizeof(char *), "mushstate.rdata->q_regs");
             mushstate.rdata->q_lens = XCALLOC(a_size, sizeof(int), "mushstate.rdata->q_lens");

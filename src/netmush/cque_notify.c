@@ -32,11 +32,11 @@ extern void remove_waitq(BQUE *);
  * @brief Notify commands from the queue and perform or discard them.
  *
  * @param player DBref of player
- * @param sem    DBref of sem
- * @param attr	 Attributes
- * @param key 	 Key
- * @param count  Counter
- * @return int
+ * @param sem    DBref of semaphore object
+ * @param attr   Attribute number (0 for default A_SEMAPHORE)
+ * @param key    Operation mode (NFY_NFY to notify, NFY_DRAIN to drain)
+ * @param count  Number of entries to notify
+ * @return int   Number of entries actually notified
  */
 int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 {
@@ -255,9 +255,9 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
  * @brief Adjust the wait time on an existing entry.
  *
  * @param player  DBref of player
- * @param key     Key
- * @param pidstr  PID of the entry
- * @param timestr Wait time
+ * @param key     Mode flags (WAIT_UNTIL for absolute time)
+ * @param pidstr  PID of the queue entry to adjust
+ * @param timestr Wait time (seconds or absolute time if WAIT_UNTIL)
  */
 void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
