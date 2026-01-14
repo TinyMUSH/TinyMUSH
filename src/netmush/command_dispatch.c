@@ -28,6 +28,16 @@
 #include <unistd.h>
 #include <libgen.h>
 
+// Handler function pointers for command dispatch (defined in command_init.c)
+extern void (*handler_cs_no_args)(dbref, dbref, int);
+extern void (*handler_cs_one_args)(dbref, dbref, int, char *);
+extern void (*handler_cs_one_args_unparse)(dbref, char *);
+extern void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);
+extern void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
+extern void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);
+extern void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);
+extern void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int);
+
 /**
  * @brief Execute a command table entry with the appropriate access and privilege checks.
  *
