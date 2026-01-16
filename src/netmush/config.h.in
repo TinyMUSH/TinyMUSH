@@ -12,8 +12,7 @@
  *
  */
 
-#ifndef __CONFIG_H
-#define __CONFIG_H
+#pragma once
 
 #define _GNU_SOURCE
 
@@ -87,5 +86,3 @@
 #define DEFAULT_PID_HOME "${TINYMUSH_ROOT_DIRECTORY}"
 #define DEFAULT_SCRIPTS_HOME "${TINYMUSH_ROOT_DIRECTORY}/scripts"
 #define DEFAULT_TEXT_HOME "${TINYMUSH_ROOT_DIRECTORY}/docs"
-
-#endif /* __CONFIG_H */

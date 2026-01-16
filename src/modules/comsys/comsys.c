@@ -304,7 +304,7 @@ static int ok_chanperms(dbref player, CHANNEL *chp, int pflag, int oflag, BOOLEX
 
     /* Channel locks are evaluated with respect to the channel owner. */
 
-    if (eval_boolexp(player, chp->owner, chp->owner, c_lock))
+    if (boolexp_eval(player, chp->owner, chp->owner, c_lock))
         return 1;
 
     return 0;
@@ -1269,11 +1269,11 @@ void do_cdestroy(dbref player, dbref cause __attribute__((unused)), int key __at
             XFREE(chp->descrip);
         XFREE(chp->header);
         if (chp->join_lock)
-            free_boolexp(chp->join_lock);
+            boolexp_free(chp->join_lock);
         if (chp->trans_lock)
-            free_boolexp(chp->trans_lock);
+            boolexp_free(chp->trans_lock);
         if (chp->recv_lock)
-            free_boolexp(chp->recv_lock);
+            boolexp_free(chp->recv_lock);
         XFREE(chp);
         hashdelete(name, &mod_comsys_comsys_htab);
         return;
@@ -1329,13 +1329,13 @@ void do_cdestroy(dbref player, dbref cause __attribute__((unused)), int key __at
     XFREE(chp->header);
 
     if (chp->join_lock)
-        free_boolexp(chp->join_lock);
+        boolexp_free(chp->join_lock);
 
     if (chp->trans_lock)
-        free_boolexp(chp->trans_lock);
+        boolexp_free(chp->trans_lock);
 
     if (chp->recv_lock)
-        free_boolexp(chp->recv_lock);
+        boolexp_free(chp->recv_lock);
 
     XFREE(chp);
     hashdelete(name, &mod_comsys_comsys_htab);
@@ -1416,40 +1416,40 @@ void do_channel(dbref player, dbref cause __attribute__((unused)), int key, char
     {
         if (arg && *arg)
         {
-            boolp = parse_boolexp(player, arg, 0);
+            boolp = boolexp_parse(player, arg, 0);
 
             if (boolp == TRUE_BOOLEXP)
             {
                 notify(player, "I don't understand that key.");
-                free_boolexp(boolp);
+                boolexp_free(boolp);
                 return;
             }
 
             if (key & CHANNEL_JOIN)
             {
                 if (chp->join_lock)
-                    free_boolexp(chp->join_lock);
+                    boolexp_free(chp->join_lock);
 
                 chp->join_lock = boolp;
             }
             else if (key & CHANNEL_RECV)
             {
                 if (chp->recv_lock)
-                    free_boolexp(chp->recv_lock);
+                    boolexp_free(chp->recv_lock);
 
                 chp->recv_lock = boolp;
             }
             else if (key & CHANNEL_TRANS)
             {
                 if (chp->trans_lock)
-                    free_boolexp(chp->trans_lock);
+                    boolexp_free(chp->trans_lock);
 
                 chp->trans_lock = boolp;
             }
             else
             {
                 notify(player, "You must specify a valid lock type.");
-                free_boolexp(boolp);
+                boolexp_free(boolp);
                 return;
             }
 
@@ -1460,21 +1460,21 @@ void do_channel(dbref player, dbref cause __attribute__((unused)), int key, char
             if (key & CHANNEL_JOIN)
             {
                 if (chp->join_lock)
-                    free_boolexp(chp->join_lock);
+                    boolexp_free(chp->join_lock);
 
                 chp->join_lock = NULL;
             }
             else if (key & CHANNEL_RECV)
             {
                 if (chp->recv_lock)
-                    free_boolexp(chp->recv_lock);
+                    boolexp_free(chp->recv_lock);
 
                 chp->recv_lock = NULL;
             }
             else if (key & CHANNEL_TRANS)
             {
                 if (chp->trans_lock)
-                    free_boolexp(chp->trans_lock);
+                    boolexp_free(chp->trans_lock);
 
                 chp->trans_lock = NULL;
             }
@@ -2202,13 +2202,13 @@ static void comsys_data_update(CHANNEL *chp, dbref obj)
     dbref aowner;
     int aflags, alen;
     key = atr_get(obj, A_LOCK, &aowner, &aflags, &alen);
-    chp->join_lock = parse_boolexp(obj, key, 1);
+    chp->join_lock = boolexp_parse(obj, key, 1);
     XFREE(key);
     key = atr_get(obj, A_LUSE, &aowner, &aflags, &alen);
-    chp->trans_lock = parse_boolexp(obj, key, 1);
+    chp->trans_lock = boolexp_parse(obj, key, 1);
     XFREE(key);
     key = atr_get(obj, A_LENTER, &aowner, &aflags, &alen);
-    chp->recv_lock = parse_boolexp(obj, key, 1);
+    chp->recv_lock = boolexp_parse(obj, key, 1);
     XFREE(key);
     key = atr_pget(obj, A_DESC, &aowner, &aflags, &alen);
 
@@ -2388,11 +2388,11 @@ static void read_comsys(FILE *fp, int com_ver)
                 if (chp->descrip)
                     XFREE(chp->descrip);
                 if (chp->join_lock)
-                    free_boolexp(chp->join_lock);
+                    boolexp_free(chp->join_lock);
                 if (chp->trans_lock)
-                    free_boolexp(chp->trans_lock);
+                    boolexp_free(chp->trans_lock);
                 if (chp->recv_lock)
-                    free_boolexp(chp->recv_lock);
+                    boolexp_free(chp->recv_lock);
                 XFREE(chp);
                 XFREE(getstring(fp, 0));
                 c = getc(fp);

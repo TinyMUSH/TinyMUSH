@@ -10,8 +10,7 @@
  *
  */
 
-#ifndef __DB_STORAGE_H
-#define __DB_STORAGE_H
+#pragma once
 
 #include "typedefs.h"
 #include <stdbool.h>
@@ -62,5 +61,3 @@ bool dddb_close(void);
 UDB_DATA db_get(UDB_DATA gamekey, unsigned int type);
 int db_put(UDB_DATA gamekey, UDB_DATA gamedata, unsigned int type);
 int db_del(UDB_DATA gamekey, unsigned int type);
-
-#endif /* __DB_BACKEND_H */

@@ -3649,7 +3649,7 @@ int main(int argc, char *argv[])
 	}
 
 	mushstate.loading_db = 0;
-	set_signals();
+	bsd_signal_enable();
 
 	/*
 	 * Do a consistency check and set up the freelist
@@ -3833,9 +3833,9 @@ int main(int argc, char *argv[])
 	}
 
 	init_timer();
-	shovechars(mushconf.port);
+	bsd_main_event_loop(mushconf.port);
 	log_write(LOG_STARTUP, "INI", "SHDN", "Going down.");
-	close_sockets(0, (char *)"Going down - Bye");
+	bsd_conn_all_close(0, (char *)"Going down - Bye");
 	dump_database();
 	db_sync_attributes();
 	dddb_close();

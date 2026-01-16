@@ -1635,7 +1635,7 @@ void load_restart_db(void)
         if (fstat(d->descriptor, &fstatbuf) < 0)
         {
             log_write(LOG_PROBLEMS, "ERR", "RESTART", "Bad descriptor %d", d->descriptor);
-            shutdownsock(d, R_SOCKDIED);
+            bsd_conn_shutdown(d, R_SOCKDIED);
         }
     }
 
@@ -1644,7 +1644,7 @@ void load_restart_db(void)
         {
             if (!isPlayer(d->player))
             {
-                shutdownsock(d, R_QUIT);
+                bsd_conn_shutdown(d, R_QUIT);
             }
         }
 

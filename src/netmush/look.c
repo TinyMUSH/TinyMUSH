@@ -877,11 +877,11 @@ void view_atr(dbref player, dbref thing, ATTR *ap, char *raw_text, dbref aowner,
 	if (ap->flags & AF_IS_LOCK)
 	{
 		BOOLEXP *bexp = NULL;
-		bexp = parse_boolexp(player, raw_text, 1);
+		bexp = boolexp_parse(player, raw_text, 1);
 		if (bexp)
 		{
 			text = unparse_boolexp(player, bexp);
-			free_boolexp(bexp);
+			boolexp_free(bexp);
 		}
 		else
 		{
@@ -1761,12 +1761,12 @@ void debug_examine(dbref player, dbref thing)
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Powers  = %s", buf);
 	XFREE(buf);
 	buf = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-	bexp = parse_boolexp(player, buf, 1);
+	bexp = boolexp_parse(player, buf, 1);
 	XFREE(buf);
 	buf = unparse_boolexp(player, bexp);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Lock    = %s", buf);
 	XFREE(buf);
-	free_boolexp(bexp);
+	boolexp_free(bexp);
 	buf = XMALLOC(LBUF_SIZE, "buf");
 	cp = buf;
 	XSAFELBSTR((char *)"Attr list: ", buf, &cp);
@@ -2101,7 +2101,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 		buf2 = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
 		// An empty lock or NULL lock still constitutes a valid lock (meaning the thing is unlocked)
 		// The parser can handle these cases and correctly returns TRUE_BOOLEXP (aka NULL), thus no null check is required here.
-		bexp = parse_boolexp(player, buf2, 1);
+		bexp = boolexp_parse(player, buf2, 1);
 		// A NULL boolexp is a valid boolexp (meaning the thing has no lock); the unparser can safely handle those, thus no null check is required here.
 		buf = unparse_boolexp(player, bexp);
 		if (buf)
@@ -2109,7 +2109,7 @@ void do_examine(dbref player, dbref cause, int key, char *name)
 			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "Owner: %s  Key: %s %s: %d", Name(Owner(thing)), buf, mushconf.many_coins, Pennies(thing));
 			XFREE(buf);
 		}
-		free_boolexp(bexp);
+		boolexp_free(bexp);
 		XFREE(buf2);
 		mushconf.many_coins[0] = savec;
 		if (localtime_r(&CreateTime(thing), &tm_created) != NULL)
@@ -2941,7 +2941,7 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 	}
 
 	thingname = atr_get(thing, A_LOCK, &aowner, &aflags, &alen);
-	bexp = parse_boolexp(player, thingname, 1);
+	bexp = boolexp_parse(player, thingname, 1);
 
 	/*
 	 * Determine the name of the thing to use in reporting and then
@@ -3002,7 +3002,7 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 		XFREE(buf);
 	}
 
-	free_boolexp(bexp);
+	boolexp_free(bexp);
 	/*
 	 * Report attributes
 	 */
@@ -3040,9 +3040,9 @@ void do_decomp(dbref player, dbref cause, int key, char *name, char *qual)
 		{
 			if (attr->flags & AF_IS_LOCK)
 			{
-				bexp = parse_boolexp(player, got, 1);
+				bexp = boolexp_parse(player, got, 1);
 				ltext = unparse_boolexp_decompile(player, bexp);
-				free_boolexp(bexp);
+				boolexp_free(bexp);
 				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "@lock/%s %s=%s", attr->name, thingname, ltext);
 				XFREE(ltext);
 			}
