@@ -25,12 +25,6 @@
 #include <netdb.h>
 #include <sys/msg.h>
 
-/**
- * @brief Message queue related globals (shared across modules)
- *
- */
-extern key_t msgq_Key;	/*!< Message Queue Key */
-extern int msgq_Id;		/*!< Message Queue ID (cached globally) */
 
 /**
  * @brief Create a DNS resolver message queue entry from an IP address string
@@ -53,7 +47,7 @@ extern int msgq_Id;		/*!< Message Queue ID (cached globally) */
  *
  * @note Thread-safe: No global state is modified.
  */
-static MSGQ_DNSRESOLVER _mk_msgq_dnsresolver(const char *addr)
+MSGQ_DNSRESOLVER bsd_dns_message_create_request(const char *addr)
 {
 	MSGQ_DNSRESOLVER h;
 
@@ -106,22 +100,20 @@ static MSGQ_DNSRESOLVER _mk_msgq_dnsresolver(const char *addr)
  * 4. Main thread receives and processes the hostname
  * 5. Shutdown: Main thread sends message with addrf=AF_UNSPEC to terminate thread
  */
-static void *_dnsResolver(void *args)
+void *bsd_dns_resolver_thread_main(void *args)
 {
-	key_t msgq_key = *((key_t *)args);
-	int msgq_id;
+	int msgq_id = *((int *)args);
 	MSGQ_DNSRESOLVER request_msg;
 
-	/* Create/open the message queue */
-	msgq_id = msgget(msgq_key, 0666 | IPC_CREAT);
-	if (msgq_id == -1)
+	/* Verify the message queue is valid */
+	if (msgq_id <= 0)
 	{
-		log_perror("DNS", "FAIL", "_dnsResolver", "msgget");
+		log_perror("DNS", "FAIL", "bsd_dns_resolver_thread_main", "Invalid message queue ID");
 		return NULL;
 	}
 
 	/* Main processing loop */
-	for (;;)
+	while(true)
 	{
 		MSGQ_DNSRESOLVER response_msg;
 		int lookup_success = 0;
@@ -215,19 +207,9 @@ static void *_dnsResolver(void *args)
  *       - Cache performance metrics
  *       - Error conditions and recovery status
  */
-void check_dnsResolver_status(dbref player, dbref cause, int key)
+void bsd_dns_status_check(dbref player, dbref cause, int key)
 {
 	/** @todo Implement DNS resolver status reporting */
 	notify(player, "This feature is not currently available.");
 }
 
-/* Internal wrapper exports for bsd_main.c */
-MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr)
-{
-	return _mk_msgq_dnsresolver(addr);
-}
-
-void *dnsResolver(void *args)
-{
-	return _dnsResolver(args);
-}

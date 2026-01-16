@@ -86,7 +86,9 @@ extern int process_output(DESC *d);
 extern void close_sockets(int emergency, char *message);
 extern void report(void);
 extern void set_signals(void);
-extern void check_dnsResolver_status(dbref player, dbref cause, int key);
+extern void bsd_dns_status_check(dbref player, dbref cause, int key);
+extern MSGQ_DNSRESOLVER bsd_dns_message_create_request(const char *addr);
+extern void *bsd_dns_resolver_thread_main(void *args);
 
 /* command.c */
 extern void init_cmdtab(void);

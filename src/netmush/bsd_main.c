@@ -42,7 +42,6 @@ DESC *descriptor_list = NULL; /*!< Descriptor list */
  * @brief Message queue related globals
  *
  */
-key_t msgq_Key = 0; /*!< Message Queue Key */
 int msgq_Id = 0;	/*!< Message Queue ID (cached globally) */
 
 /**
@@ -56,8 +55,6 @@ extern int make_socket(int port);
 extern DESC *new_connection(int sock);
 extern int process_input(DESC *d);
 extern int process_output(DESC *d);
-extern MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr);
-extern void *dnsResolver(void *args);
 extern void shutdownsock(DESC *d, int reason);
 
 /**
@@ -142,13 +139,13 @@ void shovechars(int port)
 
 	msgq_Path = XASPRINTF("s", "/tmp/%sXXXXXX", mushconf.mush_shortname);
 	msgq_Path = mkdtemp(msgq_Path);
-	msgq_Key = ftok(msgq_Path, 0x32);
-	msgq_Id_local = msgget(msgq_Key, 0666 | IPC_CREAT);
+	key_t msgq_key_local = ftok(msgq_Path, 0x32);
+	msgq_Id_local = msgget(msgq_key_local, 0666 | IPC_CREAT);
 	msgq_Id = msgq_Id_local;
 	memset(&msgq_Dns, 0, sizeof(msgq_Dns));
 
 	/* Start the DNS resolver thread */
-	pthread_create(&thread_Dns, NULL, dnsResolver, &msgq_Key);
+	pthread_create(&thread_Dns, NULL, bsd_dns_resolver_thread_main, &msgq_Id_local);
 
 	/* This is the main loop of the MUSH, everything derive from here... */
 	while (mushstate.shutdown_flag == 0)

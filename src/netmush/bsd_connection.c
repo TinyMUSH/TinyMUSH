@@ -26,14 +26,7 @@
 #include <time.h>
 #include <unistd.h>
 
-/**
- * @brief Shared globals
- *
- */
-extern int ndescriptors;
-extern int maxd;
-extern DESC *descriptor_list;
-extern int msgq_Id;
+
 
 /* Forward declarations for functions in other modules */
 extern void make_nonblocking(int s);

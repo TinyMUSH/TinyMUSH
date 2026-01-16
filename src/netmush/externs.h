@@ -29,6 +29,7 @@ extern DESC *descriptor_list;
 extern int sock;
 extern int maxd;
 extern int ndescriptors;
+extern int msgq_Id;
 
 extern CONFDATA mushconf;
 extern STATEDATA mushstate;

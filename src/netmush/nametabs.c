@@ -705,7 +705,7 @@ CMDENT command_table[] = {
     {(char *)"@set", set_sw, CA_NO_SLAVE | CA_GBL_BUILD | CA_NO_GUEST, 0, CS_TWO_ARG, NULL, NULL, NULL, {do_set}},
     {(char *)"@shutdown", shutdown_sw, CA_WIZARD, 0, CS_ONE_ARG, NULL, NULL, NULL, {do_shutdown}},
     {(char *)"@stats", stats_sw, CA_PUBLIC, 0, CS_ONE_ARG | CS_INTERP, NULL, NULL, NULL, {do_stats}},
-    {(char *)"@startslave", NULL, CA_WIZARD, 0, CS_NO_ARGS, NULL, NULL, NULL, {check_dnsResolver_status}},
+    {(char *)"@startslave", NULL, CA_WIZARD, 0, CS_NO_ARGS, NULL, NULL, NULL, {bsd_dns_status_check}},
     {(char *)"@sweep", sweep_sw, CA_PUBLIC, 0, CS_ONE_ARG, NULL, NULL, NULL, {do_sweep}},
     {(char *)"@switch", switch_sw, CA_GBL_INTERP, 0, CS_TWO_ARG | CS_ARGV | CS_CMDARG | CS_NOINTERP | CS_STRIP_AROUND, NULL, NULL, NULL, {do_switch}},
     {(char *)"@teleport", teleport_sw, CA_NO_GUEST, TELEPORT_DEFAULT, CS_TWO_ARG | CS_INTERP | CS_FUNCTION, NULL, NULL, NULL, {do_teleport}},
