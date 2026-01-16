@@ -50,7 +50,7 @@
  *
  * @warning This function may return -1, caller must check return value
  */
-static int _make_socket(int port)
+static int _bsd_socket_create(int port)
 {
 	int sock_fd;
 	int reuse_addr = 1;
@@ -123,7 +123,7 @@ static int _make_socket(int port)
  * 1. Set non-blocking flag via fcntl() - supports both FNDELAY and O_NDELAY
  * 2. Disable SO_LINGER to prevent TIME_WAIT state accumulation
  */
-static inline void _make_nonblocking(int s)
+static inline void _bsd_socket_nonblocking_set(int s)
 {
 	struct linger ling;
 
@@ -153,12 +153,12 @@ static inline void _make_nonblocking(int s)
 }
 
 /* Public exports for bsd_main.c and bsd_connection.c */
-int make_socket(int port)
+int bsd_socket_create(int port)
 {
-	return _make_socket(port);
+	return _bsd_socket_create(port);
 }
 
-void make_nonblocking(int s)
+void bsd_socket_nonblocking_set(int s)
 {
-	_make_nonblocking(s);
+	_bsd_socket_nonblocking_set(s);
 }

@@ -29,17 +29,17 @@
 
 
 /* Forward declarations for functions in other modules */
-extern void make_nonblocking(int s);
-extern int process_output(DESC *d);
+extern void bsd_socket_nonblocking_set(int s);
+extern int bsd_io_output_process(DESC *d);
 
 /**
- * @brief Static debug label for new_connection
+ * @brief Static debug label for bsd_conn_new
  *
  */
-static const char *DBG_NEW_CONNECTION = "< new_connection>";
+static const char *DBG_NEW_CONNECTION = "< bsd_conn_new >";
 
 /* Forward declarations */
-static DESC *_initializesock(int s, struct sockaddr_in *a);
+static DESC *_bsd_sock_initialize(int s, struct sockaddr_in *a);
 
 /**
  * @brief Accept a new client connection and perform initial setup
@@ -75,9 +75,9 @@ static DESC *_initializesock(int s, struct sockaddr_in *a);
  *    - Return initialized descriptor
  *
  * @warning Returns NULL on failure; caller must check return value
- * @see initializesock() for descriptor initialization details
+ * @see _bsd_sock_initialize() for descriptor initialization details
  */
-static DESC *_new_connection(int sock)
+static DESC *_bsd_conn_new(int sock)
 {
 	int newsock = 0;
 	char *cmdsave = NULL;
@@ -119,7 +119,7 @@ static DESC *_new_connection(int sock)
 		msgsnd(msgq_Id, &msgData, sizeof(msgData.payload), 0);
 
 		log_write(LOG_NET, "NET", "CONN", "[%d/%s] Connection opened (remote port %d)", newsock, conn_addr_str, ntohs(addr.sin_port));
-		d = _initializesock(newsock, &addr);
+		d = _bsd_sock_initialize(newsock, &addr);
 	}
 
 	/* Do not free debug_cmd - it's pointing to a static constant */
@@ -168,7 +168,7 @@ static DESC *_new_connection(int sock)
  * - Limits: Standard command quota, idle timeout, retry limits
  * - Resources: No colormap, program data, or special buffers allocated
  */
-static DESC *_initializesock(int s, struct sockaddr_in *a)
+static DESC *_bsd_sock_initialize(int s, struct sockaddr_in *a)
 {
 	DESC *d = NULL;
 
@@ -184,7 +184,7 @@ static DESC *_initializesock(int s, struct sockaddr_in *a)
 	d->address = *a;
 
 	/* Configure socket for non-blocking I/O */
-	make_nonblocking(s);
+	bsd_socket_nonblocking_set(s);
 
 	/* Set default limits and timeouts */
 	d->retries_left = mushconf.retry_limit;
@@ -231,7 +231,7 @@ static DESC *_initializesock(int s, struct sockaddr_in *a)
  * @note Memory: No dynamic allocation, all strings are compile-time constants
  *
  */
-inline char *connReasons(int reason)
+inline char *bsd_conn_reason_string(int reason)
 {
 	static const char *reason_strings[] = {
 		"Unspecified",
@@ -276,7 +276,7 @@ inline char *connReasons(int reason)
  * @note Memory: No dynamic allocation, all strings are compile-time constants
  *
  */
-inline char *connMessages(int reason)
+inline char *bsd_conn_message_string(int reason)
 {
 	static const char *message_strings[] = {
 		"unknown",
@@ -335,7 +335,7 @@ inline char *connMessages(int reason)
  * - R_SOCKDIED: Skips quit file display due to network failure
  * - Forbidden IPs: Converts logout to quit to prevent reconnection exploits
  */
-void _shutdownsock(DESC *d, int reason)
+void _bsd_conn_shutdown(DESC *d, int reason)
 {
 	char *buff = NULL, *buff2 = NULL;
 	time_t now = 0L;
@@ -364,18 +364,18 @@ void _shutdownsock(DESC *d, int reason)
 				fcache_dump(d, FC_QUIT);
 			}
 
-			log_write(LOG_NET | LOG_LOGIN, "NET", "DISC", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, connReasons(reason), d->command_count, d->input_tot, d->output_tot, conn_time);
+			log_write(LOG_NET | LOG_LOGIN, "NET", "DISC", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, bsd_conn_reason_string(reason), d->command_count, d->input_tot, d->output_tot, conn_time);
 		}
 		else
 		{
-			log_write(LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, connReasons(reason), d->command_count, d->input_tot, d->output_tot, conn_time);
+			log_write(LOG_NET | LOG_LOGIN, "NET", "LOGO", "[%d/%s] Logout by %s <%s: %d cmds, %d bytes in, %d bytes out, %d secs>", d->descriptor, d->addr, buff, bsd_conn_reason_string(reason), d->command_count, d->input_tot, d->output_tot, conn_time);
 		}
 		/* If requested, write an accounting record of the form: Plyr# Flags Cmds ConnTime Loc Money [Site] \<DiscRsn\> Name */
 		now = mushstate.now - d->connected_at;
 		buff2 = unparse_flags(GOD, d->player);
-		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, connReasons(reason), buff);
+		log_write(LOG_ACCOUNTING, "DIS", "ACCT", "%d %s %d %d %d %d [%s] <%s> %s", d->player, buff2, d->command_count, (int)now, Location(d->player), Pennies(d->player), d->addr, bsd_conn_reason_string(reason), buff);
 		XFREE(buff2);
-		announce_disconnect(d->player, d, connMessages(reason));
+		announce_disconnect(d->player, d, bsd_conn_message_string(reason));
 	}
 	else
 	{
@@ -384,11 +384,11 @@ void _shutdownsock(DESC *d, int reason)
 			reason = R_QUIT;
 		}
 
-		log_write(LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, connReasons(reason));
+		log_write(LOG_SECURITY | LOG_NET, "NET", "DISC", "[%d/%s] Connection closed, never connected. <Reason: %s>", d->descriptor, d->addr, bsd_conn_reason_string(reason));
 	}
 
 	XFREE(buff);
-	process_output(d);
+	bsd_io_output_process(d);
 	clearstrings(d);
 
 	/* If this was our only connection, get out of interactive mode. */
@@ -503,17 +503,17 @@ void _shutdownsock(DESC *d, int reason)
 }
 
 /* Public exports for bsd_main.c */
-DESC *new_connection(int sock)
+DESC *bsd_conn_new(int sock)
 {
-	return _new_connection(sock);
+	return _bsd_conn_new(sock);
 }
 
-DESC *initializesock(int s, struct sockaddr_in *a)
+DESC *bsd_sock_initialize(int s, struct sockaddr_in *a)
 {
-	return _initializesock(s, a);
+	return _bsd_sock_initialize(s, a);
 }
 
-void shutdownsock(DESC *d, int reason)
+void bsd_conn_shutdown(DESC *d, int reason)
 {
-	_shutdownsock(d, reason);
+	_bsd_conn_shutdown(d, reason);
 }

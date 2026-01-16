@@ -295,7 +295,7 @@ void raw_broadcast(int inflags, char *template, ...)
 			{
 				queue_string(d, NULL, buff);
 				queue_write(d, "\r\n", 2);
-				process_output(d);
+				bsd_io_output_process(d);
 			}
 		}
 	va_end(ap);
@@ -343,7 +343,7 @@ void queue_write(DESC *d, const char *b, int n)
 
 	if (d->output_size + n > mushconf.output_limit)
 	{
-		process_output(d);
+		bsd_io_output_process(d);
 	}
 
 	left = mushconf.output_limit - d->output_size - n;
@@ -1504,7 +1504,7 @@ int boot_off(dbref player, char *message)
 			queue_write(d, "\r\n", 2);
 		}
 
-		shutdownsock(d, R_BOOT);
+		bsd_conn_shutdown(d, R_BOOT);
 		count++;
 	}
 	return count;
@@ -1526,7 +1526,7 @@ int boot_by_port(int port, int no_god, char *message)
 				queue_write(d, "\r\n", 2);
 			}
 
-			shutdownsock(d, R_BOOT);
+			bsd_conn_shutdown(d, R_BOOT);
 			count++;
 		}
 	}
@@ -1664,7 +1664,7 @@ void check_idle(void)
 			if ((idletime > d->timeout) && !Can_Idle(d->player))
 			{
 				queue_rawstring(d, NULL, "*** Inactivity Timeout ***\r\n");
-				shutdownsock(d, R_TIMEOUT);
+				bsd_conn_shutdown(d, R_TIMEOUT);
 			}
 			else if (mushconf.idle_wiz_dark && (idletime > mushconf.idle_timeout) && Can_Idle(d->player) && Can_Hide(d->player) && !Hidden(d->player))
 			{
@@ -1680,7 +1680,7 @@ void check_idle(void)
 			if (idletime > mushconf.conn_timeout)
 			{
 				queue_rawstring(d, NULL, "*** Login Timeout ***\r\n");
-				shutdownsock(d, R_TIMEOUT);
+				bsd_conn_shutdown(d, R_TIMEOUT);
 			}
 		}
 	}
@@ -2275,7 +2275,7 @@ void failconn(const char *logcode, const char *logtype, const char *logreason, D
 	XFREE(command);
 	XFREE(user);
 	XFREE(password);
-	shutdownsock(d, disconnect_reason);
+	bsd_conn_shutdown(d, disconnect_reason);
 }
 
 const char *connect_fail = "Either that player does not exist, or has a different password.\r\n";
@@ -2357,7 +2357,7 @@ int check_connect(DESC *d, char *msg)
 				XFREE(command);
 				XFREE(user);
 				XFREE(password);
-				shutdownsock(d, R_BADLOGIN);
+				bsd_conn_shutdown(d, R_BADLOGIN);
 				XFREE(mushstate.debug_cmd);
 				mushstate.debug_cmd = cmdsave;
 				return 0;
@@ -2399,12 +2399,12 @@ int check_connect(DESC *d, char *msg)
 			if ((mushconf.log_info & LOGOPT_LOC) && Has_location(player))
 			{
 				lname = log_getname(Location(player));
-				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, connReasons(reason), user);
+				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s in %s %s %s", d->descriptor, d->addr, pname, lname, bsd_conn_reason_string(reason), user);
 				XFREE(lname);
 			}
 			else
 			{
-				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s %s %s", d->descriptor, d->addr, pname, connReasons(reason), user);
+				log_write(LOG_LOGIN, "CON", "LOGIN", "[%d/%s] %s %s %s", d->descriptor, d->addr, pname, bsd_conn_reason_string(reason), user);
 			}
 
 			XFREE(pname);
@@ -2456,7 +2456,7 @@ int check_connect(DESC *d, char *msg)
 				XFREE(buff);
 			}
 
-			announce_connect(player, d, connMessages(reason));
+			announce_connect(player, d, bsd_conn_message_string(reason));
 
 			/*
 			 * If stuck in an @prog, show the prompt
@@ -2543,14 +2543,14 @@ int check_connect(DESC *d, char *msg)
 			else
 			{
 				name = log_getname(player);
-				log_write(LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, connReasons(reason), name);
+				log_write(LOG_LOGIN | LOG_PCREATES, "CON", "CREA", "[%d/%s] %s %s", d->descriptor, d->addr, bsd_conn_reason_string(reason), name);
 				XFREE(name);
 				move_object(player, (Good_loc(mushconf.start_room) ? mushconf.start_room : 0));
 				d->flags |= DS_CONNECTED;
 				d->connected_at = time(NULL);
 				d->player = player;
 				fcache_dump(d, FC_CREA_NEW);
-				announce_connect(player, d, connMessages(R_CREATE));
+				announce_connect(player, d, bsd_conn_message_string(R_CREATE));
 			}
 		}
 	}
@@ -2574,11 +2574,11 @@ void logged_out_internal(DESC *d, int key, char *arg)
 	switch (key)
 	{
 	case CMD_QUIT:
-		shutdownsock(d, R_QUIT);
+		bsd_conn_shutdown(d, R_QUIT);
 		break;
 
 	case CMD_LOGOUT:
-		shutdownsock(d, R_LOGOUT);
+		bsd_conn_shutdown(d, R_LOGOUT);
 		break;
 
 	case CMD_WHO:

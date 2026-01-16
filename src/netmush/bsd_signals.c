@@ -31,9 +31,9 @@
 extern int maxd;
 
 /* Forward declarations for internal functions */
-static void _unset_signals(void);
-static inline void _check_panicking(int sig);
-static inline void _log_signal(const char *signame);
+static void _bsd_signal_disable(void);
+static inline void _bsd_signal_panic_check(int sig);
+static inline void _bsd_signal_log(const char *signame);
 
 /**
  * @brief Signal handler function for system signals
@@ -50,7 +50,7 @@ static inline void _log_signal(const char *signame);
  * @note Called automatically by signal handling system
  * @note Thread safety: Conforms to async-signal-safe requirements
  */
-static void _sighandler(int sig)
+static void _bsd_signal_handler(int sig)
 {
 	const char *signames[] = {"SIGZERO", "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGEMT", "SIGFPE", "SIGKILL", "SIGBUS", "SIGSEGV", "SIGSYS", "SIGPIPE", "SIGALRM", "SIGTERM", "SIGURG", "SIGSTOP", "SIGTSTP", "SIGCONT", "SIGCHLD", "SIGTTIN", "SIGTTOU", "SIGIO", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGLOST", "SIGUSR1", "SIGUSR2"};
 	int i = 0;
@@ -61,7 +61,7 @@ static void _sighandler(int sig)
 	switch (sig)
 	{
 	case SIGUSR1: /* Normal restart now */
-		_log_signal(signames[sig]);
+		_bsd_signal_log(signames[sig]);
 		do_restart(GOD, GOD, 0);
 		break;
 
@@ -86,7 +86,7 @@ static void _sighandler(int sig)
 		break;
 
 	case SIGHUP: /* Dump database soon */
-		_log_signal(signames[sig]);
+		_bsd_signal_log(signames[sig]);
 		mushstate.dump_counter = 0;
 		break;
 
@@ -102,8 +102,8 @@ static void _sighandler(int sig)
 #ifdef SIGXCPU
 	case SIGXCPU:
 #endif
-		_check_panicking(sig);
-		_log_signal(signames[sig]);
+		_bsd_signal_panic_check(sig);
+		_bsd_signal_log(signames[sig]);
 		raw_broadcast(0, "GAME: Caught signal %s, shutting down gracefully.", signames[sig]);
 		al_store();								/* Persist any in-memory attribute list before exit */
 		dump_database_internal(DUMP_DB_NORMAL); /* Use normal dump for graceful shutdown */
@@ -129,9 +129,9 @@ static void _sighandler(int sig)
 #ifdef SIGSYS
 	case SIGSYS:
 #endif
-		_check_panicking(sig);
-		_log_signal(signames[sig]);
-		report();
+		_bsd_signal_panic_check(sig);
+		_bsd_signal_log(signames[sig]);
+		bsd_status_report();
 
 		if (mushconf.sig_action != SA_EXIT)
 		{
@@ -145,7 +145,7 @@ static void _sighandler(int sig)
 			/* Try our best to dump a usable core by generating a second signal with the SIG_DFL action. */
 			if (fork() > 0)
 			{
-				_unset_signals();
+				_bsd_signal_disable();
 				/* In the parent process (easier to follow with gdb), we're about to return from this signal handler
 				 * and hope that a second signal is delivered. Meanwhile let's close all our files to avoid corrupting
 				 * the child process. */
@@ -164,17 +164,17 @@ static void _sighandler(int sig)
 		}
 		else
 		{
-			_unset_signals();
+			_bsd_signal_disable();
 			log_write_raw(1, "ABORT! bsd.c, SA_EXIT requested.\n");
 			write_status_file(NOTHING, "ABORT! bsd.c, SA_EXIT requested.");
 			abort();
 		}
 
 	case SIGABRT: /* Coredump now */
-		_check_panicking(sig);
-		_log_signal(signames[sig]);
-		report();
-		_unset_signals();
+		_bsd_signal_panic_check(sig);
+		_bsd_signal_log(signames[sig]);
+		bsd_status_report();
+		_bsd_signal_disable();
 		log_write_raw(1, "ABORT! bsd.c, SIGABRT received.\n");
 		write_status_file(NOTHING, "ABORT! bsd.c, SIGABRT received.");
 		abort();
@@ -192,7 +192,7 @@ static void _sighandler(int sig)
  * This function configures the server to respond appropriately to system signals, ensuring
  * proper shutdown, restart, and error handling capabilities.
  */
-void _set_signals(void)
+void _bsd_signal_setup(void)
 {
 	sigset_t sigs;
 	struct sigaction sa;
@@ -203,7 +203,7 @@ void _set_signals(void)
 	sigprocmask(SIG_UNBLOCK, &sigs, NULL);
 
 	/* Setup sigaction structure for our handler */
-	sa.sa_handler = _sighandler;
+	sa.sa_handler = _bsd_signal_handler;
 	sigemptyset(&sa.sa_mask);
 
 	/* Restart interrupted syscalls automatically */
@@ -221,7 +221,7 @@ void _set_signals(void)
 	sigaction(SIGPIPE, &sa, NULL);
 
 	/* Restore handler for remaining signals */
-	sa.sa_handler = _sighandler;
+	sa.sa_handler = _bsd_signal_handler;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	sigaction(SIGTRAP, &sa, NULL);
@@ -234,7 +234,7 @@ void _set_signals(void)
 	sigaction(SIGFPE, &sa, NULL);
 
 	/* Restore handler for remaining signals */
-	sa.sa_handler = _sighandler;
+	sa.sa_handler = _bsd_signal_handler;
 	sigaction(SIGILL, &sa, NULL);
 	sigaction(SIGSEGV, &sa, NULL);
 	sigaction(SIGABRT, &sa, NULL);
@@ -258,7 +258,7 @@ void _set_signals(void)
  * Removes all custom signal handlers installed by the server and restores the default
  * system signal dispositions.
  */
-static void _unset_signals(void)
+static void _bsd_signal_disable(void)
 {
 	struct sigaction sa;
 	sa.sa_handler = SIG_DFL;
@@ -277,7 +277,7 @@ static void _unset_signals(void)
  * Implements panic detection and recovery mechanism to prevent infinite loops
  * in signal handling.
  */
-static inline void _check_panicking(int sig)
+static inline void _bsd_signal_panic_check(int sig)
 {
 	/* If we are panicking, turn off signal catching and resignal */
 	if (mushstate.panicking)
@@ -299,33 +299,33 @@ static inline void _check_panicking(int sig)
  * Records the reception of a POSIX signal in the server's problem log for
  * diagnostic and monitoring purposes.
  */
-static inline void _log_signal(const char *signame)
+static inline void _bsd_signal_log(const char *signame)
 {
 	log_write(LOG_PROBLEMS, "SIG", "CATCH", "Caught signal %s", signame);
 }
 
 /* Public exports for bsd_main.c */
-void sighandler(int sig)
+void bsd_signal_handler(int sig)
 {
-	_sighandler(sig);
+	_bsd_signal_handler(sig);
 }
 
-void set_signals(void)
+void bsd_signal_enable(void)
 {
-	_set_signals();
+	_bsd_signal_setup();
 }
 
-void unset_signals(void)
+void bsd_signal_disable(void)
 {
-	_unset_signals();
+	_bsd_signal_disable();
 }
 
-void check_panicking(int sig)
+void bsd_signal_panic_check(int sig)
 {
-	_check_panicking(sig);
+	_bsd_signal_panic_check(sig);
 }
 
-void log_signal(const char *signame)
+void bsd_signal_log(const char *signame)
 {
-	_log_signal(signame);
+	_bsd_signal_log(signame);
 }

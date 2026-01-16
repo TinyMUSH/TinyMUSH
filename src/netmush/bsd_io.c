@@ -26,8 +26,8 @@
  * @brief Static debug labels
  *
  */
-static const char *DBG_PROCESS_OUTPUT = "< process_output >";
-static const char *DBG_PROCESS_INPUT = "< process_input >";
+static const char *DBG_PROCESS_OUTPUT = "< bsd_io_output_process >";
+static const char *DBG_PROCESS_INPUT = "< bsd_io_input_process >";
 
 /**
  * @brief Process and send pending output data to a client socket
@@ -68,7 +68,7 @@ static const char *DBG_PROCESS_INPUT = "< process_input >";
  * - write() returns -1 with errno == EWOULDBLOCK: Temporary block, return 1 (retry later)
  * - All data written successfully: Return 1
  */
-int process_output(DESC *d)
+int bsd_io_output_process(DESC *d)
 {
 	TBLOCK *tb = NULL, *save = NULL;
 	int cnt = 0;
@@ -174,7 +174,7 @@ static unsigned char char_valid_table[256] = {0};
  * remains static and is used for fast character validation throughout the
  * input processing pipeline.
  */
-static void _init_char_table(void)
+static void _bsd_io_chartable_init(void)
 {
 	static int initialized = 0;
 	if (initialized)
@@ -245,13 +245,13 @@ static void _init_char_table(void)
  * - Invalid controls: Filtered out
  * - Backspace/Delete: Handled for line editing
  */
-static int _process_input(DESC *d)
+static int _bsd_io_input_process(DESC *d)
 {
 	char *buf, *p, *pend, *q, *qend, *cmdsave;
 	int got, in, lost;
 	unsigned char ch, cmd, option, response[3];
 
-	_init_char_table();
+	_bsd_io_chartable_init();
 
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = (char *)DBG_PROCESS_INPUT;
@@ -480,12 +480,12 @@ static int _process_input(DESC *d)
 }
 
 /* Public exports for bsd_main.c */
-void init_char_table(void)
+void bsd_io_chartable_init(void)
 {
-	_init_char_table();
+	_bsd_io_chartable_init();
 }
 
-int process_input(DESC *d)
+int bsd_io_input_process(DESC *d)
 {
-	return _process_input(d);
+	return _bsd_io_input_process(d);
 }

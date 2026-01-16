@@ -48,14 +48,14 @@ int msgq_Id = 0;	/*!< Message Queue ID (cached globally) */
  * @brief Static debug labels
  *
  */
-static const char *DBG_SHOVECHARS = "< shovechars >";
+static const char *DBG_SHOVECHARS = "< bsd_main_event_loop >";
 
 /* Forward declarations for functions from other modules */
-extern int make_socket(int port);
-extern DESC *new_connection(int sock);
-extern int process_input(DESC *d);
-extern int process_output(DESC *d);
-extern void shutdownsock(DESC *d, int reason);
+extern int bsd_socket_create(int port);
+extern DESC *bsd_conn_new(int sock);
+extern int bsd_io_input_process(DESC *d);
+extern int bsd_io_output_process(DESC *d);
+extern void bsd_conn_shutdown(DESC *d, int reason);
 
 /**
  * @brief Main server event loop processing network I/O and game commands
@@ -97,7 +97,7 @@ extern void shutdownsock(DESC *d, int reason);
  * - Handles connection limits and descriptor exhaustion gracefully
  * - Supports hot restart by preserving existing socket during mushstate.restarting
  */
-void shovechars(int port)
+void bsd_main_event_loop(int port)
 {
 	fd_set input_set, output_set;
 	struct timeval last_slice, current_time, next_slice, timeout;
@@ -114,7 +114,7 @@ void shovechars(int port)
 
 	if (!mushstate.restarting)
 	{
-		sock = make_socket(port);
+		sock = bsd_socket_create(port);
 	}
 
 	if (!mushstate.restarting)
@@ -239,7 +239,7 @@ void shovechars(int port)
 					{
 						/* It's a player. Just toss the connection. */
 						log_write(LOG_PROBLEMS, "ERR", "EBADF", "Bad descriptor %d", d->descriptor);
-						shutdownsock(d, R_SOCKDIED);
+						bsd_conn_shutdown(d, R_SOCKDIED);
 					}
 				}
 
@@ -309,7 +309,7 @@ void shovechars(int port)
 		/* Check for new connection requests */
 		if (FD_ISSET(sock, &input_set))
 		{
-			newd = new_connection(sock);
+			newd = bsd_conn_new(sock);
 
 			if (!newd)
 			{
@@ -317,7 +317,7 @@ void shovechars(int port)
 
 				if (check)
 				{
-					log_perror("NET", "FAIL", NULL, "new_connection");
+					log_perror("NET", "FAIL", NULL, "bsd_conn_new");
 				}
 			}
 			else
@@ -341,18 +341,18 @@ void shovechars(int port)
 					s_Flags(d->player, Flags(d->player) & ~DARK);
 				}
 				/* Process received data */
-				if (!process_input(d))
+				if (!bsd_io_input_process(d))
 				{
-					shutdownsock(d, R_SOCKDIED);
+					bsd_conn_shutdown(d, R_SOCKDIED);
 					continue;
 				}
 			}
 			/* Process output for sockets with pending output */
 			if (FD_ISSET(d->descriptor, &output_set))
 			{
-				if (!process_output(d))
+				if (!bsd_io_output_process(d))
 				{
-					shutdownsock(d, R_SOCKDIED);
+					bsd_conn_shutdown(d, R_SOCKDIED);
 				}
 			}
 		}
@@ -408,7 +408,7 @@ void shovechars(int port)
  * - shutdown() failures are logged but don't prevent socket closure
  * - All connections are closed regardless of individual operation failures
  */
-void close_sockets(int emergency, char *message)
+void bsd_conn_all_close(int emergency, char *message)
 {
 	DESC *d = NULL, *dnext = NULL;
 	size_t msg_len = 0;
@@ -442,7 +442,7 @@ void close_sockets(int emergency, char *message)
 			/* Graceful shutdown: queue message and use proper disconnection */
 			queue_string(d, NULL, message);
 			queue_write(d, "\r\n", 2);
-			shutdownsock(d, R_GOING_DOWN);
+			bsd_conn_shutdown(d, R_GOING_DOWN);
 		}
 	}
 
@@ -486,7 +486,7 @@ void close_sockets(int emergency, char *message)
  * - Critical error reporting during command processing
  * - Debugging context capture for crash analysis
  */
-void report(void)
+void bsd_status_report(void)
 {
 	char *player = NULL, *enactor = NULL;
 
