@@ -41,21 +41,13 @@
  */
 static MSGQ_DNSRESOLVER mk_msgq_dnsresolver(const char *addr);	   /*!< Create DNS resolver message queue entry */
 static void *dnsResolver(void *args);							   /*!< DNS resolver thread function */
-void check_dnsResolver_status(dbref player, dbref cause, int key); /*!< Check DNS resolver thread status */
 static int make_socket(int port);								   /*!< Create and bind server socket */
-void shovechars(int port);										   /*!< Accept new connections on server socket */
 static DESC *new_connection(int sock);							   /*!< Initialize new connection descriptor */
-char *connReasons(int reason);									   /*!< Connection reason strings */
-char *connMessages(int reason);									   /*!< Connection message strings */
-void shutdownsock(DESC *d, int reason);							   /*!< Shutdown a socket connection */
 static inline void make_nonblocking(int s);						   /*!< Set socket to non-blocking mode */
 static DESC *initializesock(int s, struct sockaddr_in *a);		   /*!< Initialize socket descriptor */
-int process_output(DESC *d);									   /*!< Process output for a descriptor */
 static int process_input(DESC *d);								   /*!< Process input for a descriptor */
-void close_sockets(int emergency, char *message);				   /*!< Close all sockets and descriptors */
-void report(void);												   /*!< Report current descriptor status */
+static void init_char_table(void);								   /*!< Initialize character validity table */
 static void sighandler(int sig);								   /*!< Signal handler function */
-void set_signals(void);											   /*!< Set up signal handlers */
 static void unset_signals(void);								   /*!< Unset signal handlers */
 static inline void check_panicking(int sig);					   /*!< Check if already panicking on signal */
 static inline void log_signal(const char *signame);				   /*!< Log received signal */
@@ -403,7 +395,7 @@ void shovechars(int port)
 	char *msgq_Path = NULL;
 	MSGQ_DNSRESOLVER msgq_Dns;
 
-	mushstate.debug_cmd = (char *)"< shovechars >";
+	mushstate.debug_cmd = (char *)DBG_SHOVECHARS;
 
 	if (!mushstate.restarting)
 	{
@@ -1220,7 +1212,7 @@ int process_output(DESC *d)
 
 	/* Save debug context for error reporting */
 	cmdsave = mushstate.debug_cmd;
-	mushstate.debug_cmd = (char *)"< process_output >";
+	mushstate.debug_cmd = (char *)DBG_PROCESS_OUTPUT;
 
 	/* Process each output block in the queue */
 	tb = d->output_head;
