@@ -121,8 +121,8 @@ Use appropriate comment styles based on context:
 **Multi-line Explanatory Comments** (for complex logic):
 ```c
 /* BOOLEXP_INDIR (i.e. @) is a unary operation which is replaced at
- * evaluation time by the lock of the object whose number is the 
- * argument of the operation. */
+   evaluation time by the lock of the object whose number is the 
+   argument of the operation. */
 ```
 
 **Single-line Comments** (for clarifications):
@@ -140,8 +140,33 @@ lock_originator = NOTHING;  /* Reset after evaluation */
 - Use `/* */` for all code comments (single or multi-line)
 - Use `/** */` only for Doxygen documentation blocks
 - Never use `//` style comments (not consistent with project style)
-- Place comments above the code they describe, not at the end of lines (except very brief inline comments)
+- **Comment placement**:
+  - If comment describes the **block of code that follows** → place above the block
+  - If comment references a **specific line of code** → place at end of that line
+  - **Exception in switch/case**: Case explanations go at end of case line (e.g., `case 1: /* description */`)
 - Keep comments concise but descriptive
+
+**Examples**:
+```c
+/* Check if player is allowed to access this object */
+if (!check_access(player, obj))
+{
+	return false;
+}
+
+mushstate.shutdown_flag = 1;  /* Signal graceful shutdown */
+
+switch (sig)
+{
+case SIGTERM:  /* Graceful shutdown with full database dump */
+	graceful_shutdown();
+	break;
+
+case SIGUSR1:  /* Normal restart now */
+	do_restart(GOD, GOD, 0);
+	break;
+}
+```
 
 #### Error Handling
 - Check return values from all system calls
