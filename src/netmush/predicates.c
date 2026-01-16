@@ -218,7 +218,7 @@ int could_doit(dbref player, dbref thing, int locknum)
 	}
 
 	key = atr_get(thing, locknum, &aowner, &aflags, &alen);
-	doit = eval_boolexp_atr(player, thing, thing, key);
+	doit = boolexp_eval_atr(player, thing, thing, key);
 	XFREE(key);
 	return doit;
 }

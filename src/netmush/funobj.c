@@ -619,10 +619,10 @@ void fun_lock(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 
 	if (Read_attr(player, it, attr, aowner, aflags))
 	{
-		bexp = parse_boolexp(player, tbuf, 1);
+		bexp = boolexp_parse(player, tbuf, 1);
 		XFREE(tbuf);
 		tbuf = (char *)unparse_boolexp_function(player, bexp);
-		free_boolexp(bexp);
+		boolexp_free(bexp);
 		XSAFELBSTR(tbuf, buff, bufc);
 		XFREE(tbuf);
 	}
@@ -688,9 +688,9 @@ void fun_elock(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
 			}
 			else
 			{
-				bexp = parse_boolexp(player, tbuf, 1);
-				XSAFEBOOL(buff, bufc, eval_boolexp(victim, it, it, bexp));
-				free_boolexp(bexp);
+				bexp = boolexp_parse(player, tbuf, 1);
+				XSAFEBOOL(buff, bufc, boolexp_eval(victim, it, it, bexp));
+				boolexp_free(bexp);
 			}
 		}
 		else
@@ -734,7 +734,7 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 	}
 	else
 	{
-		BOOLEXP *okey = parse_boolexp(player, fargs[2], 0);
+		BOOLEXP *okey = boolexp_parse(player, fargs[2], 0);
 
 		if (okey == TRUE_BOOLEXP)
 		{
@@ -746,10 +746,10 @@ void fun_elockstr(char *buff, char **bufc, dbref player, dbref caller, dbref cau
 		}
 		else
 		{
-			XSAFELTOS(buff, bufc, eval_boolexp(actor_obj, locked_obj, locked_obj, okey), LBUF_SIZE);
+			XSAFELTOS(buff, bufc, boolexp_eval(actor_obj, locked_obj, locked_obj, okey), LBUF_SIZE);
 		}
 
-		free_boolexp(okey);
+		boolexp_free(okey);
 	}
 }
 

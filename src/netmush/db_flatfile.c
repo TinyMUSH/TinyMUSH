@@ -55,7 +55,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		abort();
 		break;
 	case '(':
-		b = alloc_boolexp();
+		b = boolexp_alloc();
 		switch (c = getc(f))
 		{
 		case NOT_TOKEN:
@@ -171,11 +171,11 @@ BOOLEXP *getboolexp1(FILE *f)
 			XFREE(buff);
 			return TRUE_BOOLEXP;
 		}
-		b = alloc_boolexp();
+		b = boolexp_alloc();
 		anum = mkattr(buff);
 		if (anum <= 0)
 		{
-			free_boolexp(b);
+			boolexp_free(b);
 			XFREE(buff);
 			goto error;
 		}
@@ -205,7 +205,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		 *
 		 */
 		ungetc(c, f);
-		b = alloc_boolexp();
+		b = boolexp_alloc();
 		b->type = BOOLEXP_CONST;
 		b->thing = 0;
 		/**
@@ -231,7 +231,7 @@ BOOLEXP *getboolexp1(FILE *f)
 			if (c == EOF)
 			{
 				XFREE(buff);
-				free_boolexp(b);
+				boolexp_free(b);
 				goto error;
 			}
 			*s = '\0';
@@ -243,7 +243,7 @@ BOOLEXP *getboolexp1(FILE *f)
 			anum = mkattr(buff);
 			if (anum <= 0)
 			{
-				free_boolexp(b);
+				boolexp_free(b);
 				XFREE(buff);
 				goto error;
 			}
@@ -252,7 +252,7 @@ BOOLEXP *getboolexp1(FILE *f)
 		}
 		else
 		{
-			free_boolexp(b);
+			boolexp_free(b);
 			goto error;
 		}
 		/**
@@ -1252,7 +1252,7 @@ dbref db_read_flatfile(FILE *f, int *db_format, int *db_version, int *db_flags)
 				s = unparse_boolexp_quiet(1, tempbool);
 				atr_add_raw(i, A_LOCK, s);
 				XFREE(s);
-				free_boolexp(tempbool);
+				boolexp_free(tempbool);
 			}
 
 			/**
@@ -1645,13 +1645,13 @@ int db_write_object_out(FILE *f, dbref i, int db_format, int flags, int *n_atrt)
 	if (!(flags & V_ATRKEY))
 	{
 		got = atr_get(i, A_LOCK, &aowner, &aflags, &alen);
-		tempbool = parse_boolexp(GOD, got, 1);
+		tempbool = boolexp_parse(GOD, got, 1);
 		XFREE(got);
 		putboolexp(f, tempbool);
 
 		if (tempbool)
 		{
-			free_boolexp(tempbool);
+			boolexp_free(tempbool);
 		}
 	}
 

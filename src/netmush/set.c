@@ -614,7 +614,7 @@ void do_lock(dbref player, dbref cause, int key, char *name, char *keytext)
 		}
 	}
 
-	okey = parse_boolexp(player, keytext, 0);
+	okey = boolexp_parse(player, keytext, 0);
 
 	if (okey == TRUE_BOOLEXP)
 	{
@@ -645,7 +645,7 @@ void do_lock(dbref player, dbref cause, int key, char *name, char *keytext)
 		}
 	}
 
-	free_boolexp(okey);
+	boolexp_free(okey);
 }
 
 /*
