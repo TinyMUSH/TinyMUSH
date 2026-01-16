@@ -102,7 +102,46 @@ Another good example of modularization:
 - **Indentation**: Tabs for indentation
 - **Braces**: Opening brace on same line for functions and control structures
 - **Line Length**: Aim for 120 characters max, but prioritize readability
-- **Comments**: Use `/* */` for multi-line and single-line explanations
+
+#### Comments
+Use appropriate comment styles based on context:
+
+**Doxygen Documentation Comments** (for functions, structs, enums):
+```c
+/**
+ * @brief One-line summary
+ *
+ * Detailed description of purpose and behavior.
+ *
+ * @param param_name Description
+ * @return Description of return value
+ */
+```
+
+**Multi-line Explanatory Comments** (for complex logic):
+```c
+/* BOOLEXP_INDIR (i.e. @) is a unary operation which is replaced at
+ * evaluation time by the lock of the object whose number is the 
+ * argument of the operation. */
+```
+
+**Single-line Comments** (for clarifications):
+```c
+/* We can see control locks... else we'd break zones */
+checkit = true;
+```
+
+**Inline Comments** (for brief explanations):
+```c
+lock_originator = NOTHING;  /* Reset after evaluation */
+```
+
+**Key Rules**:
+- Use `/* */` for all code comments (single or multi-line)
+- Use `/** */` only for Doxygen documentation blocks
+- Never use `//` style comments (not consistent with project style)
+- Place comments above the code they describe, not at the end of lines (except very brief inline comments)
+- Keep comments concise but descriptive
 
 #### Error Handling
 - Check return values from all system calls
