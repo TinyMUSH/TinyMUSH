@@ -42,20 +42,36 @@ static inline const char *filename_only(const char *path)
 }
 
 /**
- * @note MEMTRACK_ALIGNMENT is configured at build time via CMake based on target architecture.
- *       See CMakeLists.txt for architecture-specific defaults. Can be overridden with:
- *       cmake -DMEMTRACK_ALIGNMENT=<value>
- */
-
-/**
- * Macros and utilities.
+ * @brief Helper function for logging memory allocation events
  *
+ * This inline function replaces the XLOGALLOC macro with proper type-safe function
+ * semantics while maintaining similar performance characteristics. It only performs
+ * logging when mushconf.malloc_logger is enabled.
+ *
+ * @param log_level Log level (e.g., LOG_MALLOC, LOG_ALWAYS)
+ * @param subsys    Subsystem identifier (e.g., "MEM")
+ * @param event     Event type (e.g., "TRACE", "ERROR")
+ * @param format    Printf-style format string
+ * @param ...       Variable arguments for format string
+ *
+ * @note Uses a stack buffer of 1024 bytes for formatted messages. This should be
+ *       sufficient for typical allocation tracking messages.
  */
-#define XLOGALLOC(x, y, z, s, ...)            \
-	if (mushconf.malloc_logger)               \
-	{                                         \
-		log_write(x, y, z, s, ##__VA_ARGS__); \
+static inline void xlogalloc(int log_level, const char *subsys, const char *event, const char *format, ...)
+	__attribute__((format(printf, 4, 5)));
+
+static inline void xlogalloc(int log_level, const char *subsys, const char *event, const char *format, ...)
+{
+	if (mushconf.malloc_logger)
+	{
+		va_list args;
+		va_start(args, format);
+		char buffer[1024];
+		vsnprintf(buffer, sizeof(buffer), format, args);
+		log_write(log_level, subsys, event, "%s", buffer);
+		va_end(args);
 	}
+}
 
 /**
  * @brief Allocate aligned memory for MEMTRACK structure
@@ -140,7 +156,7 @@ void *__xmalloc(size_t size, const char *file, int line, const char *function, c
 				mtrk->magic = (uint64_t *)((char *)mtrk->bptr + size);
 				mushstate.raw_allocs = mtrk;
 				*(mtrk->magic) = XMAGIC;
-				XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Alloc %ld bytes", mtrk->file, mtrk->line, mtrk->function, mtrk->var, mtrk->size);
+				xlogalloc(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Alloc %ld bytes", mtrk->file, mtrk->line, mtrk->function, mtrk->var, mtrk->size);
 				return mtrk->bptr;
 			}
 		}
@@ -184,7 +200,7 @@ void *__xcalloc(size_t nmemb, size_t size, const char *file, int line, const cha
 	{
 		if (nmemb > SIZE_MAX / size)
 		{
-			XLOGALLOC(LOG_ALWAYS, "MEM", "ERROR", "Integer overflow detected in __xcalloc(%zu, %zu)", nmemb, size);
+			xlogalloc(LOG_ALWAYS, "MEM", "ERROR", "Integer overflow detected in __xcalloc(%zu, %zu)", nmemb, size);
 			return NULL;
 		}
 		return __xmalloc(nmemb * size, file, line, function, var);
@@ -365,12 +381,8 @@ int __xfree(void *ptr)
 				}
 				if (overrun)
 				{
-					XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Free %ld bytes", curr->file, curr->line, curr->function, curr->var, curr->size);
-				}
-				else
-				{
-
-					XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Free %ld bytes -- OVERRUN ---", curr->file, curr->line, curr->function, curr->var, curr->size);
+				xlogalloc(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Free %ld bytes", curr->file, curr->line, curr->function, curr->var, curr->size);
+					xlogalloc(LOG_MALLOC, "MEM", "TRACE", "%s[%d]%s:%s Free %ld bytes -- OVERRUN ---", curr->file, curr->line, curr->function, curr->var, curr->size);
 				}
 				if (mushstate.raw_allocs == curr)
 				{
