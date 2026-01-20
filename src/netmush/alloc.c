@@ -58,9 +58,7 @@ static inline const char *filename_only(const char *path)
  *       sufficient for typical allocation tracking messages.
  */
 static inline void xlogalloc(int log_level, const char *subsys, const char *event, const char *format, ...)
-	__attribute__((format(printf, 4, 5)));
-
-static inline void xlogalloc(int log_level, const char *subsys, const char *event, const char *format, ...)
+	__attribute__((format(printf, 4, 5)))
 {
 	if (mushconf.malloc_logger)
 	{
