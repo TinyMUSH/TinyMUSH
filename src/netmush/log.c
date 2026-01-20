@@ -29,6 +29,45 @@ FILE *log_fp = NULL;     /*!< Pointer to the facility's log file */
 char *log_pos = NULL;
 
 /**
+ * @brief Write a message to a log file with optional stderr duplication.
+ *
+ * This is a low-level helper function that centralizes all log file writing
+ * operations. It writes the message to the specified log file and optionally
+ * duplicates it to stderr during startup when mushstate.logstderr is enabled.
+ * This function handles error reporting and avoids recursion when writing to stderr.
+ *
+ * @param lfp The file pointer to write to (log_fp, mainlog_fp, or stderr).
+ *            If NULL, no write operation is performed.
+ * @param message The message string to write. Must not be NULL.
+ *
+ * @note Errors writing to the log file are reported to stderr (unless lfp is stderr).
+ * @note During startup (mushstate.logstderr), messages are duplicated to stderr
+ *       unless already writing to stderr.
+ * @note Errors writing to stderr during duplication are silently ignored to avoid recursion.
+ */
+static inline void write_to_logfile(FILE *lfp, const char *message)
+{
+	/* Write to target log file if available */
+	if (lfp != NULL)
+	{
+		if (fputs(message, lfp) == EOF)
+		{
+			/* Report error with errno for diagnostics (avoid recursion if writing to stderr) */
+			if (lfp != stderr)
+			{
+				fprintf(stderr, "Error: Failed to write to log file (errno=%d)\n", errno);
+			}
+		}
+	}
+
+	/* During startup, duplicate to stderr if not already writing to it */
+	if ((lfp != stderr) && (mushstate.logstderr))
+	{
+		fputs(message, stderr); /* Ignore errors on stderr */
+	}
+}
+
+/**
  * @brief Initialize the main logfile for the MUSH logging system.
  *
  * This function initializes the main log file pointer (mainlog_fp) by opening
@@ -692,20 +731,7 @@ void _log_write(const char *file, int line, int key, const char *primary, const 
         }
 
         /* Write to log file - start_log() guarantees log_fp is valid */
-        if (fputs(output_str, log_fp) == EOF)
-        {
-            /* Report error with errno for diagnostics */
-            if (log_fp != stderr)
-            {
-                fprintf(stderr, "Error: Failed to write to log file (errno=%d)\n", errno);
-            }
-        }
-
-        /* During startup, duplicate to stderr if not already writing to it */
-        if ((log_fp != stderr) && (mushstate.logstderr))
-        {
-            fputs(output_str, stderr); /* Ignore errors on stderr */
-        }
+        write_to_logfile(log_fp, output_str);
 
         XFREE(str1);
         free(str);
@@ -836,23 +862,7 @@ void log_write_raw(int key, const char *format, ...)
     va_end(ap);
 
     /* Write to target log file if available */
-    if (lfp != NULL)
-    {
-        if (fputs(str, lfp) == EOF)
-        {
-            /* Report error with errno for diagnostics (avoid recursion if writing to stderr) */
-            if (lfp != stderr)
-            {
-                fprintf(stderr, "Error: Failed to write to log file (errno=%d)\n", errno);
-            }
-        }
-    }
-
-    /* During startup, duplicate to stderr if not already writing to it */
-    if ((lfp != stderr) && (mushstate.logstderr))
-    {
-        fputs(str, stderr); /* Ignore errors on stderr */
-    }
+    write_to_logfile(lfp, str);
 
     free(str);
 }

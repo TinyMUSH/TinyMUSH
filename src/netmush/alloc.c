@@ -57,8 +57,8 @@ static inline const char *filename_only(const char *path)
  * @note Uses a stack buffer of 1024 bytes for formatted messages. This should be
  *       sufficient for typical allocation tracking messages.
  */
+__attribute__((format(printf, 4, 5)))
 static inline void xlogalloc(int log_level, const char *subsys, const char *event, const char *format, ...)
-	__attribute__((format(printf, 4, 5)))
 {
 	if (mushconf.malloc_logger)
 	{
