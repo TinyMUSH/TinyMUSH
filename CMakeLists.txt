@@ -16,6 +16,25 @@ set(NUM_ENV_VARS 10)
 # Maximum parse depth to prevent stack overflow
 set(MAX_BOOLEXP_PARSE_DEPTH 100)
 
+# Memory alignment for MEMTRACK structures (bytes)
+# Detect optimal alignment based on architecture if not explicitly set
+if(NOT DEFINED MEMTRACK_ALIGNMENT)
+    # Detect processor architecture
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
+        set(MEMTRACK_ALIGNMENT 16 CACHE STRING "Memory alignment for MEMTRACK structures (16 bytes for x86_64)")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64|ARM64")
+        set(MEMTRACK_ALIGNMENT 16 CACHE STRING "Memory alignment for MEMTRACK structures (16 bytes for ARM64)")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i386|i686|x86")
+        set(MEMTRACK_ALIGNMENT 8 CACHE STRING "Memory alignment for MEMTRACK structures (8 bytes for 32-bit x86)")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm|armv7")
+        set(MEMTRACK_ALIGNMENT 8 CACHE STRING "Memory alignment for MEMTRACK structures (8 bytes for 32-bit ARM)")
+    else()
+        set(MEMTRACK_ALIGNMENT 16 CACHE STRING "Memory alignment for MEMTRACK structures (16 bytes default)")
+    endif()
+else()
+    set(MEMTRACK_ALIGNMENT ${MEMTRACK_ALIGNMENT} CACHE STRING "Memory alignment for MEMTRACK structures (user override)")
+endif()
+
 # PCRE2 configuration
 set(PCRE2_CODE_UNIT_WIDTH 8)
 

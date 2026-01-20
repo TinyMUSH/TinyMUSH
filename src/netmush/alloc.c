@@ -42,9 +42,10 @@ static inline const char *filename_only(const char *path)
 }
 
 /**
- * @brief Alignment value for MEMTRACK structures (16 bytes for cache line optimization)
+ * @note MEMTRACK_ALIGNMENT is configured at build time via CMake based on target architecture.
+ *       See CMakeLists.txt for architecture-specific defaults. Can be overridden with:
+ *       cmake -DMEMTRACK_ALIGNMENT=<value>
  */
-#define MEMTRACK_ALIGNMENT 16
 
 /**
  * Macros and utilities.
@@ -388,15 +389,6 @@ int __xfree(void *ptr)
 			curr = curr->next;
 		}
 	}
-	/*
-	if (ptr)
-	{
-		XLOGALLOC(LOG_MALLOC, "MEM", "TRACE", "%p Free", ptr);
-		free(ptr);
-		ptr = NULL;
-	}
-	*/
-
 	return overrun;
 }
 

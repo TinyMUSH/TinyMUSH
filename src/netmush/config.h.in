@@ -28,6 +28,9 @@
 /* Maximum parse depth to prevent stack overflow */
 #define MAX_BOOLEXP_PARSE_DEPTH ${MAX_BOOLEXP_PARSE_DEPTH}
 
+/* Memory alignment for MEMTRACK structures (auto-detected or user-configured) */
+#define MEMTRACK_ALIGNMENT ${MEMTRACK_ALIGNMENT}
+
 #define PCRE2_CODE_UNIT_WIDTH ${PCRE2_CODE_UNIT_WIDTH}
 
 /* Define to the version broken down to it's components */

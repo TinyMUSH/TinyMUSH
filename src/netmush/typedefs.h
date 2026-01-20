@@ -26,8 +26,11 @@ typedef int POWER;
 /**
  * @brief Memory tracking header structure
  *
- * Aligned to 16 bytes for optimal performance on modern architectures.
- * This ensures proper cache line alignment and prevents false sharing.
+ * Alignment is configured at build time via CMake based on target architecture.
+ * This ensures optimal cache line alignment and prevents false sharing.
+ * Default alignments: x86_64/ARM64=16 bytes, x86/ARM32=8 bytes.
+ *
+ * @note The alignment value must match MEMTRACK_ALIGNMENT from config.h
  */
 typedef struct tracemem_header
 {
@@ -39,7 +42,7 @@ typedef struct tracemem_header
     const char *var;
     uint64_t *magic;
     struct tracemem_header *next;
-} __attribute__((aligned(16))) MEMTRACK;
+} __attribute__((aligned(MEMTRACK_ALIGNMENT))) MEMTRACK;
 
 typedef struct hookentry
 {
