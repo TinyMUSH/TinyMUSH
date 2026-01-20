@@ -37,14 +37,14 @@
  * @brief Command handler function pointers for various call sequences
  *
  */
-void (*handler_cs_no_args)(dbref, dbref, int);													   /*!< Handler for no-arg commands */
-void (*handler_cs_one_args)(dbref, dbref, int, char *);											   /*!< Handler for one-arg commands */
-void (*handler_cs_one_args_unparse)(dbref, char *);												   /*!< Handler for one-arg unparsed commands */
-void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);					   /*!< Handler for one-arg commands with cmdargs */
-void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);									   /*!< Handler for two-arg commands */
-void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);			   /*!< Handler for two-arg commands with cmdargs */
-void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);						   /*!< Handler for two-arg commands with argv */
-void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int); /*!< Handler for two-arg commands with cmdargs and argv */
+handler_cs_no_args_t handler_cs_no_args;													   /*!< Handler for no-arg commands */
+handler_cs_one_args_t handler_cs_one_args;											   /*!< Handler for one-arg commands */
+handler_cs_one_args_unparse_t handler_cs_one_args_unparse;												   /*!< Handler for one-arg unparsed commands */
+handler_cs_one_args_cmdargs_t handler_cs_one_args_cmdargs;					   /*!< Handler for one-arg commands with cmdargs */
+handler_cs_two_args_t handler_cs_two_args;									   /*!< Handler for two-arg commands */
+handler_cs_two_args_cmdargs_t handler_cs_two_args_cmdargs;			   /*!< Handler for two-arg commands with cmdargs */
+handler_cs_two_args_argv_t handler_cs_two_args_argv;						   /*!< Handler for two-arg commands with argv */
+handler_cs_two_args_cmdargs_argv_t handler_cs_two_args_cmdargs_argv; /*!< Handler for two-arg commands with cmdargs and argv */
 
 /**
  * @brief Command hash table and prefix command array

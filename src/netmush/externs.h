@@ -115,14 +115,14 @@ extern LOGFILETAB logfds_table[]; /*!< Logfile Tables */
 extern ATTR attr[];               /*!< List of built-in attributes*/
 
 /* Command subsystem global variables */
-extern void (*handler_cs_no_args)(dbref, dbref, int);
-extern void (*handler_cs_one_args)(dbref, dbref, int, char *);
-extern void (*handler_cs_one_args_unparse)(dbref, char *);
-extern void (*handler_cs_one_args_cmdargs)(dbref, dbref, int, char *, char *[], int);
-extern void (*handler_cs_two_args)(dbref, dbref, int, char *, char *);
-extern void (*handler_cs_two_args_cmdargs)(dbref, dbref, int, char *, char *, char *[], int);
-extern void (*handler_cs_two_args_argv)(dbref, dbref, int, char *, char *[], int);
-extern void (*handler_cs_two_args_cmdargs_argv)(dbref, dbref, int, char *, char *[], int, char *[], int);
+extern handler_cs_no_args_t handler_cs_no_args;
+extern handler_cs_one_args_t handler_cs_one_args;
+extern handler_cs_one_args_unparse_t handler_cs_one_args_unparse;
+extern handler_cs_one_args_cmdargs_t handler_cs_one_args_cmdargs;
+extern handler_cs_two_args_t handler_cs_two_args;
+extern handler_cs_two_args_cmdargs_t handler_cs_two_args_cmdargs;
+extern handler_cs_two_args_argv_t handler_cs_two_args_argv;
+extern handler_cs_two_args_cmdargs_argv_t handler_cs_two_args_cmdargs_argv;
 extern CMDENT *prefix_cmds[256];
 extern CMDENT *goto_cmdp, *enter_cmdp, *leave_cmdp, *internalgoto_cmdp;
 

@@ -1452,3 +1452,19 @@ typedef struct
     bool reset;
 } VT100ATTR;
 
+/**
+ * @brief Command handler function pointer types
+ *
+ * These typedefs define the various function signatures for command handlers
+ * used in the command dispatch system. They allow for consistent type-safe
+ * handling of commands with different argument structures.
+ */
+typedef void (*handler_cs_no_args_t)(dbref, dbref, int);
+typedef void (*handler_cs_one_args_t)(dbref, dbref, int, char *);
+typedef void (*handler_cs_one_args_unparse_t)(dbref, char *);
+typedef void (*handler_cs_one_args_cmdargs_t)(dbref, dbref, int, char *, char *[], int);
+typedef void (*handler_cs_two_args_t)(dbref, dbref, int, char *, char *);
+typedef void (*handler_cs_two_args_cmdargs_t)(dbref, dbref, int, char *, char *, char *[], int);
+typedef void (*handler_cs_two_args_argv_t)(dbref, dbref, int, char *, char *[], int);
+typedef void (*handler_cs_two_args_cmdargs_argv_t)(dbref, dbref, int, char *, char *[], int, char *[], int);
+
