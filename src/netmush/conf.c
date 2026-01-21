@@ -449,7 +449,7 @@ void cf_log(dbref player, const char *primary, const char *secondary, char *cmd,
  * @note Message routing handled by `cf_log()`.
  * @see cf_log()
  */
-CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int failure)
+static CF_Result _cf_status_from_succfail(dbref player, char *cmd, int success, int failure)
 {
     /* Success present: full success if no errors, else partial */
     if (success > 0)
@@ -1414,7 +1414,7 @@ CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd)
  *
  * Parses tokens in `str`, optionally prefixed with '!' to clear bits, and
  * updates the flag word referenced by `vp` using entries from the provided
- * name table. Aggregates results with `cf_status_from_succfail()`.
+ * name table. Aggregates results with `_cf_status_from_succfail()`.
  *
  * @param vp        Pointer to the flag word to modify
  * @param str       Space-separated list of flag names (prefix with '!' to clear)
@@ -1431,7 +1431,7 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
 
     if ((str == NULL) || (ntab == NULL))
     {
-        return cf_status_from_succfail(player, cmd, 0, 0);
+        return _cf_status_from_succfail(player, cmd, 0, 0);
     }
 
     sp = strtok_r(str, " \t", &tokst);
@@ -1476,7 +1476,7 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
         sp = strtok_r(NULL, " \t", &tokst);
     }
 
-    return cf_status_from_succfail(player, cmd, success, failure);
+    return _cf_status_from_succfail(player, cmd, success, failure);
 }
 
 /**
@@ -1492,7 +1492,7 @@ CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd
  * @param negate    true to remove the function; false to add
  * @return bool     true on update, false if the removal target is missing
  */
-bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool negate)
+static bool _cf_modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool negate)
 {
     NAMEDFUNC *np = NULL, **tp = NULL;
     int i = 0;
@@ -1671,7 +1671,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
                                 }
                                 else
                                 {
-                                    if (modify_xfuncs(ostr, hp, xperms, negate))
+                                    if (_cf_modify_xfuncs(ostr, hp, xperms, negate))
                                     {
                                         success++;
                                     }
@@ -1708,7 +1708,7 @@ CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *nt
         sp = strtok_r(NULL, " \t", &tokst);
     }
 
-    return cf_status_from_succfail(player, cmd, success, failure);
+    return _cf_status_from_succfail(player, cmd, success, failure);
 }
 
 /**
@@ -1874,7 +1874,7 @@ CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param str       IPv4 address string
  * @return in_addr_t Parsed address or INADDR_NONE on error
  */
-in_addr_t sane_inet_addr(char *str)
+static in_addr_t _sane_inet_addr(char *str)
 {
     struct in_addr addr;
 
@@ -1937,7 +1937,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         }
 
         /* Validate address */
-        if ((addr_num.s_addr = sane_inet_addr(addr_txt)) == INADDR_NONE)
+        if ((addr_num.s_addr = _sane_inet_addr(addr_txt)) == INADDR_NONE)
         {
             cf_log(player, "CNF", "SYNTX", cmd, "Malformed host address: %s", addr_txt);
             return CF_Failure;
@@ -1946,7 +1946,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         /* Validate netmask: special case for 255.255.255.255, else parse as IP */
         if (strcmp(mask_txt, "255.255.255.255") != 0)
         {
-            if ((mask_num.s_addr = sane_inet_addr(mask_txt)) == INADDR_NONE)
+            if ((mask_num.s_addr = _sane_inet_addr(mask_txt)) == INADDR_NONE)
             {
                 cf_log(player, "CNF", "SYNTX", cmd, "Malformed mask address: %s", mask_txt);
                 return CF_Failure;
@@ -1988,7 +1988,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         }
 
         /* Validate address */
-        if ((addr_num.s_addr = sane_inet_addr(addr_txt)) == INADDR_NONE)
+        if ((addr_num.s_addr = _sane_inet_addr(addr_txt)) == INADDR_NONE)
         {
             cf_log(player, "CNF", "SYNTX", cmd, "Malformed host address: %s", addr_txt);
             return CF_Failure;
@@ -2049,7 +2049,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
  * @param extra     Pointer to access name table
  * @return CF_Result Result from `cf_modify_bits`, or `CF_Failure` on denial
  */
-CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra)
+static CF_Result _cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra)
 {
     const char *access_type = ((long)vp) ? "read" : "write";
 
@@ -2087,7 +2087,7 @@ CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *c
  * @brief Configure read/write access for a named directive
  *
  * Locates the configuration directive (core or module) by name and delegates
- * to `helper_cf_cf_access` to apply read or write access changes as requested.
+ * to `_cf_cf_access` to apply read or write access changes as requested.
  * Logs an error when the directive is not found.
  *
  * @param vp        Non-zero to edit read perms; zero to edit write perms
@@ -2137,7 +2137,7 @@ CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
     {
         if (!strcmp(tp->pname, directive_name))
         {
-            CF_Result result = helper_cf_cf_access(tp, player, vp, perms_str, cmd, extra);
+            CF_Result result = _cf_cf_access(tp, player, vp, perms_str, cmd, extra);
             XFREE(str_copy);
             return result;
         }
@@ -2152,7 +2152,7 @@ CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
             {
                 if (!strcmp(tp->pname, directive_name))
                 {
-                    CF_Result result = helper_cf_cf_access(tp, player, vp, perms_str, cmd, extra);
+                    CF_Result result = _cf_cf_access(tp, player, vp, perms_str, cmd, extra);
                     XFREE(str_copy);
                     return result;
                 }
@@ -2549,7 +2549,7 @@ int (*cf_interpreter)(int *, char *, long, dbref, char *);
  * @param tp        Config table entry describing the directive
  * @return CF_Result Result from the interpreter (success/partial/failure)
  */
-CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
+static CF_Result _cf_set(char *cp, char *ap, dbref player, CONF *tp)
 {
     CF_Result result = CF_Failure;
     const char *status_msg = "Strange.";
@@ -2619,7 +2619,7 @@ CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp)
  * @brief Dispatch a configuration directive to the appropriate handler
  *
  * Looks up the directive in core and module tables, invokes its handler via
- * `helper_cf_set`, and logs not-found errors for runtime callers. Standalone
+ * `_cf_set`, and logs not-found errors for runtime callers. Standalone
  * mode restricts processing to module-loading essentials.
  *
  * @param cp        Configuration directive name
@@ -2654,7 +2654,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
     {
         if (!strcmp(tp->pname, cp))
         {
-            return helper_cf_set(cp, ap, player, tp);
+            return _cf_set(cp, ap, player, tp);
         }
     }
 
@@ -2667,7 +2667,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
             {
                 if (!strcmp(tp->pname, cp))
                 {
-                    return helper_cf_set(cp, ap, player, tp);
+                    return _cf_set(cp, ap, player, tp);
                 }
             }
         }
@@ -2934,7 +2934,7 @@ void cf_verify(void)
  * @param tp        Configuration table entry to display
  * @return void
  */
-void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
+static void _cf_display(dbref player, char *buff, char **bufc, CONF *tp)
 {
     NAMETAB *opt = NULL;
 
@@ -2985,7 +2985,7 @@ void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp)
  * @brief Display a configuration parameter by name
  *
  * Finds the named parameter in core or module tables and delegates formatting
- * to `helper_cf_display`. Emits a no-match marker when the parameter is not
+ * to `_cf_display`. Emits a no-match marker when the parameter is not
  * found.
  *
  * @param player        DBref of player requesting the value
@@ -3019,7 +3019,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
     {
         if (!strcasecmp(tp->pname, param_name))
         {
-            helper_cf_display(player, buff, bufc, tp);
+            _cf_display(player, buff, bufc, tp);
             return;
         }
     }
@@ -3036,7 +3036,7 @@ void cf_display(dbref player, char *param_name, char *buff, char **bufc)
         {
             if (!strcasecmp(tp->pname, param_name))
             {
-                helper_cf_display(player, buff, bufc, tp);
+                _cf_display(player, buff, bufc, tp);
                 return;
             }
         }
