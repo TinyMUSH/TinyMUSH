@@ -167,7 +167,7 @@ extern CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, c
 extern CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp);
 extern CF_Result cf_set(char *cp, char *ap, dbref player);
-extern void cf_admin(dbref player, dbref cause, int extra, char *kw, char *value);
+extern void cf_do_admin(dbref player, dbref cause, int extra, char *kw, char *value);
 extern CF_Result cf_read(char *fn);
 extern void list_cf_access(dbref player);
 extern void list_cf_read_access(dbref player);

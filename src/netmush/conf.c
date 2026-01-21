@@ -2696,7 +2696,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
  * @param value     Argument string (may be empty or NULL)
  * @return void
  */
-void cf_admin(dbref player, dbref cause, int extra, char *kw, char *value)
+void cf_do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
 {
     /* Validate directive name before invoking handler */
     if (kw == NULL)

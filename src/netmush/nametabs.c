@@ -620,7 +620,7 @@ NAMETAB logout_cmdtable[] = {
 CMDENT command_table[] = {
     {(char *)"@@", NULL, CA_PUBLIC, 0, CS_NO_ARGS, NULL, NULL, NULL, {do_comment}},
     {(char *)"@addcommand", addcmd_sw, CA_GOD, 0, CS_TWO_ARG, NULL, NULL, NULL, {do_addcommand}},
-    {(char *)"@admin", NULL, CA_WIZARD, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {cf_admin}},
+    {(char *)"@admin", NULL, CA_WIZARD, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {cf_do_admin}},
     {(char *)"@alias", NULL, CA_NO_GUEST | CA_NO_SLAVE, 0, CS_TWO_ARG, NULL, NULL, NULL, {do_alias}},
     {(char *)"@apply_marked", NULL, CA_WIZARD | CA_GBL_INTERP, 0, CS_ONE_ARG | CS_CMDARG | CS_NOINTERP | CS_STRIP_AROUND, NULL, NULL, NULL, {do_apply_marked}},
     {(char *)"@attribute", attrib_sw, CA_WIZARD, 0, CS_TWO_ARG | CS_INTERP, NULL, NULL, NULL, {do_attribute}},
