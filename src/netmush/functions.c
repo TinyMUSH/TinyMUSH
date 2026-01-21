@@ -23,7 +23,7 @@
 #include <string.h>
 #include <dlfcn.h>
 
-extern int parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
+extern int cf_parse_ext_access(int *, EXTFUNCS **, char *, NAMETAB *, dbref, char *);
 
 UFUN *ufun_head;
 UFUN *ufun_tail;
@@ -473,7 +473,7 @@ int cf_func_access(int *vp, char *str, long extra, dbref player, char *cmd)
     {
         if (!string_compare(fp->name, str))
         {
-            return (parse_ext_access(&fp->perms, &fp->xperms, ap, (NAMETAB *)extra, player, cmd));
+            return (cf_parse_ext_access(&fp->perms, &fp->xperms, ap, (NAMETAB *)extra, player, cmd));
         }
     }
 

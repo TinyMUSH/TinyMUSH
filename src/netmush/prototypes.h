@@ -154,7 +154,7 @@ extern CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char 
 extern CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd);
 extern bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool negate);
-extern CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd);
+extern CF_Result cf_parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd);
 extern CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd);
 extern in_addr_t sane_inet_addr(char *str);

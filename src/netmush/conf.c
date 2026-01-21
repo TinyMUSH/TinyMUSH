@@ -1598,7 +1598,7 @@ static bool _cf_modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xf
  * @param cmd       Configuration directive name
  * @return CF_Result Aggregated success status
  */
-CF_Result parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd)
+CF_Result cf_parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd)
 {
     char *sp = NULL, *tokst = NULL, *cp = NULL, *ostr = NULL, *s = NULL;
     int f = 0, negate = 0, success = 0, failure = 0, got_one = 0;
@@ -1874,7 +1874,7 @@ CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd)
  * @param str       IPv4 address string
  * @return in_addr_t Parsed address or INADDR_NONE on error
  */
-static in_addr_t _sane_inet_addr(char *str)
+static in_addr_t _cf_sane_inet_addr(char *str)
 {
     struct in_addr addr;
 
@@ -1937,7 +1937,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         }
 
         /* Validate address */
-        if ((addr_num.s_addr = _sane_inet_addr(addr_txt)) == INADDR_NONE)
+        if ((addr_num.s_addr = _cf_sane_inet_addr(addr_txt)) == INADDR_NONE)
         {
             cf_log(player, "CNF", "SYNTX", cmd, "Malformed host address: %s", addr_txt);
             return CF_Failure;
@@ -1946,7 +1946,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         /* Validate netmask: special case for 255.255.255.255, else parse as IP */
         if (strcmp(mask_txt, "255.255.255.255") != 0)
         {
-            if ((mask_num.s_addr = _sane_inet_addr(mask_txt)) == INADDR_NONE)
+            if ((mask_num.s_addr = _cf_sane_inet_addr(mask_txt)) == INADDR_NONE)
             {
                 cf_log(player, "CNF", "SYNTX", cmd, "Malformed mask address: %s", mask_txt);
                 return CF_Failure;
@@ -1988,7 +1988,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
         }
 
         /* Validate address */
-        if ((addr_num.s_addr = _sane_inet_addr(addr_txt)) == INADDR_NONE)
+        if ((addr_num.s_addr = _cf_sane_inet_addr(addr_txt)) == INADDR_NONE)
         {
             cf_log(player, "CNF", "SYNTX", cmd, "Malformed host address: %s", addr_txt);
             return CF_Failure;
