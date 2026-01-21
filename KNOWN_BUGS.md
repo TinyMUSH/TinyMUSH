@@ -16,7 +16,7 @@ As of January 3, 2026, **no open critical bugs** are known. Recent fixes and sta
 
 ### Empty config lines cause parser error (Resolved)
 - **Status:** Fixed (January 2, 2026)
-- **Scope:** Configuration file parser in `src/netmush/conf.c`
+- **Scope:** Configuration file parser in `src/netmush/conf_files.c`
 - **Impact:** Server now correctly skips empty lines in configuration files, preventing "Config directive not found" errors that could prevent startup.
 
 ### KILL/CRASH flatfiles reused incorrectly (Resolved)

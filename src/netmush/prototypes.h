@@ -137,10 +137,9 @@ extern void print_memory(dbref player, const char *item, size_t size);
 extern void list_memory(dbref player);
 extern void do_list(dbref player, dbref cause, int extra, char *arg);
 
-/* conf.c */
+/* conf modules */
 extern void cf_init(void);
 extern void cf_log(dbref player, const char *primary, const char *secondary, char *cmd, const char *format, ...);
-extern CF_Result cf_status_from_succfail(dbref player, char *cmd, int success, int failure);
 extern CF_Result cf_const(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_int(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_int_factor(int *vp, char *str, long extra, dbref player, char *cmd);
@@ -153,26 +152,21 @@ extern CF_Result cf_alias(int *vp, char *str, long extra, dbref player, char *cm
 extern CF_Result cf_infotext(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_divert_log(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, char *cmd);
-extern bool modify_xfuncs(char *fn_name, int (*fn_ptr)(dbref), EXTFUNCS **xfuncs, bool negate);
 extern CF_Result cf_parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd);
 extern CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd);
-extern in_addr_t sane_inet_addr(char *str);
 extern CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd);
-extern CF_Result helper_cf_cf_access(CONF *tp, dbref player, int *vp, char *ap, char *cmd, long extra);
 extern CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_add_helpfile(dbref player, char *confcmd, char *str, bool is_raw);
 extern CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_include(int *vp, char *str, long extra, dbref player, char *cmd);
-extern CF_Result helper_cf_set(char *cp, char *ap, dbref player, CONF *tp);
 extern CF_Result cf_set(char *cp, char *ap, dbref player);
 extern void cf_do_admin(dbref player, dbref cause, int extra, char *kw, char *value);
 extern CF_Result cf_read(char *fn);
 extern void list_cf_access(dbref player);
 extern void list_cf_read_access(dbref player);
 extern void cf_verify(void);
-extern void helper_cf_display(dbref player, char *buff, char **bufc, CONF *tp);
 extern void cf_display(dbref player, char *param_name, char *buff, char **bufc);
 extern void list_options(dbref player);
 extern void *dlopen_format(const char *filename, ...);
