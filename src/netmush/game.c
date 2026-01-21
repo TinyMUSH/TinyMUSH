@@ -3513,9 +3513,9 @@ int main(int argc, char *argv[])
 		mushconf.help_quick = XASPRINTF("mushconf.help_quick", "qhelp %s/qhelp", mushconf.txthome);
 	}
 
-	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_users, 1);
-	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_wizards, 1);
-	add_helpfile(GOD, (char *)"main:add_helpfile", mushconf.help_quick, 1);
+	cf_add_helpfile(GOD, (char *)"main:cf_add_helpfile", mushconf.help_users, 1);
+	cf_add_helpfile(GOD, (char *)"main:cf_add_helpfile", mushconf.help_wizards, 1);
+	cf_add_helpfile(GOD, (char *)"main:cf_add_helpfile", mushconf.help_quick, 1);
 
 	if (mushconf.guest_file == NULL)
 	{

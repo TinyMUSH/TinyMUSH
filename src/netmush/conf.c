@@ -2184,7 +2184,7 @@ CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd)
  *
  * @note Thread-safe: No; mutates command/help registries and global tables.
  */
-CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
+CF_Result cf_add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
 {
     CMDENT *cmdp = NULL;
     HASHTAB *hashes = NULL;
@@ -2197,7 +2197,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
     /* Validate inputs early */
     if ((str == NULL) || (confcmd == NULL))
     {
-        cf_log(player, "CNF", "SYNTX", confcmd ? confcmd : "add_helpfile", "Missing input parameters");
+        cf_log(player, "CNF", "SYNTX", confcmd ? confcmd : "cf_add_helpfile", "Missing input parameters");
         return -1;
     }
 
@@ -2357,7 +2357,7 @@ CF_Result add_helpfile(dbref player, char *confcmd, char *str, bool is_raw)
  */
 CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    return add_helpfile(player, cmd, str, 0);
+    return cf_add_helpfile(player, cmd, str, 0);
 }
 
 /**
@@ -2375,7 +2375,7 @@ CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
  */
 CF_Result cf_raw_helpfile(int *vp, char *str, long extra, dbref player, char *cmd)
 {
-    return add_helpfile(player, cmd, str, 1);
+    return cf_add_helpfile(player, cmd, str, 1);
 }
 
 /**
@@ -2696,7 +2696,7 @@ CF_Result cf_set(char *cp, char *ap, dbref player)
  * @param value     Argument string (may be empty or NULL)
  * @return void
  */
-void do_admin(dbref player, dbref cause, int extra, char *kw, char *value)
+void cf_admin(dbref player, dbref cause, int extra, char *kw, char *value)
 {
     /* Validate directive name before invoking handler */
     if (kw == NULL)
