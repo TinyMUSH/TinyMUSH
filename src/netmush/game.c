@@ -790,7 +790,23 @@ void html_escape(const char *src, char *dest, char **destp)
 	**destp = '\0';
 }
 
-void notify_check(dbref target, dbref sender, int key, const char *format, ...)
+/**
+ * @brief Internal notification with va_list parameter
+ *
+ * Delivers messages to objects with optional nospoof, forwarding, listening,
+ * and propagation based on key flags. This version accepts a va_list parameter
+ * for use by wrapper functions.
+ *
+ * @param target  DBref of target to notify
+ * @param sender  DBref of sender
+ * @param key     Message flags controlling behavior
+ * @param format  Printf-style format string (NULL means first vararg is message)
+ * @param ap      Variable argument list
+ *
+ * @note Thread-safe: No (modifies mushstate)
+ * @note Recursion-limited by mushconf.ntfy_nest_lim
+ */
+void _notify_check_va(dbref target, dbref sender, int key, const char *format, va_list ap)
 {
 	char *msg = XMALLOC(LBUF_SIZE, "msg");
 	char *msg_ns, *mp, *tbuff, *tp, *buff;
@@ -801,8 +817,6 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	FWDLIST *fp;
 	NUMBERTAB *np;
 	GDATA *preserve;
-	va_list ap;
-	va_start(ap, format);
 
 	/*
 	 * Allow callers to pass a NULL format string and supply the message as the
@@ -813,7 +827,10 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	 */
 	if (!format || !(*format))
 	{
-		char *s = va_arg(ap, char *);
+		va_list ap_copy;
+		va_copy(ap_copy, ap);
+		char *s = va_arg(ap_copy, char *);
+		va_end(ap_copy);
 
 		if (s)
 		{
@@ -822,16 +839,16 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 		else
 		{
 			XFREE(msg);
-			va_end(ap);
 			return;
 		}
 	}
 	else
 	{
-		XVSNPRINTF(msg, LBUF_SIZE, format, ap);
+		va_list ap_copy;
+		va_copy(ap_copy, ap);
+		XVSNPRINTF(msg, LBUF_SIZE, format, ap_copy);
+		va_end(ap_copy);
 	}
-
-	va_end(ap);
 
 	/*
 	 * If speaker is invalid or message is empty, just exit
@@ -1329,6 +1346,28 @@ void notify_check(dbref target, dbref sender, int key, const char *format, ...)
 	XFREE(msg);
 
 	mushstate.ntfy_nest_lev--;
+}
+
+/**
+ * @brief Deliver a message to an object with optional forwarding and listening
+ *
+ * Wrapper function that accepts variadic arguments and calls _notify_check_va().
+ * See _notify_check_va() for detailed documentation.
+ *
+ * @param target  DBref of target to notify
+ * @param sender  DBref of sender
+ * @param key     Message flags controlling behavior
+ * @param format  Printf-style format string (NULL means first vararg is message)
+ * @param ...     Variable arguments for format string
+ *
+ * @note Thread-safe: No (modifies mushstate)
+ */
+void notify_check(dbref target, dbref sender, int key, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	_notify_check_va(target, sender, key, format, ap);
+	va_end(ap);
 }
 
 void notify_except(dbref loc, dbref player, dbref exception, int flags, const char *format, ...)
@@ -3342,8 +3381,6 @@ int main(int argc, char *argv[])
 	init_flagtab();
 	init_powertab();
 	init_functab();
-	/* Seed global RNG early to ensure good randomness across rapid calls */
-	rng_global_init();
 	init_attrtab();
 	log_version();
 	init_mstate();
@@ -3352,6 +3389,9 @@ int main(int argc, char *argv[])
 	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration file : %s", mushconf.config_file);
 	log_write(LOG_ALWAYS, "INI", "LOAD", "Configuration home : %s", mushconf.config_home);
 	cf_read(mushconf.config_file);
+
+	/* Seed global RNG after reading config so rng_seed takes effect */
+	rng_global_init();
 
 	/*
 	 * Abort if someone tried to set the number of global registers to

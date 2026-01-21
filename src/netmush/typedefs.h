@@ -1113,86 +1113,83 @@ typedef struct
 
 typedef struct statedata
 {
-    int record_players;                 /*!< The maximum # of player logged on */
-    int db_block_size;                  /*!< Block size of database */
-    UDB_OBJECT *objpipes[NUM_OBJPIPES]; /*!< Number of object pipelines */
-    unsigned int objc;                  /*!< Object reference counter */
-    versioninfo version;                /*!< MUSH version info */
-    // char *configureinfo;                /*!< Configure switches */
-    // char *compilerinfo;                 /*!< Compiler command line */
-    // char *linkerinfo;                   /*!< Linker command line */
-    char *modloaded;         /*!< Modules loaded */
-    char **cfiletab;         /*!< Array of config files */
-    int configfiles;         /*!< Number of config files */
-    int initializing;        /*!< Are we reading config file at startup? */
-    int loading_db;          /*!< Are we loading the db? */
-    int standalone;          /*!< Are we converting the database? */
-    int panicking;           /*!< Are we in the middle of dying horribly? */
-    int restarting;          /*!< Are we restarting? */
-    int dumping;             /*!< Are we dumping? */
-    int logstderr;           /*!< Echo log to stderr too? */
-    int debug;               /*!< Are we being debug? */
-    pid_t dumper;            /*!< If forked-dumping, with what pid? */
-    int logging;             /*!< Are we in the middle of logging? */
-    int epoch;               /*!< Generation number for dumps */
-    int generation;          /*!< DB global generation number */
-    int mush_lognum;         /*!< Number of logfile */
-    int helpfiles;           /*!< Number of external indexed helpfiles */
-    int hfiletab_size;       /*!< Size of the table storing path pointers */
-    char **hfiletab;         /*!< Array of path pointers */
-    HASHTAB *hfile_hashes;   /*!< Pointer to an array of index hashtables */
-    dbref curr_enactor;      /*!< Who initiated the current command */
-    dbref curr_player;       /*!< Who is running the current command */
-    char *curr_cmd;          /*!< The current command */
-    int alarm_triggered;     /*!< Has periodic alarm signal occurred? */
-    time_t now;              /*!< What time is it now? */
-    time_t dump_counter;     /*!< Countdown to next db dump */
-    time_t check_counter;    /*!< Countdown to next db check */
-    time_t idle_counter;     /*!< Countdown to next idle check */
-    time_t mstats_counter;   /*!< Countdown to next mstats snapshot */
-    time_t events_counter;   /*!< Countdown to next events check */
-    int shutdown_flag;       /*!< Should interface be shut down? */
-    int flatfile_flag;       /*!< Dump a flatfile when we have the chance */
-    int backup_flag;         /*!< Force a live backup when we have the chance */
-    time_t start_time;       /*!< When was MUSH started */
-    time_t restart_time;     /*!< When did we last restart? */
-    int reboot_nums;         /*!< How many times have we restarted? */
-    time_t cpu_count_from;   /*!< When did we last reset CPU counters? */
-    char *debug_cmd;         /*!< The command we are executing (if any) */
-    char *doing_hdr;         /*!< Doing column header in WHO display */
-    SITE *access_list;       /*!< Access states for sites */
-    SITE *suspect_list;      /*!< Sites that are suspect */
-    HASHTAB command_htab;    /*!< Commands hashtable */
-    HASHTAB logout_cmd_htab; /*!< Logged-out commands hashtable (WHO, etc) */
-    HASHTAB func_htab;       /*!< Functions hashtable */
-    HASHTAB ufunc_htab;      /*!< Local functions hashtable */
-    HASHTAB powers_htab;     /*!< Powers hashtable */
-    HASHTAB flags_htab;      /*!< Flags hashtable */
-    HASHTAB attr_name_htab;  /*!< Attribute names hashtable */
-    HASHTAB vattr_name_htab; /*!< User attribute names hashtable */
-    HASHTAB player_htab;     /*!< Player name->number hashtable */
-    HASHTAB nref_htab;       /*!< Object name reference #_name_ mapping */
-    HASHTAB desc_htab;       /*!< Socket descriptor hashtable */
-    HASHTAB fwdlist_htab;    /*!< Room forwardlists */
-    HASHTAB propdir_htab;    /*!< Propdir lists */
-    HASHTAB qpid_htab;       /*!< Queue process IDs */
-    HASHTAB redir_htab;      /*!< Redirections */
-    HASHTAB objstack_htab;   /*!< Object stacks */
-    HASHTAB objgrid_htab;    /*!< Object grids */
-    HASHTAB parent_htab;     /*!< Parent $-command exclusion */
-    HASHTAB vars_htab;       /*!< Persistent variables hashtable */
-    HASHTAB structs_htab;    /*!< Structure hashtable */
-    HASHTAB cdefs_htab;      /*!< Components hashtable */
-    HASHTAB instance_htab;   /*!< Instances hashtable */
-    HASHTAB instdata_htab;   /*!< Structure data hashtable */
-    HASHTAB api_func_htab;   /*!< Registered module API functions */
-    MODULE *modules_list;    /*!< Loadable modules hashtable */
-    int max_structs;
-    int max_cdefs;
-    int max_instance;
-    int max_instdata;
-    int max_stacks;
-    int max_vars;
+    int record_players;                  /*!< The maximum # of player logged on */
+    int db_block_size;                   /*!< Block size of database */
+    UDB_OBJECT *objpipes[NUM_OBJPIPES];  /*!< Number of object pipelines */
+    unsigned int objc;                   /*!< Object reference counter */
+    versioninfo version;                 /*!< MUSH version info */
+    char *modloaded;                     /*!< Modules loaded */
+    char **cfiletab;                     /*!< Array of config files */
+    int configfiles;                     /*!< Number of config files */
+    int initializing;                    /*!< Are we reading config file at startup? */
+    int loading_db;                      /*!< Are we loading the db? */
+    int standalone;                      /*!< Are we converting the database? */
+    int panicking;                       /*!< Are we in the middle of dying horribly? */
+    int restarting;                      /*!< Are we restarting? */
+    int dumping;                         /*!< Are we dumping? */
+    int logstderr;                       /*!< Echo log to stderr too? */
+    int debug;                           /*!< Are we being debug? */
+    pid_t dumper;                        /*!< If forked-dumping, with what pid? */
+    int logging;                         /*!< Are we in the middle of logging? */
+    int epoch;                           /*!< Generation number for dumps */
+    int generation;                      /*!< DB global generation number */
+    int mush_lognum;                     /*!< Number of logfile */
+    int helpfiles;                       /*!< Number of external indexed helpfiles */
+    int hfiletab_size;                   /*!< Size of the table storing path pointers */
+    char **hfiletab;                     /*!< Array of path pointers */
+    HASHTAB *hfile_hashes;               /*!< Pointer to an array of index hashtables */
+    dbref curr_enactor;                  /*!< Who initiated the current command */
+    dbref curr_player;                   /*!< Who is running the current command */
+    char *curr_cmd;                      /*!< The current command */
+    int alarm_triggered;                 /*!< Has periodic alarm signal occurred? */
+    time_t now;                          /*!< What time is it now? */
+    time_t dump_counter;                 /*!< Countdown to next db dump */
+    time_t check_counter;                /*!< Countdown to next db check */
+    time_t idle_counter;                 /*!< Countdown to next idle check */
+    time_t mstats_counter;               /*!< Countdown to next mstats snapshot */
+    time_t events_counter;               /*!< Countdown to next events check */
+    int shutdown_flag;                   /*!< Should interface be shut down? */
+    int flatfile_flag;                   /*!< Dump a flatfile when we have the chance */
+    int backup_flag;                     /*!< Force a live backup when we have the chance */
+    time_t start_time;                   /*!< When was MUSH started */
+    time_t restart_time;                 /*!< When did we last restart? */
+    int reboot_nums;                     /*!< How many times have we restarted? */
+    time_t cpu_count_from;               /*!< When did we last reset CPU counters? */
+    char *debug_cmd;                     /*!< The command we are executing (if any) */
+    char *doing_hdr;                     /*!< Doing column header in WHO display */
+    SITE *access_list;                   /*!< Access states for sites */
+    SITE *suspect_list;                  /*!< Sites that are suspect */
+    HASHTAB command_htab;                /*!< Commands hashtable */
+    HASHTAB logout_cmd_htab;             /*!< Logged-out commands hashtable (WHO, etc) */
+    HASHTAB func_htab;                   /*!< Functions hashtable */
+    HASHTAB ufunc_htab;                  /*!< Local functions hashtable */
+    HASHTAB powers_htab;                 /*!< Powers hashtable */
+    HASHTAB flags_htab;                  /*!< Flags hashtable */
+    HASHTAB attr_name_htab;              /*!< Attribute names hashtable */
+    HASHTAB vattr_name_htab;             /*!< User attribute names hashtable */
+    HASHTAB player_htab;                 /*!< Player name->number hashtable */
+    HASHTAB nref_htab;                   /*!< Object name reference #_name_ mapping */
+    HASHTAB desc_htab;                   /*!< Socket descriptor hashtable */
+    HASHTAB fwdlist_htab;                /*!< Room forwardlists */
+    HASHTAB propdir_htab;                /*!< Propdir lists */
+    HASHTAB qpid_htab;                   /*!< Queue process IDs */
+    HASHTAB redir_htab;                  /*!< Redirections */
+    HASHTAB objstack_htab;               /*!< Object stacks */
+    HASHTAB objgrid_htab;                /*!< Object grids */
+    HASHTAB parent_htab;                 /*!< Parent $-command exclusion */
+    HASHTAB vars_htab;                   /*!< Persistent variables hashtable */
+    HASHTAB structs_htab;                /*!< Structure hashtable */
+    HASHTAB cdefs_htab;                  /*!< Components hashtable */
+    HASHTAB instance_htab;               /*!< Instances hashtable */
+    HASHTAB instdata_htab;               /*!< Structure data hashtable */
+    HASHTAB api_func_htab;               /*!< Registered module API functions */
+    MODULE *modules_list;                /*!< Loadable modules hashtable */
+    int max_structs;                     /*!< Maximum number of structures */
+    int max_cdefs;                       /*!< Maximum number of components */
+    int max_instance;                    /*!< Maximum number of structure instances */
+    int max_instdata;                    /*!< Maximum number of structure instance data entries */
+    int max_stacks;                      /*!< Maximum number of object stacks */
+    int max_vars;                        /*!< Maximum number of persistent variables */
     int attr_next;                       /*!< Next attr to alloc when freelist is empty */
     BQUE *qfirst;                        /*!< Head of player queue */
     BQUE *qlast;                         /*!< Tail of player queue */
@@ -1217,7 +1214,7 @@ typedef struct statedata
     int db_top;                          /*!< Number of items in the db */
     int db_size;                         /*!< Allocated size of db structure */
     unsigned int moduletype_top;         /*!< Highest module DBTYPE */
-    int *guest_free;                     /*!< Table to keep track of free guests */
+    //int *guest_free;                     /*!< Table to keep track of free guests */
     MARKBYTE *markbits;                  /*!< temp storage for marking/unmarking */
     int in_loop;                         /*!< In a loop() statement? */
     char *loop_token[MAX_ITER_NESTING];  /*!< Value of ## */
@@ -1409,8 +1406,8 @@ typedef enum COLOR_TYPE
 
 typedef struct COLORDEF
 {
-    COLOR_TYPE type;    /* Type of color */
-    bool is_bg;         /* Is this a background color? */
+    COLOR_TYPE type; /* Type of color */
+    bool is_bg;      /* Is this a background color? */
     union
     {
         uint8_t ansi_index;  /* 0-15 */
@@ -1445,7 +1442,7 @@ typedef struct
 {
     ANSICOLORTYPES type;
     rgbColor rgb;
-    uint8_t xterm_index;  /* Original xterm index (0-255) when type is ANSICOLORTYPE_XTERM */
+    uint8_t xterm_index; /* Original xterm index (0-255) when type is ANSICOLORTYPE_XTERM */
 } VT100COLOR;
 
 typedef struct
@@ -1470,4 +1467,3 @@ typedef void (*handler_cs_two_args_t)(dbref, dbref, int, char *, char *);
 typedef void (*handler_cs_two_args_cmdargs_t)(dbref, dbref, int, char *, char *, char *[], int);
 typedef void (*handler_cs_two_args_argv_t)(dbref, dbref, int, char *, char *[], int);
 typedef void (*handler_cs_two_args_cmdargs_argv_t)(dbref, dbref, int, char *, char *[], int, char *[], int);
-

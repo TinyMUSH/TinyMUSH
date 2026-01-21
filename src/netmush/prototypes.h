@@ -824,6 +824,7 @@ extern int check_filter(dbref object, dbref player, int filter, const char *msg)
 extern char *add_prefix(dbref object, dbref player, int prefix, const char *msg, const char *dflt);
 extern char *dflt_from_msg(dbref sender, dbref sendloc);
 extern void html_escape(const char *src, char *dest, char **destp);
+extern void _notify_check_va(dbref target, dbref sender, int key, const char *format, va_list ap);
 extern void notify_check(dbref target, dbref sender, int key, const char *format, ...);
 extern void notify_except(dbref loc, dbref player, dbref exception, int flags, const char *format, ...);
 extern void notify_except2(dbref loc, dbref player, dbref exc1, dbref exc2, int flags, const char *format, ...);
@@ -906,6 +907,7 @@ extern void logfile_move(char *oldfn, char *newfn);
 extern int start_log(const char *primary, const char *secondary, int key);
 extern void end_log(void);
 extern void _log_perror(const char *file, int line, const char *primary, const char *secondary, const char *extra, const char *failing_object);
+extern void _log_write_va(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, va_list ap);
 extern void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...);
 extern void log_write_raw(int key, const char *format, ...);
 extern char *log_getname(dbref target);

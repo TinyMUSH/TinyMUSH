@@ -590,6 +590,125 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
 }
 
 /**
+ * @brief Format and write a structured log message from va_list (internal).
+ *
+ * This is an internal logging function that handles message formatting from an existing
+ * va_list. It processes the message in the same manner as _log_write() but accepts
+ * a pre-initialized va_list rather than variadic arguments. This allows multiple
+ * logging functions to share the same core formatting and writing logic without
+ * duplicating code or requiring intermediate string allocations.
+ *
+ * This function is typically used by wrapper functions like cf_log() that need to
+ * accept variadic arguments, process them once, and then pass to the logging system.
+ *
+ * Operation sequence:
+ * 1. Validates the format string parameter (must not be NULL)
+ * 2. Checks if logging should occur:
+ *    - Filters against mushconf.log_options using bitwise AND with key
+ *    - Calls start_log() to initialize the log entry and write header
+ *    - Skips logging if filtering fails or start_log() returns 0
+ * 3. Formats the message:
+ *    - Calculates required buffer size using vsnprintf(NULL, 0, ...)
+ *    - Allocates buffer with calloc (untracked to avoid logger recursion)
+ *    - Formats the message using vsnprintf with the provided va_list
+ * 4. Optionally adds debug information:
+ *    - If mushstate.debug is enabled, prepends "file:line " to the message
+ *    - Creates secondary buffer (str1) with XNASPRINTF for debug format
+ * 5. Writes to log file and optionally to stderr
+ * 6. Cleanup: Frees buffers and calls end_log()
+ *
+ * @param file Source filename where the log call originated (typically via __FILE__).
+ *             Used in debug mode to prepend location info to log messages.
+ * @param line Source line number where the log call originated (typically via __LINE__).
+ * @param key Bitfield key for log filtering (e.g., LOG_ALWAYS, LOG_BUGS, LOG_NET).
+ * @param primary The primary category/type of the log entry (e.g., "WIZ", "NET").
+ * @param secondary Optional secondary category for finer classification (e.g., "LOGIN").
+ * @param format Printf-style format string for the log message body. Must not be NULL.
+ * @param ap Initialized va_list with arguments matching the format string specifiers.
+ *           The caller is responsible for calling va_start() before passing and
+ *           va_end() after this function returns.
+ *
+ * @note This is an internal function; use log_write() or _log_write() for normal logging.
+ * @note The va_list is NOT modified by this function (it's passed by value to vsnprintf).
+ * @note Memory allocations use calloc/free rather than XMALLOC to avoid recursion.
+ *
+ * @warning Do not call this function directly unless you have an initialized va_list.
+ *          For most purposes, use log_write() or _log_write() instead.
+ * @warning The caller must have called va_start() before passing the va_list.
+ * @warning The caller should call va_end() after this function returns (not this function's responsibility).
+ *
+ * @see _log_write()
+ * @see log_write()
+ * @see start_log()
+ * @see end_log()
+ */
+void _log_write_va(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, va_list ap)
+{
+	if (!format)
+	{
+		fprintf(stderr, "Error: NULL format string in _log_write_va\n");
+		return;
+	}
+
+	if ((((key)&mushconf.log_options) != 0) && start_log(primary, secondary, key))
+	{
+		int size = 0;
+		char *str = NULL, *str1 = NULL;
+		const char *output_str = NULL;
+		va_list ap_copy;
+
+		if (!file)
+		{
+			file = "<unknown>";
+		}
+
+		/* Make a copy of ap for the size calculation */
+		va_copy(ap_copy, ap);
+		size = vsnprintf(NULL, 0, format, ap_copy);
+		va_end(ap_copy);
+
+		if (size < 0)
+		{
+			end_log();
+			return;
+		}
+
+		size++;
+		str = calloc(size, sizeof(char)); // Don't track the logger...
+
+		if (str == NULL)
+		{
+			end_log();
+			return;
+		}
+
+		/* Make another copy of ap for the actual formatting */
+		va_copy(ap_copy, ap);
+		vsnprintf(str, size, format, ap_copy);
+		va_end(ap_copy);
+
+		/* Prepare output string: add debug info if enabled */
+		if (mushstate.debug)
+		{
+			str1 = XNASPRINTF("%s:%d %s", file, line, str);
+			output_str = str1 ? str1 : str;  /* Fallback to str if allocation fails */
+		}
+		else
+		{
+			output_str = str;
+		}
+
+		/* Write to log file - start_log() guarantees log_fp is valid */
+		write_to_logfile(log_fp, output_str);
+
+		XFREE(str1);
+		free(str);
+
+		end_log();
+	}
+}
+
+/**
  * @brief Format and write a structured log message with optional debug information.
  *
  * This is the core internal logging function for TinyMUSH's structured logging system.
@@ -598,79 +717,24 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
  * appropriate. This function is typically called through the log_write() macro which
  * automatically provides file and line number tracking.
  *
- * Operation sequence:
- * 1. Validates the format string parameter (must not be NULL)
- * 2. Checks if logging should occur:
- *    - Filters against mushconf.log_options using bitwise AND with key
- *    - Calls start_log() to initialize the log entry and write header
- *    - Skips logging if filtering fails or start_log() returns 0
- * 3. Prepares for message formatting:
- *    - Initializes va_list for variadic argument processing
- *    - Calculates required buffer size using vsnprintf(NULL, 0, ...)
- *    - Allocates buffer with calloc (untracked to avoid logger recursion)
- * 4. Formats the user message using vsnprintf with variadic arguments
- * 5. Optionally adds debug information:
- *    - If mushstate.debug is enabled, prepends "file:line " to the message
- *    - Creates secondary buffer (str1) with XNASPRINTF for debug format
- * 6. Writes to primary log file (log_fp):
- *    - Uses debug format (str1) if available and debug mode is on
- *    - Uses plain format (str) otherwise
- *    - Reports write errors to stderr via fprintf
- * 7. Optionally duplicates to stderr:
- *    - If log_fp != stderr AND mushstate.logstderr is enabled
- *    - Supports startup logging where both file and console output are needed
- *    - Silently ignores stderr write errors to avoid recursion
- * 8. Cleanup:
- *    - Frees debug buffer (str1) with XFREE if allocated
- *    - Frees message buffer (str) with free (untracked allocation)
- *    - Calls end_log() to finalize the log entry and flush buffers
- *
- * Message format examples:
- * - Normal: "Failed to open database file"
- * - Debug mode: "db.c:1234 Failed to open database file"
- *
- * Typical usage pattern (via macro):
- * @code
- * if (database_fd < 0) {
- *     log_write(LOG_ALWAYS, "DB", "LOAD", "Failed to open %s", dbfile);
- * }
- * // With macro expansion becomes:
- * // _log_write(__FILE__, __LINE__, LOG_ALWAYS, "DB", "LOAD", "Failed to open %s", dbfile);
- * @endcode
- *
  * @param file Source filename where the log call originated (typically via __FILE__).
- *             Used in debug mode to prepend location info to log messages.
- *             If NULL, replaced with "<unknown>" for safety.
  * @param line Source line number where the log call originated (typically via __LINE__).
- *             Used in debug mode to prepend location info to log messages.
- * @param key Bitfield key for log filtering and routing (e.g., LOG_ALWAYS, LOG_BUGS, LOG_NET).
- *            Tested against mushconf.log_options to determine if message should be logged.
- *            Passed to start_log() for routing to appropriate log file.
- * @param primary The primary category/type of the log entry (e.g., "WIZ", "NET", "CMD").
- *                Passed to start_log() for log header formatting.
- * @param secondary Optional secondary category for finer classification (e.g., "LOGIN", "ERROR").
- *                  Can be NULL. Passed to start_log() for log header formatting.
+ * @param key Bitfield key for log filtering (e.g., LOG_ALWAYS, LOG_BUGS, LOG_NET).
+ * @param primary The primary category/type of the log entry (e.g., "WIZ", "NET").
+ * @param secondary Optional secondary category for finer classification (e.g., "LOGIN").
  * @param format Printf-style format string for the log message body. Must not be NULL.
- *               Supports all standard printf format specifiers (%s, %d, %x, etc.).
  * @param ... Variable arguments matching the format string specifiers.
- *            Processed using va_list and vsnprintf for safe formatting.
  *
- * @note This is an internal function; use the log_write() macro instead for automatic file/line tracking.
- * @note Memory allocations use calloc/free rather than XMALLOC to avoid recursion in memory tracking.
- * @note If start_log() returns 0 (logging skipped), no message formatting or writing occurs.
- * @note The function always calls end_log() after successful start_log() to maintain proper state.
- * @note Debug information (file:line prefix) is only added when mushstate.debug is enabled.
- * @note Stderr duplication only occurs during startup (mushstate.logstderr) and when log_fp != stderr.
+ * @note This is an internal function; use the log_write() macro instead.
+ * @note Memory allocations use calloc/free rather than XMALLOC to avoid recursion.
+ * @note If start_log() returns 0 (logging skipped), no message formatting occurs.
+ * @note The function always calls end_log() after successful start_log().
  *
- * @warning Do not call this function directly; use the log_write() macro to ensure
- *          proper file and line number tracking.
- * @warning Buffer allocation failures cause early return after calling end_log() to maintain state.
- * @warning Write errors to log_fp are reported to stderr, but stderr write errors are silently ignored
- *          to prevent infinite recursion in error handling.
- * @warning If format is NULL, an error is printed to stderr and the function returns immediately
- *          without calling start_log() or end_log().
+ * @warning Do not call this function directly; use the log_write() macro.
+ * @warning If format is NULL, an error is printed to stderr and the function returns.
  *
  * @see log_write()
+ * @see _log_write_va()
  * @see start_log()
  * @see end_log()
  * @see log_write_raw()
@@ -678,66 +742,17 @@ void _log_perror(const char *file, int line, const char *primary, const char *se
  */
 void _log_write(const char *file, int line, int key, const char *primary, const char *secondary, const char *format, ...)
 {
-    if (!format)
-    {
-        fprintf(stderr, "Error: NULL format string in _log_write\n");
-        return;
-    }
+	va_list ap;
 
-    if ((((key)&mushconf.log_options) != 0) && start_log(primary, secondary, key))
-    {
-        int size = 0;
-        char *str = NULL, *str1 = NULL;
-        const char *output_str = NULL;  /* Pointer to the string to output */
-        va_list ap;
+	if (!format)
+	{
+		fprintf(stderr, "Error: NULL format string in _log_write\n");
+		return;
+	}
 
-        if (!file)
-        {
-            file = "<unknown>";
-        }
-
-        va_start(ap, format);
-        size = vsnprintf(NULL, 0, format, ap);
-        va_end(ap);
-
-        if (size < 0)
-        {
-            end_log();
-            return;
-        }
-
-        size++;
-        str = calloc(size, sizeof(char)); // Don't track the logger...
-
-        if (str == NULL)
-        {
-            end_log();
-            return;
-        }
-
-        va_start(ap, format);
-        vsnprintf(str, size, format, ap);
-        va_end(ap);
-
-        /* Prepare output string: add debug info if enabled */
-        if (mushstate.debug)
-        {
-            str1 = XNASPRINTF("%s:%d %s", file, line, str);
-            output_str = str1 ? str1 : str;  /* Fallback to str if allocation fails */
-        }
-        else
-        {
-            output_str = str;
-        }
-
-        /* Write to log file - start_log() guarantees log_fp is valid */
-        write_to_logfile(log_fp, output_str);
-
-        XFREE(str1);
-        free(str);
-
-        end_log();
-    }
+	va_start(ap, format);
+	_log_write_va(file, line, key, primary, secondary, format, ap);
+	va_end(ap);
 }
 
 /**
