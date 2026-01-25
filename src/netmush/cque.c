@@ -1844,8 +1844,8 @@ void do_second(void)
 	BQUE *trail = NULL, *point = NULL, *next = NULL;
 	char *cmdsave = NULL;
 
-	/* Move low-priority queue to end of normal queue, delaying object effects by 1 second */
-	if ((mushconf.control_flags & CF_DEQUEUE) == 0)
+	/* Early exit if command processing is disabled */
+	if (!(mushconf.control_flags & CF_DEQUEUE))
 	{
 		return;
 	}
@@ -1853,6 +1853,7 @@ void do_second(void)
 	cmdsave = mushstate.debug_cmd;
 	mushstate.debug_cmd = (char *)"< do_second >";
 
+	/* Promote low-priority (object) queue to end of normal queue */
 	if (mushstate.qlfirst)
 	{
 		if (mushstate.qlast)
@@ -1868,33 +1869,37 @@ void do_second(void)
 		mushstate.qllast = mushstate.qlfirst = NULL;
 	}
 
-	/* the point->waittime test would be 0 except the command is being put in the low priority queue to be done in one second anyway */
+	/* Process wait queue: move expired entries to normal queue */
 	while (mushstate.qwait && mushstate.qwait->waittime <= mushstate.now)
 	{
-		/* Do the wait queue, move the command to the normal queue */
 		point = mushstate.qwait;
 		mushstate.qwait = point->next;
 		give_que(point);
 	}
 
-	/* Check the semaphore queue for expired timed-waits */
+	/* Process semaphore queue: handle expired timed-waits */
 	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 	{
+		/* Skip non-timed semaphore waits */
 		if (point->waittime == 0)
 		{
 			next = (trail = point)->next;
-			continue; /* Skip if not timed-wait */
+			continue;
 		}
 
+		/* Check if timed-wait has expired */
 		if (point->waittime <= mushstate.now)
 		{
-			if (trail != NULL)
+			/* Unlink from semaphore queue */
+			next = point->next;
+
+			if (trail)
 			{
-				trail->next = next = point->next;
+				trail->next = next;
 			}
 			else
 			{
-				mushstate.qsemfirst = next = point->next;
+				mushstate.qsemfirst = next;
 			}
 
 			if (point == mushstate.qsemlast)
@@ -1902,7 +1907,8 @@ void do_second(void)
 				mushstate.qsemlast = trail;
 			}
 
-			add_to(point->player, point->sem, -1, (point->attr ? point->attr : A_SEMAPHORE));
+			/* Decrement semaphore and execute command */
+			add_to(point->player, point->sem, -1, point->attr ? point->attr : A_SEMAPHORE);
 			point->sem = NOTHING;
 			give_que(point);
 		}
@@ -1913,7 +1919,6 @@ void do_second(void)
 	}
 
 	mushstate.debug_cmd = cmdsave;
-	return;
 }
 
 /**
