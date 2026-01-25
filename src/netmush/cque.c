@@ -2232,99 +2232,108 @@ int do_top(int ncmds)
 void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
 	BQUE *tmp = NULL;
-	char *bp = NULL, *bufp = NULL;
-	int i = 0;
+	char *bp = NULL, *bufp = NULL, *enactor_name = NULL;
+	int msg_flags = MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN;
 	ATTR *ap = NULL;
 
-	*qtot = 0;
-	*qent = 0;
-	*qdel = 0;
+	*qtot = *qent = *qdel = 0;
 
 	for (tmp = queue; tmp; tmp = tmp->next)
 	{
 		(*qtot)++;
 
-		if (que_want(tmp, player_targ, obj_targ))
+		/* Track deleted entries */
+		if (tmp->player == NOTHING)
 		{
-			(*qent)++;
+			(*qdel)++;
+			continue;
+		}
 
-			if (key == PS_SUMM)
-			{
-				continue;
-			}
+		/* Filter entries by target criteria */
+		if (!que_want(tmp, player_targ, obj_targ))
+		{
+			continue;
+		}
 
-			if (*qent == 1)
-			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "----- %s Queue -----", header);
-			}
+		(*qent)++;
 
-			bufp = unparse_object(player, tmp->player, 0);
+		/* Skip display for summary mode */
+		if (key == PS_SUMM)
+		{
+			continue;
+		}
 
-			if ((tmp->waittime > 0) && (Good_obj(tmp->sem)))
-			{
-				/* A minor shortcut. We can never timeout-wait on a non-Semaphore attribute. */
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d/%d] %d:%s:%s", tmp->sem, tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
-			}
-			else if (tmp->waittime > 0)
-			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[%d] %d:%s:%s", tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
-			}
-			else if (Good_obj(tmp->sem))
-			{
-				if (tmp->attr == A_SEMAPHORE)
-				{
-					notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm);
-				}
-				else
-				{
-					ap = atr_num(tmp->attr);
+		/* Display header on first matching entry */
+		if (*qent == 1)
+		{
+			notify_check(player, player, msg_flags, "----- %s Queue -----", header);
+		}
 
-					if (ap && ap->name)
-					{
-						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d/%s] %d:%s:%s", tmp->sem, ap->name, tmp->pid, bufp, tmp->comm);
-					}
-					else
-					{
-						notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm);
-					}
-				}
+		bufp = unparse_object(player, tmp->player, 0);
+
+		/* Display entry based on type */
+		if ((tmp->waittime > 0) && Good_obj(tmp->sem))
+		{
+			/* Timed wait on semaphore */
+			notify_check(player, player, msg_flags, "[#%d/%d] %d:%s:%s", tmp->sem, tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
+		}
+		else if (tmp->waittime > 0)
+		{
+			/* Timed wait without semaphore */
+			notify_check(player, player, msg_flags, "[%d] %d:%s:%s", tmp->waittime - mushstate.now, tmp->pid, bufp, tmp->comm);
+		}
+		else if (Good_obj(tmp->sem))
+		{
+			/* Semaphore wait without timeout */
+			if (tmp->attr == A_SEMAPHORE)
+			{
+				notify_check(player, player, msg_flags, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm);
 			}
 			else
 			{
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%d:%s:%s", tmp->pid, bufp, tmp->comm);
-			}
+				ap = atr_num(tmp->attr);
 
+				if (ap && ap->name)
+				{
+					notify_check(player, player, msg_flags, "[#%d/%s] %d:%s:%s", tmp->sem, ap->name, tmp->pid, bufp, tmp->comm);
+				}
+				else
+				{
+					notify_check(player, player, msg_flags, "[#%d] %d:%s:%s", tmp->sem, tmp->pid, bufp, tmp->comm);
+				}
+			}
+		}
+		else
+		{
+			/* Normal queue entry */
+			notify_check(player, player, msg_flags, "%d:%s:%s", tmp->pid, bufp, tmp->comm);
+		}
+
+		/* Display detailed information in long mode */
+		if (key == PS_LONG)
+		{
 			bp = bufp;
 
-			if (key == PS_LONG)
+			for (int i = 0; i < tmp->nargs; i++)
 			{
-				for (i = 0; i < (tmp->nargs); i++)
+				if (tmp->env[i])
 				{
-					if (tmp->env[i] != NULL)
-					{
-						XSAFELBSTR((char *)"; Arg", bufp, &bp);
-						XSAFELBCHR(i + '0', bufp, &bp);
-						XSAFELBSTR((char *)"='", bufp, &bp);
-						XSAFELBSTR(tmp->env[i], bufp, &bp);
-						XSAFELBCHR('\'', bufp, &bp);
-					}
+					XSAFELBSTR((char *)"; Arg", bufp, &bp);
+					XSAFELBCHR(i + '0', bufp, &bp);
+					XSAFELBSTR((char *)"='", bufp, &bp);
+					XSAFELBSTR(tmp->env[i], bufp, &bp);
+					XSAFELBCHR('\'', bufp, &bp);
 				}
-
-				*bp = '\0';
-				bp = unparse_object(player, tmp->cause, 0);
-				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "   Enactor: %s%s", bp, bufp);
-				XFREE(bp);
 			}
 
-			XFREE(bufp);
+			*bp = '\0';
+			enactor_name = unparse_object(player, tmp->cause, 0);
+			notify_check(player, player, msg_flags, "   Enactor: %s%s", enactor_name, bufp);
+			XFREE(enactor_name);
 		}
-		else if (tmp->player == NOTHING)
-		{
-			(*qdel)++;
-		}
-	}
 
-	return;
+		XFREE(bufp);
+	}
 }
 
 /**
