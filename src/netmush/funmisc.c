@@ -2001,7 +2001,7 @@ void fun_trigger(char *buff, char **bufc, dbref player, dbref caller, dbref caus
  */
 void fun_wait(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
-	do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
+	cque_do_wait(player, cause, 0, fargs[0], fargs[1], cargs, ncargs);
 }
 
 /**
@@ -2418,7 +2418,7 @@ void list_qpids(dbref player_targ, dbref obj_targ, BQUE *queue, char *buff, char
 
 	for (tmp = queue; tmp; tmp = tmp->next)
 	{
-		if (que_want(tmp, player_targ, obj_targ))
+		if (cque_que_want(tmp, player_targ, obj_targ))
 		{
 			if (*bufc != bb_p)
 			{

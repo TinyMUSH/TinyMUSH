@@ -114,10 +114,10 @@ static void _cque_free_gdata(GDATA *gdata)
  * @note Return value 0 indicates all PIDs exhausted - caller must handle gracefully
  * @attention PIDs wrap around from max_qpid to 1, ensuring bounded search space
  *
- * @see setup_que() for PID allocation usage
- * @see delete_qentry() for PID deallocation (via nhashdelete)
+ * @see cque_setup_que() for PID allocation usage
+ * @see cque_delete_qentry() for PID deallocation (via nhashdelete)
  */
-int qpid_next(void)
+int cque_qpid_next(void)
 {
 	int qpid = qpid_top;
 
@@ -167,16 +167,16 @@ int qpid_next(void)
  *         - 999: No commands in any queue (default 1000 - 1)
  *
  * @note Thread-safe: Yes (read-only operation on queue structures)
- * @note Return value of 0 triggers immediate do_top() execution
+ * @note Return value of 0 triggers immediate cque_do_top() execution
  * @note Imminent threshold (2 seconds) provides buffer for processing latency
  * @attention Depends on mushstate.now being current time (updated by main loop)
  * @attention Semaphore entries with waittime = 0 are skipped (no timeout)
  *
- * @see do_second() for wait queue processing when time expires
- * @see do_top() for command execution triggered by return value 0
+ * @see cque_do_second() for wait queue processing when time expires
+ * @see cque_do_top() for command execution triggered by return value 0
  * @see test_top() for player queue readiness check
  */
-int que_next(void)
+int cque_que_next(void)
 {
 	int min = 1000, this = 0;
 	BQUE *point = NULL;
@@ -247,9 +247,9 @@ int que_next(void)
  * 1. Low-priority queue promotion: Moves entire object queue (qlfirst/qllast) to end of
  *    normal queue (qfirst/qlast), implementing one-second delay for object actions
  * 2. Wait queue processing: Scans mushstate.qwait in sorted order, moving all entries
- *    with waittime <= now to normal queue via give_que() for immediate execution
+ *    with waittime <= now to normal queue via cque_give_que() for immediate execution
  * 3. Semaphore timeout processing: Scans mushstate.qsemfirst for timed-wait entries
- *    (waittime != 0), decrements semaphore counter via add_to(), and moves expired
+ *    (waittime != 0), decrements semaphore counter via cque_add_to(), and moves expired
  *    entries to normal queue
  *
  * Queue promotion logic maintains responsive gameplay by prioritizing player commands
@@ -260,26 +260,26 @@ int que_next(void)
  * Timed semaphore behavior: When timeout expires, decrements semaphore counter and
  * executes command regardless of semaphore state. This prevents deadlock when notification
  * never arrives. Non-timed semaphores (waittime = 0) remain queued until explicit
- * notification via nfy_que()/do_notify().
+ * notification via cque_nfy_que()/cque_do_notify().
  *
  * Early exit: If CF_DEQUEUE flag is disabled, function returns immediately without
  * processing any queues, effectively pausing command execution system.
  *
  * @note Thread-safe: No (modifies global queue structures mushstate.qfirst/qlast/qwait/qsemfirst)
- * @note Called by main event loop approximately once per second (see que_next() return values)
+ * @note Called by main event loop approximately once per second (see cque_que_next() return values)
  * @note Low-priority queue promotion occurs before wait processing for consistent timing
- * @note Wait queue early-exit optimization assumes sorted order (maintained by wait_que())
+ * @note Wait queue early-exit optimization assumes sorted order (maintained by cque_wait_que())
  * @attention Requires mushstate.now to be current Unix timestamp (updated by caller)
  * @attention CF_DEQUEUE flag must be set or no command processing occurs
  * @attention Semaphore counter decremented even if command fails to execute
  *
- * @see que_next() for sleep time calculation that triggers this function
- * @see wait_que() for wait queue insertion and sorting
- * @see give_que() for normal queue insertion (immediate execution)
- * @see nfy_que() for semaphore notification (non-timeout release)
- * @see do_top() for command execution from normal queue
+ * @see cque_que_next() for sleep time calculation that triggers this function
+ * @see cque_wait_que() for wait queue insertion and sorting
+ * @see cque_give_que() for normal queue insertion (immediate execution)
+ * @see cque_nfy_que() for semaphore notification (non-timeout release)
+ * @see cque_do_top() for command execution from normal queue
  */
-void do_second(void)
+void cque_do_second(void)
 {
 	BQUE *trail = NULL, *point = NULL, *next = NULL;
 	char *cmdsave = NULL;
@@ -314,7 +314,7 @@ void do_second(void)
 	{
 		point = mushstate.qwait;
 		mushstate.qwait = point->next;
-		give_que(point);
+		cque_give_que(point);
 	}
 
 	/* Process semaphore queue: handle expired timed-waits */
@@ -348,9 +348,9 @@ void do_second(void)
 			}
 
 			/* Decrement semaphore and execute command */
-			add_to(point->player, point->sem, -1, point->attr ? point->attr : A_SEMAPHORE);
+			cque_add_to(point->player, point->sem, -1, point->attr ? point->attr : A_SEMAPHORE);
 			point->sem = NOTHING;
-			give_que(point);
+			cque_give_que(point);
 		}
 		else
 		{
@@ -373,13 +373,13 @@ void do_second(void)
  * Execution sequence per command:
  * 1. Check test_top() for available commands (early exit if queue empty)
  * 2. Extract player from queue head (mushstate.qfirst)
- * 3. Refund waitcost to player (paid during setup_que())
+ * 3. Refund waitcost to player (paid during cque_setup_que())
  * 4. Set execution context (curr_player, curr_enactor)
  * 5. Decrement player's queue counter via a_Queue()
  * 6. Mark entry as processed (player = NOTHING prevents double-execution)
  * 7. Load scratch registers (q-registers, x-registers) from queue entry gdata
  * 8. Parse and execute command via process_cmdent()
- * 9. Clean up queue entry via delete_qentry()
+ * 9. Clean up queue entry via cque_delete_qentry()
  * 10. Advance queue head to next entry
  *
  * Register context management: Global registers (mushstate.rdata) are preserved across
@@ -407,12 +407,12 @@ void do_second(void)
  * @attention Global register context (mushstate.rdata) shared across batch execution
  *
  * @see test_top() for queue readiness check
- * @see give_que() for normal queue insertion
+ * @see cque_give_que() for normal queue insertion
  * @see process_cmdent() for command parsing and execution
- * @see delete_qentry() for queue entry cleanup and deallocation
- * @see do_second() for wait/semaphore queue processing that feeds this queue
+ * @see cque_delete_qentry() for queue entry cleanup and deallocation
+ * @see cque_do_second() for wait/semaphore queue processing that feeds this queue
  */
-int do_top(int ncmds)
+int cque_do_top(int ncmds)
 {
 	BQUE *tmp = NULL;
 	dbref player = NOTHING;
@@ -528,7 +528,7 @@ int do_top(int ncmds)
 		{
 			tmp = mushstate.qfirst;
 			mushstate.qfirst = mushstate.qfirst->next;
-			delete_qentry(tmp);
+			cque_delete_qentry(tmp);
 		}
 
 		if (!mushstate.qfirst)

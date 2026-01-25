@@ -8,7 +8,7 @@
  *            You may distribute under the terms the Artistic License,
  *            as specified in the COPYING file.
  *
- * This module provides the main setup_que() function for queue entry creation and
+ * This module provides the main cque_setup_que() function for queue entry creation and
  * routes to specialized queue management modules for halt, notify, wait, execution,
  * and administrative commands.
  *
@@ -56,7 +56,7 @@
  * - Allocates queue entry structure
  * - Allocates single text buffer for all strings (command, args, registers)
  * - Increments queue counter via a_Queue(Owner(player), 1)
- * - Assigns unique PID via qpid_next()
+ * - Assigns unique PID via cque_qpid_next()
  * - Registers entry in qpid hash table
  *
  * Quota enforcement: Wizards and their objects may queue up to db_top+1 commands.
@@ -76,17 +76,17 @@
  * @note Queue quota exceeded results in notification and player being halted
  * @note PID exhaustion results in notification and failure
  * @note All arguments are clamped to prevent overflow (nargs, string lengths)
- * @attention Caller must use give_que(), wait_que(), or nfy_que() to route entry to queue
- * @attention Caller must release entry via delete_qentry() on failure or cleanup
+ * @attention Caller must use cque_give_que(), cque_wait_que(), or cque_nfy_que() to route entry to queue
+ * @attention Caller must release entry via cque_delete_qentry() on failure or cleanup
  * @attention Memory buffer is single allocation - pointers are internal offsets
  *
- * @see give_que() for normal queue insertion
- * @see wait_que() for wait queue insertion (timed or semaphore)
- * @see qpid_next() for PID allocation
- * @see delete_qentry() for cleanup on failure
+ * @see cque_give_que() for normal queue insertion
+ * @see cque_wait_que() for wait queue insertion (timed or semaphore)
+ * @see cque_qpid_next() for PID allocation
+ * @see cque_delete_qentry() for cleanup on failure
  * @see halt_que() for quota enforcement halt
  */
-BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs)
+BQUE *cque_setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs)
 {
 	int a = 0, tlen = 0, qpid = 0;
 	BQUE *tmp = NULL;
@@ -125,7 +125,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 	}
 
 	/* Generate a PID */
-	qpid = qpid_next();
+	qpid = cque_qpid_next();
 
 	if (qpid == 0)
 	{

@@ -687,7 +687,7 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 			}
 			else
 			{
-				wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
+				cque_wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
 			}
 
 			XFREE(tbuf);
@@ -713,7 +713,7 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 			}
 			else
 			{
-				wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
+				cque_wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
 			}
 
 			XFREE(tbuf);
@@ -740,7 +740,7 @@ void do_switch(dbref player, dbref cause, int key, char *expr, char *args[], int
 		}
 		else
 		{
-			wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
+			cque_wait_que(player, cause, 0, NOTHING, 0, tbuf, cargs, ncargs, mushstate.rdata);
 		}
 
 		XFREE(tbuf);
@@ -762,7 +762,7 @@ void do_end(dbref player, dbref cause, int key, char *condstr, char *cmdstr, cha
 
 		if (cmdstr && *cmdstr)
 		{
-			wait_que(player, cause, 0, NOTHING, 0, cmdstr, args, nargs, mushstate.rdata);
+			cque_wait_que(player, cause, 0, NOTHING, 0, cmdstr, args, nargs, mushstate.rdata);
 		}
 	}
 }
@@ -3053,7 +3053,7 @@ void did_it(dbref player, dbref thing, int what, const char *def, int owhat, con
 		}
 		else
 		{
-			wait_que(thing, player, 0, NOTHING, 0, tp, args, nargs, mushstate.rdata);
+			cque_wait_que(thing, player, 0, NOTHING, 0, tp, args, nargs, mushstate.rdata);
 		}
 	}
 

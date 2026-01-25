@@ -30,22 +30,22 @@ bool _cque_parse_pid_string(const char *pidstr, int *qpid);
 /**
  * @brief Queue a command for delayed or semaphore-controlled execution.
  *
- * Creates a queue entry via setup_que() and routes it to the appropriate queue based on
+ * Creates a queue entry via cque_setup_que() and routes it to the appropriate queue based on
  * wait time and semaphore parameters. Supports three execution modes: immediate (wait <= 0,
  * no semaphore), time-delayed (wait > 0, no semaphore), and semaphore-blocked (semaphore
  * specified). The wait queue is maintained in sorted order by execution time for efficient
- * processing by do_second().
+ * processing by cque_do_second().
  *
  * Queue routing logic:
- * - No semaphore + wait <= 0: Immediate execution via give_que()
+ * - No semaphore + wait <= 0: Immediate execution via cque_give_que()
  * - No semaphore + wait > 0: Time-sorted insertion into wait queue (mushstate.qwait)
  * - Semaphore specified: Append to semaphore queue (mushstate.qsemfirst/qsemlast)
  *
  * Wait time handling includes overflow protection: values exceeding INT_MAX/INT_MIN are
  * clamped to prevent timestamp wraparound. The wait queue is sorted by absolute execution
- * time (now + wait), enabling efficient O(1) pop operations by do_second().
+ * time (now + wait), enabling efficient O(1) pop operations by cque_do_second().
  *
- * If CF_INTERP flag is disabled or setup_que() fails (halted player, insufficient funds,
+ * If CF_INTERP flag is disabled or cque_setup_que() fails (halted player, insufficient funds,
  * quota exceeded, PID exhaustion), the command is silently discarded.
  *
  * @param player  DBref of the player queuing the command
@@ -59,17 +59,17 @@ bool _cque_parse_pid_string(const char *pidstr, int *qpid);
  * @param gargs   Global and extended register data (q-registers, x-registers) or NULL
  *
  * @note Thread-safe: No (modifies global queue structures and calls non-thread-safe functions)
- * @note If setup_que() fails, function returns silently without notification
+ * @note If cque_setup_que() fails, function returns silently without notification
  * @note Semaphore queue is unsorted (FIFO); wait queue is sorted by execution time
  * @attention Wait time overflow is silently clamped to INT_MAX/INT_MIN
  * @attention Requires CF_INTERP flag to be set or command is ignored
  *
- * @see setup_que() for queue entry creation and validation
- * @see give_que() for immediate execution queue
- * @see do_second() for wait queue processing
- * @see nfy_que() for semaphore release
+ * @see cque_setup_que() for queue entry creation and validation
+ * @see cque_give_que() for immediate execution queue
+ * @see cque_do_second() for wait queue processing
+ * @see cque_nfy_que() for semaphore release
  */
-void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
+void cque_wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
 {
 	BQUE *tmp = NULL, *point = NULL, **pptr = NULL;
 
@@ -78,7 +78,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 		return;
 	}
 
-	tmp = setup_que(player, cause, command, args, nargs, gargs);
+	tmp = cque_setup_que(player, cause, command, args, nargs, gargs);
 
 	if (tmp == NULL)
 	{
@@ -120,7 +120,7 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 		/* No semaphore, put on wait queue if wait value specified. Otherwise put on the normal queue. */
 		if (wait <= 0)
 		{
-			give_que(tmp);
+			cque_give_que(tmp);
 		}
 		else
 		{
@@ -191,11 +191,11 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
  * @attention Cannot adjust semaphore entries with waittime = 0 (non-timed waits)
  * @attention Time overflow is silently clamped to INT_MAX/INT_MIN
  *
- * @see wait_que() for initial queue entry creation
- * @see remove_waitq() for queue removal before re-threading
- * @see do_wait() for the wait command that creates timed waits
+ * @see cque_wait_que() for initial queue entry creation
+ * @see cque_remove_waitq() for queue removal before re-threading
+ * @see cque_do_wait() for the wait command that creates timed waits
  */
-void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
+void cque_do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
 	int qpid = 0;
 	BQUE *qptr = NULL, **pptr = NULL;
@@ -281,7 +281,7 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 	/* Re-thread wait queue entry if necessary (queue is sorted by waittime) */
 	if (qptr->sem == NOTHING)
 	{
-		remove_waitq(qptr);
+		cque_remove_waitq(qptr);
 
 		/* Use pointer-to-pointer technique for clean insertion */
 		pptr = &mushstate.qwait;
@@ -300,13 +300,13 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 /**
  * @brief Command interface for queuing commands with time delays or semaphore blocking.
  *
- * Parses event specification to determine execution mode and delegates to wait_que() for
+ * Parses event specification to determine execution mode and delegates to cque_wait_que() for
  * actual queuing. Supports two primary modes: simple timed delay (numeric event) and
  * semaphore-based blocking (object[/attribute] event). The WAIT_PID flag provides access
- * to do_wait_pid() for adjusting existing queue entries instead of creating new ones.
+ * to cque_do_wait_pid() for adjusting existing queue entries instead of creating new ones.
  *
  * Execution modes:
- * 1. PID adjustment (WAIT_PID flag): Delegates to do_wait_pid() to modify existing entry
+ * 1. PID adjustment (WAIT_PID flag): Delegates to cque_do_wait_pid() to modify existing entry
  * 2. Timed delay (numeric event): Queues command with specified delay in seconds
  *    - WAIT_UNTIL flag: Treats value as absolute Unix timestamp
  *    - Default: Treats value as relative delay from current time
@@ -320,9 +320,9 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
  * - If non-numeric: Semaphore mode, parse as "object" or "object/attribute[/timeout]"
  * - Split on '/' to extract object name, optional attribute name, optional timeout
  *
- * Semaphore behavior: Increments attribute counter via add_to(). If counter becomes <= 0
+ * Semaphore behavior: Increments attribute counter via cque_add_to(). If counter becomes <= 0
  * (over-notification), command executes immediately without blocking. Otherwise, command
- * is queued on semaphore until nfy_que() or do_notify() releases it.
+ * is queued on semaphore until cque_nfy_que() or cque_do_notify() releases it.
  *
  * Permission requirements: For semaphore mode, player must either control the target
  * object or object must have Link_ok flag. For custom attributes, player must have
@@ -342,12 +342,12 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
  * @attention Semaphore counter increment occurs before queuing - potential race condition
  * @attention Timeout values exceeding INT_MAX are clamped to INT_MAX
  *
- * @see wait_que() for the underlying queue insertion implementation
- * @see do_wait_pid() for PID-based wait time adjustment
- * @see do_notify() for semaphore notification/release
- * @see nfy_que() for semaphore queue processing
+ * @see cque_wait_que() for the underlying queue insertion implementation
+ * @see cque_do_wait_pid() for PID-based wait time adjustment
+ * @see cque_do_notify() for semaphore notification/release
+ * @see cque_nfy_que() for semaphore queue processing
  */
-void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
+void cque_do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {
 	dbref thing = NOTHING, aowner = NOTHING;
 	int howlong = 0, num = 0, attr = A_SEMAPHORE, aflags = 0;
@@ -358,7 +358,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 	/* PID adjustment mode */
 	if (key & WAIT_PID)
 	{
-		do_wait_pid(player, key, event, cmd);
+		cque_do_wait_pid(player, key, event, cmd);
 		return;
 	}
 
@@ -385,7 +385,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 			howlong = (int)val;
 		}
 
-		wait_que(player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mushstate.rdata);
+		cque_wait_que(player, cause, howlong, NOTHING, 0, cmd, cargs, ncargs, mushstate.rdata);
 		return;
 	}
 
@@ -461,7 +461,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 	}
 
 	/* Increment semaphore counter */
-	num = add_to(player, thing, 1, attr);
+	num = cque_add_to(player, thing, 1, attr);
 
 	if (num <= 0)
 	{
@@ -470,5 +470,5 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 		howlong = 0;
 	}
 
-	wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mushstate.rdata);
+	cque_wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mushstate.rdata);
 }

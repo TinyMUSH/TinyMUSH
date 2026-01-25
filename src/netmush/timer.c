@@ -74,7 +74,7 @@ void check_cron(void)
             cmd = atr_pget(crp->obj, crp->atr, &aowner, &aflags, &alen);
             if (*cmd && Good_obj(crp->obj))
             {
-                wait_que(crp->obj, crp->obj, 0, NOTHING, 0, cmd, (char **)NULL, 0, NULL);
+                cque_wait_que(crp->obj, crp->obj, 0, NOTHING, 0, cmd, (char **)NULL, 0, NULL);
             }
             XFREE(cmd);
         }
@@ -540,7 +540,7 @@ void dispatch(void)
 
     mushstate.alarm_triggered = 0;
     mushstate.now = time(NULL);
-    do_second();
+cque_do_second();
 
     /*
      * Module API hook
@@ -650,7 +650,7 @@ void do_timewarp(dbref player, dbref cause, int key, char *arg)
 
     if ((key == 0) || (key & TWARP_QUEUE))
     {
-        do_queue(player, cause, QUEUE_WARP, arg);
+        cque_do_queue(player, cause, QUEUE_WARP, arg);
     }
 
     if (key & TWARP_DUMP)

@@ -302,7 +302,7 @@ void do_force(dbref player, dbref cause, int key, char *what, char *command, cha
 		process_cmdline(victim, player, command, args, nargs, NULL);
 	}
 	else
-		wait_que(victim, player, 0, NOTHING, 0, command, args, nargs, mushstate.rdata);
+		cque_wait_que(victim, player, 0, NOTHING, 0, command, args, nargs, mushstate.rdata);
 }
 
 /*

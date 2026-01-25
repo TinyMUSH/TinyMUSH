@@ -49,7 +49,7 @@ void bind_and_queue(dbref player, dbref cause, char *action, char *argstr, char 
 		process_cmdline(player, cause, command2, cargs, ncargs, NULL);
 	}
 	else
-		wait_que(player, cause, 0, NOTHING, 0, command2, cargs, ncargs, mushstate.rdata);
+		cque_wait_que(player, cause, 0, NOTHING, 0, command2, cargs, ncargs, mushstate.rdata);
 
 	XFREE(command);
 	XFREE(command2);
@@ -109,7 +109,7 @@ void do_dolist(dbref player, dbref cause, int key, char *list, char *command, ch
 	{
 		tbuf = XMALLOC(LBUF_SIZE, "tbuf");
 		XSTRCPY(tbuf, (char *)"@notify me");
-		wait_que(player, cause, 0, NOTHING, A_SEMAPHORE, tbuf, cargs, ncargs, mushstate.rdata);
+		cque_wait_que(player, cause, 0, NOTHING, A_SEMAPHORE, tbuf, cargs, ncargs, mushstate.rdata);
 		XFREE(tbuf);
 	}
 }

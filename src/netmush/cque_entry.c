@@ -37,7 +37,7 @@
  * @note Thread-safe: No (must be called with appropriate locking)
  * @attention Caller must ensure qptr has been removed from any linked lists before calling
  */
-void delete_qentry(BQUE *qptr)
+void cque_delete_qentry(BQUE *qptr)
 {
 	GDATA *gdata = NULL;
 	int i = 0;
@@ -113,7 +113,7 @@ void delete_qentry(BQUE *qptr)
  * @note Thread-safe: No (modifies database attributes)
  * @note Invalid or non-numeric attribute values are treated as 0
  */
-int add_to(dbref doer, dbref player, int am, int attrnum)
+int cque_add_to(dbref doer, dbref player, int am, int attrnum)
 {
 	int num = 0, aflags = 0, alen = 0;
 	dbref aowner = NOTHING;
@@ -159,10 +159,10 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
  * @note Entry must be fully initialized before calling this function
  * @attention Does not check for null pointer - caller must validate
  *
- * @see wait_que() for delayed queue entries
- * @see do_top() for queue execution
+ * @see cque_wait_que() for delayed queue entries
+ * @see cque_do_top() for queue execution
  */
-void give_que(BQUE *tmp)
+void cque_give_que(BQUE *tmp)
 {
 	BQUE **qhead = NULL, **qtail = NULL;
 
@@ -204,14 +204,14 @@ void give_que(BQUE *tmp)
  * @param qptr Queue entry to remove from wait queue
  *
  * @note Thread-safe: No (modifies global wait queue structure)
- * @note Does not free the entry - caller must call delete_qentry() separately
+ * @note Does not free the entry - caller must call cque_delete_qentry() separately
  * @attention Entry must actually be in the wait queue or behavior is undefined
  * @attention If entry is not found, queue remains unchanged (silent failure)
  *
- * @see wait_que() for adding entries to wait queue
- * @see do_wait_pid() for wait time adjustment that uses this function
+ * @see cque_wait_que() for adding entries to wait queue
+ * @see cque_do_wait_pid() for wait time adjustment that uses this function
  */
-void remove_waitq(BQUE *qptr)
+void cque_remove_waitq(BQUE *qptr)
 {
 	BQUE **pptr = &mushstate.qwait;
 

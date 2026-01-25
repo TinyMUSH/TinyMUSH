@@ -531,7 +531,7 @@ int atr_match1(dbref thing, dbref parent, dbref player, char type, char *str, ch
 			}
 			else
 			{
-				wait_que(thing, player, 0, NOTHING, 0, s, args, NUM_ENV_VARS, mushstate.rdata);
+				cque_wait_que(thing, player, 0, NOTHING, 0, s, args, NUM_ENV_VARS, mushstate.rdata);
 			}
 
 			for (i = 0; i < NUM_ENV_VARS; i++)
@@ -2930,7 +2930,7 @@ void process_preload(void)
 			}
 		}
 
-		do_top(10);
+		cque_do_top(10);
 		/*
 		 * Look for STARTUP and DAILY attributes on parents.
 		 */
@@ -2942,8 +2942,8 @@ void process_preload(void)
 				/*
 				 * Process queue entries as we add them
 				 */
-				do_second();
-				do_top(10);
+				cque_do_second();
+				cque_do_top(10);
 				break;
 			}
 		}

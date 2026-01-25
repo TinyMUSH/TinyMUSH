@@ -51,11 +51,11 @@
  * @note NFY_DRAIN mode processes all matching entries regardless of count parameter
  * @attention Clears the semaphore attribute entirely in NFY_DRAIN mode
  *
- * @see do_notify() for the command interface
- * @see wait_que() for adding entries to semaphore queue
- * @see give_que() for queuing entries for execution
+ * @see cque_do_notify() for the command interface
+ * @see cque_wait_que() for adding entries to semaphore queue
+ * @see cque_give_que() for queuing entries for execution
  */
-int nfy_que(dbref player, dbref sem, int attr, int key, int count)
+int cque_nfy_que(dbref player, dbref sem, int attr, int key, int count)
 {
 	BQUE *point = NULL, *trail = NULL, *next = NULL;
 	int num = 0, aflags = 0, alen = 0;
@@ -113,13 +113,13 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 				/* Either run or discard the command */
 				if (key != NFY_DRAIN)
 				{
-					give_que(point);
+					cque_give_que(point);
 				}
 				else
 				{
 					giveto(point->player, mushconf.waitcost);
 					a_Queue(Owner(point->player), -1);
-					delete_qentry(point);
+					cque_delete_qentry(point);
 				}
 
 				/* If we've notified enough, exit */
@@ -138,7 +138,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 	/* Update the semaphore waiters count */
 	if (key == NFY_NFY)
 	{
-		add_to(player, sem, -count, attrnum);
+		cque_add_to(player, sem, -count, attrnum);
 	}
 	else
 	{
@@ -184,7 +184,7 @@ static bool _cque_parse_count_string(const char *countstr, int *cnt)
  *
  * Parses target specification (object[/attribute]) to identify the semaphore object and
  * optional attribute containing the semaphore counter. Validates permissions (controls or
- * Link_ok), parses the count parameter, and delegates to nfy_que() to process waiting
+ * Link_ok), parses the count parameter, and delegates to cque_nfy_que() to process waiting
  * commands. Provides user feedback on completion unless both player and target are Quiet.
  *
  * Target format: "object" uses A_SEMAPHORE attribute, "object/attribute" uses specified
@@ -207,11 +207,11 @@ static bool _cque_parse_count_string(const char *countstr, int *cnt)
  * @attention Requires controls or Link_ok permission on target object
  * @attention Custom attribute requires Set_attr permission
  *
- * @see nfy_que() for the underlying notification implementation
- * @see wait_que() for queuing commands on semaphores
- * @see do_wait() for the wait command that blocks on semaphores
+ * @see cque_nfy_que() for the underlying notification implementation
+ * @see cque_wait_que() for queuing commands on semaphores
+ * @see cque_do_wait() for the wait command that blocks on semaphores
  */
-void do_notify(dbref player, dbref cause, int key, char *what, char *count)
+void cque_do_notify(dbref player, dbref cause, int key, char *what, char *count)
 {
 	dbref thing = NOTHING, aowner = NOTHING;
 	int loccount = 0, attr = 0, aflags = 0;
@@ -271,7 +271,7 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 	/* Process semaphore queue if count is positive */
 	if (loccount > 0)
 	{
-		nfy_que(player, thing, attr, key, loccount);
+		cque_nfy_que(player, thing, attr, key, loccount);
 
 		if (!(Quiet(player) || Quiet(thing)))
 		{

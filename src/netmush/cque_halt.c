@@ -44,9 +44,9 @@ bool _cque_parse_pid_string(const char *pidstr, int *qpid);
  * @note Entries with invalid player dbrefs (halted entries) never match
  *
  * @see halt_que() for primary usage example
- * @see show_que() for display filtering
+ * @see cque_show_que() for display filtering
  */
-bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
+bool cque_que_want(BQUE *entry, dbref ptarg, dbref otarg)
 {
 	return Good_obj(entry->player) &&
 	       ((ptarg == NOTHING) || (ptarg == Owner(entry->player))) &&
@@ -97,8 +97,8 @@ static void _cque_halt_record(int *numhalted, int *dbrefs_array, BQUE *entry, in
  * @note Wait/semaphore entries are immediately deleted; execution queue entries remain
  * @attention Global halt-all (both params NOTHING) requires special permission checks
  *
- * @see do_halt() for command interface
- * @see que_want() for filtering logic
+ * @see cque_do_halt() for command interface
+ * @see cque_que_want() for filtering logic
  */
 int halt_que(dbref player, dbref object)
 {
@@ -116,7 +116,7 @@ int halt_que(dbref player, dbref object)
 
 	/* Player queue */
 	for (point = mushstate.qfirst; point; point = point->next)
-		if (que_want(point, player, object))
+		if (cque_que_want(point, player, object))
 		{
 			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
@@ -124,7 +124,7 @@ int halt_que(dbref player, dbref object)
 
 	/* Object queue */
 	for (point = mushstate.qlfirst; point; point = point->next)
-		if (que_want(point, player, object))
+		if (cque_que_want(point, player, object))
 		{
 			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
@@ -132,7 +132,7 @@ int halt_que(dbref player, dbref object)
 
 	/* Wait queue */
 	for (point = mushstate.qwait, trail = NULL; point; point = next)
-		if (que_want(point, player, object))
+		if (cque_que_want(point, player, object))
 		{
 			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
@@ -144,7 +144,7 @@ int halt_que(dbref player, dbref object)
 				mushstate.qwait = next = point->next;
 			}
 
-			delete_qentry(point);
+			cque_delete_qentry(point);
 		}
 		else
 		{
@@ -153,7 +153,7 @@ int halt_que(dbref player, dbref object)
 
 	/* Semaphore queue */
 	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
-		if (que_want(point, player, object))
+		if (cque_que_want(point, player, object))
 		{
 			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
@@ -170,8 +170,8 @@ int halt_que(dbref player, dbref object)
 				mushstate.qsemlast = trail;
 			}
 
-			add_to(player, point->sem, -1, point->attr);
-			delete_qentry(point);
+			cque_add_to(player, point->sem, -1, point->attr);
+			cque_delete_qentry(point);
 		}
 		else
 		{
@@ -279,10 +279,10 @@ bool _cque_parse_pid_string(const char *pidstr, int *qpid)
  * @attention Requires Controls permission on entry owner or Can_Halt privilege
  *
  * @see halt_que() for halting multiple entries by player/object criteria
- * @see remove_waitq() for wait queue removal
- * @see delete_qentry() for resource cleanup
+ * @see cque_remove_waitq() for wait queue removal
+ * @see cque_delete_qentry() for resource cleanup
  */
-void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
+void cque_do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
 	dbref victim = NOTHING;
 	int qpid = 0;
@@ -320,7 +320,7 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 
 	if (qptr->sem == NOTHING)
 	{
-		remove_waitq(qptr);
+		cque_remove_waitq(qptr);
 	}
 	else
 	{
@@ -343,10 +343,10 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 			}
 		}
 
-		add_to(player, qptr->sem, -1, qptr->attr);
+		cque_add_to(player, qptr->sem, -1, qptr->attr);
 	}
 
-	delete_qentry(qptr);
+	cque_delete_qentry(qptr);
 	giveto(victim, mushconf.waitcost);
 	a_Queue(victim, -1);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Halted queue entry PID %d.", qpid);
@@ -450,17 +450,17 @@ static bool _cque_parse_halt_target(dbref player, int key, const char *target,
  * @attention Permission checks occur before any queue modification
  *
  * @see halt_que() for the underlying halt implementation
- * @see do_halt_pid() for PID-based halting
- * @see que_want() for filtering logic
+ * @see cque_do_halt_pid() for PID-based halting
+ * @see cque_que_want() for filtering logic
  */
-void do_halt(dbref player, dbref cause, int key, char *target)
+void cque_do_halt(dbref player, dbref cause, int key, char *target)
 {
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
 	int numhalted = 0;
 
 	if (key & HALT_PID)
 	{
-		do_halt_pid(player, cause, key, target);
+		cque_do_halt_pid(player, cause, key, target);
 		return;
 	}
 

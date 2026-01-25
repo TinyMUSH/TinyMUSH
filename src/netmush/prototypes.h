@@ -173,27 +173,27 @@ extern void *dlopen_format(const char *filename, ...);
 extern void *dlsym_format(void *place, const char *symbol, ...);
 
 /* cque.c */
-extern void delete_qentry(BQUE *qptr);
-extern int add_to(dbref doer, dbref player, int am, int attrnum);
-extern void give_que(BQUE *tmp);
-extern bool que_want(BQUE *entry, dbref ptarg, dbref otarg);
+extern void cque_delete_qentry(BQUE *qptr);
+extern int cque_add_to(dbref doer, dbref player, int am, int attrnum);
+extern void cque_give_que(BQUE *tmp);
+extern bool cque_que_want(BQUE *entry, dbref ptarg, dbref otarg);
 extern int halt_que(dbref player, dbref object);
-extern void remove_waitq(BQUE *qptr);
-extern void do_halt_pid(dbref player, dbref cause, int key, char *pidstr);
-extern void do_halt(dbref player, dbref cause, int key, char *target);
-extern int nfy_que(dbref player, dbref sem, int attr, int key, int count);
-extern void do_notify(dbref player, dbref cause, int key, char *what, char *count);
-extern int qpid_next(void);
-extern BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs);
-extern void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs);
-extern void do_wait_pid(dbref player, int key, char *pidstr, char *timestr);
-extern void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs);
-extern int que_next(void);
-extern void do_second(void);
-extern int do_top(int ncmds);
-extern void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header);
-extern void do_ps(dbref player, dbref cause, int key, char *target);
-extern void do_queue(dbref player, dbref cause, int key, char *arg);
+extern void cque_remove_waitq(BQUE *qptr);
+extern void cque_do_halt_pid(dbref player, dbref cause, int key, char *pidstr);
+extern void cque_do_halt(dbref player, dbref cause, int key, char *target);
+extern int cque_nfy_que(dbref player, dbref sem, int attr, int key, int count);
+extern void cque_do_notify(dbref player, dbref cause, int key, char *what, char *count);
+extern int cque_qpid_next(void);
+extern BQUE *cque_setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs);
+extern void cque_wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs);
+extern void cque_do_wait_pid(dbref player, int key, char *pidstr, char *timestr);
+extern void cque_do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs);
+extern int cque_que_next(void);
+extern void cque_do_second(void);
+extern int cque_do_top(int ncmds);
+extern void cque_show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header);
+extern void cque_do_ps(dbref player, dbref cause, int key, char *target);
+extern void cque_do_queue(dbref player, dbref cause, int key, char *arg);
 
 /* create.c */
 extern dbref parse_linkable_room(dbref player, char *room_name);

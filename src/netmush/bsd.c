@@ -195,7 +195,7 @@ void bsd_main_event_loop(int port)
 		dispatch();
 
 		/* any queued robot commands waiting? */
-		timeout.tv_sec = que_next();
+		timeout.tv_sec = cque_que_next();
 		timeout.tv_usec = 0;
 		next_slice = msec_add(last_slice, mushconf.timeslice);
 		timeval_sub(next_slice, current_time);
@@ -262,14 +262,14 @@ void bsd_main_event_loop(int port)
 		{
 			if (mushconf.queue_chunk)
 			{
-				do_top(mushconf.queue_chunk);
+				cque_do_top(mushconf.queue_chunk);
 			}
 
 			continue;
 		}
 		else
 		{
-			do_top(mushconf.active_q_chunk);
+			cque_do_top(mushconf.active_q_chunk);
 		}
 
 		/* Check if we have something from the DNS Resolver. */

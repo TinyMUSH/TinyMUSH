@@ -1132,7 +1132,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 	if (*buf)
 	{
-		wait_que(player, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+		cque_wait_que(player, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 	}
 
 	XFREE(buf);
@@ -1142,7 +1142,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 		buf = atr_pget(mushconf.master_room, attr, &aowner, &aflags, &alen);
 
 		if (*buf)
-			wait_que(mushconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+			cque_wait_que(mushconf.master_room, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 
 		XFREE(buf);
 		dbref master_contents = Contents(mushconf.master_room);
@@ -1158,7 +1158,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 				if (*buf)
 				{
-					wait_que(obj, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+					cque_wait_que(obj, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 				}
 
 				XFREE(buf);
@@ -1179,7 +1179,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 			if (*buf)
 			{
-				wait_que(zone, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+				cque_wait_que(zone, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 			}
 
 			XFREE(buf);
@@ -1203,7 +1203,7 @@ void announce_connattr(DESC *d, dbref player, dbref loc, const char *reason, int
 
 				if (*buf)
 				{
-					wait_que(obj, player, 0, NOTHING, 0, buf, argv, argn, NULL);
+					cque_wait_que(obj, player, 0, NOTHING, 0, buf, argv, argn, NULL);
 				}
 
 				XFREE(buf);

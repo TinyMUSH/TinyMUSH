@@ -683,7 +683,7 @@ void destroy_obj(dbref player, dbref obj)
 		}
 	}
 
-	nfy_que(GOD, obj, 0, NFY_DRAIN, 0);
+	cque_nfy_que(GOD, obj, 0, NFY_DRAIN, 0);
 	cron_clr(obj, NOTHING);
 	/*
 	 * Remove forwardlists, stacks, etc. from the hash tables.

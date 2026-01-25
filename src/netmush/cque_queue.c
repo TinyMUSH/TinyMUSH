@@ -30,14 +30,14 @@
  * Iterates through a queue (player, object, wait, or semaphore) and displays entries
  * matching player_targ/obj_targ filters. Supports three detail modes: summary (count only),
  * brief (one line per entry), and long (multi-line with arguments and enactor). Used by
- * do_ps() to implement the @ps command for queue inspection and monitoring.
+ * cque_do_ps() to implement the @ps command for queue inspection and monitoring.
  *
  * Display modes (key parameter):
  * - PS_SUMM: Count matching entries without displaying individual commands
  * - PS_BRIEF: Display one line per entry with PID, player, and command text
  * - PS_LONG: Display multi-line entries including arguments (%0-%9) and enactor
  *
- * Entry filtering: Only displays entries where que_want() returns true, filtering by:
+ * Entry filtering: Only displays entries where cque_que_want() returns true, filtering by:
  * - player_targ: Match entries owned by specific player (NOTHING = all players)
  * - obj_targ: Match entries from specific object (NOTHING = all objects)
  *
@@ -73,11 +73,11 @@
  * @attention Assumes mushstate.now is current time for accurate time remaining calculation
  * @attention Memory allocated for unparse_object() strings must be freed after use
  *
- * @see do_ps() for command interface that calls this function
- * @see que_want() for entry filtering logic
+ * @see cque_do_ps() for command interface that calls this function
+ * @see cque_que_want() for entry filtering logic
  * @see unparse_object() for player/object name formatting
  */
-void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
+void cque_show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
 	BQUE *tmp = NULL;
 	char *bp = NULL, *bufp = NULL, *enactor_name = NULL;
@@ -98,7 +98,7 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
 		}
 
 		/* Filter entries by target criteria */
-		if (!que_want(tmp, player_targ, obj_targ))
+		if (!cque_que_want(tmp, player_targ, obj_targ))
 		{
 			continue;
 		}
@@ -190,7 +190,7 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  * Implements the @ps command that displays pending commands across all four queue types
  * (player, object, wait, semaphore) with filtering by player/object ownership. Supports
  * three detail levels (brief, summary, long) and optional "all queues" mode for wizards.
- * Delegates to show_que() for each queue type, then displays aggregate statistics.
+ * Delegates to cque_show_que() for each queue type, then displays aggregate statistics.
  *
  * Display modes (key parameter):
  * - PS_BRIEF (default): One line per entry with PID, player, and command
@@ -212,7 +212,7 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  * Target matching uses match_controlled() for normal users, match_thing() for wizards.
  * Invalid combinations (PS_ALL + target) are rejected with error message.
  *
- * Output format: Calls show_que() four times (player, object, wait, semaphore queues),
+ * Output format: Calls cque_show_que() four times (player, object, wait, semaphore queues),
  * then displays summary line with totals. Wizard view includes deleted entry counts
  * ("[Xdel]" suffix) for player and object queues. Normal users see entry/total counts.
  *
@@ -225,18 +225,18 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
  * @param key    Command flags: PS_BRIEF/PS_SUMM/PS_LONG for detail, PS_ALL for global view
  * @param target Target specification: player/object name to filter, or empty for self
  *
- * @note Thread-safe: Yes (read-only operation via show_que() calls)
+ * @note Thread-safe: Yes (read-only operation via cque_show_que() calls)
  * @note PS_ALL stripped from key before switch validation to allow combining with detail modes
  * @note Deleted entry counts (qdel) only collected/displayed for player and object queues
  * @note Wait and semaphore queues do not track deleted entries in summary statistics
  * @attention Requires See_Queue permission for PS_ALL flag or viewing other players' queues
  * @attention Target + PS_ALL combination is explicitly forbidden and returns error
  *
- * @see show_que() for individual queue display implementation
- * @see que_want() for entry filtering logic
+ * @see cque_show_que() for individual queue display implementation
+ * @see cque_que_want() for entry filtering logic
  * @see match_controlled() for target resolution with permission checks
  */
-void do_ps(dbref player, dbref cause, int key, char *target)
+void cque_do_ps(dbref player, dbref cause, int key, char *target)
 {
 	char *bufp = NULL;
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
@@ -301,10 +301,10 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 	}
 
 	/* Display all four queues */
-	show_que(player, key & ~PS_ALL, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
-	show_que(player, key & ~PS_ALL, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
-	show_que(player, key & ~PS_ALL, mushstate.qwait, &wqtot, &wqent, (int *)0, player_targ, obj_targ, "Wait");
-	show_que(player, key & ~PS_ALL, mushstate.qsemfirst, &sqtot, &sqent, (int *)0, player_targ, obj_targ, "Semaphore");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qwait, &wqtot, &wqent, (int *)0, player_targ, obj_targ, "Wait");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qsemfirst, &sqtot, &sqent, (int *)0, player_targ, obj_targ, "Semaphore");
 
 	/* Display summary statistics */
 	bufp = XMALLOC(MBUF_SIZE, "bufp");
@@ -367,7 +367,7 @@ static bool _cque_parse_queue_arg(const char *arg, int *val)
  *
  * Operational modes:
  * 1. QUEUE_KICK: Manually execute specified number of commands from player queue
- *    - Calls do_top(i) to process i commands from mushstate.qfirst
+ *    - Calls cque_do_top(i) to process i commands from mushstate.qfirst
  *    - Returns count of commands actually executed (may be less than requested)
  *    - Useful for draining queue during high load or testing command processing
  *    - Temporarily enables CF_DEQUEUE if disabled (warns player)
@@ -375,7 +375,7 @@ static bool _cque_parse_queue_arg(const char *arg, int *val)
  * 2. QUEUE_WARP: Adjust wait times by time offset (positive = advance, negative = rewind)
  *    - Modifies all wait queue entries: sets waittime = -i (forces immediate execution)
  *    - Modifies semaphore timeouts: decrements waittime by i (clamps negative to -1)
- *    - Calls do_second() to process newly-expired entries
+ *    - Calls cque_do_second() to process newly-expired entries
  *    - Special case: i = 0 promotes object queue to player queue without time change
  *    - Used for testing time-based features or recovering from clock issues
  *
@@ -407,11 +407,11 @@ static bool _cque_parse_queue_arg(const char *arg, int *val)
  * @attention QUEUE_KICK may process fewer commands than requested if queue depletes
  * @attention Temporary CF_DEQUEUE enable triggers warning notification
  *
- * @see do_top() for command execution implementation used by QUEUE_KICK
- * @see do_second() for wait queue processing triggered by QUEUE_WARP
+ * @see cque_do_top() for command execution implementation used by QUEUE_KICK
+ * @see cque_do_second() for wait queue processing triggered by QUEUE_WARP
  * @see mushconf.control_flags for CF_DEQUEUE flag controlling automatic processing
  */
-void do_queue(dbref player, dbref cause, int key, char *arg)
+void cque_do_queue(dbref player, dbref cause, int key, char *arg)
 {
 	BQUE *point = NULL;
 	int i = 0, ncmds = 0;
@@ -433,7 +433,7 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
 
 	if (key == QUEUE_KICK)
 	{
-		ncmds = do_top(i);
+		ncmds = cque_do_top(i);
 
 		if (!Quiet(player))
 		{
@@ -462,7 +462,7 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
 			}
 		}
 
-		do_second();
+		cque_do_second();
 
 		if (!Quiet(player))
 		{
