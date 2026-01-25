@@ -24,10 +24,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-extern int a_Queue(dbref, int);
-extern void s_Queue(dbref, int);
-extern int QueueMax(dbref);
-int qpid_top = 1;
+static int qpid_top = 1; /*!< Next queue PID to allocate (internal optimization) */
 
 /**
  * @brief Delete and free a queue entry.
