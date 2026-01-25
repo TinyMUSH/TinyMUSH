@@ -1241,17 +1241,46 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 }
 
 /**
- * @brief Add commands to the wait or semaphore queues.
+ * @brief Queue a command for delayed or semaphore-controlled execution.
  *
- * @param player  DBref of player
- * @param cause   DBref of cause
- * @param wait    Delay
- * @param sem     Semaphores
- * @param attr    Attributes
- * @param command Command
- * @param args    Arguments
- * @param nargs   Number of arguments
- * @param gargs   Global registers
+ * Creates a queue entry via setup_que() and routes it to the appropriate queue based on
+ * wait time and semaphore parameters. Supports three execution modes: immediate (wait <= 0,
+ * no semaphore), time-delayed (wait > 0, no semaphore), and semaphore-blocked (semaphore
+ * specified). The wait queue is maintained in sorted order by execution time for efficient
+ * processing by do_second().
+ *
+ * Queue routing logic:
+ * - No semaphore + wait <= 0: Immediate execution via give_que()
+ * - No semaphore + wait > 0: Time-sorted insertion into wait queue (mushstate.qwait)
+ * - Semaphore specified: Append to semaphore queue (mushstate.qsemfirst/qsemlast)
+ *
+ * Wait time handling includes overflow protection: values exceeding INT_MAX/INT_MIN are
+ * clamped to prevent timestamp wraparound. The wait queue is sorted by absolute execution
+ * time (now + wait), enabling efficient O(1) pop operations by do_second().
+ *
+ * If CF_INTERP flag is disabled or setup_que() fails (halted player, insufficient funds,
+ * quota exceeded, PID exhaustion), the command is silently discarded.
+ *
+ * @param player  DBref of the player queuing the command
+ * @param cause   DBref of the object that caused this command (for attribution)
+ * @param wait    Delay in seconds before execution (0 = immediate, negative treated as 0)
+ * @param sem     DBref of semaphore object to wait on (NOTHING = no semaphore)
+ * @param attr    Attribute number for semaphore counter (0 = A_SEMAPHORE, ignored if sem = NOTHING)
+ * @param command Command text string to execute (may be NULL)
+ * @param args    Array of environment variable strings (%0-%9) - may contain NULLs
+ * @param nargs   Number of arguments in args array
+ * @param gargs   Global and extended register data (q-registers, x-registers) or NULL
+ *
+ * @note Thread-safe: No (modifies global queue structures and calls non-thread-safe functions)
+ * @note If setup_que() fails, function returns silently without notification
+ * @note Semaphore queue is unsorted (FIFO); wait queue is sorted by execution time
+ * @attention Wait time overflow is silently clamped to INT_MAX/INT_MIN
+ * @attention Requires CF_INTERP flag to be set or command is ignored
+ *
+ * @see setup_que() for queue entry creation and validation
+ * @see give_que() for immediate execution queue
+ * @see do_second() for wait queue processing
+ * @see nfy_que() for semaphore release
  */
 void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
 {
@@ -1337,12 +1366,46 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 }
 
 /**
- * @brief Adjust the wait time on an existing entry.
+ * @brief Adjust the wait time of a specific queue entry identified by PID.
  *
- * @param player  DBref of player
- * @param key     Key
- * @param pidstr  PID of the entry
- * @param timestr Wait time
+ * Validates and parses both PID and time strings, locates the queue entry, and modifies
+ * its execution time after permission checks. Supports two time specification modes:
+ * absolute (WAIT_UNTIL) and relative (default). For wait queue entries, automatically
+ * re-threads the entry to maintain sorted order by execution time. Semaphore queue
+ * entries remain in place as that queue is unsorted.
+ *
+ * Time specification modes:
+ * - WAIT_UNTIL: Absolute Unix timestamp (negative values = execute now)
+ * - Relative (default): Offset from current time or entry's existing time
+ *   * Prefixed with +/-: Adjust existing waittime by offset
+ *   * No prefix: Set to (current_time + offset)
+ *
+ * Validation sequence:
+ * 1. Verify both timestr and pidstr are valid integers
+ * 2. Confirm PID in valid range [1, max_qpid]
+ * 3. Locate entry in PID hash table
+ * 4. Check entry not halted (player != NOTHING)
+ * 5. Verify Controls permission on entry owner
+ * 6. For semaphore entries, ensure waittime != 0 (must be timed-wait)
+ *
+ * Overflow protection: Time calculations check for INT_MAX/INT_MIN overflow and clamp
+ * results. Negative waittimes (except from WAIT_UNTIL) are corrected to either current
+ * time (if decremented) or INT_MAX (if incremented).
+ *
+ * @param player  DBref of the player adjusting the wait time
+ * @param key     Command flags: WAIT_UNTIL for absolute time mode
+ * @param pidstr  String representation of the PID to modify
+ * @param timestr String representation of new time (seconds or Unix timestamp)
+ *
+ * @note Thread-safe: No (modifies global queue structures)
+ * @note Notifies player of all validation errors with specific error messages
+ * @note Wait queue entries are automatically re-sorted after time adjustment
+ * @attention Cannot adjust semaphore entries with waittime = 0 (non-timed waits)
+ * @attention Time overflow is silently clamped to INT_MAX/INT_MIN
+ *
+ * @see wait_que() for initial queue entry creation
+ * @see remove_waitq() for queue removal before re-threading
+ * @see do_wait() for the wait command that creates timed waits
  */
 void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
@@ -1509,15 +1572,54 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 }
 
 /**
- * @brief Command interface to wait_que
+ * @brief Command interface for queuing commands with time delays or semaphore blocking.
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key    Key
- * @param event  Event
- * @param cmd    Command
- * @param cargs  Command arguments
- * @param ncargs Number of commands
+ * Parses event specification to determine execution mode and delegates to wait_que() for
+ * actual queuing. Supports two primary modes: simple timed delay (numeric event) and
+ * semaphore-based blocking (object[/attribute] event). The WAIT_PID flag provides access
+ * to do_wait_pid() for adjusting existing queue entries instead of creating new ones.
+ *
+ * Execution modes:
+ * 1. PID adjustment (WAIT_PID flag): Delegates to do_wait_pid() to modify existing entry
+ * 2. Timed delay (numeric event): Queues command with specified delay in seconds
+ *    - WAIT_UNTIL flag: Treats value as absolute Unix timestamp
+ *    - Default: Treats value as relative delay from current time
+ * 3. Semaphore wait (object event): Increments semaphore counter and blocks until notified
+ *    - Format: "object" uses A_SEMAPHORE attribute
+ *    - Format: "object/attribute" uses custom attribute for semaphore counter
+ *    - Optional timeout after "/" separator (numeric, seconds)
+ *
+ * Event parsing logic:
+ * - If numeric: Timed delay mode, parse as seconds (or timestamp if WAIT_UNTIL)
+ * - If non-numeric: Semaphore mode, parse as "object" or "object/attribute[/timeout]"
+ * - Split on '/' to extract object name, optional attribute name, optional timeout
+ *
+ * Semaphore behavior: Increments attribute counter via add_to(). If counter becomes <= 0
+ * (over-notification), command executes immediately without blocking. Otherwise, command
+ * is queued on semaphore until nfy_que() or do_notify() releases it.
+ *
+ * Permission requirements: For semaphore mode, player must either control the target
+ * object or object must have Link_ok flag. For custom attributes, player must have
+ * Set_attr permission on that attribute.
+ *
+ * @param player DBref of the player issuing the wait command
+ * @param cause  DBref of the cause object (for attribution in queued command)
+ * @param key    Command flags: WAIT_PID for PID adjustment, WAIT_UNTIL for absolute time
+ * @param event  Event specification: PID (if WAIT_PID), seconds, or object[/attr[/timeout]]
+ * @param cmd    Command text string to execute after delay/notification
+ * @param cargs  Array of environment variable strings (%0-%9) for command execution
+ * @param ncargs Number of arguments in cargs array
+ *
+ * @note Thread-safe: No (calls wait_que which modifies global queue state)
+ * @note Invalid numeric values result in error notification and command is not queued
+ * @note Over-notified semaphores (counter <= 0) execute command immediately
+ * @attention Semaphore counter increment occurs before queuing - potential race condition
+ * @attention Timeout values exceeding INT_MAX are clamped to INT_MAX
+ *
+ * @see wait_que() for the underlying queue insertion implementation
+ * @see do_wait_pid() for PID-based wait time adjustment
+ * @see do_notify() for semaphore notification/release
+ * @see nfy_que() for semaphore queue processing
  */
 void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {
@@ -1677,9 +1779,45 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 }
 
 /**
- * @brief Return the time in seconds until the next command should be run from the queue.
+ * @brief Calculate seconds until next queue command is ready for execution.
  *
- * @return int
+ * Implements a priority-based scheduling algorithm to determine optimal sleep time before
+ * the next queue processing cycle. Scans all four queue types (player, object, wait,
+ * semaphore) and returns the minimum time until any command becomes ready, implementing
+ * a three-tier priority system for responsive gameplay.
+ *
+ * Priority tiers and return values:
+ * 1. Player queue (highest): Returns 0 for immediate execution
+ * 2. Object queue: Returns 1 for one-second delay
+ * 3. Wait/semaphore queues: Returns minimum time until next command (min - 1)
+ *
+ * Scanning algorithm:
+ * - Checks test_top() for player queue readiness (immediate return 0)
+ * - Checks mushstate.qlfirst for object queue presence (return 1)
+ * - Scans wait queue: Computes (waittime - now) for each entry
+ * - Scans semaphore queue: Only considers timed-waits (waittime != 0)
+ * - Returns (minimum_time - 1) with floor of 1 second for imminent commands
+ *
+ * The algorithm prioritizes player commands over object commands to maintain responsive
+ * user experience. Commands within 2 seconds of execution time are treated as "imminent"
+ * and scheduled for immediate processing (return 1). The default maximum of 1000 seconds
+ * serves as a safety ceiling for empty queues.
+ *
+ * @return Seconds to sleep before next queue processing cycle:
+ *         - 0: Player queue has ready commands (immediate processing)
+ *         - 1: Object queue or imminent wait/semaphore commands (short delay)
+ *         - 2+: Time until next scheduled command minus 1 second
+ *         - 999: No commands in any queue (default 1000 - 1)
+ *
+ * @note Thread-safe: Yes (read-only operation on queue structures)
+ * @note Return value of 0 triggers immediate do_top() execution
+ * @note Imminent threshold (2 seconds) provides buffer for processing latency
+ * @attention Depends on mushstate.now being current time (updated by main loop)
+ * @attention Semaphore entries with waittime = 0 are skipped (no timeout)
+ *
+ * @see do_second() for wait queue processing when time expires
+ * @see do_top() for command execution triggered by return value 0
+ * @see test_top() for player queue readiness check
  */
 int que_next(void)
 {
@@ -1739,7 +1877,51 @@ int que_next(void)
 	return min - 1;
 }
 
-/* Check the wait and semaphore queues for commands to remove. */
+/**
+ * @brief Process expired wait queue and semaphore queue entries for execution.
+ *
+ * Called once per second by the main event loop to check wait and semaphore queues for
+ * commands ready to execute. Performs three queue management operations in order:
+ * low-priority queue promotion, wait queue expiration processing, and semaphore timeout
+ * handling. This function implements the core time-based command scheduling mechanism
+ * that enables @wait, timed semaphores, and object action throttling.
+ *
+ * Processing sequence:
+ * 1. Low-priority queue promotion: Moves entire object queue (qlfirst/qllast) to end of
+ *    normal queue (qfirst/qlast), implementing one-second delay for object actions
+ * 2. Wait queue processing: Scans mushstate.qwait in sorted order, moving all entries
+ *    with waittime <= now to normal queue via give_que() for immediate execution
+ * 3. Semaphore timeout processing: Scans mushstate.qsemfirst for timed-wait entries
+ *    (waittime != 0), decrements semaphore counter via add_to(), and moves expired
+ *    entries to normal queue
+ *
+ * Queue promotion logic maintains responsive gameplay by prioritizing player commands
+ * (immediate execution) over object commands (one-second delay). The wait queue is
+ * sorted by execution time, enabling efficient O(1) early-exit when first entry is
+ * not ready. Semaphore queue is unsorted and requires full scan.
+ *
+ * Timed semaphore behavior: When timeout expires, decrements semaphore counter and
+ * executes command regardless of semaphore state. This prevents deadlock when notification
+ * never arrives. Non-timed semaphores (waittime = 0) remain queued until explicit
+ * notification via nfy_que()/do_notify().
+ *
+ * Early exit: If CF_DEQUEUE flag is disabled, function returns immediately without
+ * processing any queues, effectively pausing command execution system.
+ *
+ * @note Thread-safe: No (modifies global queue structures mushstate.qfirst/qlast/qwait/qsemfirst)
+ * @note Called by main event loop approximately once per second (see que_next() return values)
+ * @note Low-priority queue promotion occurs before wait processing for consistent timing
+ * @note Wait queue early-exit optimization assumes sorted order (maintained by wait_que())
+ * @attention Requires mushstate.now to be current Unix timestamp (updated by caller)
+ * @attention CF_DEQUEUE flag must be set or no command processing occurs
+ * @attention Semaphore counter decremented even if command fails to execute
+ *
+ * @see que_next() for sleep time calculation that triggers this function
+ * @see wait_que() for wait queue insertion and sorting
+ * @see give_que() for normal queue insertion (immediate execution)
+ * @see nfy_que() for semaphore notification (non-timeout release)
+ * @see do_top() for command execution from normal queue
+ */
 void do_second(void)
 {
 	BQUE *trail = NULL, *point = NULL, *next = NULL;
@@ -1818,10 +2000,55 @@ void do_second(void)
 }
 
 /**
- * @brief Execute the command at the top of the queue
+ * @brief Execute up to ncmds commands from the player queue (normal priority).
  *
- * @param ncmds Number of commands to execute
- * @return int
+ * Main command execution engine that dequeues and runs commands from mushstate.qfirst
+ * (player/normal priority queue). Processes commands in FIFO order, handling resource
+ * refunds, register context setup, command parsing, and queue entry cleanup. Executes
+ * a maximum of ncmds commands per invocation to prevent CPU starvation, returning the
+ * actual count executed for scheduling feedback.
+ *
+ * Execution sequence per command:
+ * 1. Check test_top() for available commands (early exit if queue empty)
+ * 2. Extract player from queue head (mushstate.qfirst)
+ * 3. Refund waitcost to player (paid during setup_que())
+ * 4. Set execution context (curr_player, curr_enactor)
+ * 5. Decrement player's queue counter via a_Queue()
+ * 6. Mark entry as processed (player = NOTHING prevents double-execution)
+ * 7. Load scratch registers (q-registers, x-registers) from queue entry gdata
+ * 8. Parse and execute command via process_cmdent()
+ * 9. Clean up queue entry via delete_qentry()
+ * 10. Advance queue head to next entry
+ *
+ * Register context management: Global registers (mushstate.rdata) are preserved across
+ * the execution batch to maintain continuity. Queue entry registers (gdata) are loaded
+ * into mushstate.global_regs before command execution. Both are cleaned up when queue
+ * becomes empty or ncmds limit is reached.
+ *
+ * Player validation: Commands for non-existent (player < 0) or Going players are
+ * silently discarded with queue entry cleanup. Halted players have entries removed
+ * but commands are not executed (wasteful waitcost refund still occurs).
+ *
+ * Early termination: If CF_DEQUEUE flag is disabled, returns 0 immediately without
+ * processing any commands, effectively pausing the command execution system. Queue
+ * state remains unchanged for later processing.
+ *
+ * @param ncmds Maximum number of commands to execute in this invocation (throttling limit)
+ * @return Number of commands actually executed (0 to ncmds inclusive)
+ *
+ * @note Thread-safe: No (modifies global queue structures and player state)
+ * @note Commands from Going players are discarded without execution
+ * @note Halted players receive waitcost refund but command is not executed
+ * @note Register cleanup (mushstate.rdata) occurs when queue empties or batch completes
+ * @attention Requires CF_DEQUEUE flag set or no commands are processed
+ * @attention Queue entries marked processed (player = NOTHING) before execution prevents retry on error
+ * @attention Global register context (mushstate.rdata) shared across batch execution
+ *
+ * @see test_top() for queue readiness check
+ * @see give_que() for normal queue insertion
+ * @see process_cmdent() for command parsing and execution
+ * @see delete_qentry() for queue entry cleanup and deallocation
+ * @see do_second() for wait/semaphore queue processing that feeds this queue
  */
 int do_top(int ncmds)
 {
@@ -2128,17 +2355,57 @@ int do_top(int ncmds)
 }
 
 /**
- * @brief tell player what commands they have pending in the queue
+ * @brief Display queue entries matching filter criteria with configurable detail level.
  *
- * @param player      DBref of player
- * @param key         Key
- * @param queue       Queue Entry
- * @param qtot        Queue Total
- * @param qent        Queue Entries
- * @param qdel        Queue Deleted
- * @param player_targ DBref of player target
- * @param obj_targ    DBref of object target
- * @param header      Header
+ * Iterates through a queue (player, object, wait, or semaphore) and displays entries
+ * matching player_targ/obj_targ filters. Supports three detail modes: summary (count only),
+ * brief (one line per entry), and long (multi-line with arguments and enactor). Used by
+ * do_ps() to implement the @ps command for queue inspection and monitoring.
+ *
+ * Display modes (key parameter):
+ * - PS_SUMM: Count matching entries without displaying individual commands
+ * - PS_BRIEF: Display one line per entry with PID, player, and command text
+ * - PS_LONG: Display multi-line entries including arguments (%0-%9) and enactor
+ *
+ * Entry filtering: Only displays entries where que_want() returns true, filtering by:
+ * - player_targ: Match entries owned by specific player (NOTHING = all players)
+ * - obj_targ: Match entries from specific object (NOTHING = all objects)
+ *
+ * Output formats vary by queue entry type:
+ * - Timed wait on semaphore: "[#sem/seconds] pid:player:command"
+ * - Timed wait (no semaphore): "[seconds] pid:player:command"
+ * - Semaphore wait (no timeout): "[#sem] pid:player:command" or "[#sem/attr] pid:player:command"
+ * - Normal queue entry: "pid:player:command"
+ *
+ * Counter updates: Function updates three output counters via pointer parameters:
+ * - *qtot: Total entries scanned in queue
+ * - *qent: Entries matching filter criteria (displayed or counted)
+ * - *qdel: Entries marked as halted (player == NOTHING)
+ *
+ * Header display: When first matching entry is found (qent == 1), displays header line
+ * "----- {header} Queue -----" to identify queue type. Header is passed by caller
+ * (typically "Player", "Object", "Wait", or "Semaphore").
+ *
+ * @param player      DBref of player viewing the queue (for permission checks and output)
+ * @param key         Display mode: PS_SUMM (summary), PS_BRIEF (brief), or PS_LONG (detailed)
+ * @param queue       Head of queue to scan (qfirst, qlfirst, qwait, or qsemfirst)
+ * @param qtot        Output: Total number of entries scanned in queue
+ * @param qent        Output: Number of entries matching filter criteria
+ * @param qdel        Output: Number of halted entries (player == NOTHING) encountered
+ * @param player_targ DBref of player to filter by (NOTHING = match all players)
+ * @param obj_targ    DBref of object to filter by (NOTHING = match all objects)
+ * @param header      Queue type name for display header ("Player", "Object", "Wait", "Semaphore")
+ *
+ * @note Thread-safe: Yes (read-only operation on queue structures)
+ * @note Time remaining for wait/semaphore entries computed as (waittime - mushstate.now)
+ * @note Halted entries (player == NOTHING) are counted but never displayed
+ * @note Long mode displays enactor separately from player (shows command attribution)
+ * @attention Assumes mushstate.now is current time for accurate time remaining calculation
+ * @attention Memory allocated for unparse_object() strings must be freed after use
+ *
+ * @see do_ps() for command interface that calls this function
+ * @see que_want() for entry filtering logic
+ * @see unparse_object() for player/object name formatting
  */
 void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qdel, dbref player_targ, dbref obj_targ, const char *header)
 {
@@ -2239,12 +2506,56 @@ void show_que(dbref player, int key, BQUE *queue, int *qtot, int *qent, int *qde
 }
 
 /**
- * @brief List queue
+ * @brief Command interface for displaying queue status and entries (@ps command).
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key    Key
- * @param target Target
+ * Implements the @ps command that displays pending commands across all four queue types
+ * (player, object, wait, semaphore) with filtering by player/object ownership. Supports
+ * three detail levels (brief, summary, long) and optional "all queues" mode for wizards.
+ * Delegates to show_que() for each queue type, then displays aggregate statistics.
+ *
+ * Display modes (key parameter):
+ * - PS_BRIEF (default): One line per entry with PID, player, and command
+ * - PS_SUMM: Count only, no individual entries displayed
+ * - PS_LONG: Multi-line format including arguments (%0-%9) and enactor
+ * - PS_ALL flag: View all queues (requires See_Queue permission)
+ *
+ * Target resolution logic:
+ * 1. No target specified:
+ *    - PS_ALL: Display all players' queues (player_targ = NOTHING)
+ *    - Default: Display issuer's queues (player_targ = Owner(player))
+ *    - If issuer is not TYPE_PLAYER, also filter by issuer object (obj_targ = player)
+ * 2. Target specified:
+ *    - Must match controlled object (or any object if See_Queue permission)
+ *    - If target is TYPE_PLAYER: Display that player's queues
+ *    - Otherwise: Display that object's queues (player_targ = Owner(player))
+ *
+ * Permission requirements: PS_ALL flag requires See_Queue permission (typically wizard).
+ * Target matching uses match_controlled() for normal users, match_thing() for wizards.
+ * Invalid combinations (PS_ALL + target) are rejected with error message.
+ *
+ * Output format: Calls show_que() four times (player, object, wait, semaphore queues),
+ * then displays summary line with totals. Wizard view includes deleted entry counts
+ * ("[Xdel]" suffix) for player and object queues. Normal users see entry/total counts.
+ *
+ * Error handling: Invalid target match returns silently after noisy_match_result().
+ * Invalid switch combinations notify player with "Illegal combination of switches."
+ * Permission denied on PS_ALL without See_Queue shows NOPERM_MESSAGE.
+ *
+ * @param player DBref of player issuing the @ps command
+ * @param cause  DBref of cause object (unused, for command interface consistency)
+ * @param key    Command flags: PS_BRIEF/PS_SUMM/PS_LONG for detail, PS_ALL for global view
+ * @param target Target specification: player/object name to filter, or empty for self
+ *
+ * @note Thread-safe: Yes (read-only operation via show_que() calls)
+ * @note PS_ALL stripped from key before switch validation to allow combining with detail modes
+ * @note Deleted entry counts (qdel) only collected/displayed for player and object queues
+ * @note Wait and semaphore queues do not track deleted entries in summary statistics
+ * @attention Requires See_Queue permission for PS_ALL flag or viewing other players' queues
+ * @attention Target + PS_ALL combination is explicitly forbidden and returns error
+ *
+ * @see show_que() for individual queue display implementation
+ * @see que_want() for entry filtering logic
+ * @see match_controlled() for target resolution with permission checks
  */
 void do_ps(dbref player, dbref cause, int key, char *target)
 {
@@ -2341,12 +2652,59 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 }
 
 /**
- * @brief Queue management
+ * @brief Administrative command interface for manual queue manipulation (@queue command).
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key    Key
- * @param arg    Arguments
+ * Implements the @queue command with two operational modes: QUEUE_KICK for forced command
+ * execution, and QUEUE_WARP for time manipulation of wait/semaphore queues. Provides
+ * wizard-level control over queue processing for debugging, performance testing, and
+ * emergency queue management. Temporarily enables CF_DEQUEUE flag if disabled to ensure
+ * operations succeed even when automatic processing is paused.
+ *
+ * Operational modes:
+ * 1. QUEUE_KICK: Manually execute specified number of commands from player queue
+ *    - Calls do_top(i) to process i commands from mushstate.qfirst
+ *    - Returns count of commands actually executed (may be less than requested)
+ *    - Useful for draining queue during high load or testing command processing
+ *    - Temporarily enables CF_DEQUEUE if disabled (warns player)
+ *
+ * 2. QUEUE_WARP: Adjust wait times by time offset (positive = advance, negative = rewind)
+ *    - Modifies all wait queue entries: sets waittime = -i (forces immediate execution)
+ *    - Modifies semaphore timeouts: decrements waittime by i (clamps negative to -1)
+ *    - Calls do_second() to process newly-expired entries
+ *    - Special case: i = 0 promotes object queue to player queue without time change
+ *    - Used for testing time-based features or recovering from clock issues
+ *
+ * CF_DEQUEUE flag handling: Both modes check if automatic dequeueing is disabled
+ * (CF_DEQUEUE flag clear). If so, temporarily enables flag, displays warning to player,
+ * executes operation, then restores original disabled state. This ensures manual
+ * operations work regardless of automatic processing state.
+ *
+ * Input validation: Argument must be valid integer within INT_MIN to INT_MAX range.
+ * Invalid values (non-numeric, overflow, empty) result in error notification and
+ * early return without modifying queue state.
+ *
+ * Output messages: Unless player is Quiet, displays operation result:
+ * - QUEUE_KICK: "X commands processed." where X is actual execution count
+ * - QUEUE_WARP positive: "WaitQ timer advanced X seconds."
+ * - QUEUE_WARP negative: "WaitQ timer set back X seconds."
+ * - QUEUE_WARP zero: "Object queue appended to player queue."
+ *
+ * @param player DBref of player issuing the @queue command (typically wizard)
+ * @param cause  DBref of cause object (unused, for command interface consistency)
+ * @param key    Operation mode: QUEUE_KICK for forced execution, QUEUE_WARP for time adjustment
+ * @param arg    String argument: command count for QUEUE_KICK, time offset for QUEUE_WARP
+ *
+ * @note Thread-safe: No (modifies global queue structures and CF_DEQUEUE flag)
+ * @note QUEUE_WARP with negative offset does not restore original wait times precisely
+ * @note Semaphore entries with waittime = 0 (non-timed waits) are unaffected by QUEUE_WARP
+ * @note CF_DEQUEUE state is preserved across operation if temporarily enabled
+ * @attention QUEUE_WARP can cause commands to execute out of intended order
+ * @attention QUEUE_KICK may process fewer commands than requested if queue depletes
+ * @attention Temporary CF_DEQUEUE enable triggers warning notification
+ *
+ * @see do_top() for command execution implementation used by QUEUE_KICK
+ * @see do_second() for wait queue processing triggered by QUEUE_WARP
+ * @see mushconf.control_flags for CF_DEQUEUE flag controlling automatic processing
  */
 void do_queue(dbref player, dbref cause, int key, char *arg)
 {
