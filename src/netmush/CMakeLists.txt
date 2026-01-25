@@ -19,7 +19,8 @@ set(NETMUSH_SOURCES
     bsd_connection.c bsd_dns.c bsd_io.c bsd.c bsd_signals.c bsd_socket.c 
     command_core.c command_access.c command_hooks.c command_admin.c 
     conf_core.c conf_data.c conf.c conf_modules.c constants.h 
-    cque.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
+    cque.c cque_entry.c cque_halt.c cque_notify.c cque_wait.c cque_exec.c cque_queue.c 
+    create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
     funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
