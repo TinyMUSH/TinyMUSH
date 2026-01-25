@@ -2392,24 +2392,20 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 {
 	char *bufp = NULL;
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
-	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0, i = 0;
+	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0;
 
-	/* Figure out what to list the queue for */
-	if ((key & PS_ALL) && !(See_Queue(player)))
+	/* Check permission for PS_ALL flag */
+	if ((key & PS_ALL) && !See_Queue(player))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;
 	}
 
+	/* Determine target objects for queue filtering */
 	if (!target || !*target)
 	{
-		obj_targ = NOTHING;
-
-		if (key & PS_ALL)
-		{
-			player_targ = NOTHING;
-		}
-		else
+		/* No target specified: default to player's own queues */
+		if (!(key & PS_ALL))
 		{
 			player_targ = Owner(player);
 
@@ -2421,16 +2417,9 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 	}
 	else
 	{
+		/* Target specified: resolve and validate */
 		player_targ = Owner(player);
-
-		if (See_Queue(player))
-		{
-			obj_targ = match_thing(player, target);
-		}
-		else
-		{
-			obj_targ = match_controlled(player, target);
-		}
+		obj_targ = See_Queue(player) ? match_thing(player, target) : match_controlled(player, target);
 
 		if (!Good_obj(obj_targ))
 		{
@@ -2450,9 +2439,8 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 		}
 	}
 
-	key = key & ~PS_ALL;
-
-	switch (key)
+	/* Validate display mode */
+	switch (key & ~PS_ALL)
 	{
 	case PS_BRIEF:
 	case PS_SUMM:
@@ -2464,19 +2452,23 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 		return;
 	}
 
-	/* Go do it */
-	show_que(player, key, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
-	show_que(player, key, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
-	show_que(player, key, mushstate.qwait, &wqtot, &wqent, &i, player_targ, obj_targ, "Wait");
-	show_que(player, key, mushstate.qsemfirst, &sqtot, &sqent, &i, player_targ, obj_targ, "Semaphore");
+	/* Display all four queues */
+	show_que(player, key & ~PS_ALL, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
+	show_que(player, key & ~PS_ALL, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
+	show_que(player, key & ~PS_ALL, mushstate.qwait, &wqtot, &wqent, (int *)0, player_targ, obj_targ, "Wait");
+	show_que(player, key & ~PS_ALL, mushstate.qsemfirst, &sqtot, &sqent, (int *)0, player_targ, obj_targ, "Semaphore");
 
-	/* Display stats */
+	/* Display summary statistics */
 	bufp = XMALLOC(MBUF_SIZE, "bufp");
 
 	if (See_Queue(player))
+	{
 		XSPRINTF(bufp, "Totals: Player...%d/%d[%ddel]  Object...%d/%d[%ddel]  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, pqdel, oqent, oqtot, oqdel, wqent, wqtot, sqent, sqtot);
+	}
 	else
+	{
 		XSPRINTF(bufp, "Totals: Player...%d/%d  Object...%d/%d  Wait...%d/%d  Semaphore...%d/%d", pqent, pqtot, oqent, oqtot, wqent, wqtot, sqent, sqtot);
+	}
 
 	notify(player, bufp);
 	XFREE(bufp);
