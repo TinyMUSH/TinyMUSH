@@ -1738,24 +1738,22 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
  */
 int que_next(void)
 {
-	int min = 0, this = 0;
+	int min = 1000, this = 0;
 	BQUE *point = NULL;
 
-	/* If there are commands in the player queue, we want to run them immediately. */
+	/* Player queue has highest priority - execute immediately */
 	if (test_top())
 	{
 		return 0;
 	}
 
-	/* If there are commands in the object queue, we want to run them after a one-second pause. */
+	/* Object queue - execute after one-second delay */
 	if (mushstate.qlfirst != NULL)
 	{
 		return 1;
 	}
 
-	/* Find minimum wait time among queued commands */
-	min = 1000;
-
+	/* Scan wait queue for minimum time until next command */
 	for (point = mushstate.qwait; point; point = point->next)
 	{
 		this = point->waittime - mushstate.now;
@@ -1771,11 +1769,13 @@ int que_next(void)
 		}
 	}
 
+	/* Scan semaphore queue for timed-waits only */
 	for (point = mushstate.qsemfirst; point; point = point->next)
 	{
+		/* Skip non-timed semaphore waits */
 		if (point->waittime == 0)
 		{
-			continue; /* Skip if no timeout */
+			continue;
 		}
 
 		this = point->waittime - mushstate.now;
