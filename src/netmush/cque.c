@@ -982,20 +982,13 @@ int qpid_next(void)
 
 	for (int i = 0; i < mushconf.max_qpid; i++)
 	{
-		if (qpid > mushconf.max_qpid)
+		if (!nhashfind(qpid, &mushstate.qpid_htab))
 		{
-			qpid = 1;
-		}
-
-		if (nhashfind(qpid, &mushstate.qpid_htab) != NULL)
-		{
-			qpid++;
-		}
-		else
-		{
-			qpid_top = qpid + 1;
+			qpid_top = (qpid < mushconf.max_qpid) ? (qpid + 1) : 1;
 			return qpid;
 		}
+
+		qpid = (qpid < mushconf.max_qpid) ? (qpid + 1) : 1;
 	}
 
 	return 0;
