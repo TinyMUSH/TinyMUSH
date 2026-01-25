@@ -202,7 +202,7 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 	long val = 0;
 
 	/* Validate and parse PID */
-	if (!_parse_pid_string(pidstr, &qpid))
+	if (!_cque_parse_pid_string(pidstr, &qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;

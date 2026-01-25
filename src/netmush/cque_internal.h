@@ -75,7 +75,7 @@ void remove_waitq(BQUE *qptr);
  *
  * @note Thread-safe: Yes (no side effects beyond deallocation)
  */
-void _free_gdata(GDATA *gdata);
+void _cque_free_gdata(GDATA *gdata);
 
 /**
  * @brief Parse and validate a PID string into an integer value.
@@ -92,7 +92,7 @@ void _free_gdata(GDATA *gdata);
  * @note Valid PID range: [1, max_qpid]
  * @attention qpid pointer must be valid when calling this function
  */
-bool _parse_pid_string(const char *pidstr, int *qpid);
+bool _cque_parse_pid_string(const char *pidstr, int *qpid);
 
 /* ==================== Wait Queue Management ==================== */
 

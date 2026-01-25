@@ -335,7 +335,7 @@ void do_ps(dbref player, dbref cause, int key, char *target)
  *
  * @note Thread-safe: Yes (no global state modification)
  */
-static bool _parse_queue_arg(const char *arg, int *val)
+static bool _cque_parse_queue_arg(const char *arg, int *val)
 {
 	char *endptr = NULL;
 	long lval = 0;
@@ -419,7 +419,7 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
 	int was_disabled = !(mushconf.control_flags & CF_DEQUEUE);
 
 	/* Parse and validate the integer argument */
-	if (!_parse_queue_arg(arg, &i))
+	if (!_cque_parse_queue_arg(arg, &i))
 	{
 		notify(player, (key == QUEUE_KICK) ? "Invalid number of commands." : "Invalid time value.");
 		return;

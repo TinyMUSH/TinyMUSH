@@ -163,7 +163,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
  * @note Valid count range: [1, INT_MAX]
  * @attention cnt pointer must be valid when calling this function
  */
-static bool _parse_count_string(const char *countstr, int *cnt)
+static bool _cque_parse_count_string(const char *countstr, int *cnt)
 {
 	char *endptr = NULL;
 	long val = 0;
@@ -258,7 +258,7 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 	/* Parse notification count */
 	if (count && *count)
 	{
-		if (!_parse_count_string(count, &loccount))
+		if (!_cque_parse_count_string(count, &loccount))
 		{
 			notify_quiet(player, "Invalid count value.");
 			return;

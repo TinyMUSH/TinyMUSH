@@ -375,7 +375,7 @@ int do_top(int ncmds)
 		if (!test_top())
 		{
 			mushstate.debug_cmd = cmdsave;
-			_free_gdata(mushstate.rdata);
+			_cque_free_gdata(mushstate.rdata);
 			mushstate.rdata = NULL;
 			return count;
 		}
@@ -397,7 +397,7 @@ int do_top(int ncmds)
 				if (mushstate.qfirst->gdata)
 				{
 					/* Clean up existing register data */
-					_free_gdata(mushstate.rdata);
+					_cque_free_gdata(mushstate.rdata);
 
 					/* Allocate new register structure if needed */
 					if (mushstate.qfirst->gdata->q_alloc || mushstate.qfirst->gdata->xr_alloc)
@@ -455,7 +455,7 @@ int do_top(int ncmds)
 				else
 				{
 					/* No register data in queue entry - clean up existing */
-					_free_gdata(mushstate.rdata);
+					_cque_free_gdata(mushstate.rdata);
 					mushstate.rdata = NULL;
 				}
 
@@ -479,7 +479,7 @@ int do_top(int ncmds)
 	}
 
 	/* Final cleanup */
-	_free_gdata(mushstate.rdata);
+	_cque_free_gdata(mushstate.rdata);
 	mushstate.rdata = NULL;
 	mushstate.debug_cmd = cmdsave;
 	return count;

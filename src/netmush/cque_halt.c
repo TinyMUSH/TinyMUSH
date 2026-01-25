@@ -66,7 +66,7 @@ bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
  * @note Thread-safe: No (modifies the dbrefs_array parameter)
  * @note dbrefs_array must be allocated by caller if halt_all is non-zero
  */
-static void _halt_record(int *numhalted, int *dbrefs_array, BQUE *entry, int halt_all)
+static void _cque_halt_record(int *numhalted, int *dbrefs_array, BQUE *entry, int halt_all)
 {
 	(*numhalted)++;
 	if (halt_all && Good_obj(entry->player))
@@ -116,7 +116,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
-			_halt_record(&numhalted, dbrefs_array, point, halt_all);
+			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
 		}
 
@@ -124,7 +124,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qlfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
-			_halt_record(&numhalted, dbrefs_array, point, halt_all);
+			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
 		}
 
@@ -132,7 +132,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qwait, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
-			_halt_record(&numhalted, dbrefs_array, point, halt_all);
+			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
 			{
 				trail->next = next = point->next;
@@ -153,7 +153,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
-			_halt_record(&numhalted, dbrefs_array, point, halt_all);
+			_cque_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
 			{
 				trail->next = next = point->next;
@@ -225,7 +225,7 @@ int halt_que(dbref player, dbref object)
  * @note Valid PID range: [1, max_qpid]
  * @attention qpid pointer must be valid when calling this function
  */
-bool _parse_pid_string(const char *pidstr, int *qpid)
+bool _cque_parse_pid_string(const char *pidstr, int *qpid)
 {
 	char *endptr = NULL;
 	long val = 0;
@@ -286,7 +286,7 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 	int qpid = 0;
 	BQUE *qptr = NULL;
 
-	if (!_parse_pid_string(pidstr, &qpid))
+	if (!_cque_parse_pid_string(pidstr, &qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;
@@ -368,7 +368,7 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
  * @note Notifies player of errors (no match, permission denied, conflicting flags)
  * @note Sets player_targ and obj_targ to appropriate values for halt_que()
  */
-static bool _parse_halt_target(dbref player, int key, const char *target,
+static bool _cque_parse_halt_target(dbref player, int key, const char *target,
                                 dbref *player_targ, dbref *obj_targ)
 {
 	/* Empty target: halt caller's own entries (or all if HALT_ALL) */
@@ -468,7 +468,7 @@ void do_halt(dbref player, dbref cause, int key, char *target)
 		return;
 	}
 
-	if (!_parse_halt_target(player, key, target, &player_targ, &obj_targ))
+	if (!_cque_parse_halt_target(player, key, target, &player_targ, &obj_targ))
 	{
 		return;
 	}

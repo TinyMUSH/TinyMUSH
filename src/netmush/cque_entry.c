@@ -240,7 +240,7 @@ void remove_waitq(BQUE *qptr)
  * @note Sets gdata pointer to NULL after cleanup (caller responsibility)
  * @attention Does not set input pointer to NULL - caller must handle
  */
-void _free_gdata(GDATA *gdata)
+void _cque_free_gdata(GDATA *gdata)
 {
 	if (!gdata)
 	{
