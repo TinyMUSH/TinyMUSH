@@ -1572,22 +1572,21 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *cargs[], int ncargs)
 {
 	dbref thing = NOTHING, aowner = NOTHING;
-	int howlong = 0, num = 0, attr = 0, aflags = 0;
-	char *what = NULL;
+	int howlong = 0, num = 0, attr = A_SEMAPHORE, aflags = 0;
+	char *what = NULL, *endptr = NULL;
+	long val = 0;
 	ATTR *ap = NULL;
 
+	/* PID adjustment mode */
 	if (key & WAIT_PID)
 	{
 		do_wait_pid(player, key, event, cmd);
 		return;
 	}
 
-	/* If arg1 is all numeric, do simple (non-sem) timed wait. */
+	/* Numeric event: simple timed wait (no semaphore) */
 	if (is_number(event))
 	{
-		char *endptr = NULL;
-		long val = 0;
-
 		errno = 0;
 		val = strtol(event, &endptr, 10);
 
@@ -1597,21 +1596,11 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 			return;
 		}
 
+		/* Calculate wait duration based on mode */
 		if (key & WAIT_UNTIL)
 		{
 			time_t now = time(NULL);
-			if (val < (long)now)
-			{
-				howlong = 0;
-			}
-			else if (val - now > INT_MAX)
-			{
-				howlong = INT_MAX;
-			}
-			else
-			{
-				howlong = (int)(val - now);
-			}
+			howlong = (val < (long)now) ? 0 : ((val - now > INT_MAX) ? INT_MAX : (int)(val - now));
 		}
 		else
 		{
@@ -1622,7 +1611,7 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 		return;
 	}
 
-	/* Semaphore wait with optional timeout */
+	/* Semaphore wait with optional timeout and custom attribute */
 	what = parse_to(&event, '/', 0);
 	init_match(player, what, NOTYPE);
 	match_everything(0);
@@ -1631,21 +1620,21 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 	if (!Good_obj(thing))
 	{
 		notify(player, "No match.");
+		return;
 	}
-	else if (!controls(player, thing) && !Link_ok(thing))
+
+	if (!controls(player, thing) && !Link_ok(thing))
 	{
 		notify(player, NOPERM_MESSAGE);
+		return;
 	}
-	else
+
+	/* Parse optional timeout (numeric) or attribute name (non-numeric) */
+	if (event && *event)
 	{
-		/* Get timeout, default 0 */
-		if (event && *event && is_number(event))
+		if (is_number(event))
 		{
-			char *endptr = NULL;
-			long val = 0;
-
-			attr = A_SEMAPHORE;
-
+			/* Numeric: parse as timeout value */
 			errno = 0;
 			val = strtol(event, &endptr, 10);
 
@@ -1655,35 +1644,12 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 				return;
 			}
 
-			if (key & WAIT_UNTIL)
-			{
-				time_t now = time(NULL);
-				if (val < (long)now)
-				{
-					howlong = 0;
-				}
-				else if (val - now > INT_MAX)
-				{
-					howlong = INT_MAX;
-				}
-				else
-				{
-					howlong = (int)(val - now);
-				}
-			}
-			else
-			{
-				howlong = (int)val;
-			}
+			/* Calculate wait duration based on mode */
+			howlong = (key & WAIT_UNTIL) ? ((val < (long)time(NULL)) ? 0 : ((val - time(NULL) > INT_MAX) ? INT_MAX : (int)(val - time(NULL)))) : (int)val;
 		}
 		else
 		{
-			attr = A_SEMAPHORE;
-			howlong = 0;
-		}
-
-		if (event && *event && !is_number(event))
-		{
+			/* Non-numeric: parse as custom attribute name */
 			ap = atr_str(event);
 
 			if (!ap)
@@ -1701,29 +1667,32 @@ void do_wait(dbref player, dbref cause, int key, char *event, char *cmd, char *c
 
 			atr_pget_info(thing, ap->number, &aowner, &aflags);
 
-			if (attr && Set_attr(player, thing, ap, aflags))
-			{
-				attr = ap->number;
-				howlong = 0;
-			}
-			else
+			if (!Set_attr(player, thing, ap, aflags))
 			{
 				notify_quiet(player, NOPERM_MESSAGE);
 				return;
 			}
-		}
 
-		num = add_to(player, thing, 1, attr);
-
-		if (num <= 0)
-		{
-			/* thing over-notified, run the command immediately */
-			thing = NOTHING;
+			attr = ap->number;
 			howlong = 0;
 		}
-
-		wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mushstate.rdata);
 	}
+	else
+	{
+		howlong = 0;
+	}
+
+	/* Increment semaphore counter */
+	num = add_to(player, thing, 1, attr);
+
+	if (num <= 0)
+	{
+		/* Over-notified semaphore: execute immediately without blocking */
+		thing = NOTHING;
+		howlong = 0;
+	}
+
+	wait_que(player, cause, howlong, thing, attr, cmd, cargs, ncargs, mushstate.rdata);
 }
 
 /**
