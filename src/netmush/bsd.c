@@ -1,5 +1,5 @@
 /**
- * @file bsd_main.c
+ * @file bsd.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Main server loop and core network event processing
  * @version 4.0
