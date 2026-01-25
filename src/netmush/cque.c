@@ -424,12 +424,31 @@ void remove_waitq(BQUE *qptr)
 }
 
 /**
- * @brief Halt a single queue entry.
+ * @brief Halt a specific queue entry identified by its process ID (PID).
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key    Key
- * @param pidstr Pîd of the queue
+ * Validates and parses the PID string, locates the corresponding queue entry in the
+ * PID hash table, and halts it after performing permission checks. The entry is removed
+ * from its queue (wait or semaphore), all resources are freed, and the wait cost is
+ * refunded to the entry owner. This provides targeted control over individual queued
+ * commands without affecting other entries.
+ *
+ * Validation steps include: integer format checking, range validation against max_qpid,
+ * existence verification in hash table, halt status checking, and permission verification
+ * (Controls or Can_Halt).
+ *
+ * @param player DBref of the player issuing the halt command
+ * @param cause  DBref of the cause object (unused in this function)
+ * @param key    Command key flags (unused in this function)
+ * @param pidstr String representation of the PID to halt
+ *
+ * @note Thread-safe: No (modifies global queue state and hash table)
+ * @note Notifies player of validation errors with specific error messages
+ * @attention PID must be in range [1, max_qpid] to be considered valid
+ * @attention Requires Controls permission on entry owner or Can_Halt privilege
+ *
+ * @see halt_que() for halting multiple entries by player/object criteria
+ * @see remove_waitq() for wait queue removal
+ * @see delete_qentry() for resource cleanup
  */
 void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
@@ -531,12 +550,35 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 }
 
 /**
- * @brief Command interface to halt_que.
+ * @brief Command interface for halting queued commands by various criteria.
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key 	 Key
- * @param target Target to halt
+ * Provides flexible queue halting capabilities through multiple modes:
+ * - PID mode (HALT_PID): Halts a specific queue entry by process ID
+ * - Target mode (default): Halts entries owned by or associated with specified object
+ * - All mode (HALT_ALL): Halts all entries owned by caller (or globally if privileged)
+ *
+ * Target parsing determines halt scope: empty target halts caller's own entries
+ * (and entries run by non-player objects owned by caller), specified target halts
+ * that player's or object's entries. Players are distinguished from objects to
+ * determine correct ownership filtering.
+ *
+ * Permission requirements vary by mode: HALT_ALL requires Can_Halt privilege,
+ * target mode requires either Can_Halt (for any target) or Controls permission
+ * (for specific target). Reports number of halted entries unless player is Quiet.
+ *
+ * @param player DBref of the player issuing the halt command
+ * @param cause  DBref of the cause object (passed to do_halt_pid if needed)
+ * @param key    Command flags: HALT_PID for PID mode, HALT_ALL for global halt
+ * @param target Target specification: PID string (if HALT_PID), object name, or empty
+ *
+ * @note Thread-safe: No (delegates to functions that modify global queue state)
+ * @note HALT_ALL without target and with Can_Halt privilege performs global halt
+ * @attention Cannot combine HALT_ALL flag with a specific target
+ * @attention Permission checks occur before any queue modification
+ *
+ * @see halt_que() for the underlying halt implementation
+ * @see do_halt_pid() for PID-based halting
+ * @see que_want() for filtering logic
  */
 void do_halt(dbref player, dbref cause, int key, char *target)
 {
@@ -625,14 +667,35 @@ void do_halt(dbref player, dbref cause, int key, char *target)
 }
 
 /**
- * @brief Notify commands from the queue and perform or discard them.
+ * @brief Release and process commands waiting on a semaphore.
  *
- * @param player DBref of player
- * @param sem    DBref of sem
- * @param attr	 Attributes
- * @param key 	 Key
- * @param count  Counter
- * @return int
+ * Reads the semaphore counter from the specified attribute (or A_SEMAPHORE if none specified),
+ * and if positive, removes up to 'count' matching entries from the semaphore queue. Entries
+ * are either executed (queued to execution queue) or discarded (with refund) based on the key.
+ * The semaphore counter is then decremented by the notification count.
+ *
+ * Processing modes:
+ * - NFY_NFY (notify): Removes up to 'count' entries and queues them for execution
+ * - NFY_DRAIN (drain): Removes all matching entries and discards them with refunds
+ *
+ * If the semaphore counter is <= 0, no entries are processed. When attr is 0, uses
+ * A_SEMAPHORE and treats counter as 1. Invalid or missing attribute values are treated as 0.
+ *
+ * @param player DBref of the player performing the notification (for attribute updates)
+ * @param sem    DBref of the semaphore object whose waiters should be notified
+ * @param attr   Attribute number containing semaphore counter (0 = use A_SEMAPHORE)
+ * @param key    Operation mode: NFY_NFY to execute commands, NFY_DRAIN to discard
+ * @param count  Maximum number of entries to notify (NFY_NFY mode only)
+ * @return Number of queue entries actually processed/notified
+ *
+ * @note Thread-safe: No (modifies global semaphore queue and database attributes)
+ * @note Semaphore counter must be positive for any processing to occur
+ * @note NFY_DRAIN mode processes all matching entries regardless of count parameter
+ * @attention Clears the semaphore attribute entirely in NFY_DRAIN mode
+ *
+ * @see do_notify() for the command interface
+ * @see wait_que() for adding entries to semaphore queue
+ * @see give_que() for queuing entries for execution
  */
 int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 {
@@ -737,13 +800,36 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 }
 
 /**
- * @brief Command interface to nfy_que
+ * @brief Command interface for notifying and releasing semaphore-blocked commands.
  *
- * @param player DBref of player
- * @param cause  DBref of cause
- * @param key    Key
- * @param what   Command
- * @param count  Counter
+ * Parses target specification (object[/attribute]) to identify the semaphore object and
+ * optional attribute containing the semaphore counter. Validates permissions (controls or
+ * Link_ok), parses the count parameter, and delegates to nfy_que() to process waiting
+ * commands. Provides user feedback on completion unless both player and target are Quiet.
+ *
+ * Target format: "object" uses A_SEMAPHORE attribute, "object/attribute" uses specified
+ * attribute. The attribute must exist and player must have Set_attr permission on it.
+ * Count defaults to 1 if not specified. Key determines operation mode (NFY_NFY to
+ * execute commands, NFY_DRAIN to discard them).
+ *
+ * Permission requirements: player must either control the semaphore object or the object
+ * must have Link_ok flag set. For custom attributes, player must have Set_attr permission.
+ * Notifies player of "Notified." or "Drained." on success unless Quiet flag is set.
+ *
+ * @param player DBref of the player issuing the notification command
+ * @param cause  DBref of the cause object (unused in this function)
+ * @param key    Operation mode: NFY_NFY to execute commands, NFY_DRAIN to discard
+ * @param what   Target specification: "object" or "object/attribute" string
+ * @param count  String representation of notification count (parsed to integer)
+ *
+ * @note Thread-safe: No (calls nfy_que which modifies global queue state)
+ * @note Count must be positive integer; invalid values result in error notification
+ * @attention Requires controls or Link_ok permission on target object
+ * @attention Custom attribute requires Set_attr permission
+ *
+ * @see nfy_que() for the underlying notification implementation
+ * @see wait_que() for queuing commands on semaphores
+ * @see do_wait() for the wait command that blocks on semaphores
  */
 void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 {
@@ -835,9 +921,32 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 }
 
 /**
- * @brief Get the next available queue PID.
+ * @brief Allocate the next available queue process ID (PID) from the PID pool.
  *
- * @return int
+ * Searches for an unused PID in the range [1, max_qpid] using an optimized allocation
+ * strategy. Maintains qpid_top as a hint to the next likely available PID, avoiding
+ * repeated scans from 1. If the search space is exhausted (all PIDs in use), returns 0
+ * to indicate queue exhaustion.
+ *
+ * Allocation algorithm:
+ * 1. Start search from qpid_top (last allocated PID + 1)
+ * 2. Wrap around to 1 if search exceeds max_qpid
+ * 3. Check PID availability via hash table lookup
+ * 4. If available, update qpid_top hint and return PID
+ * 5. If unavailable, increment and continue
+ * 6. After max_qpid attempts, queue is full - return 0
+ *
+ * The qpid_top optimization reduces allocation time from O(n²) to approximately O(1)
+ * for typical usage patterns where PIDs are allocated and freed sequentially.
+ *
+ * @return Next available PID in range [1, max_qpid], or 0 if queue is full
+ *
+ * @note Thread-safe: No (modifies static qpid_top and checks global hash table)
+ * @note Return value 0 indicates all PIDs exhausted - caller must handle gracefully
+ * @attention PIDs wrap around from max_qpid to 1, ensuring bounded search space
+ *
+ * @see setup_que() for PID allocation usage
+ * @see delete_qentry() for PID deallocation (via nhashdelete)
  */
 int qpid_next(void)
 {
@@ -865,15 +974,44 @@ int qpid_next(void)
 }
 
 /**
- * @brief Set up a queue entry.
+ * @brief Create and initialize a new queue entry with command, arguments, and registers.
  *
- * @param player  DBref of player
- * @param cause   DBref of cause
- * @param command Command
- * @param args    Arguments
- * @param nargs   Number of arguments
- * @param gargs   Global registers
- * @return BQUE*
+ * Constructs a fully initialized queue entry (BQUE) after performing comprehensive validation:
+ * checks player halt status, verifies payment for queue cost, enforces queue quota limits,
+ * allocates a unique PID, and carefully calculates total memory requirements to prevent
+ * integer overflow. All data (command text, arguments, global registers, extended registers)
+ * is copied into a single contiguous memory block for cache efficiency.
+ *
+ * Validation sequence:
+ * 1. Check if player is halted (cannot queue commands)
+ * 2. Charge waitcost (with occasional machinecost penalty)
+ * 3. Verify queue quota not exceeded (triggers auto-halt if over limit)
+ * 4. Allocate available PID from pool
+ * 5. Calculate total memory size with overflow detection
+ * 6. Allocate and populate queue entry structure
+ *
+ * Memory layout: Single allocation containing command string, nargs argument strings,
+ * q_alloc global register contents, and xr_alloc extended register name/value pairs,
+ * all null-terminated and referenced via pointers in the BQUE structure.
+ *
+ * @param player  DBref of the player queuing the command
+ * @param cause   DBref of the object that caused this command (for attribution)
+ * @param command Command text string to execute (may be NULL)
+ * @param args    Array of environment variable strings (%0-%9) - may contain NULLs
+ * @param nargs   Number of arguments in args array (clamped to NUM_ENV_VARS)
+ * @param gargs   Global and extended register data (q-registers, x-registers) or NULL
+ * @return Newly allocated and initialized queue entry, or NULL on failure
+ *
+ * @note Thread-safe: No (modifies global queue counters, hash table, charges player)
+ * @note Caller must add returned entry to appropriate queue (via give_que or wait_que)
+ * @note On failure (NULL return), player is notified with specific error message
+ * @attention Player is charged waitcost immediately; refund required if entry not queued
+ * @attention Returns NULL if player halted, insufficient funds, quota exceeded, or PID exhausted
+ *
+ * @see wait_que() for queuing entry with delay or semaphore
+ * @see give_que() for immediate execution queue
+ * @see qpid_next() for PID allocation
+ * @see delete_qentry() for cleanup and deallocation
  */
 BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int nargs, GDATA *gargs)
 {
