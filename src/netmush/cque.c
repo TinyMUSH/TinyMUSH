@@ -37,10 +37,6 @@
 #include <errno.h>
 #include <ctype.h>
 
-/* ==================== Global Variables ==================== */
-
-int qpid_top = 1; /*!< Next queue PID to allocate (internal optimization) */
-
 /* ==================== Queue Entry Setup ==================== */
 
 /**

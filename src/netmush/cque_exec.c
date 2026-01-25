@@ -25,6 +25,11 @@
 #include <errno.h>
 #include <ctype.h>
 
+/* ==================== Global Variables ==================== */
+
+/** @brief Next queue PID to allocate (internal optimization hint for qpid_next) */
+int qpid_top = 1;
+
 /**
  * @brief Allocate the next available queue process ID (PID) from the PID pool.
  *

@@ -15,16 +15,6 @@
 
 #pragma once
 
-/* ==================== Global Variables ==================== */
-
-/**
- * @brief Next queue PID to allocate (internal optimization)
- * 
- * Shared variable tracking the next available queue process ID.
- * Access protected by queue management functions.
- */
-extern int qpid_top;
-
 /* ==================== Entry Management ==================== */
 
 /**
