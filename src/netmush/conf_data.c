@@ -380,8 +380,9 @@ static in_addr_t _cf_sane_inet_addr(char *str)
 	return addr.s_addr;
 }
 
-CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
+CF_Result cf_site(int *vp, char *str, long extra, dbref player, char *cmd)
 {
+	SITE **site_list = (SITE **)vp;
 	SITE *site = NULL, *last = NULL, *head = NULL;
 	char *addr_txt = NULL, *mask_txt = NULL, *tokst = NULL, *endp = NULL;
 	struct in_addr addr_num, mask_num;
@@ -464,7 +465,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 		}
 	}
 
-	head = (SITE *)*vp;
+	head = *site_list;
 
 	site = (SITE *)XMALLOC(sizeof(SITE), "site");
 	if (!site)
@@ -481,7 +482,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 	{
 		if (head == NULL)
 		{
-			*vp = (long *)site;
+			*site_list = site;
 		}
 		else
 		{
@@ -493,7 +494,7 @@ CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd)
 	else
 	{
 		site->next = head;
-		*vp = (long *)site;
+		*site_list = site;
 	}
 
 	return CF_Success;

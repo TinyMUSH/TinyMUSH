@@ -117,6 +117,26 @@ typedef enum CF_RESULT
 } CF_Result;
 
 /**
+ * @brief Type de callback pour les interpréteurs de directives de configuration
+ *
+ * Signature standard pour les interpréteurs `cf_*` : prennent l'adresse de 
+ * la valeur (`vp`), une chaîne d'arguments (`str`), un champ additionnel (`extra`), 
+ * l'initiateur (`player`) et le nom de la directive (`cmd`).
+ *
+ * @note Ce typedef documente la signature standard, mais la structure CONF utilise
+ *       `int (*interpreter)()` pour supporter les variantes polymorphiques (cf_site 
+ *       utilise `long **` au lieu de `int *`).
+ *
+ * @param vp    Pointeur vers la valeur configurée (généralement `int *` ou `long **`)
+ * @param str   Chaîne d'arguments de la directive
+ * @param extra Données supplémentaires du descripteur de directive
+ * @param player Objet initiateur de la directive
+ * @param cmd   Nom de la directive en cours de traitement
+ * @return CF_Result (CF_Success, CF_Partial, CF_Failure)
+ */
+typedef CF_Result (*cf_interpreter_t)(int *vp, char *str, long extra, dbref player, char *cmd);
+
+/**
  * DB Related typedefs
  *
  */
@@ -777,7 +797,7 @@ typedef union
 typedef struct confparm
 {
     char *pname;          /*!< parm name */
-    int (*interpreter)(); /*!< routine to interp parameter */
+    cf_interpreter_t interpreter; /*!< routine to interp parameter */
     int flags;            /*!< control flags */
     int rperms;           /*!< read permission flags */
     int *loc;             /*!< where to store value */

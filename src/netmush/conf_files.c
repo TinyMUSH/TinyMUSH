@@ -12,7 +12,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "conf_internal.h"
 
 #include <ctype.h>
 #include <dlfcn.h>
@@ -325,8 +324,7 @@ static CF_Result _cf_set(char *cp, char *ap, dbref player, CONF *tp)
 		buff = XSTRDUP(ap, "buff");
 	}
 
-	cf_interpreter = tp->interpreter;
-	interp_result = cf_interpreter(tp->loc, ap, tp->extra, player, cp);
+	interp_result = tp->interpreter(tp->loc, ap, tp->extra, player, cp);
 
 	if (mushstate.initializing)
 	{

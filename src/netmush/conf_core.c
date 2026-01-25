@@ -20,7 +20,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "conf_internal.h"
 
 #include <arpa/inet.h>
 #include <ctype.h>
@@ -35,7 +34,6 @@
 
 CONFDATA mushconf;
 STATEDATA mushstate;
-int (*cf_interpreter)(int *, char *, long, dbref, char *) = NULL;
 
 void cf_init(void)
 {

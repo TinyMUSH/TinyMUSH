@@ -155,7 +155,7 @@ extern CF_Result cf_modify_bits(int *vp, char *str, long extra, dbref player, ch
 extern CF_Result cf_parse_ext_access(int *perms, EXTFUNCS **xperms, char *str, NAMETAB *ntab, dbref player, char *cmd);
 extern CF_Result cf_set_flags(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_badname(int *vp, char *str, long extra, dbref player, char *cmd);
-extern CF_Result cf_site(long **vp, char *str, long extra, dbref player, char *cmd);
+extern CF_Result cf_site(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_cf_access(int *vp, char *str, long extra, dbref player, char *cmd);
 extern CF_Result cf_add_helpfile(dbref player, char *confcmd, char *str, bool is_raw);
 extern CF_Result cf_helpfile(int *vp, char *str, long extra, dbref player, char *cmd);

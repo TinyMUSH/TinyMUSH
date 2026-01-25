@@ -18,7 +18,7 @@ set(NETMUSH_SOURCES
     boolexp_eval.c boolexp_parse.c
     bsd_connection.c bsd_dns.c bsd_io.c bsd_main.c bsd_signals.c bsd_socket.c 
     command_core.c command_access.c command_hooks.c command_admin.c 
-    conf_core.c conf_data.c conf_files.c conf_modules.c conf_internal.h constants.h 
+    conf_core.c conf_data.c conf_files.c conf_modules.c constants.h 
     cque.c create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
