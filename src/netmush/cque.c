@@ -554,6 +554,76 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 }
 
 /**
+ * @brief Parse and validate halt command target specification.
+ *
+ * Resolves the target string into player and object references for halting operations.
+ * Handles empty targets (halts caller's entries), player targets, and object targets.
+ * Validates that the resolved target is accessible based on the player's privileges.
+ *
+ * @param player DBref of the player issuing the halt command
+ * @param key Command flags (HALT_ALL controls permission requirement)
+ * @param target Target specification string (object name or empty)
+ * @param player_targ Pointer to store resolved player target (NOTHING = no player target)
+ * @param obj_targ Pointer to store resolved object target (NOTHING = no object target)
+ * @return true if target parsed successfully, false on error (with notify() already called)
+ *
+ * @note Thread-safe: No (calls match_* functions which may modify game state)
+ * @note Notifies player of errors (no match, permission denied, conflicting flags)
+ * @note Sets player_targ and obj_targ to appropriate values for halt_que()
+ */
+static bool _parse_halt_target(dbref player, int key, const char *target,
+                                dbref *player_targ, dbref *obj_targ)
+{
+	/* Empty target: halt caller's own entries (or all if HALT_ALL) */
+	if (!target || !*target)
+	{
+		*obj_targ = NOTHING;
+		*player_targ = (key & HALT_ALL) ? NOTHING : Owner(player);
+
+		if (Typeof(player) != TYPE_PLAYER)
+		{
+			*obj_targ = player;
+		}
+
+		return true;
+	}
+
+	/* Specified target: resolve it */
+	if (Can_Halt(player))
+	{
+		*obj_targ = match_thing(player, target);
+	}
+	else
+	{
+		*obj_targ = match_controlled(player, target);
+	}
+
+	if (!Good_obj(*obj_targ))
+	{
+		return false;
+	}
+
+	if (key & HALT_ALL)
+	{
+		notify(player, "Can't specify a target and /all");
+		return false;
+	}
+
+	/* Distinguish players from objects for filtering */
+	if (Typeof(*obj_targ) == TYPE_PLAYER)
+	{
+		*player_targ = *obj_targ;
+		*obj_targ = NOTHING;
+	}
+	else
+	{
+		*player_targ = NOTHING;
+	}
+
+	return true;
+}
+
+/**
  * @brief Command interface for halting queued commands by various criteria.
  *
  * Provides flexible queue halting capabilities through multiple modes:
@@ -595,78 +665,30 @@ void do_halt(dbref player, dbref cause, int key, char *target)
 		return;
 	}
 
-	if ((key & HALT_ALL) && !(Can_Halt(player)))
+	if ((key & HALT_ALL) && !Can_Halt(player))
 	{
 		notify(player, NOPERM_MESSAGE);
 		return;
 	}
 
-	/* Figure out what to halt */
-	if (!target || !*target)
-	{
-		obj_targ = NOTHING;
-
-		if (key & HALT_ALL)
-		{
-			player_targ = NOTHING;
-		}
-		else
-		{
-			player_targ = Owner(player);
-
-			if (Typeof(player) != TYPE_PLAYER)
-			{
-				obj_targ = player;
-			}
-		}
-	}
-	else
-	{
-		if (Can_Halt(player))
-		{
-			obj_targ = match_thing(player, target);
-		}
-		else
-		{
-			obj_targ = match_controlled(player, target);
-		}
-
-		if (!Good_obj(obj_targ))
-		{
-			return;
-		}
-
-		if (key & HALT_ALL)
-		{
-			notify(player, "Can't specify a target and /all");
-			return;
-		}
-
-		if (Typeof(obj_targ) == TYPE_PLAYER)
-		{
-			player_targ = obj_targ;
-			obj_targ = NOTHING;
-		}
-		else
-		{
-			player_targ = NOTHING;
-		}
-	}
-
-	numhalted = halt_que(player_targ, obj_targ);
-
-	if (Quiet(player))
+	if (!_parse_halt_target(player, key, target, &player_targ, &obj_targ))
 	{
 		return;
 	}
 
-	if (numhalted == 1)
+	numhalted = halt_que(player_targ, obj_targ);
+
+	if (!Quiet(player))
 	{
-		notify(Owner(player), "1 queue entries removed.");
-	}
-	else
-	{
-		notify_check(Owner(player), Owner(player), MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "%d queue entries removed.", numhalted);
+		if (numhalted == 1)
+		{
+			notify(Owner(player), "1 queue entries removed.");
+		}
+		else
+		{
+			notify_check(Owner(player), Owner(player), MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN,
+						 "%d queue entries removed.", numhalted);
+		}
 	}
 }
 
