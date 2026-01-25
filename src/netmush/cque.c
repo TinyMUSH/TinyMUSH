@@ -1922,6 +1922,78 @@ void do_second(void)
 }
 
 /**
+ * @brief Clean up and free global register data (GDATA) structure.
+ *
+ * Frees all allocated memory in a GDATA structure including q-registers, x-registers,
+ * and their associated length arrays. Handles NULL pointers gracefully at all levels.
+ * Used during queue command execution to manage global register context cleanup.
+ *
+ * @param gdata Pointer to GDATA structure to free (may be NULL)
+ *
+ * @note Thread-safe: Yes (no side effects beyond deallocation)
+ * @note Sets gdata pointer to NULL after cleanup (caller responsibility)
+ * @attention Does not set input pointer to NULL - caller must handle
+ */
+static void _free_gdata(GDATA *gdata)
+{
+	if (!gdata)
+	{
+		return;
+	}
+
+	/* Free q-register contents */
+	for (int z = 0; z < gdata->q_alloc; z++)
+	{
+		if (gdata->q_regs[z])
+		{
+			XFREE(gdata->q_regs[z]);
+		}
+	}
+
+	/* Free x-register names and contents */
+	for (int z = 0; z < gdata->xr_alloc; z++)
+	{
+		if (gdata->x_names[z])
+		{
+			XFREE(gdata->x_names[z]);
+		}
+
+		if (gdata->x_regs[z])
+		{
+			XFREE(gdata->x_regs[z]);
+		}
+	}
+
+	/* Free register arrays */
+	if (gdata->q_regs)
+	{
+		XFREE(gdata->q_regs);
+	}
+
+	if (gdata->q_lens)
+	{
+		XFREE(gdata->q_lens);
+	}
+
+	if (gdata->x_names)
+	{
+		XFREE(gdata->x_names);
+	}
+
+	if (gdata->x_regs)
+	{
+		XFREE(gdata->x_regs);
+	}
+
+	if (gdata->x_lens)
+	{
+		XFREE(gdata->x_lens);
+	}
+
+	XFREE(gdata);
+}
+
+/**
  * @brief Execute up to ncmds commands from the player queue (normal priority).
  *
  * Main command execution engine that dequeues and runs commands from mushstate.qfirst
@@ -1979,7 +2051,8 @@ int do_top(int ncmds)
 	int count = 0;
 	char *cmdsave = NULL;
 
-	if ((mushconf.control_flags & CF_DEQUEUE) == 0)
+	/* Early exit if command processing is disabled */
+	if (!(mushconf.control_flags & CF_DEQUEUE))
 	{
 		return 0;
 	}
@@ -1989,61 +2062,18 @@ int do_top(int ncmds)
 
 	for (count = 0; count < ncmds; count++)
 	{
+		/* Check if queue has commands */
 		if (!test_top())
 		{
 			mushstate.debug_cmd = cmdsave;
-
-			if (mushstate.rdata)
-			{
-				for (int z = 0; z < mushstate.rdata->q_alloc; z++)
-				{
-					if (mushstate.rdata->q_regs[z])
-						XFREE(mushstate.rdata->q_regs[z]);
-				}
-
-				for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
-				{
-					if (mushstate.rdata->x_names[z])
-						XFREE(mushstate.rdata->x_names[z]);
-
-					if (mushstate.rdata->x_regs[z])
-						XFREE(mushstate.rdata->x_regs[z]);
-				}
-
-				if (mushstate.rdata->q_regs)
-				{
-					XFREE(mushstate.rdata->q_regs);
-				}
-
-				if (mushstate.rdata->q_lens)
-				{
-					XFREE(mushstate.rdata->q_lens);
-				}
-
-				if (mushstate.rdata->x_names)
-				{
-					XFREE(mushstate.rdata->x_names);
-				}
-
-				if (mushstate.rdata->x_regs)
-				{
-					XFREE(mushstate.rdata->x_regs);
-				}
-
-				if (mushstate.rdata->x_lens)
-				{
-					XFREE(mushstate.rdata->x_lens);
-				}
-
-				XFREE(mushstate.rdata);
-			}
-
+			_free_gdata(mushstate.rdata);
 			mushstate.rdata = NULL;
 			return count;
 		}
 
 		player = mushstate.qfirst->player;
 
+		/* Process valid player commands */
 		if ((player >= 0) && !Going(player))
 		{
 			giveto(player, mushconf.waitcost);
@@ -2054,74 +2084,23 @@ int do_top(int ncmds)
 
 			if (!Halted(player))
 			{
-				/* Load scratch args */
+				/* Load scratch registers from queue entry */
 				if (mushstate.qfirst->gdata)
 				{
-					if (mushstate.rdata)
-					{
-						for (int z = 0; z < mushstate.rdata->q_alloc; z++)
-						{
-							if (mushstate.rdata->q_regs[z])
-								XFREE(mushstate.rdata->q_regs[z]);
-						}
-						for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
-						{
-							if (mushstate.rdata->x_names[z])
-								XFREE(mushstate.rdata->x_names[z]);
-							if (mushstate.rdata->x_regs[z])
-								XFREE(mushstate.rdata->x_regs[z]);
-						}
+					/* Clean up existing register data */
+					_free_gdata(mushstate.rdata);
 
-						if (mushstate.rdata->q_regs)
-						{
-							XFREE(mushstate.rdata->q_regs);
-						}
-						if (mushstate.rdata->q_lens)
-						{
-							XFREE(mushstate.rdata->q_lens);
-						}
-						if (mushstate.rdata->x_names)
-						{
-							XFREE(mushstate.rdata->x_names);
-						}
-						if (mushstate.rdata->x_regs)
-						{
-							XFREE(mushstate.rdata->x_regs);
-						}
-						if (mushstate.rdata->x_lens)
-						{
-							XFREE(mushstate.rdata->x_lens);
-						}
-						XFREE(mushstate.rdata);
-					}
-
-					if (mushstate.qfirst->gdata && (mushstate.qfirst->gdata->q_alloc || mushstate.qfirst->gdata->xr_alloc))
+					/* Allocate new register structure if needed */
+					if (mushstate.qfirst->gdata->q_alloc || mushstate.qfirst->gdata->xr_alloc)
 					{
 						mushstate.rdata = (GDATA *)XMALLOC(sizeof(GDATA), "do_top");
 						mushstate.rdata->q_alloc = mushstate.qfirst->gdata->q_alloc;
-						if (mushstate.qfirst->gdata->q_alloc)
-						{
-							mushstate.rdata->q_regs = XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(char *), "q_regs");
-							mushstate.rdata->q_lens = XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(int), "q_lens");
-						}
-						else
-						{
-							mushstate.rdata->q_regs = NULL;
-							mushstate.rdata->q_lens = NULL;
-						}
+						mushstate.rdata->q_regs = mushstate.qfirst->gdata->q_alloc ? XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(char *), "q_regs") : NULL;
+						mushstate.rdata->q_lens = mushstate.qfirst->gdata->q_alloc ? XCALLOC(mushstate.qfirst->gdata->q_alloc, sizeof(int), "q_lens") : NULL;
 						mushstate.rdata->xr_alloc = mushstate.qfirst->gdata->xr_alloc;
-						if (mushstate.qfirst->gdata->xr_alloc)
-						{
-							mushstate.rdata->x_names = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_names");
-							mushstate.rdata->x_regs = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_regs");
-							mushstate.rdata->x_lens = XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(int), "x_lens");
-						}
-						else
-						{
-							mushstate.rdata->x_names = NULL;
-							mushstate.rdata->x_regs = NULL;
-							mushstate.rdata->x_lens = NULL;
-						}
+						mushstate.rdata->x_names = mushstate.qfirst->gdata->xr_alloc ? XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_names") : NULL;
+						mushstate.rdata->x_regs = mushstate.qfirst->gdata->xr_alloc ? XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(char *), "x_regs") : NULL;
+						mushstate.rdata->x_lens = mushstate.qfirst->gdata->xr_alloc ? XCALLOC(mushstate.qfirst->gdata->xr_alloc, sizeof(int), "x_lens") : NULL;
 						mushstate.rdata->dirty = 0;
 					}
 					else
@@ -2129,7 +2108,8 @@ int do_top(int ncmds)
 						mushstate.rdata = NULL;
 					}
 
-					if (mushstate.qfirst->gdata && mushstate.qfirst->gdata->q_alloc)
+					/* Copy q-register contents */
+					if (mushstate.qfirst->gdata->q_alloc)
 					{
 						for (int z = 0; z < mushstate.qfirst->gdata->q_alloc; z++)
 						{
@@ -2142,7 +2122,8 @@ int do_top(int ncmds)
 						}
 					}
 
-					if (mushstate.qfirst->gdata && mushstate.qfirst->gdata->xr_alloc)
+					/* Copy x-register contents */
+					if (mushstate.qfirst->gdata->xr_alloc)
 					{
 						for (int z = 0; z < mushstate.qfirst->gdata->xr_alloc; z++)
 						{
@@ -2157,54 +2138,15 @@ int do_top(int ncmds)
 						}
 					}
 
-					if (mushstate.qfirst->gdata)
+					if (mushstate.rdata)
 					{
 						mushstate.rdata->dirty = mushstate.qfirst->gdata->dirty;
-					}
-					else
-					{
-						mushstate.rdata->dirty = 0;
 					}
 				}
 				else
 				{
-					if (mushstate.rdata)
-					{
-						for (int z = 0; z < mushstate.rdata->q_alloc; z++)
-						{
-							if (mushstate.rdata->q_regs[z])
-								XFREE(mushstate.rdata->q_regs[z]);
-						}
-						for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
-						{
-							if (mushstate.rdata->x_names[z])
-								XFREE(mushstate.rdata->x_names[z]);
-							if (mushstate.rdata->x_regs[z])
-								XFREE(mushstate.rdata->x_regs[z]);
-						}
-
-						if (mushstate.rdata->q_regs)
-						{
-							XFREE(mushstate.rdata->q_regs);
-						}
-						if (mushstate.rdata->q_lens)
-						{
-							XFREE(mushstate.rdata->q_lens);
-						}
-						if (mushstate.rdata->x_names)
-						{
-							XFREE(mushstate.rdata->x_names);
-						}
-						if (mushstate.rdata->x_regs)
-						{
-							XFREE(mushstate.rdata->x_regs);
-						}
-						if (mushstate.rdata->x_lens)
-						{
-							XFREE(mushstate.rdata->x_lens);
-						}
-						XFREE(mushstate.rdata);
-					}
+					/* No register data in queue entry - clean up existing */
+					_free_gdata(mushstate.rdata);
 					mushstate.rdata = NULL;
 				}
 
@@ -2213,6 +2155,7 @@ int do_top(int ncmds)
 			}
 		}
 
+		/* Remove processed entry from queue */
 		if (mushstate.qfirst)
 		{
 			tmp = mushstate.qfirst;
@@ -2222,55 +2165,12 @@ int do_top(int ncmds)
 
 		if (!mushstate.qfirst)
 		{
-			mushstate.qlast = NULL; /* gotta check this, as the value's * changed */
+			mushstate.qlast = NULL;
 		}
 	}
 
-	if (mushstate.rdata)
-	{
-		for (int z = 0; z < mushstate.rdata->q_alloc; z++)
-		{
-			if (mushstate.rdata->q_regs[z])
-				XFREE(mushstate.rdata->q_regs[z]);
-		}
-
-		for (int z = 0; z < mushstate.rdata->xr_alloc; z++)
-		{
-			if (mushstate.rdata->x_names[z])
-				XFREE(mushstate.rdata->x_names[z]);
-
-			if (mushstate.rdata->x_regs[z])
-				XFREE(mushstate.rdata->x_regs[z]);
-		}
-
-		if (mushstate.rdata->q_regs)
-		{
-			XFREE(mushstate.rdata->q_regs);
-		}
-
-		if (mushstate.rdata->q_lens)
-		{
-			XFREE(mushstate.rdata->q_lens);
-		}
-
-		if (mushstate.rdata->x_names)
-		{
-			XFREE(mushstate.rdata->x_names);
-		}
-
-		if (mushstate.rdata->x_regs)
-		{
-			XFREE(mushstate.rdata->x_regs);
-		}
-
-		if (mushstate.rdata->x_lens)
-		{
-			XFREE(mushstate.rdata->x_lens);
-		}
-
-		XFREE(mushstate.rdata);
-	}
-
+	/* Final cleanup */
+	_free_gdata(mushstate.rdata);
 	mushstate.rdata = NULL;
 	mushstate.debug_cmd = cmdsave;
 	return count;
