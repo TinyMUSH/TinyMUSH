@@ -1419,33 +1419,17 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
  */
 void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 {
-	int qpid = 0, wsecs = 0;
-	BQUE *qptr = NULL, *point = NULL, *trail = NULL;
+	int qpid = 0;
+	BQUE *qptr = NULL, **pptr = NULL;
 	char *endptr = NULL;
 	long val = 0;
 
-	if (!is_integer(timestr))
-	{
-		notify(player, "That is not a valid wait time.");
-		return;
-	}
-
-	if (!is_integer(pidstr))
+	/* Validate and parse PID */
+	if (!_parse_pid_string(pidstr, &qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;
 	}
-
-	errno = 0;
-	val = strtol(pidstr, &endptr, 10);
-
-	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == pidstr || *endptr != '\0')
-	{
-		notify(player, "That is not a valid PID.");
-		return;
-	}
-
-	qpid = (int)val;
 
 	if ((qpid < 1) || (qpid > mushconf.max_qpid))
 	{
@@ -1453,6 +1437,17 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 		return;
 	}
 
+	/* Validate and parse time value */
+	errno = 0;
+	val = strtol(timestr, &endptr, 10);
+
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == timestr || *endptr != '\0')
+	{
+		notify(player, "That is not a valid wait time.");
+		return;
+	}
+
+	/* Locate queue entry by PID */
 	qptr = (BQUE *)nhashfind(qpid, &mushstate.qpid_htab);
 
 	if (!qptr)
@@ -1479,103 +1474,46 @@ void do_wait_pid(dbref player, int key, char *pidstr, char *timestr)
 		return;
 	}
 
+	/* Calculate new wait time based on mode */
 	if (key & WAIT_UNTIL)
 	{
-		char *endptr_time = NULL;
-		long val_time = 0;
-
-		errno = 0;
-		val_time = strtol(timestr, &endptr_time, 10);
-
-		if (errno == ERANGE || val_time > INT_MAX || val_time < INT_MIN || endptr_time == timestr || *endptr_time != '\0')
-		{
-			notify(player, "That is not a valid wait time.");
-			return;
-		}
-
-		wsecs = (int)val_time;
-
-		if (wsecs < 0)
-		{
-			qptr->waittime = time(NULL);
-		}
-		else
-		{
-			qptr->waittime = wsecs;
-		}
+		qptr->waittime = (val < 0) ? time(NULL) : (int)val;
 	}
 	else
 	{
-		char *endptr_time = NULL;
-		long val_time = 0;
+		time_t base_time = (timestr[0] == '+' || timestr[0] == '-') ? qptr->waittime : time(NULL);
 
-		errno = 0;
-		val_time = strtol(timestr, &endptr_time, 10);
-
-		if (errno == ERANGE || val_time > INT_MAX || val_time < INT_MIN || endptr_time == timestr || *endptr_time != '\0')
+		/* Check for overflow before addition */
+		if ((val > 0 && base_time > INT_MAX - val) || (val < 0 && base_time < INT_MIN - val))
 		{
-			notify(player, "That is not a valid wait time.");
-			return;
-		}
-
-		if ((timestr[0] == '+') || (timestr[0] == '-'))
-		{
-			time_t old_time = qptr->waittime;
-			if ((val_time > 0 && old_time > INT_MAX - val_time) || (val_time < 0 && old_time < INT_MIN - val_time))
-			{
-				qptr->waittime = (val_time > 0) ? INT_MAX : INT_MIN;
-			}
-			else
-			{
-				qptr->waittime = old_time + (int)val_time;
-			}
+			qptr->waittime = (val > 0) ? INT_MAX : INT_MIN;
 		}
 		else
 		{
-			time_t now = time(NULL);
-			if ((val_time > 0 && now > INT_MAX - val_time) || (val_time < 0 && now < INT_MIN - val_time))
-			{
-				qptr->waittime = (val_time > 0) ? INT_MAX : INT_MIN;
-			}
-			else
-			{
-				qptr->waittime = now + (int)val_time;
-			}
+			qptr->waittime = base_time + (int)val;
 		}
 
+		/* Correct negative waittimes */
 		if (qptr->waittime < 0)
 		{
-			if (timestr[0] == '-')
-			{
-				qptr->waittime = time(NULL);
-			}
-			else
-			{
-				qptr->waittime = INT_MAX;
-			}
+			qptr->waittime = (timestr[0] == '-') ? time(NULL) : INT_MAX;
 		}
 	}
 
-	/* The semaphore queue is unsorted, but the main wait queue is sorted. So we may have to go rethread. */
+	/* Re-thread wait queue entry if necessary (queue is sorted by waittime) */
 	if (qptr->sem == NOTHING)
 	{
 		remove_waitq(qptr);
 
-		for (point = mushstate.qwait, trail = NULL; point && point->waittime <= qptr->waittime; point = point->next)
+		/* Use pointer-to-pointer technique for clean insertion */
+		pptr = &mushstate.qwait;
+		while (*pptr && (*pptr)->waittime <= qptr->waittime)
 		{
-			trail = point;
+			pptr = &((*pptr)->next);
 		}
 
-		qptr->next = point;
-
-		if (trail != NULL)
-		{
-			trail->next = qptr;
-		}
-		else
-		{
-			mushstate.qwait = qptr;
-		}
+		qptr->next = *pptr;
+		*pptr = qptr;
 	}
 
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Adjusted wait time for queue entry PID %d.", qpid);
