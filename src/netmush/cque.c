@@ -433,7 +433,7 @@ static bool _parse_pid_string(const char *pidstr, int *qpid)
 	char *endptr = NULL;
 	long val = 0;
 
-	if (!is_integer(pidstr))
+	if (!is_integer((char *)pidstr))
 	{
 		return false;
 	}
