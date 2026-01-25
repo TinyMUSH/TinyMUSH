@@ -817,6 +817,37 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 }
 
 /**
+ * @brief Parse and validate a count string into an integer value.
+ *
+ * Validates the count string format and range, ensuring it represents a valid
+ * positive integer count for semaphore notifications or drain operations.
+ *
+ * @param countstr String representation of the count
+ * @param cnt Pointer to store the parsed count value (only valid if returns true)
+ * @return true if countstr is valid and parsed successfully, false otherwise
+ *
+ * @note Thread-safe: Yes (read-only, no side effects beyond output parameter)
+ * @note Valid count range: [1, INT_MAX]
+ * @attention cnt pointer must be valid when calling this function
+ */
+static bool _parse_count_string(const char *countstr, int *cnt)
+{
+	char *endptr = NULL;
+	long val = 0;
+
+	errno = 0;
+	val = strtol(countstr, &endptr, 10);
+
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == countstr || *endptr != '\0')
+	{
+		return false;
+	}
+
+	*cnt = (int)val;
+	return true;
+}
+
+/**
  * @brief Command interface for notifying and releasing semaphore-blocked commands.
  *
  * Parses target specification (object[/attribute]) to identify the semaphore object and
@@ -861,78 +892,58 @@ void do_notify(dbref player, dbref cause, int key, char *what, char *count)
 	if ((thing = noisy_match_result()) < 0)
 	{
 		notify(player, "No match.");
+		return;
 	}
-	else if (!controls(player, thing) && !Link_ok(thing))
+
+	if (!controls(player, thing) && !Link_ok(thing))
 	{
 		notify(player, NOPERM_MESSAGE);
+		return;
+	}
+
+	/* Resolve semaphore attribute */
+	ap = (what && *what) ? atr_str(what) : NULL;
+
+	if (ap)
+	{
+		/* Do they have permission to set this attribute? */
+		atr_pget_info(thing, ap->number, &aowner, &aflags);
+
+		if (!Set_attr(player, thing, ap, aflags))
+		{
+			notify_quiet(player, NOPERM_MESSAGE);
+			return;
+		}
+
+		attr = ap->number;
 	}
 	else
 	{
-		if (!what || !*what)
+		attr = A_SEMAPHORE;
+	}
+
+	/* Parse notification count */
+	if (count && *count)
+	{
+		if (!_parse_count_string(count, &loccount))
 		{
-			ap = NULL;
+			notify_quiet(player, "Invalid count value.");
+			return;
 		}
-		else
+	}
+	else
+	{
+		loccount = 1;
+	}
+
+	/* Process semaphore queue if count is positive */
+	if (loccount > 0)
+	{
+		nfy_que(player, thing, attr, key, loccount);
+
+		if (!(Quiet(player) || Quiet(thing)))
 		{
-			ap = atr_str(what);
-		}
-
-		if (!ap)
-		{
-			attr = A_SEMAPHORE;
-		}
-		else
-		{
-			/* Do they have permission to set this attribute? */
-			atr_pget_info(thing, ap->number, &aowner, &aflags);
-
-			if (Set_attr(player, thing, ap, aflags))
-			{
-				attr = ap->number;
-			}
-			else
-			{
-				notify_quiet(player, NOPERM_MESSAGE);
-				return;
-			}
-		}
-
-		if (count && *count)
-		{
-			char *endptr = NULL;
-			long val = 0;
-
-			errno = 0;
-			val = strtol(count, &endptr, 10);
-
-			if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == count || *endptr != '\0')
-			{
-				notify_quiet(player, "Invalid count value.");
-				return;
-			}
-
-			loccount = (int)val;
-		}
-		else
-		{
-			loccount = 1;
-		}
-
-		if (loccount > 0)
-		{
-			nfy_que(player, thing, attr, key, loccount);
-
-			if (!(Quiet(player) || Quiet(thing)))
-			{
-				if (key == NFY_DRAIN)
-				{
-					notify_quiet(player, "Drained.");
-				}
-				else
-				{
-					notify_quiet(player, "Notified.");
-				}
-			}
+			notify_quiet(player, (key == NFY_DRAIN) ? "Drained." : "Notified.");
 		}
 	}
 }
