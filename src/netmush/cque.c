@@ -41,33 +41,58 @@ static int qpid_top = 1; /*!< Next queue PID to allocate (internal optimization)
  */
 void delete_qentry(BQUE *qptr)
 {
-	nhashdelete(qptr->pid, &mushstate.qpid_htab);
+	GDATA *gdata = NULL;
+	int i = 0;
 
+	nhashdelete(qptr->pid, &mushstate.qpid_htab);
 	XFREE(qptr->text);
 
-	if (qptr->gdata)
+	if ((gdata = qptr->gdata) != NULL)
 	{
-		if ((qptr->gdata)->q_regs)
+		/* Free individual q-register strings */
+		for (i = 0; i < gdata->q_alloc; i++)
 		{
-			XFREE((qptr->gdata)->q_regs);
+			if (gdata->q_regs[i])
+			{
+				XFREE(gdata->q_regs[i]);
+			}
 		}
-		if ((qptr->gdata)->q_lens)
+
+		/* Free individual x-register names and values */
+		for (i = 0; i < gdata->xr_alloc; i++)
 		{
-			XFREE((qptr->gdata)->q_lens);
+			if (gdata->x_names[i])
+			{
+				XFREE(gdata->x_names[i]);
+			}
+			if (gdata->x_regs[i])
+			{
+				XFREE(gdata->x_regs[i]);
+			}
 		}
-		if ((qptr->gdata)->x_names)
+
+		/* Free the register arrays themselves */
+		if (gdata->q_regs)
 		{
-			XFREE((qptr->gdata)->x_names);
+			XFREE(gdata->q_regs);
 		}
-		if ((qptr->gdata)->x_regs)
+		if (gdata->q_lens)
 		{
-			XFREE((qptr->gdata)->x_regs);
+			XFREE(gdata->q_lens);
 		}
-		if ((qptr->gdata)->x_lens)
+		if (gdata->x_names)
 		{
-			XFREE((qptr->gdata)->x_lens);
+			XFREE(gdata->x_names);
 		}
-		XFREE(qptr->gdata);
+		if (gdata->x_regs)
+		{
+			XFREE(gdata->x_regs);
+		}
+		if (gdata->x_lens)
+		{
+			XFREE(gdata->x_lens);
+		}
+		XFREE(gdata);
 	}
 
 	XFREE(qptr);
@@ -92,12 +117,12 @@ void delete_qentry(BQUE *qptr)
  */
 int add_to(dbref doer, dbref player, int am, int attrnum)
 {
-	long val = 0;
 	int num = 0, aflags = 0, alen = 0;
 	dbref aowner = NOTHING;
 	char *buff = NULL;
 	char *atr_gotten = NULL;
 	char *endptr = NULL;
+	long val = 0;
 
 	/* Get attribute value and parse it safely */
 	atr_gotten = atr_get(player, attrnum, &aowner, &aflags, &alen);
@@ -105,12 +130,8 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
 	errno = 0;
 	val = strtol(atr_gotten, &endptr, 10);
 
-	/* Validate conversion and range */
-	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || (*endptr != '\0' && !isspace(*endptr)))
-	{
-		num = 0;
-	}
-	else
+	/* Validate conversion and range - if successful, use the value */
+	if (errno != ERANGE && val <= INT_MAX && val >= INT_MIN && (*endptr == '\0' || isspace(*endptr)))
 	{
 		num = (int)val;
 	}
@@ -118,18 +139,11 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
 	XFREE(atr_gotten);
 	num += am;
 
-	if (num)
-	{
-		buff = ltos(num);
-		atr_add(player, attrnum, buff, Owner(doer), aflags);
-		XFREE(buff);
-	}
-	else
-	{
-		atr_add(player, attrnum, NULL, Owner(doer), aflags);
-	}
+	buff = num ? ltos(num) : NULL;
+	atr_add(player, attrnum, buff, Owner(doer), aflags);
+	XFREE(buff);
 
-	return (num);
+	return num;
 }
 
 /**
@@ -152,33 +166,32 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
  */
 void give_que(BQUE *tmp)
 {
+	BQUE **qhead = NULL, **qtail = NULL;
+
 	tmp->next = NULL;
 	tmp->waittime = 0;
 
-	/* Thread the command into the correct queue */
+	/* Determine which queue to use based on cause type */
 	if (Typeof(tmp->cause) == TYPE_PLAYER)
 	{
-		if (mushstate.qlast != NULL)
-		{
-			mushstate.qlast->next = tmp;
-			mushstate.qlast = tmp;
-		}
-		else
-		{
-			mushstate.qlast = mushstate.qfirst = tmp;
-		}
+		qhead = &mushstate.qfirst;
+		qtail = &mushstate.qlast;
 	}
 	else
 	{
-		if (mushstate.qllast)
-		{
-			mushstate.qllast->next = tmp;
-			mushstate.qllast = tmp;
-		}
-		else
-		{
-			mushstate.qllast = mushstate.qlfirst = tmp;
-		}
+		qhead = &mushstate.qlfirst;
+		qtail = &mushstate.qllast;
+	}
+
+	/* Add to end of queue */
+	if (*qtail != NULL)
+	{
+		(*qtail)->next = tmp;
+		*qtail = tmp;
+	}
+	else
+	{
+		*qhead = *qtail = tmp;
 	}
 }
 
@@ -203,22 +216,9 @@ void give_que(BQUE *tmp)
  */
 bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
 {
-	if (!Good_obj(entry->player))
-	{
-		return false;
-	}
-
-	if ((ptarg != NOTHING) && (ptarg != Owner(entry->player)))
-	{
-		return false;
-	}
-
-	if ((otarg != NOTHING) && (otarg != entry->player))
-	{
-		return false;
-	}
-
-	return true;
+	return Good_obj(entry->player) &&
+	       ((ptarg == NOTHING) || (ptarg == Owner(entry->player))) &&
+	       ((otarg == NOTHING) || (otarg == entry->player));
 }
 
 /**
