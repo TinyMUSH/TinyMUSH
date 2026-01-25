@@ -1293,16 +1293,14 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
  */
 void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *command, char *args[], int nargs, GDATA *gargs)
 {
-	BQUE *tmp = NULL, *point = NULL, *trail = NULL;
+	BQUE *tmp = NULL, *point = NULL, **pptr = NULL;
 
-	if (mushconf.control_flags & CF_INTERP)
+	if (!(mushconf.control_flags & CF_INTERP))
 	{
-		tmp = setup_que(player, cause, command, args, nargs, gargs);
+		return;
 	}
-	else
-	{
-		tmp = NULL;
-	}
+
+	tmp = setup_que(player, cause, command, args, nargs, gargs);
 
 	if (tmp == NULL)
 	{
@@ -1310,15 +1308,23 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 	}
 
 	/* Set wait time, and check for integer overflow before the addition */
-	if (wait != 0)
+	if (wait > 0)
 	{
 		time_t now = time(NULL);
 		/* Check for overflow before performing the addition */
-		if (wait > 0 && (time_t)wait > INT_MAX - now)
+		if ((time_t)wait > INT_MAX - now)
 		{
 			tmp->waittime = INT_MAX;
 		}
-		else if (wait < 0 && (time_t)wait < INT_MIN - now)
+		else
+		{
+			tmp->waittime = now + wait;
+		}
+	}
+	else if (wait < 0)
+	{
+		time_t now = time(NULL);
+		if ((time_t)wait < INT_MIN - now)
 		{
 			tmp->waittime = INT_MIN;
 		}
@@ -1340,25 +1346,20 @@ void wait_que(dbref player, dbref cause, int wait, dbref sem, int attr, char *co
 		}
 		else
 		{
-			for (point = mushstate.qwait, trail = NULL; point && point->waittime <= tmp->waittime; point = point->next)
+			/* Thread into sorted wait queue using pointer-to-pointer technique */
+			pptr = &mushstate.qwait;
+			while (*pptr && (*pptr)->waittime <= tmp->waittime)
 			{
-				trail = point;
+				pptr = &((*pptr)->next);
 			}
 
-			tmp->next = point;
-
-			if (trail != NULL)
-			{
-				trail->next = tmp;
-			}
-			else
-			{
-				mushstate.qwait = tmp;
-			}
+			tmp->next = *pptr;
+			*pptr = tmp;
 		}
 	}
 	else
 	{
+		/* Append to semaphore queue (unsorted, FIFO) */
 		tmp->next = NULL;
 
 		if (mushstate.qsemlast != NULL)
