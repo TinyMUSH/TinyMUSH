@@ -222,6 +222,30 @@ bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
 }
 
 /**
+ * @brief Record a halted queue entry for accounting and tracking.
+ *
+ * Helper function that increments the halt counter and tracks owner costs when
+ * performing a global halt-all operation. Checks ownership validity before updating
+ * the per-owner accounting array.
+ *
+ * @param numhalted Pointer to halt counter to increment
+ * @param dbrefs_array Owner accounting array (NULL if not halt-all mode)
+ * @param entry Queue entry being halted
+ * @param halt_all Non-zero if in global halt-all mode
+ *
+ * @note Thread-safe: No (modifies the dbrefs_array parameter)
+ * @note dbrefs_array must be allocated by caller if halt_all is non-zero
+ */
+static void _halt_record(int *numhalted, int *dbrefs_array, BQUE *entry, int halt_all)
+{
+	(*numhalted)++;
+	if (halt_all && Good_obj(entry->player))
+	{
+		dbrefs_array[Owner(entry->player)] += 1;
+	}
+}
+
+/**
  * @brief Halt and remove queued commands matching specified player/object criteria.
  *
  * Traverses all four queue types (player, object, wait, semaphore) and halts entries
@@ -262,13 +286,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
-			numhalted++;
-
-			if (halt_all && Good_obj(point->player))
-			{
-				dbrefs_array[Owner(point->player)] += 1;
-			}
-
+			_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
 		}
 
@@ -276,13 +294,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qlfirst; point; point = point->next)
 		if (que_want(point, player, object))
 		{
-			numhalted++;
-
-			if (halt_all && Good_obj(point->player))
-			{
-				dbrefs_array[Owner(point->player)] += 1;
-			}
-
+			_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			point->player = NOTHING;
 		}
 
@@ -290,13 +302,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qwait, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
-			numhalted++;
-
-			if (halt_all && Good_obj(point->player))
-			{
-				dbrefs_array[Owner(point->player)] += 1;
-			}
-
+			_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
 			{
 				trail->next = next = point->next;
@@ -317,13 +323,7 @@ int halt_que(dbref player, dbref object)
 	for (point = mushstate.qsemfirst, trail = NULL; point; point = next)
 		if (que_want(point, player, object))
 		{
-			numhalted++;
-
-			if (halt_all && Good_obj(point->player))
-			{
-				dbrefs_array[Owner(point->player)] += 1;
-			}
-
+			_halt_record(&numhalted, dbrefs_array, point, halt_all);
 			if (trail)
 			{
 				trail->next = next = point->next;
@@ -400,27 +400,60 @@ int halt_que(dbref player, dbref object)
  */
 void remove_waitq(BQUE *qptr)
 {
-	BQUE *point = NULL, *trail = NULL;
+	BQUE **pptr = &mushstate.qwait;
 
-	if (qptr == mushstate.qwait)
+	while (*pptr && *pptr != qptr)
 	{
-		/* Head of the queue. Just remove it and relink. */
-		mushstate.qwait = qptr->next;
+		pptr = &((*pptr)->next);
 	}
-	else
-	{
-		/* Go find it somewhere in the queue and take it out. */
-		for (point = mushstate.qwait, trail = NULL; point != NULL; point = point->next)
-		{
-			if (qptr == point)
-			{
-				trail->next = qptr->next;
-				break;
-			}
 
-			trail = point;
-		}
+	if (*pptr)
+	{
+		*pptr = qptr->next;
 	}
+}
+
+/**
+ * @brief Parse and validate a PID string into an integer value.
+ *
+ * Validates the PID string format and range, ensuring it represents a valid
+ * process ID within the configured queue limits. Performs comprehensive error
+ * checking for parsing and range validation.
+ *
+ * @param pidstr String representation of the PID
+ * @param qpid Pointer to store the parsed PID value (only valid if returns true)
+ * @return true if pidstr is valid and parsed successfully, false otherwise
+ *
+ * @note Thread-safe: Yes (read-only, no side effects beyond output parameter)
+ * @note Valid PID range: [1, max_qpid]
+ * @attention qpid pointer must be valid when calling this function
+ */
+static bool _parse_pid_string(const char *pidstr, int *qpid)
+{
+	char *endptr = NULL;
+	long val = 0;
+
+	if (!is_integer(pidstr))
+	{
+		return false;
+	}
+
+	errno = 0;
+	val = strtol(pidstr, &endptr, 10);
+
+	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == pidstr || *endptr != '\0')
+	{
+		return false;
+	}
+
+	*qpid = (int)val;
+
+	if ((*qpid < 1) || (*qpid > mushconf.max_qpid))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -454,34 +487,9 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 {
 	dbref victim = NOTHING;
 	int qpid = 0;
-	BQUE *qptr = NULL, *last = NULL, *tmp = NULL;
-	char *endptr = NULL;
-	long val = 0;
+	BQUE *qptr = NULL;
 
-	if (!is_integer(pidstr))
-	{
-		notify(player, "That is not a valid PID.");
-		return;
-	}
-
-	errno = 0;
-	val = strtol(pidstr, &endptr, 10);
-
-	if (errno == ERANGE || val > INT_MAX || val < INT_MIN)
-	{
-		notify(player, "That is not a valid PID.");
-		return;
-	}
-
-	if (endptr == pidstr || *endptr != '\0')
-	{
-		notify(player, "That is not a valid PID.");
-		return;
-	}
-
-	qpid = (int)val;
-
-	if ((qpid < 1) || (qpid > mushconf.max_qpid))
+	if (!_parse_pid_string(pidstr, &qpid))
 	{
 		notify(player, "That is not a valid PID.");
 		return;
@@ -514,36 +522,32 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 	if (qptr->sem == NOTHING)
 	{
 		remove_waitq(qptr);
-		delete_qentry(qptr);
 	}
 	else
 	{
-		for (tmp = mushstate.qsemfirst, last = NULL; tmp != NULL; last = tmp, tmp = tmp->next)
+		/* Remove from semaphore queue using pointer-to-pointer technique */
+		BQUE **pptr = &mushstate.qsemfirst, *prev = NULL;
+		
+		while (*pptr && *pptr != qptr)
 		{
-			if (tmp == qptr)
+			prev = *pptr;
+			pptr = &((*pptr)->next);
+		}
+
+		if (*pptr)
+		{
+			*pptr = qptr->next;
+
+			if (mushstate.qsemlast == qptr)
 			{
-				if (last)
-				{
-					last->next = tmp->next;
-				}
-				else
-				{
-					mushstate.qsemfirst = tmp->next;
-				}
-
-				if (mushstate.qsemlast == tmp)
-				{
-					mushstate.qsemlast = last;
-				}
-
-				break;
+				mushstate.qsemlast = prev;
 			}
 		}
 
 		add_to(player, qptr->sem, -1, qptr->attr);
-		delete_qentry(qptr);
 	}
 
+	delete_qentry(qptr);
 	giveto(victim, mushconf.waitcost);
 	a_Queue(victim, -1);
 	notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Halted queue entry PID %d.", qpid);
