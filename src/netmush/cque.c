@@ -27,9 +27,17 @@
 static int qpid_top = 1; /*!< Next queue PID to allocate (internal optimization) */
 
 /**
- * @brief Delete and free a queue entry.
+ * @brief Delete and free a queue entry, releasing all associated resources.
  *
- * @param qptr Queue entry
+ * Removes the entry from the PID hash table and frees all allocated memory including
+ * command text, global registers (q_regs), extended registers (x_regs), and the queue
+ * entry structure itself. This function must be called for proper cleanup of queue entries
+ * to prevent memory leaks.
+ *
+ * @param qptr Queue entry to delete
+ *
+ * @note Thread-safe: No (must be called with appropriate locking)
+ * @attention Caller must ensure qptr has been removed from any linked lists before calling
  */
 void delete_qentry(BQUE *qptr)
 {
@@ -66,13 +74,21 @@ void delete_qentry(BQUE *qptr)
 }
 
 /**
- * @brief Adjust an object's queue or semaphore count.
+ * @brief Adjust an object's queue or semaphore count attribute.
  *
- * @param doer		Dbref of doer
- * @param player	DBref of player
- * @param am		Attribute map
- * @param attrnum	Attribute number
- * @return int
+ * Reads the specified attribute from the player object, interprets it as an integer
+ * count, adds the adjustment value (am), and writes the result back. If the resulting
+ * count is zero, the attribute is cleared. This function is used to track semaphore
+ * wait counts and queue throttling limits.
+ *
+ * @param doer    DBref of the actor performing the adjustment (for ownership tracking)
+ * @param player  DBref of the object whose attribute is being adjusted
+ * @param am      Amount to add (positive) or subtract (negative) from current value
+ * @param attrnum Attribute number to read/modify (e.g., A_SEMAPHORE)
+ * @return New attribute value after adjustment, or 0 if attribute was invalid/cleared
+ *
+ * @note Thread-safe: No (modifies database attributes)
+ * @note Invalid or non-numeric attribute values are treated as 0
  */
 int add_to(dbref doer, dbref player, int am, int attrnum)
 {
@@ -117,9 +133,22 @@ int add_to(dbref doer, dbref player, int am, int attrnum)
 }
 
 /**
- * @brief Thread a queue block onto the high or low priority queue
+ * @brief Thread a queue entry onto the appropriate priority queue for execution.
  *
- * @param tmp Queue Entry
+ * Adds a queue entry to either the high-priority (player) queue or low-priority
+ * (object) queue based on the cause type. Player-caused commands are queued with
+ * higher priority to ensure responsive gameplay. The entry is appended to the end
+ * of the appropriate queue. Resets waittime to 0 and next pointer to NULL before
+ * queueing.
+ *
+ * @param tmp Queue entry to add to execution queue
+ *
+ * @note Thread-safe: No (modifies global queue state)
+ * @note Entry must be fully initialized before calling this function
+ * @attention Does not check for null pointer - caller must validate
+ *
+ * @see wait_que() for delayed queue entries
+ * @see do_top() for queue execution
  */
 void give_que(BQUE *tmp)
 {
@@ -154,12 +183,23 @@ void give_que(BQUE *tmp)
 }
 
 /**
- * @brief Do we want this queue entry?
+ * @brief Filter queue entries by owner and/or object criteria.
  *
- * @param entry Queue Entry
- * @param ptarg Player target
- * @param otarg	Object target
- * @return bool
+ * Determines if a queue entry matches specified filtering criteria based on the
+ * entry's player and owner. Used by queue operations (halt, display, etc.) to
+ * select which entries to process. If both targets are NOTHING, all valid entries
+ * match. If only one target is specified, entries must match that criterion.
+ *
+ * @param entry Queue entry to evaluate
+ * @param ptarg Player target filter (NOTHING = don't filter by player owner)
+ * @param otarg Object target filter (NOTHING = don't filter by object)
+ * @return true if entry matches filtering criteria, false otherwise
+ *
+ * @note Thread-safe: Yes (read-only operation)
+ * @note Entries with invalid player dbrefs (halted entries) never match
+ *
+ * @see halt_que() for primary usage example
+ * @see show_que() for display filtering
  */
 bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
 {
@@ -182,11 +222,27 @@ bool que_want(BQUE *entry, dbref ptarg, dbref otarg)
 }
 
 /**
- * @brief Remove all queued commands from a certain player
+ * @brief Halt and remove queued commands matching specified player/object criteria.
  *
- * @param player DBref of player
- * @param object DBref of object
- * @return int
+ * Traverses all four queue types (player, object, wait, semaphore) and halts entries
+ * matching the specified player owner and/or object. Halted entries in execution queues
+ * (player/object) are flagged but not immediately deleted. Entries in wait/semaphore
+ * queues are removed and freed. Refunds wait costs and adjusts queue counters.
+ *
+ * Special case: When both player and object are NOTHING, performs a global halt-all
+ * operation that tracks and refunds costs per owner.
+ *
+ * @param player Player owner to match (NOTHING = don't filter by owner, or halt-all mode)
+ * @param object Object to match (NOTHING = don't filter by object)
+ * @return Number of queue entries halted
+ *
+ * @note Thread-safe: No (modifies global queue state)
+ * @note Halted entries are marked with player=NOTHING to prevent execution
+ * @note Wait/semaphore entries are immediately deleted; execution queue entries remain
+ * @attention Global halt-all (both params NOTHING) requires special permission checks
+ *
+ * @see do_halt() for command interface
+ * @see que_want() for filtering logic
  */
 int halt_que(dbref player, dbref object)
 {
@@ -325,9 +381,22 @@ int halt_que(dbref player, dbref object)
 }
 
 /**
- * @brief Remove an entry from the wait queue.
+ * @brief Remove a specific entry from the time-sorted wait queue.
  *
- * @param qptr Queue Entry
+ * Searches for and unlinks the specified queue entry from the wait queue linked list
+ * without freeing it. Handles both head-of-queue and mid-queue removal cases. This
+ * function only removes the entry from the linked list structure; the caller is
+ * responsible for freeing the entry's memory if needed.
+ *
+ * @param qptr Queue entry to remove from wait queue
+ *
+ * @note Thread-safe: No (modifies global wait queue structure)
+ * @note Does not free the entry - caller must call delete_qentry() separately
+ * @attention Entry must actually be in the wait queue or behavior is undefined
+ * @attention If entry is not found, queue remains unchanged (silent failure)
+ *
+ * @see wait_que() for adding entries to wait queue
+ * @see do_wait_pid() for wait time adjustment that uses this function
  */
 void remove_waitq(BQUE *qptr)
 {
