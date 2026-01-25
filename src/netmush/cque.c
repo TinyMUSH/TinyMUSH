@@ -731,28 +731,19 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 	char *str = NULL;
 	char *endptr = NULL;
 	long val = 0;
+	int attrnum = attr ? attr : A_SEMAPHORE;
 
+	/* Get semaphore counter from attribute */
 	if (attr)
 	{
 		str = atr_get(sem, attr, &aowner, &aflags, &alen);
 
-		if (str && *str)
-		{
-			errno = 0;
-			val = strtol(str, &endptr, 10);
+		errno = 0;
+		val = strtol(str ? str : "0", &endptr, 10);
 
-			if (errno != ERANGE && val >= INT_MIN && val <= INT_MAX && endptr != str && *endptr == '\0')
-			{
-				num = (int)val;
-			}
-			else
-			{
-				num = 0;
-			}
-		}
-		else
+		if (errno != ERANGE && val >= INT_MIN && val <= INT_MAX && endptr != str && (str && (*endptr == '\0' || !*str)))
 		{
-			num = 0;
+			num = (int)val;
 		}
 
 		XFREE(str);
@@ -762,6 +753,7 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 		num = 1;
 	}
 
+	/* Process matching semaphore entries */
 	if (num > 0)
 	{
 		num = 0;
@@ -777,7 +769,9 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 					trail->next = next = point->next;
 				}
 				else
+				{
 					mushstate.qsemfirst = next = point->next;
+				}
 
 				if (point == mushstate.qsemlast)
 				{
@@ -795,31 +789,28 @@ int nfy_que(dbref player, dbref sem, int attr, int key, int count)
 					a_Queue(Owner(point->player), -1);
 					delete_qentry(point);
 				}
+
+				/* If we've notified enough, exit */
+				if ((key == NFY_NFY) && (num >= count))
+				{
+					next = NULL;
+				}
 			}
 			else
 			{
 				next = (trail = point)->next;
 			}
-			/* If we've notified enough, exit */
-			if ((key == NFY_NFY) && (num >= count))
-			{
-				next = NULL;
-			}
 		}
 	}
-	else
-	{
-		num = 0;
-	}
 
-	/* Update the sem waiters count */
+	/* Update the semaphore waiters count */
 	if (key == NFY_NFY)
 	{
-		add_to(player, sem, -count, (attr ? attr : A_SEMAPHORE));
+		add_to(player, sem, -count, attrnum);
 	}
 	else
 	{
-		atr_clr(sem, (attr ? attr : A_SEMAPHORE));
+		atr_clr(sem, attrnum);
 	}
 
 	return num;
