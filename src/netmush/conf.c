@@ -1,5 +1,5 @@
 /**
- * @file conf_files.c
+ * @file conf.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Configuration file handling, helpfile loading, and runtime dispatch
  * @version 4.0
