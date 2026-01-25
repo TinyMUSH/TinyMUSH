@@ -2475,6 +2475,40 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 }
 
 /**
+ * @brief Parse and validate an integer argument for queue operations.
+ *
+ * Parses a string argument into an integer within INT_MIN to INT_MAX range.
+ * Validates for ERANGE errors (overflow/underflow) and out-of-range values.
+ *
+ * @param arg    String argument to parse
+ * @param val    Output: parsed integer value (valid only if function returns true)
+ * @return true if parsing succeeded, false on any error (overflow, underflow, non-numeric)
+ *
+ * @note Thread-safe: Yes (no global state modification)
+ */
+static bool _parse_queue_arg(const char *arg, int *val)
+{
+	char *endptr = NULL;
+	long lval = 0;
+
+	if (!arg || !*arg || !val)
+	{
+		return false;
+	}
+
+	errno = 0;
+	lval = strtol(arg, &endptr, 10);
+
+	if (errno == ERANGE || lval > INT_MAX || lval < INT_MIN || endptr == arg || *endptr != '\0')
+	{
+		return false;
+	}
+
+	*val = (int)lval;
+	return true;
+}
+
+/**
  * @brief Administrative command interface for manual queue manipulation (@queue command).
  *
  * Implements the @queue command with two operational modes: QUEUE_KICK for forced command
@@ -2532,37 +2566,26 @@ void do_ps(dbref player, dbref cause, int key, char *target)
 void do_queue(dbref player, dbref cause, int key, char *arg)
 {
 	BQUE *point = NULL;
-	int i = 0, ncmds = 0, was_disabled = 0;
+	int i = 0, ncmds = 0;
+	int was_disabled = !(mushconf.control_flags & CF_DEQUEUE);
+
+	/* Parse and validate the integer argument */
+	if (!_parse_queue_arg(arg, &i))
+	{
+		notify(player, (key == QUEUE_KICK) ? "Invalid number of commands." : "Invalid time value.");
+		return;
+	}
+
+	/* Temporarily enable CF_DEQUEUE if needed */
+	if (was_disabled)
+	{
+		mushconf.control_flags |= CF_DEQUEUE;
+		notify(player, "Warning: automatic dequeueing is disabled.");
+	}
 
 	if (key == QUEUE_KICK)
 	{
-		char *endptr = NULL;
-		long val = 0;
-
-		errno = 0;
-		val = strtol(arg, &endptr, 10);
-
-		if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == arg || *endptr != '\0')
-		{
-			notify(player, "Invalid number of commands.");
-			return;
-		}
-
-		i = (int)val;
-
-		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
-		{
-			was_disabled = 1;
-			mushconf.control_flags |= CF_DEQUEUE;
-			notify(player, "Warning: automatic dequeueing is disabled.");
-		}
-
 		ncmds = do_top(i);
-
-		if (was_disabled)
-		{
-			mushconf.control_flags &= ~CF_DEQUEUE;
-		}
 
 		if (!Quiet(player))
 		{
@@ -2571,34 +2594,13 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
 	}
 	else if (key == QUEUE_WARP)
 	{
-		char *endptr = NULL;
-		long val = 0;
-
-		errno = 0;
-		val = strtol(arg, &endptr, 10);
-
-		if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == arg || *endptr != '\0')
-		{
-			notify(player, "Invalid time value.");
-			return;
-		}
-
-		i = (int)val;
-
-		if ((mushconf.control_flags & CF_DEQUEUE) == 0)
-		{
-			was_disabled = 1;
-			mushconf.control_flags |= CF_DEQUEUE;
-			notify(player, "Warning: automatic dequeueing is disabled.");
-		}
-
-		/* Handle the wait queue */
+		/* Adjust wait queue: set all entries to negative of time offset */
 		for (point = mushstate.qwait; point; point = point->next)
 		{
 			point->waittime = -i;
 		}
 
-		/* Handle the semaphore queue */
+		/* Adjust semaphore queue: decrement timeouts, clamp to -1 if negative */
 		for (point = mushstate.qsemfirst; point; point = point->next)
 		{
 			if (point->waittime > 0)
@@ -2614,27 +2616,26 @@ void do_queue(dbref player, dbref cause, int key, char *arg)
 
 		do_second();
 
-		if (was_disabled)
+		if (!Quiet(player))
 		{
-			mushconf.control_flags &= ~CF_DEQUEUE;
+			if (i > 0)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "WaitQ timer advanced %d seconds.", i);
+			}
+			else if (i < 0)
+			{
+				notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "WaitQ timer set back %d seconds.", i);
+			}
+			else
+			{
+				notify(player, "Object queue appended to player queue.");
+			}
 		}
+	}
 
-		if (Quiet(player))
-		{
-			return;
-		}
-
-		if (i > 0)
-		{
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "WaitQ timer advanced %d seconds.", i);
-		}
-		else if (i < 0)
-		{
-			notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "WaitQ timer set back %d seconds.", i);
-		}
-		else
-		{
-			notify(player, "Object queue appended to player queue.");
-		}
+	/* Restore original CF_DEQUEUE state */
+	if (was_disabled)
+	{
+		mushconf.control_flags &= ~CF_DEQUEUE;
 	}
 }
