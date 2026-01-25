@@ -439,7 +439,7 @@ static bool _parse_pid_string(const char *pidstr, int *qpid)
 	}
 
 	errno = 0;
-	val = strtol(pidstr, &endptr, 10);
+	val = strtol((char *)pidstr, &endptr, 10);
 
 	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == pidstr || *endptr != '\0')
 	{
@@ -591,11 +591,11 @@ static bool _parse_halt_target(dbref player, int key, const char *target,
 	/* Specified target: resolve it */
 	if (Can_Halt(player))
 	{
-		*obj_targ = match_thing(player, target);
+		*obj_targ = match_thing(player, (char *)target);
 	}
 	else
 	{
-		*obj_targ = match_controlled(player, target);
+		*obj_targ = match_controlled(player, (char *)target);
 	}
 
 	if (!Good_obj(*obj_targ))
@@ -836,7 +836,7 @@ static bool _parse_count_string(const char *countstr, int *cnt)
 	long val = 0;
 
 	errno = 0;
-	val = strtol(countstr, &endptr, 10);
+	val = strtol((char *)countstr, &endptr, 10);
 
 	if (errno == ERANGE || val > INT_MAX || val < INT_MIN || endptr == countstr || *endptr != '\0')
 	{
