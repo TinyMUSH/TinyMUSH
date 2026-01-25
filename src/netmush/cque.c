@@ -419,7 +419,7 @@ void do_halt_pid(dbref player, dbref cause, int key, char *pidstr)
 		return;
 	}
 
-	/* Changing the player to NOTHING will flag this as halted, but we may have to delete it from the wait queue as well as the semaphore queue. */
+	/* Flag as halted and remove from wait/semaphore queues if needed */
 	victim = Owner(qptr->player);
 	qptr->player = NOTHING;
 
@@ -844,7 +844,7 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 		return NULL;
 	}
 
-	/* Generate a PID */	
+	/* Generate a PID */
 	qpid = qpid_next();
 
 	if (qpid == 0)
@@ -1491,7 +1491,7 @@ int que_next(void)
 		return 1;
 	}
 
-	/* Walk the wait and semaphore queues, looking for the smallest wait value.  Return the smallest value - 1, because the command gets moved to the player queue when it has 1 second to go. */
+	/* Find minimum wait time among queued commands */
 	min = 1000;
 
 	for (point = mushstate.qwait; point; point = point->next)
@@ -1538,7 +1538,7 @@ void do_second(void)
 	BQUE *trail = NULL, *point = NULL, *next = NULL;
 	char *cmdsave = NULL;
 
-	/* move contents of low priority queue onto end of normal one this helps to keep objects from getting out of control since its affects on other objects happen only after one second  this should allow \@halt to be type before getting blown away  by scrolling text */
+	/* Move low-priority queue to end of normal queue, delaying object effects by 1 second */
 	if ((mushconf.control_flags & CF_DEQUEUE) == 0)
 	{
 		return;
