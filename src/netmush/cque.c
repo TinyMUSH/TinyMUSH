@@ -1168,17 +1168,12 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 
 	if (gargs && (gargs->q_alloc || gargs->xr_alloc))
 	{
-		tmp->gdata = (GDATA *)XMALLOC(sizeof(GDATA), "setup_que");
+		tmp->gdata = (GDATA *)XCALLOC(1, sizeof(GDATA), "setup_que");
 		tmp->gdata->q_alloc = gargs->q_alloc;
 		if (gargs->q_alloc)
 		{
 			tmp->gdata->q_regs = XCALLOC(gargs->q_alloc, sizeof(char *), "q_regs");
 			tmp->gdata->q_lens = XCALLOC(gargs->q_alloc, sizeof(int), "q_lens");
-		}
-		else
-		{
-			tmp->gdata->q_regs = NULL;
-			tmp->gdata->q_lens = NULL;
 		}
 		tmp->gdata->xr_alloc = gargs->xr_alloc;
 		if (gargs->xr_alloc)
@@ -1187,13 +1182,6 @@ BQUE *setup_que(dbref player, dbref cause, char *command, char *args[], int narg
 			tmp->gdata->x_regs = XCALLOC(gargs->xr_alloc, sizeof(char *), "x_regs");
 			tmp->gdata->x_lens = XCALLOC(gargs->xr_alloc, sizeof(int), "x_lens");
 		}
-		else
-		{
-			tmp->gdata->x_names = NULL;
-			tmp->gdata->x_regs = NULL;
-			tmp->gdata->x_lens = NULL;
-		}
-		tmp->gdata->dirty = 0;
 	}
 	else
 	{
