@@ -17,7 +17,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "cque_internal.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -240,61 +239,4 @@ void remove_waitq(BQUE *qptr)
  * @note Sets gdata pointer to NULL after cleanup (caller responsibility)
  * @attention Does not set input pointer to NULL - caller must handle
  */
-void _cque_free_gdata(GDATA *gdata)
-{
-	if (!gdata)
-	{
-		return;
-	}
-
-	/* Free q-register contents */
-	for (int z = 0; z < gdata->q_alloc; z++)
-	{
-		if (gdata->q_regs[z])
-		{
-			XFREE(gdata->q_regs[z]);
-		}
-	}
-
-	/* Free x-register names and contents */
-	for (int z = 0; z < gdata->xr_alloc; z++)
-	{
-		if (gdata->x_names[z])
-		{
-			XFREE(gdata->x_names[z]);
-		}
-
-		if (gdata->x_regs[z])
-		{
-			XFREE(gdata->x_regs[z]);
-		}
-	}
-
-	/* Free register arrays */
-	if (gdata->q_regs)
-	{
-		XFREE(gdata->q_regs);
-	}
-
-	if (gdata->q_lens)
-	{
-		XFREE(gdata->q_lens);
-	}
-
-	if (gdata->x_names)
-	{
-		XFREE(gdata->x_names);
-	}
-
-	if (gdata->x_regs)
-	{
-		XFREE(gdata->x_regs);
-	}
-
-	if (gdata->x_lens)
-	{
-		XFREE(gdata->x_lens);
-	}
-
-	XFREE(gdata);
-}
+/* _cque_free_gdata moved to cque_exec.c as an internal helper */

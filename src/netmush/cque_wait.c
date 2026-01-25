@@ -17,10 +17,11 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "cque_internal.h"
-
 #include <stdbool.h>
+
 #include <string.h>
+/* Local prototype for helper defined in cque_halt.c */
+bool _cque_parse_pid_string(const char *pidstr, int *qpid);
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>

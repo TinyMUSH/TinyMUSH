@@ -17,13 +17,15 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "cque_internal.h"
 
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
+
+/* Local prototype for helper shared with wait module */
+bool _cque_parse_pid_string(const char *pidstr, int *qpid);
 
 /**
  * @brief Filter queue entries by owner and/or object criteria.

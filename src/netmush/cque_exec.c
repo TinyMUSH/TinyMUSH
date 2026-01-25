@@ -17,7 +17,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "cque_internal.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -29,6 +28,66 @@
 
 /** @brief Next queue PID to allocate (internal optimization hint for qpid_next) */
 int qpid_top = 1;
+
+/* Internal helper: free global register data */
+static void _cque_free_gdata(GDATA *gdata)
+{
+	if (!gdata)
+	{
+		return;
+	}
+
+	/* Free q-register contents */
+	for (int z = 0; z < gdata->q_alloc; z++)
+	{
+		if (gdata->q_regs[z])
+		{
+			XFREE(gdata->q_regs[z]);
+		}
+	}
+
+	/* Free x-register names and contents */
+	for (int z = 0; z < gdata->xr_alloc; z++)
+	{
+		if (gdata->x_names[z])
+		{
+			XFREE(gdata->x_names[z]);
+		}
+
+		if (gdata->x_regs[z])
+		{
+			XFREE(gdata->x_regs[z]);
+		}
+	}
+
+	/* Free register arrays */
+	if (gdata->q_regs)
+	{
+		XFREE(gdata->q_regs);
+	}
+
+	if (gdata->q_lens)
+	{
+		XFREE(gdata->q_lens);
+	}
+
+	if (gdata->x_names)
+	{
+		XFREE(gdata->x_names);
+	}
+
+	if (gdata->x_regs)
+	{
+		XFREE(gdata->x_regs);
+	}
+
+	if (gdata->x_lens)
+	{
+		XFREE(gdata->x_lens);
+	}
+
+	XFREE(gdata);
+}
 
 /**
  * @brief Allocate the next available queue process ID (PID) from the PID pool.

@@ -17,7 +17,6 @@
 #include "macros.h"
 #include "externs.h"
 #include "prototypes.h"
-#include "cque_internal.h"
 
 #include <stdbool.h>
 #include <string.h>
