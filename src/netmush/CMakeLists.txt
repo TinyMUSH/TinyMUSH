@@ -15,7 +15,7 @@ endif()
 # Base source files
 set(NETMUSH_SOURCES
     alloc.c ansi.c ansi.h api.c 
-    boolexp_eval.c boolexp_parse.c
+    boolexp.c boolexp_parse.c
     bsd_connection.c bsd_dns.c bsd_io.c bsd.c bsd_signals.c bsd_socket.c 
     command_core.c command_access.c command_hooks.c command_admin.c 
     conf_core.c conf_data.c conf.c conf_modules.c constants.h 

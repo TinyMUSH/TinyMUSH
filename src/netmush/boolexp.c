@@ -1,5 +1,5 @@
 /**
- * @file boolexp_eval.c
+ * @file boolexp.c
  * @author TinyMUSH development team (https://github.com/TinyMUSH)
  * @brief Evaluation functions for boolean expressions
  * @version 4.0
