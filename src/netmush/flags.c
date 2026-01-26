@@ -274,7 +274,7 @@ int fh_going_bit(dbref target, dbref player, FLAG flag, int fflags, int reset)
         return (fh_any(target, player, flag, fflags, reset));
     }
 
-    if (!God(player) || !destroyable(target))
+    if (!God(player) || !create_destroyable(target))
     {
         return 0;
     }

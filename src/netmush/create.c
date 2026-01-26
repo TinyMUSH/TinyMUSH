@@ -1329,7 +1329,7 @@ void create_do_pcreate(dbref player, dbref cause, int key, char *name, char *pas
  * @see Exits() macro for retrieving exit's parent location
  * @see Has_location() for validating player has valid location
  * @see Wizard() predicate for wizard privilege check
- * @see destroyable() for special object protection checks
+ * @see create_destroyable() for special object protection checks
  */
 static bool _create_can_destroy_exit(dbref player, dbref exit)
 {
@@ -1409,7 +1409,7 @@ static bool _create_can_destroy_exit(dbref player, dbref exit)
  * @see God() predicate for God player check
  * @see CONF structure for configuration table entry format
  */
-bool destroyable(dbref victim)
+bool create_destroyable(dbref victim)
 {
     CONF *tp = NULL, *ctab = NULL;
     MODULE *mp = NULL;
@@ -1488,7 +1488,7 @@ bool destroyable(dbref victim)
  * @note Called by do_destroy() after general permission checks and before actual destruction
  * @note "No suicide allowed" message applies to both self-destruction and destroying others
  * @note Wizard protection absolute; no override switch bypasses wizard-vs-wizard restriction
- * @note Does not check SAFE flag, Controls(), or destroyable() (handled by do_destroy)
+ * @note Does not check SAFE flag, Controls(), or create_destroyable() (handled by do_destroy)
  * @note God player check performed elsewhere; this function treats God as wizard
  * @attention Non-wizard players cannot destroy any player character including themselves
  * @attention Wizards cannot destroy themselves (blocked by wizard victim check)
@@ -1497,7 +1497,7 @@ bool destroyable(dbref victim)
  *
  * @see do_destroy() for complete destruction logic including instant/queued destruction
  * @see Wizard() predicate for wizard privilege check
- * @see destroyable() for special object protection (God player handled there)
+ * @see create_destroyable() for special object protection (God player handled there)
  * @see _create_can_destroy_exit() for exit-specific destruction validation
  * @see destroy_player() for actual player destruction implementation
  */
@@ -1547,7 +1547,7 @@ static bool _create_can_destroy_player(dbref player, dbref victim)
  * 2. SAFE flag protection: Blocks destruction unless DEST_OVERRIDE switch used
  *    - Exception: DESTROY_OK things bypass SAFE protection
  *    - Notification: "Sorry, that object is protected. Use @destroy/override to destroy it."
- * 3. Special object protection: Calls destroyable() to check system objects
+ * 3. Special object protection: Calls create_destroyable() to check system objects
  *    - Protects dbref 0, God, configuration table references
  *    - Notification: "You can't destroy that!"
  * 4. Type-specific validation: Calls can_destroy_exit() or can_destroy_player()
@@ -1604,7 +1604,7 @@ static bool _create_can_destroy_player(dbref player, dbref victim)
  *
  * @see match_controlled_quiet() for primary object matching and control validation
  * @see controls() for ownership/control predicate
- * @see destroyable() for special object protection (dbref 0, God, conftable references)
+ * @see create_destroyable() for special object protection (dbref 0, God, conftable references)
  * @see _create_can_destroy_exit() for exit-specific location permission validation
  * @see _create_can_destroy_player() for player-specific wizard privilege validation
  * @see destroy_exit() for instant exit removal implementation
@@ -1663,7 +1663,7 @@ void create_do_destroy(dbref player, dbref cause, int key, char *what)
     }
 
     /* Make sure we're not trying to destroy a special object */
-    if (!destroyable(thing))
+    if (!create_destroyable(thing))
     {
         notify_quiet(player, "You can't destroy that!");
         return;

@@ -203,7 +203,7 @@ extern void create_do_dig(dbref player, dbref cause, int key, char *name, char *
 extern void create_do_create(dbref player, dbref cause, int key, char *name, char *coststr);
 extern void create_do_clone(dbref player, dbref cause, int key, char *name, char *arg2);
 extern void create_do_pcreate(dbref player, dbref cause, int key, char *name, char *pass);
-extern bool destroyable(dbref victim);
+extern bool create_destroyable(dbref victim);
 extern void create_do_destroy(dbref player, dbref cause, int key, char *what);
 
 /* db_filehelpers.c */
