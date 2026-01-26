@@ -225,7 +225,7 @@ static void _create_open_exit(dbref player, dbref loc, char *direction, char *li
  * @see _create_parse_linkable_room() for destination resolution
  * @see OPEN_INVENTORY flag for inventory vs. room mode
  */
-void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
+void create_do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
 {
     dbref loc = NOTHING, destnum = NOTHING;
     char *dest = NULL, *s = NULL;
@@ -411,7 +411,7 @@ static void _create_link_exit(dbref player, dbref exit, dbref dest)
  * @see can_set_home() for home location permission predicate
  * @see isRoom() for room type validation
  */
-void do_link(dbref player, dbref cause, int key, char *what, char *where)
+void create_do_link(dbref player, dbref cause, int key, char *what, char *where)
 {
     dbref thing = NOTHING, room = NOTHING;
 
@@ -595,7 +595,7 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
  * @see s_Modified() to update object's modification timestamp
  * @see mushconf.parent_nest_lim configuration limit
  */
-void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
+void create_do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
 {
     dbref thing = NOTHING, parent = NOTHING, curr = NOTHING;
     int lev = 0;
@@ -710,7 +710,7 @@ void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
  * @see DIG_TELEPORT flag definition
  * @see ok_name() for room name validation
  */
-void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs)
+void create_do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs)
 {
     dbref room = NOTHING;
     char *s = NULL;
@@ -804,7 +804,7 @@ void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int na
  * @see ansi_strip_ansi_len() for ANSI color code stripping validation
  * @see strtol() for cost string parsing
  */
-void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
+void create_do_create(dbref player, dbref cause, int key, char *name, char *coststr)
 {
     dbref thing = NOTHING;
     int cost = 0;
@@ -936,7 +936,7 @@ void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
  * @see OBJECT_ENDOWMENT() for cost-to-pennies conversion
  * @see mushconf.stripped_flags for flag stripping configuration
  */
-void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
+void create_do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 {
     dbref clone = NOTHING, thing = NOTHING, new_owner = NOTHING, loc = NOTHING;
     FLAG rmv_flags = 0;
@@ -1236,7 +1236,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
  * @see LOG_PCREATES for player creation log flag
  * @see LOG_WIZARD for wizard action log flag
  */
-void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
+void create_do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
 {
     dbref newplayer = NOTHING;
     char *newname = NULL, *cname = NULL, *nname = NULL;
@@ -1618,7 +1618,7 @@ static bool _create_can_destroy_player(dbref player, dbref victim)
  * @see DEST_OVERRIDE flag for SAFE override switch
  * @see DEST_INSTANT flag for instant destruction switch
  */
-void do_destroy(dbref player, dbref cause, int key, char *what)
+void create_do_destroy(dbref player, dbref cause, int key, char *what)
 {
     dbref thing = NOTHING;
     bool can_doit = false;

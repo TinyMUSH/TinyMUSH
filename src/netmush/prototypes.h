@@ -196,15 +196,15 @@ extern void cque_do_ps(dbref player, dbref cause, int key, char *target);
 extern void cque_do_queue(dbref player, dbref cause, int key, char *arg);
 
 /* create.c */
-extern void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks);
-extern void do_link(dbref player, dbref cause, int key, char *what, char *where);
-extern void do_parent(dbref player, dbref cause, int key, char *tname, char *pname);
-extern void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs);
-extern void do_create(dbref player, dbref cause, int key, char *name, char *coststr);
-extern void do_clone(dbref player, dbref cause, int key, char *name, char *arg2);
-extern void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass);
+extern void create_do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks);
+extern void create_do_link(dbref player, dbref cause, int key, char *what, char *where);
+extern void create_do_parent(dbref player, dbref cause, int key, char *tname, char *pname);
+extern void create_do_dig(dbref player, dbref cause, int key, char *name, char *args[], int nargs);
+extern void create_do_create(dbref player, dbref cause, int key, char *name, char *coststr);
+extern void create_do_clone(dbref player, dbref cause, int key, char *name, char *arg2);
+extern void create_do_pcreate(dbref player, dbref cause, int key, char *name, char *pass);
 extern bool destroyable(dbref victim);
-extern void do_destroy(dbref player, dbref cause, int key, char *what);
+extern void create_do_destroy(dbref player, dbref cause, int key, char *what);
 
 /* db_filehelpers.c */
 extern void tf_xclose(FILE *fd);

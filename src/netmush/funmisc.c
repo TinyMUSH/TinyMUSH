@@ -1802,7 +1802,7 @@ void fun_link(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
 		return;
 	}
 
-	do_link(player, cause, 0, fargs[0], fargs[1]);
+	create_do_link(player, cause, 0, fargs[0], fargs[1]);
 }
 
 /**
