@@ -23,6 +23,13 @@
 #include <errno.h>
 #include <limits.h>
 
+/* Internal function prototypes */
+static dbref _create_parse_linkable_room(dbref player, char *room_name);
+static void _create_open_exit(dbref player, dbref loc, char *direction, char *linkto);
+static void _create_link_exit(dbref player, dbref exit, dbref dest);
+static bool _create_can_destroy_exit(dbref player, dbref exit);
+static bool _create_can_destroy_player(dbref player, dbref victim);
+
 /**
  * @brief Parse and validate a room name to ensure the player can link to it.
  *
@@ -48,7 +55,7 @@
  * @see Linkable() for permission predicate
  * @see match_everything() for name resolution rules
  */
-dbref parse_linkable_room(dbref player, char *room_name)
+static dbref _create_parse_linkable_room(dbref player, char *room_name)
 {
     dbref room = NOTHING;
 
@@ -110,12 +117,12 @@ dbref parse_linkable_room(dbref player, char *room_name)
  * @attention Validates permissions but does not check SAFE flag (not SAFE-protected)
  * @attention linkcost charged if linking succeeds, but not if exit creation fails
  *
- * @see parse_linkable_room() for destination resolution rules
+ * @see _create_parse_linkable_room() for destination resolution rules
  * @see Openable() for location permission predicate
  * @see Passes_Openlock() for openlock validation
- * @see link_exit() for explicit exit linking
+ * @see _create_link_exit() for explicit exit linking
  */
-void open_exit(dbref player, dbref loc, char *direction, char *linkto)
+static void _create_open_exit(dbref player, dbref loc, char *direction, char *linkto)
 {
     dbref exit = NOTHING;
 
@@ -158,7 +165,7 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
         return;
     }
 
-    loc = parse_linkable_room(player, linkto);
+    loc = _create_parse_linkable_room(player, linkto);
 
     if (loc != NOTHING)
     {
@@ -211,11 +218,11 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
  * @note Back-links only created if destination is linkable and nlinks >= 2
  * @note Notifies player of success/failure through notify_quiet() via open_exit()
  * @note Uses XASPRINTF to convert location number to string for back-link destination
- * @attention Both forward and back-link creation share cost; cost charged for each via open_exit()
+ * @attention Both forward and back-link creation share cost; cost charged for each via _create_open_exit()
  * @attention If back-link creation fails, forward exit remains (not rolled back)
  *
- * @see open_exit() for actual exit creation and linking logic
- * @see parse_linkable_room() for destination resolution
+ * @see _create_open_exit() for actual exit creation and linking logic
+ * @see _create_parse_linkable_room() for destination resolution
  * @see OPEN_INVENTORY flag for inventory vs. room mode
  */
 void do_open(dbref player, dbref cause, int key, char *direction, char *links[], int nlinks)
@@ -227,17 +234,17 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
     dest = (nlinks >= 1) ? links[0] : NULL;
     loc = (key == OPEN_INVENTORY) ? player : Location(player);
 
-    open_exit(player, loc, direction, dest);
+    _create_open_exit(player, loc, direction, dest);
 
     /* Open the back link if we can */
     if (nlinks >= 2)
     {
-        destnum = parse_linkable_room(player, dest);
+        destnum = _create_parse_linkable_room(player, dest);
 
         if (destnum != NOTHING)
         {
             s = XASPRINTF("s", "%d", loc);
-            open_exit(player, destnum, links[1], s);
+            _create_open_exit(player, destnum, links[1], s);
             XFREE(s);
         }
     }
@@ -287,7 +294,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
  * @see canpayfees() for fee validation including quotas
  * @see payfees() for currency deduction
  */
-void link_exit(dbref player, dbref exit, dbref dest)
+static void _create_link_exit(dbref player, dbref exit, dbref dest)
 {
     int cost = 0, quot = 0;
     bool ownership_change = false;
@@ -357,10 +364,10 @@ void link_exit(dbref player, dbref exit, dbref dest)
  *
  * Type-specific behaviors:
  *
- * **TYPE_EXIT**: Links exit to destination via link_exit()
+ * **TYPE_EXIT**: Links exit to destination via _create_link_exit()
  * - Special case: "variable" keyword creates variable/AMBIGUOUS exit (requires LinkVariable power)
- * - Normal destinations resolved via parse_linkable_room()
- * - Calls link_exit() which validates permissions, handles costs, potential ownership changes
+ * - Normal destinations resolved via _create_parse_linkable_room()
+ * - Calls _create_link_exit() which validates permissions, handles costs, potential ownership changes
  *
  * **TYPE_PLAYER / TYPE_THING**: Sets home location (s_Home)
  * - Requires player to control the object
@@ -398,8 +405,8 @@ void link_exit(dbref player, dbref exit, dbref dest)
  * @attention For rooms: HOME is always linkable but shows different behavior
  * @attention Objects of GARBAGE type always rejected regardless of control/permissions
  *
- * @see link_exit() for exit linking logic, cost calculation, ownership handling
- * @see parse_linkable_room() for room name resolution and permission checking
+ * @see _create_link_exit() for exit linking logic, cost calculation, ownership handling
+ * @see _create_parse_linkable_room() for room name resolution and permission checking
  * @see do_unlink() for unlinking implementation when destination unspecified
  * @see can_set_home() for home location permission predicate
  * @see isRoom() for room type validation
@@ -429,11 +436,11 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
     {
     case TYPE_EXIT:
         /* Set destination */
-        room = (!strcasecmp(where, "variable")) ? AMBIGUOUS : parse_linkable_room(player, where);
+        room = (!strcasecmp(where, "variable")) ? AMBIGUOUS : _create_parse_linkable_room(player, where);
 
         if (room != NOTHING)
         {
-            link_exit(player, thing, room);
+            _create_link_exit(player, thing, room);
         }
 
         break;
@@ -492,7 +499,7 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
             break;
         }
 
-        room = parse_linkable_room(player, where);
+        room = _create_parse_linkable_room(player, where);
 
         if (room == HOME)
         {
@@ -697,7 +704,7 @@ void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
  * @attention Both forward and back-link creation charge player separately; costs not combined
  * @attention DIG_TELEPORT applied after exits; player teleported even if exit creation fails
  *
- * @see open_exit() for exit creation logic, permission validation, cost calculation
+ * @see _create_open_exit() for exit creation logic, permission validation, cost calculation
  * @see create_obj() for room object creation and quota enforcement
  * @see move_via_teleport() for teleportation logic and restrictions
  * @see DIG_TELEPORT flag definition
@@ -727,14 +734,14 @@ void do_dig(dbref player, dbref cause, int key, char *name, char *args[], int na
     if ((nargs >= 1) && args[0] && *args[0])
     {
         s = XASPRINTF("s", "%d", room);
-        open_exit(player, Location(player), args[0], s);
+        _create_open_exit(player, Location(player), args[0], s);
         XFREE(s);
     }
 
     if ((nargs >= 2) && args[1] && *args[1])
     {
         s = XASPRINTF("s", "%d", Location(player));
-        open_exit(player, room, args[1], s);
+        _create_open_exit(player, room, args[1], s);
         XFREE(s);
     }
 
@@ -923,7 +930,7 @@ void do_create(dbref player, dbref cause, int key, char *name, char *coststr)
  * @see create_obj() for object creation and cost enforcement
  * @see atr_cpy() for attribute copying
  * @see atr_free() for attribute clearing
- * @see link_exit() for re-establishing exit links
+ * @see _create_link_exit() for re-establishing exit links
  * @see clone_home() for destination home determination
  * @see did_it() for A_ACLONE attribute trigger
  * @see OBJECT_ENDOWMENT() for cost-to-pennies conversion
@@ -1125,7 +1132,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 
         if (Dropto(thing) != NOTHING)
         {
-            link_exit(player, clone, Dropto(thing));
+            _create_link_exit(player, clone, Dropto(thing));
         }
 
         break;
@@ -1137,7 +1144,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 
         if (Location(thing) != NOTHING)
         {
-            link_exit(player, clone, Location(thing));
+            _create_link_exit(player, clone, Location(thing));
         }
 
         break;
@@ -1324,7 +1331,7 @@ void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
  * @see Wizard() predicate for wizard privilege check
  * @see destroyable() for special object protection checks
  */
-bool can_destroy_exit(dbref player, dbref exit)
+static bool _create_can_destroy_exit(dbref player, dbref exit)
 {
     dbref loc = Exits(exit);
 
@@ -1491,10 +1498,10 @@ bool destroyable(dbref victim)
  * @see do_destroy() for complete destruction logic including instant/queued destruction
  * @see Wizard() predicate for wizard privilege check
  * @see destroyable() for special object protection (God player handled there)
- * @see can_destroy_exit() for exit-specific destruction validation
+ * @see _create_can_destroy_exit() for exit-specific destruction validation
  * @see destroy_player() for actual player destruction implementation
  */
-bool can_destroy_player(dbref player, dbref victim)
+static bool _create_can_destroy_player(dbref player, dbref victim)
 {
     if (!Wizard(player))
     {
@@ -1598,8 +1605,8 @@ bool can_destroy_player(dbref player, dbref victim)
  * @see match_controlled_quiet() for primary object matching and control validation
  * @see controls() for ownership/control predicate
  * @see destroyable() for special object protection (dbref 0, God, conftable references)
- * @see can_destroy_exit() for exit-specific location permission validation
- * @see can_destroy_player() for player-specific wizard privilege validation
+ * @see _create_can_destroy_exit() for exit-specific location permission validation
+ * @see _create_can_destroy_player() for player-specific wizard privilege validation
  * @see destroy_exit() for instant exit removal implementation
  * @see destroy_player() for instant player removal implementation
  * @see destroy_thing() for instant thing removal implementation
@@ -1667,12 +1674,12 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
     {
     case TYPE_EXIT:
         typename = "exit";
-        can_doit = can_destroy_exit(player, thing);
+        can_doit = _create_can_destroy_exit(player, thing);
         break;
 
     case TYPE_PLAYER:
         typename = "player";
-        can_doit = can_destroy_player(player, thing);
+        can_doit = _create_can_destroy_player(player, thing);
         break;
 
     case TYPE_ROOM:
