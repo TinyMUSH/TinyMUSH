@@ -68,15 +68,14 @@ dbref parse_linkable_room(dbref player, char *room_name)
         notify_quiet(player, "That's not a valid object.");
         return NOTHING;
     }
-    else if (!Linkable(player, room))
+    
+    if (!Linkable(player, room))
     {
         notify_quiet(player, "You can't link to that.");
         return NOTHING;
     }
-    else
-    {
-        return room;
-    }
+    
+    return room;
 }
 
 /**
@@ -130,11 +129,9 @@ void open_exit(dbref player, dbref loc, char *direction, char *linkto)
         notify_quiet(player, "Open where?");
         return;
     }
-    /* Make sure we can open here: - We must control the destination or it must be OPEN_OK 
-      or we must have Open_Anywhere and the location's not God. - We must be able to pass
-      the openlock, or we must be able to Open_Anywhere (power, or be a wizard) and be
-      config'd so wizards ignore openlocks */
-    else if (!(Openable(player, loc) && Passes_Openlock(player, loc)))
+    
+    /* Verify player can open exits here (location permissions and openlock) */
+    if (!(Openable(player, loc) && Passes_Openlock(player, loc)))
     {
         notify_quiet(player, NOPERM_MESSAGE);
         return;
@@ -227,30 +224,12 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
     char *dest = NULL, *s = NULL;
 
     /* Create the exit and link to the destination, if there is one */
-    if (nlinks >= 1)
-    {
-        dest = links[0];
-    }
-    else
-    {
-        dest = NULL;
-    }
-
-    if (key == OPEN_INVENTORY)
-    {
-        loc = player;
-    }
-    else
-    {
-        loc = Location(player);
-    }
+    dest = (nlinks >= 1) ? links[0] : NULL;
+    loc = (key == OPEN_INVENTORY) ? player : Location(player);
 
     open_exit(player, loc, direction, dest);
 
-    /**
-     * Open the back link if we can
-     *
-     */
+    /* Open the back link if we can */
     if (nlinks >= 2)
     {
         destnum = parse_linkable_room(player, dest);
@@ -311,6 +290,7 @@ void do_open(dbref player, dbref cause, int key, char *direction, char *links[],
 void link_exit(dbref player, dbref exit, dbref dest)
 {
     int cost = 0, quot = 0;
+    bool ownership_change = false;
 
     /* Make sure we can link there: Our destination is HOME Our
        destination is AMBIGUOUS and we can link to variable exits Normal
@@ -332,34 +312,32 @@ void link_exit(dbref player, dbref exit, dbref dest)
         return;
     }
 
-    /* handle costs */
+    /* Calculate cost (linkcost + opencost/quota if ownership changes) */
     cost = mushconf.linkcost;
-    quot = 0;
+    ownership_change = (Owner(exit) != Owner(player));
 
-    if (Owner(exit) != Owner(player))
+    if (ownership_change)
     {
         cost += mushconf.opencost;
-        quot += mushconf.exit_quota;
+        quot = mushconf.exit_quota;
     }
 
     if (!canpayfees(player, player, cost, quot, TYPE_EXIT))
     {
         return;
     }
-    else
-    {
-        payfees(player, cost, quot, TYPE_EXIT);
-    }
+    
+    payfees(player, cost, quot, TYPE_EXIT);
 
     /* Pay the owner for his loss */
-    if (Owner(exit) != Owner(player))
+    if (ownership_change)
     {
         payfees(Owner(exit), -mushconf.opencost, -quot, TYPE_EXIT);
         s_Owner(exit, Owner(player));
         s_Flags(exit, (Flags(exit) & ~(INHERIT | WIZARD)) | HALT);
     }
 
-    /* link has been validated and paid for, do it and tell the player */
+    /* Apply validated link */
     s_Location(exit, dest);
 
     if (!Quiet(player))
@@ -450,16 +428,8 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
     switch (Typeof(thing))
     {
     case TYPE_EXIT:
-
         /* Set destination */
-        if (!strcasecmp(where, "variable"))
-        {
-            room = AMBIGUOUS;
-        }
-        else
-        {
-            room = parse_linkable_room(player, where);
-        }
+        room = (!strcasecmp(where, "variable")) ? AMBIGUOUS : parse_linkable_room(player, where);
 
         if (room != NOTHING)
         {
@@ -470,7 +440,6 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
 
     case TYPE_PLAYER:
     case TYPE_THING:
-
         /* Set home */
         if (!Controls(player, thing))
         {
@@ -496,27 +465,26 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
         if (!can_set_home(player, thing, room) || !Passes_Linklock(player, room))
         {
             notify_quiet(player, NOPERM_MESSAGE);
+            break;
         }
-        else if (room == HOME)
+        
+        if (room == HOME)
         {
             notify_quiet(player, "Can't set home to home.");
+            break;
         }
-        else
+
+        s_Home(thing, room);
+
+        if (!Quiet(player))
         {
-            s_Home(thing, room);
-
-            if (!Quiet(player))
-            {
-                notify_quiet(player, "Home set.");
-            }
-
-            s_Modified(thing);
+            notify_quiet(player, "Home set.");
         }
 
+        s_Modified(thing);
         break;
 
     case TYPE_ROOM:
-
         /* Set dropto */
         if (!Controls(player, thing))
         {
@@ -536,31 +504,34 @@ void do_link(dbref player, dbref cause, int key, char *what, char *where)
             }
 
             s_Modified(thing);
+            break;
         }
-        else if (!(Good_obj(room)))
+        
+        if (!Good_obj(room))
         {
             break;
         }
-        else if (!isRoom(room))
+        
+        if (!isRoom(room))
         {
             notify_quiet(player, "That is not a room!");
+            break;
         }
-        else if (!(Linkable(player, room) && Passes_Linklock(player, room)))
+        
+        if (!(Linkable(player, room) && Passes_Linklock(player, room)))
         {
             notify_quiet(player, NOPERM_MESSAGE);
+            break;
         }
-        else
+
+        s_Dropto(thing, room);
+
+        if (!Quiet(player))
         {
-            s_Dropto(thing, room);
-
-            if (!Quiet(player))
-            {
-                notify_quiet(player, "Dropto set.");
-            }
-
-            s_Modified(thing);
+            notify_quiet(player, "Dropto set.");
         }
 
+        s_Modified(thing);
         break;
 
     case TYPE_GARBAGE:
@@ -640,6 +611,8 @@ void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
     }
 
     /* Find out what the new parent is */
+    parent = NOTHING;
+    
     if (*pname)
     {
         init_match(player, pname, Typeof(thing));
@@ -668,24 +641,13 @@ void do_parent(dbref player, dbref cause, int key, char *tname, char *pname)
             }
         }
     }
-    else
-    {
-        parent = NOTHING;
-    }
 
     s_Parent(thing, parent);
     s_Modified(thing);
 
     if (!Quiet(thing) && !Quiet(player))
     {
-        if (parent == NOTHING)
-        {
-            notify_quiet(player, "Parent cleared.");
-        }
-        else
-        {
-            notify_quiet(player, "Parent set.");
-        }
+        notify_quiet(player, (parent == NOTHING) ? "Parent cleared." : "Parent set.");
     }
 }
 
@@ -974,14 +936,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
     int cost = 0;
     const char *clone_name = NULL;
 
-    if ((key & CLONE_INVENTORY) || !Has_location(player))
-    {
-        loc = player;
-    }
-    else
-    {
-        loc = Location(player);
-    }
+    loc = ((key & CLONE_INVENTORY) || !Has_location(player)) ? player : Location(player);
 
     if (!Good_obj(loc))
     {
@@ -1026,10 +981,9 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         new_owner = Owner(player);
     }
 
-    /* Determine the cost of cloning. We have to do limits enforcement
-       here, because we're going to wipe out the attribute for money set
-       by create_obj() and need to set this ourselves. Note that you
-       can't change the cost of objects other than things. */
+    /* Calculate clone cost (attributes wiped, so must enforce limits here) */
+    cost = 0;
+    
     if (key & CLONE_SET_COST)
     {
         if (arg2 && *arg2)
@@ -1054,15 +1008,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
 
             cost = (int)val;
         }
-        else
-        {
-            cost = 0;
-        }
         arg2 = NULL;
-    }
-    else
-    {
-        cost = 0;
     }
 
     switch (Typeof(thing))
@@ -1102,20 +1048,16 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         break;
     }
 
-    /* Go make the clone object */
-    if ((arg2 && *arg2) && ok_name(arg2))
-    {
-        clone = create_obj(new_owner, Typeof(thing), arg2, cost);
-    }
-    else
-        clone = create_obj(new_owner, Typeof(thing), Name(thing), cost);
+    /* Create clone object */
+    clone_name = ((arg2 && *arg2) && ok_name(arg2)) ? arg2 : Name(thing);
+    clone = create_obj(new_owner, Typeof(thing), clone_name, cost);
 
     if (clone == NOTHING)
     {
         return;
     }
 
-    /* Wipe out any old attributes and copy in the new data */
+    /* Clear attributes, then copy from source or set parent */
     atr_free(clone);
 
     if (key & CLONE_FROM_PARENT)
@@ -1127,41 +1069,19 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         atr_cpy(player, clone, thing);
     }
 
-    /* Reset the name, since we cleared the attributes. */
-    if ((arg2 && *arg2) && ok_name(arg2))
-    {
-        clone_name = arg2;
-    }
-    else
-    {
-        clone_name = Name(thing);
-    }
-
+    /* Restore name (cleared by atr_free) */
     s_Name(clone, (char *)clone_name);
 
-    /* Reset the cost, since this also got wiped when we cleared
-       attributes. Note that only things have a value, though you
-       pay a cost for creating everything. */
+    /* Set cost (only things have pennies value) */
     if (isThing(clone))
     {
         s_Pennies(clone, OBJECT_ENDOWMENT(cost));
     }
 
-    /* Clear out problem flags from the original. Don't strip the INHERIT
-       bit if we got the Inherit switch. Don't strip other flags if we
-       got the NoStrip switch EXCEPT for the Wizard flag, unless we're
-       God. (Powers are not cloned, ever.) */
+    /* Apply flags: /nostrip preserves all (except WIZARD unless God), default strips per config */
     if (key & CLONE_NOSTRIP)
     {
-        if (God(player))
-        {
-            s_Flags(clone, Flags(thing));
-        }
-        else
-        {
-            s_Flags(clone, Flags(thing) & ~WIZARD);
-        }
-
+        s_Flags(clone, God(player) ? Flags(thing) : (Flags(thing) & ~WIZARD));
         s_Flags2(clone, Flags2(thing));
         s_Flags3(clone, Flags3(thing));
     }
@@ -1179,7 +1099,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         s_Flags3(clone, Flags3(thing) & ~mushconf.stripped_flags.word3);
     }
 
-    /* Tell creator about it */
+    /* Notify creator of successful cloning */
     if (!Quiet(player))
     {
         if (arg2 && *arg2)
@@ -1192,7 +1112,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         }
     }
 
-    /* Put the new thing in its new home.  Break any dropto or link, then try to re-establish it. */
+    /* Place clone and re-establish links/dropto as appropriate */
     switch (Typeof(thing))
     {
     case TYPE_THING:
@@ -1223,7 +1143,7 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
         break;
     }
 
-    /* If same owner run Aclone, else halt it.  Also copy parent if we can */
+    /* Trigger Aclone if same owner, otherwise halt; set parent as appropriate */
     if (new_owner == Owner(thing))
     {
         if (!(key & CLONE_FROM_PARENT))
@@ -1311,11 +1231,10 @@ void do_clone(dbref player, dbref cause, int key, char *name, char *arg2)
  */
 void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
 {
-    int isrobot = 0;
     dbref newplayer = NOTHING;
     char *newname = NULL, *cname = NULL, *nname = NULL;
+    bool isrobot = (key == PCRE_ROBOT);
 
-    isrobot = (key == PCRE_ROBOT) ? 1 : 0;
     cname = log_getname(player);
     newplayer = create_player(name, pass, player, isrobot, 0);
     newname = munge_space(name);
@@ -1323,16 +1242,10 @@ void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
     if (newplayer == NOTHING)
     {
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "Failure creating '%s'", newname);
-
-        if (isrobot)
-        {
-            log_write(LOG_PCREATES, "CRE", "ROBOT", "Failure creating '%s' by %s", newname, cname);
-        }
-        else
-        {
-            log_write(LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "Failure creating '%s' by %s", newname, cname);
-        }
-
+        log_write(isrobot ? LOG_PCREATES : (LOG_PCREATES | LOG_WIZARD), 
+                  isrobot ? "CRE" : "WIZ", 
+                  isrobot ? "ROBOT" : "PCREA", 
+                  "Failure creating '%s' by %s", newname, cname);
         XFREE(cname);
         XFREE(newname);
         return;
@@ -1349,7 +1262,7 @@ void do_pcreate(dbref player, dbref cause, int key, char *name, char *pass)
     }
     else
     {
-        move_object(newplayer, (Good_loc(mushconf.start_room) ? mushconf.start_room : 0));
+        move_object(newplayer, Good_loc(mushconf.start_room) ? mushconf.start_room : 0);
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "New player '%s' (#%d) created with password '%s'", newname, newplayer, pass);
         log_write(LOG_PCREATES | LOG_WIZARD, "WIZ", "PCREA", "%s created by %s", nname, cname);
     }
@@ -1494,7 +1407,7 @@ bool destroyable(dbref victim)
     CONF *tp = NULL, *ctab = NULL;
     MODULE *mp = NULL;
 
-    if ((victim == (dbref)0) || (God(victim)))
+    if ((victim == (dbref)0) || God(victim))
     {
         return false;
     }
@@ -1509,7 +1422,9 @@ bool destroyable(dbref victim)
 
     for (mp = mushstate.modules_list; mp != NULL; mp = mp->next)
     {
-        if ((ctab = (CONF *)dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable")) != NULL)
+        ctab = (CONF *)dlsym_format(mp->handle, "mod_%s_%s", mp->modname, "conftable");
+        
+        if (ctab != NULL)
         {
             for (tp = ctab; tp->pname; tp++)
             {
@@ -1721,7 +1636,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
         match_possession();
         thing = last_match_result();
 
-        if ((thing != NOTHING) && !(isThing(thing) && Destroy_ok(thing)))
+        if (thing != NOTHING && !(isThing(thing) && Destroy_ok(thing)))
         {
             thing = NOPERM;
         }
@@ -1786,17 +1701,14 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
         return;
     }
 
-    /* We can use \@destroy/instant to immediately blow up an object that was already
-       queued for destruction -- that object is unmodified except for being Going. */
+    /* Allow /instant to destroy already-Going objects (except GARBAGE) */
     if (Going(thing) && !((key & DEST_INSTANT) && (Typeof(thing) != TYPE_GARBAGE)))
     {
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME, "That %s has already been destroyed.", typename);
         return;
     }
 
-    /* If we specified the instant switch, or we're configured to
-       immediately make Destroy_Ok things (or things owned by Destroy_Ok
-       owners) go away, we do instant destruction. */
+    /* Instant destruction: /instant switch or instant_recycle for DESTROY_OK objects */
     if ((key & DEST_INSTANT) || (mushconf.instant_recycle && (Destroy_ok(thing) || Destroy_ok(Owner(thing)))))
     {
         switch (Typeof(thing))
@@ -1829,7 +1741,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
         return;
     }
 
-    /* Otherwise we queue things up for destruction. */
+    /* Queue for destruction (set Going flag after notifications) */
     if (!isRoom(thing))
     {
         notify_check(player, player, MSG_PUP_ALWAYS | MSG_ME_ALL | MSG_F_DOWN, "The %s shakes and begins to crumble.", typename);
@@ -1844,7 +1756,7 @@ void do_destroy(dbref player, dbref cause, int key, char *what)
         notify_check(Owner(thing), Owner(thing), MSG_PUP_ALWAYS | MSG_ME, "You will be rewarded shortly for %s(#%d).", Name(thing), thing);
     }
 
-    if ((Owner(thing) != player) && !Quiet(player))
+    if (Owner(thing) != player && !Quiet(player))
     {
         t = tbuf = XMALLOC(SBUF_SIZE, "t");
         XSAFESBSTR(Name(Owner(thing)), tbuf, &t);
