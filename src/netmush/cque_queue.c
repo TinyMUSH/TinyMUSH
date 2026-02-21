@@ -240,7 +240,7 @@ void cque_do_ps(dbref player, dbref cause, int key, char *target)
 {
 	char *bufp = NULL;
 	dbref player_targ = NOTHING, obj_targ = NOTHING;
-	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, sqent = 0, sqtot = 0;
+	int pqent = 0, pqtot = 0, pqdel = 0, oqent = 0, oqtot = 0, oqdel = 0, wqent = 0, wqtot = 0, wqdel = 0, sqent = 0, sqtot = 0, sqdel = 0;
 
 	/* Check permission for PS_ALL flag */
 	if ((key & PS_ALL) && !See_Queue(player))
@@ -303,8 +303,8 @@ void cque_do_ps(dbref player, dbref cause, int key, char *target)
 	/* Display all four queues */
 	cque_show_que(player, key & ~PS_ALL, mushstate.qfirst, &pqtot, &pqent, &pqdel, player_targ, obj_targ, "Player");
 	cque_show_que(player, key & ~PS_ALL, mushstate.qlfirst, &oqtot, &oqent, &oqdel, player_targ, obj_targ, "Object");
-	cque_show_que(player, key & ~PS_ALL, mushstate.qwait, &wqtot, &wqent, (int *)0, player_targ, obj_targ, "Wait");
-	cque_show_que(player, key & ~PS_ALL, mushstate.qsemfirst, &sqtot, &sqent, (int *)0, player_targ, obj_targ, "Semaphore");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qwait, &wqtot, &wqent, &wqdel, player_targ, obj_targ, "Wait");
+	cque_show_que(player, key & ~PS_ALL, mushstate.qsemfirst, &sqtot, &sqent, &sqdel, player_targ, obj_targ, "Semaphore");
 
 	/* Display summary statistics */
 	bufp = XMALLOC(MBUF_SIZE, "bufp");
