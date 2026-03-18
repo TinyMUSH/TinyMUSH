@@ -23,7 +23,7 @@ set(NETMUSH_SOURCES
     create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funmath.c funmisc.c funobj.c 
-    funstring.c funvars.c game.c help.c htab.c log.c look.c macros.h match.c 
+    funstring.c funvars.c funvars_registers.c funvars_xvars.c funvars_struct_core.c funvars_struct_ops.c funvars_stacks.c funvars_regex.c funvars_grids.c game.c help.c htab.c log.c look.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c player.c player_c.c 
     powers.c predicates.c prototypes.h quota.c rob.c set.c speech.c 
     string_util.c timer.c typedefs.h 
