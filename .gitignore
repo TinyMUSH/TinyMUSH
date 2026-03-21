@@ -10,6 +10,7 @@ packages-microsoft-prod.deb
 
 # CMake build directories
 /build
+/build2
 /game
 
 # CMake files
