@@ -177,12 +177,18 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 						buf = ansi_strip_ansi(buff1);
 						if (buf)
 						{
-							XSAFELBSTR(buf, buff, &e);
+							/*
+							 * Escape the ANSI-stripped command for HTML attribute context.
+							 */
+							html_escape(buf, buff, &e);
 							XFREE(buf);
 						}
 						else
 						{
-							XSAFELBSTR(buff1, buff, &e);
+							/*
+							 * Fallback to escaping the original exit name.
+							 */
+							html_escape(buff1, buff, &e);
 						}
 						XSAFELBSTR((char *)"\">", buff, &e);
 						/*
