@@ -292,21 +292,16 @@ void look_contents(dbref player, dbref loc, const char *contents_name, int style
 					{
 						XSAFELBSTR("<a xch_cmd=\"look ", html_buff, &html_cp);
 
-						/**
-						 * @bug Just stripping ansi isn't enough.
-						 *
-						 */
-
 						switch (style)
 						{
 						case CONTENTS_LOCAL:
-							XSAFELBSTR(PureName(thing), html_buff, &html_cp);
+							html_escape(PureName(thing), html_buff, &html_cp);
 							break;
 
 						case CONTENTS_NESTED:
-							XSAFELBSTR(PureName(Location(thing)), html_buff, &html_cp);
+							html_escape(PureName(Location(thing)), html_buff, &html_cp);
 							XSAFELBSTR("'s ", html_buff, &html_cp);
-							XSAFELBSTR(PureName(thing), html_buff, &html_cp);
+							html_escape(PureName(thing), html_buff, &html_cp);
 							break;
 
 						case CONTENTS_REMOTE:
