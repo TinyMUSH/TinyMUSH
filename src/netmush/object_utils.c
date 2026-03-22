@@ -98,14 +98,12 @@ void update_newobjs(dbref player, dbref obj_num, int obj_type)
 	int obj_list[4];
 	newobj_str = atr_get(player, A_NEWOBJS, &aowner, &aflags, &alen);
 
-	if (!*newobj_str)
+	for (i = 0; i < 4; i++)
 	{
-		for (i = 0; i < 4; i++)
-		{
-			obj_list[i] = -1;
-		}
+		obj_list[i] = -1;
 	}
-	else
+
+	if (*newobj_str)
 	{
 		for (p = strtok_r(newobj_str, " ", &tokst), i = 0; p && (i < 4); p = strtok_r(NULL, " ", &tokst), i++)
 		{
