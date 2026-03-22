@@ -35,27 +35,6 @@ static const ColorState color_cyan = {.foreground = {.is_set = ColorStatusSet, .
 static const ColorState color_blue = {.foreground = {.is_set = ColorStatusSet, .ansi_index = 4, .xterm_index = 21, .truecolor = {0, 0, 255}}};
 
 
-static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
-{
-	return memcmp(a, b, sizeof(ColorState)) == 0;
-}
-
-static void append_color_transition(const ColorState *from, const ColorState *to, ColorType type, char *buff, char **bufc)
-{
-	if (type == ColorTypeNone || colorstate_equal(from, to))
-	{
-		return;
-	}
-
-	char *seq = ansi_transition_colorstate(*from, *to, type, false);
-
-	if (seq)
-	{
-		XSAFELBSTR(seq, buff, bufc);
-		XFREE(seq);
-	}
-}
-
 static ColorState pair_color_states[5] = {
 	color_magenta,
 	color_green,

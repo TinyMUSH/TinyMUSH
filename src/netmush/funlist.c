@@ -25,18 +25,6 @@ static const ColorState color_normal = {.foreground = {.is_set = ColorStatusRese
 static const ColorState color_none = {0};
 
 /**
- * @brief Compare two ColorState structures for equality.
- *
- * @param a Pointer to first ColorState
- * @param b Pointer to second ColorState
- * @return bool True if equal, false otherwise
- */
-static inline bool colorstate_equal(const ColorState *a, const ColorState *b)
-{
-	return memcmp(a, b, sizeof(ColorState)) == 0;
-}
-
-/**
  * List management utilities.
  *
  */
