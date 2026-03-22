@@ -71,7 +71,22 @@ dbref new_home(dbref player)
 		return loc;
 	}
 
-	return (Good_home(mushconf.default_home) ? mushconf.default_home : (Good_home(mushconf.start_home) ? mushconf.start_home : (Good_home(mushconf.start_room) ? mushconf.start_room : 0)));
+	if (Good_home(mushconf.default_home))
+	{
+		return mushconf.default_home;
+	}
+
+	if (Good_home(mushconf.start_home))
+	{
+		return mushconf.start_home;
+	}
+
+	if (Good_home(mushconf.start_room))
+	{
+		return mushconf.start_room;
+	}
+
+	return 0;
 }
 
 dbref clone_home(dbref player, dbref thing)
