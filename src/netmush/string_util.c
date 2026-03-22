@@ -25,22 +25,6 @@
 static const ColorState color_none = {0};
 
 /**
- * @brief Consume an ANSI escape sequence and update ColorState
- *
- * @param cursor Pointer to the current position in the string
- * @param state Pointer to ColorState to update
- */
-static inline void consume_ansi_sequence_state(char **cursor, ColorState *state)
-{
-	const char *ptr = *cursor;
-
-	if (ansi_apply_sequence(&ptr, state))
-	{
-		*cursor = (char *)ptr;
-	}
-}
-
-/**
  * @brief Thread-safe wrapper for strerror
  *
  * @param errnum Error number

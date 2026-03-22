@@ -671,6 +671,10 @@ extern void fun_isalnum(char *buff, char **bufc, dbref player, dbref caller, dbr
 extern void fun_isnum(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_isdbref(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_isobjid(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
+extern bool colorstate_equal(const ColorState *a, const ColorState *b);
+extern void append_color_transition(const ColorState *from, const ColorState *to, ColorType type, char *buff, char **bufc);
+extern void emit_colored_range(const char *text, const ColorState *states, int start, int end, ColorState initial_state, ColorState final_state, ColorType type, char *buff, char **bufc);
+extern void consume_ansi_sequence_state(char **cursor, ColorState *state);
 extern void fun_null(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_squish(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);
 extern void fun_trim(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs);

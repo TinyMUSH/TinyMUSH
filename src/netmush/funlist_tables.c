@@ -47,32 +47,6 @@ static inline void copy_delim(Delim *dest, const Delim *src)
 
 
 /**
- * @brief Consume a single ANSI escape sequence and update a ColorState.
- *
- * Advances the input cursor past a single ANSI escape sequence if one is
- * present at the current position, updating the provided `ColorState` to
- * reflect the effect of that sequence. If no valid escape sequence is
- * recognized, the cursor is advanced by one byte to avoid stalling.
- *
- * @param cursor Pointer to the input cursor (will be advanced)
- * @param state Pointer to the current `ColorState` to update
- */
-static inline void consume_ansi_sequence_state(char **cursor, ColorState *state)
-{
-	const char *ptr = *cursor;
-
-	if (ansi_apply_sequence(&ptr, state))
-	{
-		*cursor = (char *)ptr;
-	}
-	else
-	{
-		++(*cursor);
-	}
-}
-
-
-/**
  * @brief Validate multiple delimiters for table functions
  *
  * @param buff Output buffer
