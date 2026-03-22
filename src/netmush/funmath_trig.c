@@ -156,7 +156,7 @@ void handle_trig(char *buff, char **bufc, dbref player, dbref caller, dbref caus
 }
 
 /**
- * @brief Convert a character to it's decimal value.
+ * @brief Convert a character to its decimal value.
  *
  * @param ch Character
  * @param base Base to convert from
@@ -193,7 +193,7 @@ int fromBaseX(char ch, int base)
 }
 
 /**
- * @brief Convert decival value to it's base X character representation
+ * @brief Convert decimal value to its base X character representation
  *
  * @param i Decimal value
  * @param base Base to convert to

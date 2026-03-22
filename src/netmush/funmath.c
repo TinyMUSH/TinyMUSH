@@ -1208,7 +1208,7 @@ void fun_bound(char *buff, char **bufc, dbref player, dbref caller, dbref cause,
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1250,7 +1250,7 @@ void fun_ladd(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -1296,7 +1296,7 @@ void fun_lmax(char *buff, char **bufc, dbref player, dbref caller, dbref cause, 
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void fun_lmin(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {

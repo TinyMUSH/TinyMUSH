@@ -79,7 +79,7 @@ void fun_t(char *buff, char **bufc, dbref player, dbref caller, dbref cause, cha
 }
 
 /**
- * @brief Convert differents values to Boolean.
+ * @brief Convert different values to Boolean.
  *
  * @param flag Calling function flags
  * @param str String to parse
@@ -107,7 +107,7 @@ bool cvtfun(int flag, char *str)
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
@@ -216,7 +216,7 @@ void handle_logic(char *buff, char **bufc, dbref player, dbref caller, dbref cau
  * @param fargs Function's arguments
  * @param nfargs Number of function's arguments
  * @param cargs Command's arguments
- * @param ncargs Nomber of command's arguments
+ * @param ncargs Number of command's arguments
  */
 void handle_listbool(char *buff, char **bufc, dbref player, dbref caller, dbref cause, char *fargs[], int nfargs, char *cargs[], int ncargs)
 {
