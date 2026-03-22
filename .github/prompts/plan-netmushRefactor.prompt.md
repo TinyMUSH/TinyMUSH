@@ -2,29 +2,24 @@
 
 Ce plan est base sur une analyse de tous les sources declares dans NETMUSH_SOURCES.
 
-- Total sources C analyses: 114
+- Total sources C analyses: 92
 - Sources > 1000 lignes: 31
-- Plus gros modules individuels: game.c (3915), ansi.c (3818), netcommon.c (3298), db_flatfile.c (2334), set.c (2020), command_admin.c (1996), create.c (1782), db_attributes.c (1713), walkdb.c (1703), funstring_format.c (1694), db_objects.c (1657)
-- Familles les plus volumineuses (somme par prefixe) a revalider en continu apres chaque extraction.
+- Plus gros modules individuels: funstring.c (4035), game.c (3915), ansi.c (3818), predicates.c (3689), netcommon.c (3298), look.c (3159), funmisc.c (2555), funmath.c (2357), db_flatfile.c (2334), object.c (2110), eval.c (2081)
+- Familles les plus volumineuses (somme par prefixe): db (7494), funvars (5755), funlist (4991), funobj (4566), command (4060), funstring (4035), bsd (2231), cque (2825)
 
 Objectif: modulariser sans changement de comportement observable, en priorisant la reduction des gros fichiers et la baisse du couplage progressif.
 
 ## Etat d avancement (2026-03-22)
 
-- Phase 1 avancee:
-	- funstring.c est sous 1000 lignes (971) avec modules funstring_check, funstring_search, funstring_format.
-	- funmisc.c est sous 1000 lignes.
-	- point restant majeur de la famille funstring: funstring_format.c (1694).
-- Phase 2 avancee:
-	- object.c est sous 1000 lignes (851) avec object_check.c (1120) et object_utils.c (202).
-	- predicates.c est sous 1000 lignes (642) avec predicates_eval.c (1352) et autres sous-modules.
-	- look.c a ete reduit (1391) mais reste >1000; look_content.c est aussi >1000 (1115).
-- eval deja partiellement module (eval_parse.c, eval_regs.c, eval_tcache.c, eval_gender.c), mais eval.c reste >1000 (1174).
+- Phase 1 entamee: `funstring.c` a deja ete decoupe (modules `funstring_check.c`, `funstring_search.c`, `funstring_format.c`) et le coordinateur principal est passe sous 1000 lignes.
+- Phase 2 entamee: extraction de helpers objets vers `object_utils.c`; `object.c` est passe sous 1000 lignes.
+- Phase 2 terminee: `look.c` decoupe en `look_pretty.c` (pairs_print, pretty_format, pretty_print) et est passe sous 1000 lignes (936).
+- `eval.c` est deja partiellement module (`eval_parse.c`, `eval_regs.c`, `eval_tcache.c`, `eval_gender.c`), mais `eval.c` reste >1000 lignes.
+- `funmath.c` decoupe en `funmath_compare.c` (comparaisons), `funmath_arith.c` (division/arithmetique), `funmath_bitwise.c` (operations bitwise); `funmath.c` est passe sous 1000 lignes (811).
 
 Prochaine etape naturelle:
-1. Continuer le decoupage du sous-systeme look pour faire passer look.c et look_content.c sous 1000 lignes.
-2. Traiter funmath.c (1333), puis eval.c (1174), en cycle court extraire -> compiler -> verifier.
-3. Reprioriser ensuite sur les plus gros modules runtime et stockage (game, ansi, netcommon, db_flatfile, set, command_admin).
+1. Continuer `eval.c` (la fonction `eval_expression_string` est trop grande pour une extraction directe; une cartographie fine des dependances est necessaire avant de commencer).
+2. Enchainer sur les autres cibles prioritaires > 1000 lignes: `game.c`, `ansi.c`, `predicates.c`, `netcommon.c`.
 
 Contraintes:
 1. Refactor strictement structurel: deplacement de code, extraction de helpers, renommage minimal, ajustement d API interne si necessaire.
@@ -42,10 +37,10 @@ Contraintes:
 
 ### Phase 1 - Cibles a fort ROI et risque modere
 Ordre recommande:
-1. funmath.c (1333)
-2. funstring_format.c (1694)
-3. funiter.c (1579)
-4. funlist.c (1174) et funlist_advanced.c (1253) en coherence avec les sous-modules deja presents
+1. funstring.c (4035) - DONE
+2. funmath.c (2357) - DONE: funmath_compare.c, funmath_arith.c, funmath_bitwise.c
+3. funmisc.c (2555)
+4. funlist.c (1186) en coherence avec ses sous-modules deja presents (funlist_edit, funlist_sort, funlist_sets, funlist_tables, funlist_advanced)
 
 Strategie:
 - Extraire par sous-domaines stables (validation, formatage, recherche, operations ANSI, operations numeriques, etc.).
@@ -54,12 +49,12 @@ Strategie:
 
 ### Phase 2 - Couche objets et etat
 Ordre recommande:
-1. look.c (1391)
-2. look_content.c (1115)
+1. object.c (2110) - DONE: object_utils.c
+2. predicates.c (3689)
 3. set.c (2020)
 4. create.c (1782)
 5. move.c (1135)
-6. predicates_eval.c (1352)
+6. look.c (3159) - DONE: look_pretty.c, look_content.c, look_scan.c
 
 Strategie:
 - Decoupage par responsabilite metier (resolution, permissions, mutation, presentation).
@@ -90,7 +85,7 @@ Strategie:
 
 ### Phase 5 - Noyau d evaluation (dernier)
 Ordre recommande:
-1. eval.c (1174)
+1. eval.c (2081) - partiellement module; eval_expression_string reste monolithique
 
 Strategie:
 - Cartographie explicite des dependances avant extraction.
@@ -116,37 +111,33 @@ Strategie:
 ## Cibles prioritaires (etat actuel)
 
 Top modules > 1000 lignes a traiter en priorite:
-1. src/netmush/game.c (3915)
-2. src/netmush/ansi.c (3818)
-3. src/netmush/netcommon.c (3298)
-4. src/netmush/db_flatfile.c (2334)
-5. src/netmush/set.c (2020)
-6. src/netmush/command_admin.c (1996)
-7. src/netmush/create.c (1782)
-8. src/netmush/db_attributes.c (1713)
-9. src/netmush/walkdb.c (1703)
-10. src/netmush/funstring_format.c (1694)
-11. src/netmush/db_objects.c (1657)
-12. src/netmush/funiter.c (1579)
-13. src/netmush/alloc.c (1548)
-14. src/netmush/log.c (1434)
-15. src/netmush/funvars_registers.c (1399)
-16. src/netmush/look.c (1391)
-17. src/netmush/command_core.c (1386)
-18. src/netmush/flags.c (1367)
-19. src/netmush/speech.c (1355)
-20. src/netmush/predicates_eval.c (1352)
-21. src/netmush/htab.c (1349)
-22. src/netmush/funmath.c (1333)
-23. src/netmush/funlist_advanced.c (1253)
-24. src/netmush/nametabs.c (1237)
-25. src/netmush/funlist.c (1174)
-26. src/netmush/eval.c (1174)
-27. src/netmush/move.c (1135)
-28. src/netmush/object_check.c (1120)
-29. src/netmush/look_content.c (1115)
-30. src/netmush/wild.c (1062)
-31. src/netmush/conf_core.c (1041)
+1. src/netmush/game.c
+2. src/netmush/ansi.c
+3. src/netmush/predicates.c
+4. src/netmush/netcommon.c
+5. src/netmush/funmisc.c
+6. src/netmush/db_flatfile.c
+7. src/netmush/eval.c
+8. src/netmush/set.c
+9. src/netmush/command_admin.c
+10. src/netmush/create.c
+11. src/netmush/db_attributes.c
+12. src/netmush/walkdb.c
+13. src/netmush/db_objects.c
+14. src/netmush/funiter.c
+15. src/netmush/alloc.c
+16. src/netmush/log.c
+17. src/netmush/funvars_registers.c
+18. src/netmush/command_core.c
+19. src/netmush/flags.c
+20. src/netmush/speech.c
+21. src/netmush/htab.c
+22. src/netmush/funlist_advanced.c
+23. src/netmush/nametabs.c
+24. src/netmush/funlist.c
+25. src/netmush/move.c
+26. src/netmush/wild.c
+27. src/netmush/conf_core.c
 
 ## Decisions
 - Prioriser par volume ET couplage, pas par taille seule.
