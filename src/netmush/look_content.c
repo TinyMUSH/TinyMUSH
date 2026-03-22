@@ -25,7 +25,7 @@ int did_attr(dbref player, dbref thing, int what)
 {
 	/*
 	 * If the attribute exists, get it, notify the player, return 1.
-	 * * If not, return 0.
+	 * If not, return 0.
 	 */
 	char *buff;
 	buff = master_attr(player, thing, what, NULL, 0, NULL);
