@@ -9,6 +9,17 @@ Ce plan est base sur une analyse de tous les sources declares dans NETMUSH_SOURC
 
 Objectif: modulariser sans changement de comportement observable, en priorisant la reduction des gros fichiers et la baisse du couplage progressif.
 
+## Etat d avancement (2026-03-22)
+
+- Phase 1 entamee: `funstring.c` a deja ete decoupe (modules `funstring_check.c`, `funstring_search.c`, `funstring_format.c`) et le coordinateur principal est passe sous 1000 lignes.
+- Phase 2 entamee: extraction de helpers objets vers `object_utils.c`; `object.c` est passe sous 1000 lignes.
+- Phase 2 en cours: extraction de rendu depuis `look.c` vers `look_content.c`; `look.c` est reduit mais reste >1000 lignes.
+- `eval.c` est deja partiellement module (`eval_parse.c`, `eval_regs.c`, `eval_tcache.c`, `eval_gender.c`), mais `eval.c` reste >1000 lignes.
+
+Prochaine etape naturelle:
+1. Continuer le decoupage de `look.c` (presentation/desc/dispatch) jusqu a passer sous 1000 lignes.
+2. Enchainer sur `funmath.c` puis `eval.c` avec le meme cycle court (extraire -> compiler -> verifier).
+
 Contraintes:
 1. Refactor strictement structurel: deplacement de code, extraction de helpers, renommage minimal, ajustement d API interne si necessaire.
 2. Maintenir les points d entree publics existants autant que possible.
