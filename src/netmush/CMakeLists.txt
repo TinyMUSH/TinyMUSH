@@ -23,7 +23,7 @@ set(NETMUSH_SOURCES
     create.c db_attributes.c db_filehelpers.c db_flatfile.c db_fwdlist.c 
     db_objects.c db_propdir.c db_serialization.c eval.c eval_gender.c eval_parse.c eval_regs.c eval_tcache.c externs.h file_c.c flags.c fnhelper.c 
     functions.c funext.c funiter.c funlist.c funlist_edit.c funlist_sort.c funlist_sets.c funlist_tables.c funlist_advanced.c funmath.c funmath_trig.c funmath_vector.c funmath_logic.c funmisc.c funmisc_action.c funmisc_time.c funobj.c funobj_locks.c funobj_flags.c funobj_attrs.c funobj_search.c funobj_speak.c 
-    funstring.c funstring_ansi.c funstring_crypto.c funstring_format.c funstring_search.c funstring_check.c funvars.c funvars_registers.c funvars_xvars.c funvars_struct_core.c funvars_struct_ops.c funvars_stacks.c funvars_regex.c funvars_grids.c game.c help.c htab.c log.c look.c macros.h match.c 
+    funstring.c funstring_ansi.c funstring_crypto.c funstring_format.c funstring_search.c funstring_check.c funvars.c funvars_registers.c funvars_xvars.c funvars_struct_core.c funvars_struct_ops.c funvars_stacks.c funvars_regex.c funvars_grids.c game.c help.c htab.c log.c look.c look_scan.c look_content.c macros.h match.c 
     mguests.c move.c nametabs.c netcommon.c object.c object_check.c player.c player_c.c 
     powers.c predicates.c predicates_commands.c predicates_eval.c predicates_locate.c predicates_prog.c prototypes.h quota.c rob.c set.c speech.c 
     string_util.c timer.c typedefs.h 
