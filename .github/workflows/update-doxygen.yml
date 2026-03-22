@@ -8,7 +8,7 @@ on:
       - 'docs/**'
       - 'README.md'
       - '.github/Doxyfile'
-      - '.github/workflows/Doxygen.yml'
+      - '.github/workflows/update-doxygen.yml'
   pull_request:
     branches: [ master ]
     paths:
@@ -16,19 +16,14 @@ on:
       - 'docs/**'
       - 'README.md'
       - '.github/Doxyfile'
-      - '.github/workflows/Doxygen.yml'
+      - '.github/workflows/update-doxygen.yml'
   workflow_dispatch:
 
 jobs:
-  docs:
+  build-docs:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: read
-      pages: write
-      id-token: write
 
     steps:
       - name: Checkout
@@ -48,26 +43,44 @@ jobs:
         run: mkdir -p build/docs/doxygen
 
       - name: Build documentation
-        run: doxygen .github/Doxyfile -v 2>&1
+        run: doxygen .github/Doxyfile
 
-      - name: Upload docs artifact (PRs)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Verify HTML output exists
+        run: test -d build/docs/doxygen/html
+
+      - name: Upload docs artifact
         uses: actions/upload-artifact@v4
         with:
           name: doxygen-html
           path: build/docs/doxygen/html
 
+  deploy-pages:
+    if: ${{ github.event_name == 'push' }}
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
       - name: Configure Pages
-        if: ${{ github.event_name == 'push' }}
         uses: actions/configure-pages@v5
 
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: doxygen-html
+          path: build/docs/doxygen/html
+
       - name: Upload Pages artifact
-        if: ${{ github.event_name == 'push' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/docs/doxygen/html
 
       - name: Deploy to Pages
-        if: ${{ github.event_name == 'push' }}
         id: deployment
         uses: actions/deploy-pages@v4
