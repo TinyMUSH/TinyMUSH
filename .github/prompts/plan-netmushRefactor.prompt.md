@@ -13,12 +13,13 @@ Objectif: modulariser sans changement de comportement observable, en priorisant 
 
 - Phase 1 entamee: `funstring.c` a deja ete decoupe (modules `funstring_check.c`, `funstring_search.c`, `funstring_format.c`) et le coordinateur principal est passe sous 1000 lignes.
 - Phase 2 entamee: extraction de helpers objets vers `object_utils.c`; `object.c` est passe sous 1000 lignes.
-- Phase 2 en cours: extraction de rendu depuis `look.c` vers `look_content.c`; `look.c` est reduit mais reste >1000 lignes.
+- Phase 2 terminee: `look.c` decoupe en `look_pretty.c` (pairs_print, pretty_format, pretty_print) et est passe sous 1000 lignes (936).
 - `eval.c` est deja partiellement module (`eval_parse.c`, `eval_regs.c`, `eval_tcache.c`, `eval_gender.c`), mais `eval.c` reste >1000 lignes.
+- `funmath.c` decoupe en `funmath_compare.c` (comparaisons), `funmath_arith.c` (division/arithmetique), `funmath_bitwise.c` (operations bitwise); `funmath.c` est passe sous 1000 lignes (811).
 
 Prochaine etape naturelle:
-1. Continuer le decoupage de `look.c` (presentation/desc/dispatch) jusqu a passer sous 1000 lignes.
-2. Enchainer sur `funmath.c` puis `eval.c` avec le meme cycle court (extraire -> compiler -> verifier).
+1. Continuer `eval.c` (la fonction `eval_expression_string` est trop grande pour une extraction directe; une cartographie fine des dependances est necessaire avant de commencer).
+2. Enchainer sur les autres cibles prioritaires > 1000 lignes: `game.c`, `ansi.c`, `predicates.c`, `netcommon.c`.
 
 Contraintes:
 1. Refactor strictement structurel: deplacement de code, extraction de helpers, renommage minimal, ajustement d API interne si necessaire.
@@ -36,8 +37,8 @@ Contraintes:
 
 ### Phase 1 - Cibles a fort ROI et risque modere
 Ordre recommande:
-1. funstring.c (4035)
-2. funmath.c (2357)
+1. funstring.c (4035) - DONE
+2. funmath.c (2357) - DONE: funmath_compare.c, funmath_arith.c, funmath_bitwise.c
 3. funmisc.c (2555)
 4. funlist.c (1186) en coherence avec ses sous-modules deja presents (funlist_edit, funlist_sort, funlist_sets, funlist_tables, funlist_advanced)
 
@@ -48,12 +49,12 @@ Strategie:
 
 ### Phase 2 - Couche objets et etat
 Ordre recommande:
-1. object.c (2110)
+1. object.c (2110) - DONE: object_utils.c
 2. predicates.c (3689)
 3. set.c (2020)
 4. create.c (1782)
 5. move.c (1135)
-6. look.c (3159)
+6. look.c (3159) - DONE: look_pretty.c, look_content.c, look_scan.c
 
 Strategie:
 - Decoupage par responsabilite metier (resolution, permissions, mutation, presentation).
@@ -84,7 +85,7 @@ Strategie:
 
 ### Phase 5 - Noyau d evaluation (dernier)
 Ordre recommande:
-1. eval.c (2081)
+1. eval.c (2081) - partiellement module; eval_expression_string reste monolithique
 
 Strategie:
 - Cartographie explicite des dependances avant extraction.
@@ -110,37 +111,33 @@ Strategie:
 ## Cibles prioritaires (etat actuel)
 
 Top modules > 1000 lignes a traiter en priorite:
-1. src/netmush/funstring.c
-2. src/netmush/game.c
-3. src/netmush/ansi.c
-4. src/netmush/predicates.c
-5. src/netmush/netcommon.c
-6. src/netmush/look.c
-7. src/netmush/funmisc.c
-8. src/netmush/funmath.c
-9. src/netmush/db_flatfile.c
-10. src/netmush/object.c
-11. src/netmush/eval.c
-12. src/netmush/set.c
-13. src/netmush/command_admin.c
-14. src/netmush/create.c
-15. src/netmush/db_attributes.c
-16. src/netmush/walkdb.c
-17. src/netmush/db_objects.c
-18. src/netmush/funiter.c
-19. src/netmush/alloc.c
-20. src/netmush/log.c
-21. src/netmush/funvars_registers.c
-22. src/netmush/command_core.c
-23. src/netmush/flags.c
-24. src/netmush/speech.c
-25. src/netmush/htab.c
-26. src/netmush/funlist_advanced.c
-27. src/netmush/nametabs.c
-28. src/netmush/funlist.c
-29. src/netmush/move.c
-30. src/netmush/wild.c
-31. src/netmush/conf_core.c
+1. src/netmush/game.c
+2. src/netmush/ansi.c
+3. src/netmush/predicates.c
+4. src/netmush/netcommon.c
+5. src/netmush/funmisc.c
+6. src/netmush/db_flatfile.c
+7. src/netmush/eval.c
+8. src/netmush/set.c
+9. src/netmush/command_admin.c
+10. src/netmush/create.c
+11. src/netmush/db_attributes.c
+12. src/netmush/walkdb.c
+13. src/netmush/db_objects.c
+14. src/netmush/funiter.c
+15. src/netmush/alloc.c
+16. src/netmush/log.c
+17. src/netmush/funvars_registers.c
+18. src/netmush/command_core.c
+19. src/netmush/flags.c
+20. src/netmush/speech.c
+21. src/netmush/htab.c
+22. src/netmush/funlist_advanced.c
+23. src/netmush/nametabs.c
+24. src/netmush/funlist.c
+25. src/netmush/move.c
+26. src/netmush/wild.c
+27. src/netmush/conf_core.c
 
 ## Decisions
 - Prioriser par volume ET couplage, pas par taille seule.
