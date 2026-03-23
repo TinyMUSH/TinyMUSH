@@ -9,7 +9,7 @@ Ce plan est base sur une analyse de tous les sources declares dans NETMUSH_SOURC
 
 Objectif: modulariser sans changement de comportement observable, en priorisant la reduction des gros fichiers et la baisse du couplage progressif.
 
-## Etat d avancement (2026-03-22)
+## Etat d avancement (2026-03-22) - MIS A JOUR
 
 - Validation branches: toutes les branches locales restantes (hors master et gh-pages) sont deja incluses dans origin/master.
 - Revalidation technique complete: ./rebuild.sh OK (build + redemarrage), avec un warning preexistant dans create.c sur const char * -> char *.
@@ -19,19 +19,22 @@ Objectif: modulariser sans changement de comportement observable, en priorisant 
   - funmisc.c est sous 1000 lignes (906).
   - funstring_format.c est passe sous 1000 lignes (596) via extraction de funstring_border.c (382) et funstring_align.c (760).
   - funiter.c est passe sous 1000 lignes (611) via extraction de funiter_apply.c (559) et funiter_compose.c (460).
-  - point restant de la famille funlist: funlist_advanced.c (1253), funlist.c (1174).
+  - funlist.c est passe sous 1000 lignes (978) via extraction de funlist_utils.c (218): autodetect_list, get_list_type, validate_list_args, dbnum.
+  - funlist_advanced.c est passe sous 1000 lignes (815) via extraction de funlist_filter.c (482): fun_elements, fun_exclude.
 - Phase 2 avancee:
   - object.c est sous 1000 lignes (851), avec object_utils.c (202) et object_check.c (1120).
   - predicates.c est sous 1000 lignes (642), avec predicates_eval.c (1352) et predicates_*.c.
   - look.c est passe sous 1000 lignes (936) avec look_pretty.c (485).
   - look_content.c est passe sous 1000 lignes (562) via extraction de look_sweep.c (313) et look_decomp.c (281).
 - Evaluation:
-  - eval.c est deja partiellement module (eval_parse.c, eval_regs.c, eval_tcache.c, eval_gender.c), mais eval.c reste a 1174 lignes.
+  - eval.c est passe sous 1000 lignes (714) via extraction de eval_subst.c (536): _eval_expand_percent() (handler de substitution %-).
+  - eval est maintenant totalement module: eval_parse.c, eval_regs.c, eval_tcache.c, eval_gender.c, eval_subst.c.
 
 Prochaine etape naturelle:
-1. Traiter eval.c (1174), en cycle court extraire -> compiler -> verifier.
-2. Traiter funlist_advanced.c (1253) et funlist.c (1174).
-3. Reprioriser ensuite sur les plus gros modules runtime/stockage: game.c (3915), ansi.c (3818), netcommon.c (3298), db_flatfile.c (2334), set.c (2020), command_admin.c (1996).
+1. Traiter set.c (2020) et create.c (1782) (Phase 2).
+2. Traiter db_flatfile.c (2334), db_attributes.c (1713), db_objects.c (1657), walkdb.c (1703) (Phase 3).
+3. Traiter game.c (3915), ansi.c (3818), netcommon.c (3298), command_admin.c (1996), command.c (4186) (Phase 4).
+4. Traiter les modules moyens restants: alloc.c (1548), log.c (1434), funvars_registers.c (1399), command_core.c (1386), flags.c (1367), speech.c (1355), predicates_eval.c (1352), htab.c (1349), nametabs.c (1237), move.c (1135), object_check.c (1120), wild.c (1062), conf_core.c (1041).
 
 Contraintes:
 1. Refactor strictement structurel: deplacement de code, extraction de helpers, renommage minimal, ajustement d API interne si necessaire.
@@ -51,8 +54,8 @@ Contraintes:
 Ordre recommande:
 1. ~~funstring_format.c (1694)~~ DONE → funstring_format.c (596) + funstring_border.c (394) + funstring_align.c (760)
 2. ~~funiter.c (1579)~~ DONE → funiter.c (611) + funiter_apply.c (559) + funiter_compose.c (460)
-3. funlist.c (1174)
-4. funlist_advanced.c (1253)
+3. ~~funlist.c (1174)~~ DONE → funlist.c (978) + funlist_utils.c (218)
+4. ~~funlist_advanced.c (1253)~~ DONE → funlist_advanced.c (815) + funlist_filter.c (482)
 
 Strategie:
 - Extraire par sous-domaines stables (validation, formatage, recherche, operations ANSI, operations numeriques, etc.).
@@ -97,7 +100,8 @@ Strategie:
 
 ### Phase 5 - Noyau d evaluation (dernier)
 Ordre recommande:
-1. eval.c (1174)
+1. ~~eval.c (1174)~~ DONE → eval.c (714) + eval_subst.c (536)
+   eval est maintenant totalement module: eval_parse.c, eval_regs.c, eval_tcache.c, eval_gender.c, eval_subst.c.
 
 Strategie:
 - Cartographie explicite des dependances avant extraction.
@@ -123,38 +127,40 @@ Strategie:
 ## Cibles prioritaires (etat actuel)
 
 Top modules > 1000 lignes a traiter en priorite:
-1. src/netmush/game.c (3915)
-2. src/netmush/ansi.c (3818)
-3. src/netmush/netcommon.c (3298)
-4. src/netmush/db_flatfile.c (2334)
-5. src/netmush/set.c (2020)
-6. src/netmush/command_admin.c (1996)
-7. src/netmush/create.c (1782)
-8. src/netmush/db_attributes.c (1713)
-9. src/netmush/walkdb.c (1703)
-10. src/netmush/db_objects.c (1657)
-11. src/netmush/alloc.c (1548)
-12. src/netmush/log.c (1434)
-13. src/netmush/funvars_registers.c (1399)
-14. src/netmush/command_core.c (1386)
-15. src/netmush/flags.c (1367)
-16. src/netmush/speech.c (1355)
-17. src/netmush/predicates_eval.c (1352)
-18. src/netmush/htab.c (1349)
-19. src/netmush/funlist_advanced.c (1253)
+1. src/netmush/command.c (4186)
+2. src/netmush/game.c (3915)
+3. src/netmush/ansi.c (3818)
+4. src/netmush/netcommon.c (3298)
+5. src/netmush/db_flatfile.c (2334)
+6. src/netmush/set.c (2020)
+7. src/netmush/command_admin.c (1996)
+8. src/netmush/create.c (1782)
+9. src/netmush/db_attributes.c (1713)
+10. src/netmush/walkdb.c (1703)
+11. src/netmush/db_objects.c (1657)
+12. src/netmush/alloc.c (1548)
+13. src/netmush/log.c (1434)
+14. src/netmush/funvars_registers.c (1399)
+15. src/netmush/command_core.c (1386)
+16. src/netmush/flags.c (1367)
+17. src/netmush/speech.c (1355)
+18. src/netmush/predicates_eval.c (1352)
+19. src/netmush/htab.c (1349)
 20. src/netmush/nametabs.c (1237)
-21. src/netmush/funlist.c (1174)
-22. src/netmush/eval.c (1174)
-23. src/netmush/move.c (1135)
-24. src/netmush/object_check.c (1120)
-25. src/netmush/wild.c (1062)
-26. src/netmush/conf_core.c (1041)
+21. src/netmush/move.c (1135)
+22. src/netmush/object_check.c (1120)
+23. src/netmush/wild.c (1062)
+24. src/netmush/db_backend_gdbm.c (1056)
+25. src/netmush/conf_core.c (1041)
 
 Modules recemment reduits (< 1000 lignes):
 - funstring_format.c: 1694 → 596 (+ funstring_border.c 382, funstring_align.c 760)
 - look_content.c: 1115 → 562 (+ look_sweep.c 313, look_decomp.c 281)
 - funiter.c: 1579 → 611 (+ funiter_apply.c 559, funiter_compose.c 460)
 - funmath.c: 1333 → 811 (+ funmath_compare.c 174, funmath_arith.c 305, funmath_bitwise.c 122)
+- funlist.c: 1174 → 978 (+ funlist_utils.c 218)
+- funlist_advanced.c: 1253 → 815 (+ funlist_filter.c 482)
+- eval.c: 1174 → 714 (+ eval_subst.c 536)
 
 ## Decisions
 - Prioriser par volume ET couplage, pas par taille seule.
