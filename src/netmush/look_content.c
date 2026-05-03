@@ -133,6 +133,7 @@ void look_exits(dbref player, dbref loc, const char *exit_name)
 				{
 					e = buff;
 					safe_exit_name(thing, buff, &e);
+					*e = '\0';
 
 					if (Location(thing) == NOTHING)
 					{
