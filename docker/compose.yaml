@@ -1,0 +1,32 @@
+services:
+  tinymush:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tinymush4
+    container_name: tinymush4
+
+    # set these defaults to the UID and GID specified in the Dockerfile.
+    # run it as my user, or if one is specified
+    user: "${UID:-1000}:${GID:-1000}"
+
+    # prevent privilege escalation
+    security_opt:
+      - no-new-privileges:true
+
+    # drop all capabilities for improved security
+    cap_drop:
+      - ALL
+
+    ports:
+      - 6250:6250
+
+    volumes:
+      - ./data/db:/app/game/db
+      - ./data/logs:/app/game/logs
+      - ./data/backups:/app/game/backups
+      - ./data/configs:/app/game/configs
+      - ./data/docs:/app/game/docs
+
+    # we don't try automatically restarting after a @shutdown
+    #restart: unless-stopped
